@@ -153,15 +153,21 @@ export function glint(rAU, f, S, satArea, nSats) {
 // Vision
 // ---------------------------------------------------------------------------
 /**
- * Eye adaptation: display value = L · k · L_a^(q−1), where L_a is the field-average luminance the eye
- * adapts to. q < 1 means brighter scenes still look brighter, as they do: the visual system compresses
- * the 6.5 decades from a moonless night to an overcast day into about 1.5 decades of display brightness
- * (adapted brightness grows slowly with luminance: Stevens & Stevens 1963; Ferwerda et al. 1996).
- * Calibrated so a 21.8 mag/arcsec² sky reads as near-black, a full-Moon-level sky as dark grey,
- * and a 1,000-lux sky as a dull overcast day.
+ * Eye adaptation. The display value of a surface at the adaptation luminance L_a follows a Naka–Rushton
+ * photoreceptor response, R = R_max · L_a^n / (L_a^n + σ^n) (Naka & Rushton 1966; used for night
+ * rendering by Pattanaik et al. 1998 and Reinhard et al. 2002). Around that level, contrasts are kept
+ * but compressed with exponent γ (local adaptation): display(L) = R(L_a) · (L / L_a)^γ.
+ * Calibrated so a 21.8 mag/arcsec² sky reads as near-black, a full-Moon-bright landscape as dark grey
+ * you can still see, and a 1,000-lux sky as a dull overcast day.
  */
-export const EYE = { k: 0.08, q: 0.227 };
-export function eyeExposure(La) { return EYE.k * Math.max(La, 1e-6) ** (EYE.q - 1); }
+export const EYE = { rMax: 0.42, n: 0.4, sigma: 1.0, gamma: 0.75 };
+export function eyeResponse(La) {
+  const x = Math.max(La, 1e-9) ** EYE.n;
+  return (EYE.rMax * x) / (x + EYE.sigma ** EYE.n);
+}
+export function toDisplay(L, La) {
+  return eyeResponse(La) * (Math.max(L, 0) / La) ** EYE.gamma;
+}
 
 /** Colour temperature from B−V (Ballesteros 2012, EPL 97, 34008). */
 export function bvToTemp(bv) {

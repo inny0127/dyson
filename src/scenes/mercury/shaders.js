@@ -54,9 +54,7 @@ uniform vec3 uCut0, uCut1, uCut2;
 uniform float uCutOn;
 uniform float uRkm, uTexelAng;
 uniform float uRelief;          // remaining natural relief (0..1)
-uniform float uStripKm;         // depth removed everywhere (km), 0 until the whole surface is mined
-uniform float uCrustKm;
-uniform float uCoreBare;        // 0..1
+uniform float uLayer;           // exposed layer where strip-mined: 0 crust, 1 mantle, 2 core
 uniform vec3 uSite[NS];
 uniform float uFill[NS];
 uniform float uThIn[NS];
@@ -64,9 +62,9 @@ uniform float uThMax[NS];
 uniform float uArea[NS];
 uniform float uMineShare;
 uniform float uPVAlb;
-uniform float uTind;            // K, industrial waste-heat temperature over the footprint
+uniform float uTrad;            // K, night-side radiators that shed the industry's waste heat
 uniform float uEps;
-uniform float uThermal, uTss, uTnight, uTlo, uThi, uExpo;
+uniform float uThermal, uTss, uTnight, uTlo, uThi;
 uniform vec3 C_REG, C_HRP, C_LRM, C_FRESH, C_MINE, C_MANTLE, C_IRON;
 
 ${NOISE_GLSL}
@@ -143,8 +141,7 @@ void main(){
   // ---- industry ----
   vec4 ind = industry(pb);
   // strip mines: fresh crust, then mantle, then iron core as the planet shrinks
-  vec3 rock = mix(C_MINE, C_MANTLE, smoothstep(uCrustKm * 0.8, uCrustKm * 1.2, uStripKm));
-  rock = mix(rock, C_IRON, uCoreBare);
+  vec3 rock = uLayer < 0.5 ? C_MINE : (uLayer < 1.5 ? C_MANTLE : C_IRON);
   float bench = aaNoise(vec3(ind.z * 1400.0, 0.0, ind.w), 1.0, fwidth(ind.z) * 1400.0);
   vec3 mineCol = rock * (0.85 + 0.3 * bench) * (0.9 + 0.2 * det);
   // PV fields: rows of dark panels with bright service gaps
@@ -181,8 +178,10 @@ void main(){
   float lon = atan(-wp.z, wp.x);                       // 0 at noon, +pi/2 at dusk
   float sinceDusk = mod(lon - 1.5707963 + 6.2831853, 6.2831853);
   float tn = uTnight * (1.0 + 0.45 * exp(-sinceDusk / 0.35));
+  // radiators work on the night side only; their flux varies from field to field (mean 1)
+  float night = 1.0 - smoothstep(-0.12, 0.02, dot(m, uSun));
   float mott = 0.45 + 1.1 * (vnoise(pb * 7.0 + ind.w) * 0.7 + vnoise(pb * 23.0) * 0.3);
-  float ti = uTind * ind.x * pow(mott, 0.25);
+  float ti = uTrad * ind.x * night * pow(mott, 0.25);
   float T = pow(pow(uTss, 4.0) * cz + pow(tn, 4.0) + pow(ti, 4.0), 0.25);
 
   if (uThermal > 0.5) {
@@ -216,7 +215,7 @@ uniform float uR;             // current radius, scene units
 uniform float uKmPerUnit;
 uniform float uR0km, uRcoreKm, uCrustKm;
 uniform float uComp;          // undo auto-exposure: the cutaway is an illustration
-uniform float uThermal, uTlo, uThi, uExpo;
+uniform float uThermal, uTlo, uThi;
 uniform vec4 uTprof;          // surface K, lid base K, lid depth km, mantle base K
 uniform vec2 uTcore;          // core top K, centre K
 uniform vec3 C_CRUST, C_MANTLE, C_CORE;

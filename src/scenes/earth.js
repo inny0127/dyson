@@ -61,7 +61,7 @@ export default function create(ctx) {
     uInvT: { value: inv.lut }, uLmax: { value: inv.Lmax },
     uTau0: { value: SP.IR_ATM.tauZenith }, uBair: { value: bAir },
     uTmax: { value: SP.IR_ATM.tMax },
-    uExp: { value: 100 }, uMode: { value: 0 },
+    uResp: { value: 0.02 }, uLa: { value: 3e-4 }, uGamma: { value: SP.EYE.gamma }, uMode: { value: 0 },
     // sky
     uMW: { value: 1.5 }, uGal: { value: galM },   // Sagittarius star clouds ≈2–3× the natural sky background (≈20.5 vs 21.8 mag/arcsec²)
     uSwCol: { value: new THREE.Vector3(...swCol) }, uGlintCol: { value: new THREE.Vector3(...glCol) },
@@ -372,7 +372,7 @@ export default function create(ctx) {
 
   function hudHTML() {
     const t = D;
-    const parts = [`<div style="width:${HUD_W}px;white-space:normal">`,
+    const parts = [`<div style="width:${HUD_W}px;white-space:normal;background:rgba(6,8,12,.62);margin:-2px -5px;padding:5px 7px 7px;border-radius:3px">`,
       `<div style="font-size:10px;letter-spacing:.12em;color:var(--muted)">MIDNIGHT · 40°N · JUNE · YEAR ${fmtYear(t.year)}</div>`];
     if (t.ext) {
       parts.push(row('Light on the ground', `${fmtLux(t.eGround)} lux`, t.eGround > 1 ? 'var(--sun)' : 'var(--fg)'));
@@ -455,14 +455,16 @@ export default function create(ctx) {
 
       // eye adaptation (fast, for the slider; the real eye takes minutes)
       logLa += (targetLogLa - logLa) * (1 - Math.exp(-dt / 0.25));
-      U.uExp.value = SP.eyeExposure(Math.exp(logLa));
+      U.uLa.value = Math.exp(logLa);
+      U.uResp.value = SP.eyeResponse(U.uLa.value);
       api.bloom = D.thermal ? 0 : 0.35;
 
       // airlight colour for distant hills = sky near the horizon
       if (!D.thermal) {
         const Lh = SP.naturalSkyLum(2 * DEG), g = D.gain * D.Ldiff;
         const L = purkinjeJS([Lh * natCol[0] + g * swCol[0], Lh * natCol[1] + g * swCol[1], Lh * natCol[2] + g * swCol[2]]);
-        U.uFogCol.value.set(L[0] * U.uExp.value, L[1] * U.uExp.value, L[2] * U.uExp.value);
+        const Y = 0.2126 * L[0] + 0.7152 * L[1] + 0.0722 * L[2], k = SP.toDisplay(Y, U.uLa.value) / Y;
+        U.uFogCol.value.set(L[0] * k, L[1] * k, L[2] * k);
       }
 
       // --- labels ---
@@ -474,7 +476,7 @@ export default function create(ctx) {
         const th = D.g.theta / DEG;
         const pos = tmpV.copy(dirFromAzAlt(180 + 0.8 * th + 0.6, antiAlt / DEG + 0.8 * th + 0.4)).multiplyScalar(100).add(camera.position);
         labels.put('earth-glint', pos,
-          `Glint off sun-facing panels${D.exaggerate && D.gain > 1.01 ? ' (enlarged)' : ''}<small>antisolar point · ${(D.g.fwhm / DEG).toFixed(1)}° across at half brightness · peak ${sci(D.g.L0 * antiExt, 2)} cd/m²</small>`, 'sun');
+          `Glint off sun-facing panels${D.exaggerate && D.gain > 1.01 ? ' (enlarged)' : ''}<small>antisolar point · ${(D.g.fwhm / DEG).toFixed(1)}° wide at half max</small><small>peak ${sci(D.g.L0 * antiExt, 2)} cd/m² · ${sci(D.glintContrast, 2)}× the sky</small>`, 'sun');
       }
       if (!D.thermal) {
         for (const [i, name] of namedIdx) {
@@ -495,45 +497,48 @@ export default function create(ctx) {
     const hint = 'Drag to look around, scroll to zoom. Thermal IR shows the 8–14 µm sky. Enlarged multiplies the swarm’s light so you can see where it comes from.';
     const fin = t.fin;
     const finTRad = SP.T_RADIATING_NOW + SP.dTRadiating(t.finForcing);
-    const heatNow = `Earth already absorbs <span class="num${Math.abs(t.forcing) >= 1 ? ' hot' : ''}">${signed(t.forcing)} W/m²</span> extra (${sci(Math.abs(t.forcing) / EARTH.co2DoublingForcing, 2)}× a CO₂ doubling).`;
-    const heatFin = `Finished swarm (year ${fmtYear(t.yFull)}): <span class="num hot">${signed(t.finForcing, 3)} W/m²</span>, Earth radiating at <span class="num hot">${Math.round(finTRad)} K</span> instead of ${EARTH.tEff} K and absorbing ${Math.round(fin.absorbed)} W/m²${fin.runaway ? `, past the ≈${EARTH.runawayAbsorbedLimit} W/m² at which the oceans run away (Goldblatt et al. 2013)` : ''}.`;
+    const num = (v, hot) => `<span class="num${hot ? ' hot' : ''}">${v}</span>`;
+    const nStr = n => n.toLocaleString('en-US');
+    const heat = `<p>Heat: ${num(`${signed(t.forcing)} W/m²`, Math.abs(t.forcing) >= 1)} extra on Earth now (${sci(Math.abs(t.forcing) / EARTH.co2DoublingForcing, 2)}× a CO₂ doubling). ` +
+      `Finished (year ${fmtYear(t.yFull)}): ${num(`${signed(t.finForcing, 3)} W/m²`, true)}; Earth radiates at ${num(`${Math.round(finTRad)} K`, true)} instead of ${EARTH.tEff} K` +
+      `${fin.runaway ? ` and absorbs ${Math.round(fin.absorbed)} W/m², past the ≈${EARTH.runawayAbsorbedLimit} W/m² runaway-greenhouse limit (Goldblatt et al. 2013)` : ''}.</p>`;
 
     if (!t.ext) {
       return {
         eyebrow, hint,
         title: 'The night stays dark. The heat comes anyway.',
-        body: `<p>This swarm orbits at <span class="num">${t.rAU.toFixed(2)} AU</span>, inside Earth’s orbit. Its sunlit faces point at the Sun, away from us, so midnight is unchanged: <span class="num">${natural.n.toLocaleString('en-US')}</span> stars.</p>` +
-          `<p>By day it blocks <span class="num${t.e.dimming > 0.01 ? ' hot' : ''}">${pct(t.e.dimming, 2)}</span> of the Sun unless it keeps the Sun–Earth line clear, and every watt it captures still leaves as heat that flows outward past Earth. ${heatNow}</p><p>${heatFin}</p>`,
+        body: `<p>This swarm orbits at ${num(`${t.rAU.toFixed(2)} AU`)}, inside Earth’s orbit. Its lit faces point at the Sun, away from us: midnight is unchanged, ${num(nStr(natural.n))} stars.</p>` +
+          `<p>By day it blocks ${num(pct(t.e.dimming, 2), t.e.dimming > 0.01)} of the Sun unless it keeps the Sun–Earth line clear, and every watt it captures leaves as heat that still flows outward past Earth.</p>${heat}`,
       };
     }
 
-    let title, p1;
     const nVis = t.vis.n, n0 = natural.n;
-    const glintTxt = t.g ? `Flat panels aimed at the Sun mirror ${(SP.GLINT.rSpecular * 100).toFixed(0)}% of it straight back: a glow <span class="num">${(t.g.fwhm / DEG).toFixed(1)}°</span> across (half brightness) around the antisolar point, <span class="num">${sci(t.glintContrast, 2)}×</span> the sky around it. Each panel in it is only magnitude ${t.g.satMag.toFixed(1)}; ${sci(t.g.satsInPatch, 2)} of them blur into one patch.` : '';
+    const mwContrast = (U.uMW.value * 2 * SP.magToLum(SP.NIGHT.zenithMag)) / t.zenithL;
+    const mw = mwContrast < 0.08 ? 'the Milky Way is gone' : mwContrast < 1 ? 'the Milky Way is fading' : 'the Milky Way still shows';
+    const g = t.g;
+    const glintFull = g ? `Flat panels aimed at the Sun mirror ${(SP.GLINT.rSpecular * 100).toFixed(0)}% of it straight back toward the Sun, and Earth sits in that beam: a glow ${num(`${(g.fwhm / DEG).toFixed(1)}°`)} wide around the antisolar point, ${num(`${sci(t.glintContrast, 2)}×`)} the sky beside it. Each panel in it is magnitude ${g.satMag.toFixed(1)}, far too faint to see alone; ${sci(g.satsInPatch, 2)} of them blur into one patch.` : '';
+    let title, p1, p2 = '';
     if (t.eGround >= SP.LUX.overcastDay) {
       title = 'Night never falls';
-      p1 = `At midnight the ground gets <span class="num hot">${fmtLux(t.eGround)} lux</span> — ${luxComparison(t.eGround)} — from sunlight scattered and mirrored back by the panels around the sky. The stars went out in year ${fmtYear(ev.starsOut)}.`;
+      p1 = `At midnight the ground gets ${num(`${fmtLux(t.eGround)} lux`, true)}, ${luxComparison(t.eGround)}: ${fmtLux(t.e.nightLux)} lux scattered off the panels’ inner faces and ${fmtLux(t.eGlintH)} lux mirrored back from around the antisolar point. The stars went out in year ${fmtYear(ev.starsOut)}.`;
     } else if (nVis === 0) {
       title = `The stars went out in year ${fmtYear(ev.starsOut)}`;
-      p1 = `No star outshines a sky of <span class="num">${sci(t.zenithL, 2)} cd/m²</span>. The ground gets <span class="num hot">${fmtLux(t.eGround)} lux</span> at midnight: ${luxComparison(t.eGround)}. Overcast-daylight levels in year ${fmtYear(ev.overcast)}.`;
+      p1 = `No star outshines a sky of ${num(`${sci(t.zenithL, 2)} cd/m²`)}. At midnight the ground gets ${num(`${fmtLux(t.eGround)} lux`, true)}, ${luxComparison(t.eGround)}. It reaches overcast-daylight levels in year ${fmtYear(ev.overcast)}.`;
     } else if (t.mlimZ < 3) {
       title = 'Only the brightest stars are left';
-      p1 = `The sky glows at <span class="num">${t.skyMag.toFixed(1)} mag/arcsec²</span> (natural: ${SP.NIGHT.zenithMag}). The faintest star overhead is magnitude <span class="num">${t.mlimZ.toFixed(1)}</span>: <span class="num hot">${nVis.toLocaleString('en-US')}</span> of ${n0.toLocaleString('en-US')} stars remain. Ground: ${fmtLux(t.eGround)} lux, ${luxComparison(t.eGround)}. All gone by year ${fmtYear(ev.starsOut)}.`;
+      p1 = `The sky glows at ${num(`${t.skyMag.toFixed(1)} mag/arcsec²`)} (natural ${SP.NIGHT.zenithMag}). The faintest star overhead is magnitude ${num(t.mlimZ.toFixed(1))}: ${num(nStr(nVis), true)} of ${nStr(n0)} stars remain. The ground gets ${fmtLux(t.eGround)} lux, ${luxComparison(t.eGround)}. All gone by year ${fmtYear(ev.starsOut)}.`;
     } else if (t.mlimZ <= SP.limitingMag(SP.NIGHT.zenithMag) - 0.5) {
       title = 'The faint stars go first';
-      p1 = `Sunlight scattered off the panels’ inner faces now brightens the whole sky to <span class="num">${t.skyMag.toFixed(1)} mag/arcsec²</span>. Faintest star overhead: magnitude <span class="num">${t.mlimZ.toFixed(1)}</span>, <span class="num hot">${nVis.toLocaleString('en-US')}</span> of ${n0.toLocaleString('en-US')} stars left. The Milky Way is gone. Every star is gone by year ${fmtYear(ev.starsOut)}.`;
+      p1 = `Sunlight scattered off the panels’ inner faces brightens the whole sky to ${num(`${t.skyMag.toFixed(1)} mag/arcsec²`)} (natural ${SP.NIGHT.zenithMag}). The faintest star overhead is magnitude ${num(t.mlimZ.toFixed(1))}: ${num(nStr(nVis), true)} of ${nStr(n0)} stars are left and ${mw}. All are gone by year ${fmtYear(ev.starsOut)}.`;
+      if (g) p2 = `<p>The glint around the antisolar point is now ${sci(t.glintContrast, 2)}× its surroundings.</p>`;
     } else if (t.glintContrast >= SP.GLINT.visibleContrast) {
       title = 'A new glow at midnight';
-      p1 = `${glintTxt} The rest of the sky is still dark: faint stars start to fade in year ${fmtYear(ev.fading)}.`;
+      p1 = `${glintFull} Faint stars start to fade in year ${fmtYear(ev.fading)}.`;
     } else {
       title = `Nothing visible yet — but Earth already gains ${signed(t.forcing)} W/m²`;
-      p1 = `At year ${fmtYear(t.year)} the panels cover <span class="num">${pct(t.f, 2)}</span> of the sky and add <span class="num">${fmtLux(t.e.nightLux)} lux</span> to the night (a moonless night is 0.002). Their glint at the antisolar point is ${sci(t.glintContrast, 2)}× the background; it becomes visible in year ${fmtYear(ev.glint)}, the stars start to fade in year ${fmtYear(ev.fading)}.`;
+      p1 = `Panels cover ${num(pct(t.f, 2))} of the sky. They add ${num(`${fmtLux(t.e.nightLux)} lux`)} to a night that has 0.002, and their glint is ${pct(t.glintContrast, 2)} of the background. It becomes visible in year ${fmtYear(ev.glint)}; stars start fading in year ${fmtYear(ev.fading)}.`;
     }
-    const p2 = (nVis > 0 && t.glintContrast >= SP.GLINT.visibleContrast && title !== 'A new glow at midnight') ? `<p>${glintTxt}</p>` : '';
-    return {
-      eyebrow, title, hint,
-      body: `<p>${p1}</p>${p2}<p>${heatNow} ${heatFin}</p>`,
-    };
+    return { eyebrow, title, hint, body: `<p>${p1}</p>${p2}${heat}` };
   }
 
   window.__earth = { U, look, get D() { return D; } };

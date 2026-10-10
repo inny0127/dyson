@@ -8,6 +8,14 @@ export const COMMON = /* glsl */ `
 const vec3 LUMW = vec3(0.2126, 0.7152, 0.0722);
 float log10f(float x) { return log(max(x, 1e-30)) * 0.4342944819; }
 
+// Eye adaptation: display = R(La) · (L / La)^γ, applied to luminance with chroma kept.
+uniform float uResp, uLa, uGamma;
+float dispY(float Y) { return uResp * pow(max(Y, 0.0) / uLa, uGamma); }
+vec3 toDisplay(vec3 L) {
+  float Y = max(dot(L, LUMW), 1e-30);
+  return L * (dispY(Y) / Y);
+}
+
 // Rod vision: below ~0.003 cd/m² colour is gone and the world reads as a slightly blue grey
 // (Purkinje shift; blue tint as in Jensen et al. 2000, "A spatial post-processing algorithm for images
 // of night scenes"). Full colour above ~1 cd/m² (CIE 191:2010 mesopic range 0.005–5 cd/m²).
@@ -105,7 +113,7 @@ void main() {
 export const SKY_FRAG = /* glsl */ `
 ${COMMON}
 varying vec3 vDir;
-uniform float uExp, uMode, uMW;
+uniform float uMode, uMW;
 uniform mat3 uGal;
 uniform vec3 uSwCol, uGlintCol, uNatCol;
 // thermal
@@ -142,7 +150,7 @@ void main() {
     float nat = naturalSky(altC) + uMW * uLnatZ * milkyWay(uGal * d) * ext;
     vec3 L = nat * uNatCol + uGain * (uLdiff * uSwCol + glintAt(d, altC) * uGlintCol);
     L = purkinje(L);
-    gl_FragColor = vec4(min(L * uExp, vec3(14.0)), 1.0);
+    gl_FragColor = vec4(min(toDisplay(L), vec3(14.0)), 1.0);
   } else {
     float Lsw = uLswIR;
     if (uInterior > 0.5) {
@@ -161,7 +169,7 @@ export const STAR_VERT = /* glsl */ `
 ${COMMON}
 attribute float aMag, aSeed;
 attribute vec3 aCol;
-uniform float uExp, uPxRatio, uTime, uShow, uSigmaPx, uPsfSr;
+uniform float uPxRatio, uTime, uShow, uSigmaPx, uPsfSr;
 varying vec3 vCol;
 varying float vPeak, vSigma, vSize;
 void main() {
@@ -179,17 +187,20 @@ void main() {
   // Physical flux E = 2.54e-6 lux · 10^(-0.4 m) spread over the eye's blur (a Gaussian of solid angle
   // uPsfSr), shown as a point of fixed pixel size so zooming does not change star brightness.
   float E = 2.54e-6 * pow(10.0, -0.4 * mobs);
-  float peak = E / uPsfSr * uExp;
+  // Star increment over its sky at the current adaptation, kept linear (point sources are not
+  // compressed the way extended surfaces are): R(La) · (E/Ω_psf) / La.
+  float peak = uResp * (E / uPsfSr) / uLa;
   // Scintillation, stronger near the horizon.
   float tw = 1.0 + (0.05 + 0.3 * smoothstep(1.5, 6.0, X)) * sin(uTime * (9.0 + 7.0 * aSeed) + aSeed * 40.0) * sin(uTime * 3.1 + aSeed * 17.0);
   // Fade in over the last 0.6 mag above the limit, so stars vanish smoothly as the sky brightens.
   peak *= smoothstep(0.0, 0.24, s) * tw;
   peak = min(peak, 40.0);
-  float sigma = uSigmaPx * uPxRatio;
+  // Bright stars look bigger (glare in the eye), not just brighter.
+  float sigma = uSigmaPx * uPxRatio * (1.0 + 0.3 * log(1.0 + peak) / log(10.0));
   vPeak = peak;
   vSigma = sigma;
   // Colour shows only for bright stars (cones need ~mag 1–2 point sources at night).
-  float sat = smoothstep(2.6, -0.2, mobs) * 0.9;
+  float sat = smoothstep(3.2, 0.5, mobs) * 0.9;
   float Y = dot(aCol, LUMW);
   vCol = mix(vec3(1.0), aCol / max(Y, 1e-3), sat);
   float r = sigma * sqrt(2.0 * log(max(peak / 0.004, 1.0001)));
@@ -226,7 +237,7 @@ export const LAND_FRAG = /* glsl */ `
 ${COMMON}
 varying vec3 vAlb, vN, vW;
 varying float vEps;
-uniform float uExp, uMode, uFogK;
+uniform float uMode, uFogK;
 uniform vec3 uSkyE, uGlintE, uFogCol, uCamPos;
 // thermal
 uniform float uTground, uRadK, uTskyHemi, uLswIR, uInterior;
@@ -241,7 +252,7 @@ void main() {
     E += uSkyE * 0.15 * (0.5 - 0.5 * n.y);
     vec3 L = vAlb * E / PI;
     L = purkinje(L);
-    vec3 c = L * uExp;
+    vec3 c = toDisplay(L);
     float fog = 1.0 - exp(-uFogK * dist);
     c = mix(c, uFogCol, fog);
     gl_FragColor = vec4(c, 1.0);
