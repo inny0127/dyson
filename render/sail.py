@@ -140,11 +140,11 @@ def simple_material(name, spec):
 # Film material (front + back in one, chosen by Backfacing)
 # ---------------------------------------------------------------------------------------------
 
-def film_material(spec, seed=1):
+def film_material(spec, seed=1, pitch=None, lanes=False):
     M = spec['materials']
     parts = spec['parts']
     seg = spec['sail']['segmentation']
-    pitch_tile = parts['tile_grid_front']['dims_m']['pitch']           # 25.4 mm
+    pitch_tile = pitch or parts['tile_grid_front']['dims_m']['pitch']  # 25.4 mm (2026 spec) or from the model
     scribe_w = parts['tile_grid_front']['dims_m']['scribe_width']
     hinge_p = seg['fold_panel_width_m']                                # 1.6256 m
     hinge_w = seg['hinge_strips']['width_m']                           # 25.4 mm
@@ -225,6 +225,11 @@ def film_material(spec, seed=1):
     back = g.node('ShaderNodeBsdfPrincipled')
     bcol = g.mix_rgb(chip, (*be['base_color_linear'], 1), (*ch['base_color_linear'], 1))
     bcol = g.mix_rgb(hinge, bcol, (*hs['base_color_linear'], 1))
+    if lanes:
+        lx, _, _ = g.stripe(x, 2.0, 1.0, 0.008)
+        ly, _, _ = g.stripe(y, 2.0, 1.0, 0.008)
+        lane = g.math('MINIMUM', g.math('ADD', lx, ly), 1.0)
+        bcol = g.mix_rgb(lane, bcol, (0.075, 0.07, 0.064, 1))
     g.L.new(bcol, back.inputs['Base Color'])
     g.set(back.inputs['Roughness'], g.mix_f(chip, be['roughness'], ch['roughness']))
     back.inputs['Specular IOR Level'].default_value = be.get('specular_ior_level', 0.5)
@@ -265,10 +270,10 @@ def vane_material(spec):
     return m
 
 
-def materials(spec):
+def materials(spec, pitch=None, lanes=False):
     M = spec['materials']
     return {
-        'film': film_material(spec),
+        'film': film_material(spec, pitch=pitch, lanes=lanes),
         'hem': simple_material('EdgeHem', M['edge_hem_and_doubler']),
         'boom': simple_material('BoomMgOxide', M['boom_mg_oxidised']),
         'vane': vane_material(spec),
@@ -350,9 +355,11 @@ def film_mesh(spec, n=240):
     return bm, edge, LD
 
 
-def build(spec=None, mats=None, seed=4, vane_tilt_deg=6.0, terminals=True, booms=True):
+def build(spec=None, mats=None, seed=4, vane_tilt_deg=6.0, terminals=True, booms=True, era='2026', pitch=None):
+    """era '2026': 60 per-patch terminals on masts (design spec). Any later era: ~12 consolidated
+    terminals (8 x 10 cm at the boom tips and hub, 4 x 30 cm on the hub), optical lanes in the film."""
     spec = spec or load_spec()
-    mats = mats or materials(spec)
+    mats = mats or materials(spec, pitch=pitch, lanes=(era != '2026'))
     P = spec['parts']
     rnd = random.Random(seed)
     root = bpy.data.objects.new('Sail', None)
@@ -472,22 +479,41 @@ def build(spec=None, mats=None, seed=4, vane_tilt_deg=6.0, terminals=True, booms
     objs.append(_obj('VaneBooms', bm_vb, mats['boom'], smooth=True))
 
     # laser terminals on the back face: service plate, mast, yoke, telescope with sunshade
-    if terminals:
+    def terminal(bm, bma, base, size, d, mast=0.6):
+        top = base + Vector((0, 0, -mast))
+        _rod(bm, base, top, max(0.04, size * 0.4), 12)
+        _box(bm, top + Vector((0, 0, -0.05)), (size * 2.2, size, 0.1))
+        c0 = top + Vector((0, 0, -0.15))
+        L = size * 2.5
+        _rod(bm, c0 - d * L / 2, c0 + d * L / 2, size / 2 + 0.02, 20)
+        _rod(bm, c0 + d * L / 2, c0 + d * (L / 2 + size * 1.4), size / 2 + 0.03, 20)
+        _rod(bma, c0 + d * (L / 2 - 0.01), c0 + d * (L / 2 + 0.005), size / 2, 20)
+
+    def aim():
+        az = rnd.uniform(0, 2 * math.pi)
+        el = math.radians(rnd.uniform(-70, -8))                        # into the -Z hemisphere
+        return Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el)))
+
+    if terminals and era == '2026':
         T = P['patch_terminal']['dims_m']
         bm, bma = bmesh.new(), bmesh.new()
         for (xx, yy) in P['patch_terminal']['xy_m']:
             _box(bm, Vector((xx, yy, -0.011)), (1.0, 1.0, 0.02))
-            top = Vector((xx, yy, -0.62))
-            _rod(bm, Vector((xx, yy, -0.02)), top, T['mast']['diameter'] / 2, 12)
-            _box(bm, top + Vector((0, 0, -0.05)), (0.3, 0.12, 0.1))
-            az = rnd.uniform(0, 2 * math.pi)
-            el = math.radians(rnd.uniform(-70, -8))                    # into the -Z hemisphere
-            d = Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el)))
-            c0 = top + Vector((0, 0, -0.15))
-            tl = T['telescope']
-            _rod(bm, c0 - d * tl['length'] / 2, c0 + d * tl['length'] / 2, tl['diameter'] / 2, 20)
-            _rod(bm, c0 + d * tl['length'] / 2, c0 + d * (tl['length'] / 2 + T['sunshade_length']), tl['diameter'] / 2 + 0.01, 20)
-            _rod(bma, c0 + d * (tl['length'] / 2 - 0.01), c0 + d * (tl['length'] / 2 + 0.005), tl['aperture'] / 2, 20)
+            terminal(bm, bma, Vector((xx, yy, -0.02)), T['telescope']['aperture'], aim())
+        objs.append(_obj('Terminals', bm, mats['terminal'], smooth=True))
+        objs.append(_obj('TerminalApertures', bma, mats['aperture'], smooth=True))
+    elif terminals:
+        bm, bma = bmesh.new(), bmesh.new()
+        zb = -0.30 - H['depth']
+        # 8 x 10 cm neighbour terminals: one on each boom-tip tensioner, four round the hub
+        for ang in (0, 90, 180, 270):
+            R = Matrix.Rotation(math.radians(ang), 3, 'Z')
+            terminal(bm, bma, R @ Vector((tip - 0.6, 0, -0.4)), 0.10, aim(), mast=0.3)
+            terminal(bm, bma, R @ Vector((2.6, 2.6, -0.32)), 0.10, aim(), mast=0.4)
+        # 4 x 30 cm long-range terminals on the hub's back face
+        for k in range(4):
+            a = math.radians(45 + 90 * k)
+            terminal(bm, bma, Vector((1.0 * math.cos(a), 1.0 * math.sin(a), zb)), 0.30, aim(), mast=0.5)
         objs.append(_obj('Terminals', bm, mats['terminal'], smooth=True))
         objs.append(_obj('TerminalApertures', bma, mats['aperture'], smooth=True))
 
@@ -527,10 +553,14 @@ def brightness_temp(T, eps):
     return 0.5 * (lo + hi)
 
 
-def thermal_view(sc, spec, lo=200.0, hi=360.0):
+def thermal_view(sc, spec, lo=200.0, hi=360.0, pitch=None, film_K=None, chip_K=None):
     import hero
     M = spec['materials']
-    tmp = spec['sail']['temperatures']
+    tmp = dict(spec['sail']['temperatures'])
+    if film_K:
+        tmp['film_K'] = tmp['hinge_K'] = film_K
+    if chip_K:
+        tmp['chiplet_die_K'] = [chip_K - 1.5, chip_K + 1.5]
     e = M
     tb = {
         'film_front': brightness_temp(tmp['film_K'], e['sail_front_pv']['eps_IR']),
@@ -561,7 +591,7 @@ def thermal_view(sc, spec, lo=200.0, hi=360.0):
 
     # film: chiplet dots and hinge strips on the back, uniform front
     P = spec['parts']
-    pitch = P['tile_grid_front']['dims_m']['pitch']
+    pitch = pitch or P['tile_grid_front']['dims_m']['pitch']
     die = P['chiplet']['dims_m'][0]
     seg = spec['sail']['segmentation']
     fm = _new_mat('IR_Film')

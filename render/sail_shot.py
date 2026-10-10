@@ -33,6 +33,8 @@ VIEWS = {
     'back': dict(cam=(140, -120, -70), target=(-10, 10, -1.5), lens=28, tilt=(0.15, -0.1)),
     # macro on the back: chiplets, a laser terminal, a hinge strip
     'back_macro': dict(cam=(58.0, -4.2, -0.75), target=(59.0, -2.6, -0.02), lens=35, tilt=(0.15, -0.1)),
+    # behind the hub: the 30 cm long-range terminals and the boom roots
+    'hub_back': dict(cam=(9.0, -7.0, -6.5), target=(0.0, 0.0, -1.6), lens=35, tilt=(0.15, -0.1)),
 }
 
 
@@ -48,22 +50,27 @@ def main(argv):
     ap.add_argument('--lo', type=float, default=300.0, help='LWIR scale bottom (K, brightness temperature)')
     ap.add_argument('--hi', type=float, default=350.0)
     ap.add_argument('--no-denoise', action='store_true')
+    ap.add_argument('--era', default='mid', help="'2026' (design spec) or a model era: low, mid, high")
     a = ap.parse_args(argv)
     spec = sail.load_spec()
-    r = a.r or spec['sail']['temperatures']['placement']['r_AU']
+    num = lib.load_numbers()[a.era]['sparse']          # model v4 (node scripts/export-numbers.mjs)
+    r = a.r or num['r_AU']
+    pitch = num['chip_pitch_m'] if a.era != '2026' else None
     w, h = (int(x) for x in a.res.split('x'))
     sc = lib.reset(samples=a.samples, res=(w, h))
     sc.cycles.max_bounces = 4
     if a.no_denoise:
         sc.cycles.use_denoising = False
-    sail.build(spec)
+    sail.build(spec, era=a.era, pitch=pitch)
     v = VIEWS[a.view]
     tx, ty = (math.radians(t) for t in v['tilt'])
     lib.add_sun(r, direction=(math.sin(tx), math.sin(ty), -1.0))
     lib.camera(Vector(v['cam']), Vector(v['target']), lens=v['lens'])
     lib.meter(sc, lib.flux(r), ev_offset=a.ev)
     if a.thermal:
-        tb = sail.thermal_view(sc, spec, a.lo, a.hi)
+        tb = sail.thermal_view(sc, spec, a.lo, a.hi, pitch=pitch,
+                               film_K=num['film_K'] if a.era != '2026' else None,
+                               chip_K=num['chip_K'] if a.era != '2026' else None)
         print('BRIGHTNESS_T', {k: round(t, 1) for k, t in tb.items()})
     lib.save(sc, a.out)
     print('WROTE', a.out, 'exposure', sc.view_settings.exposure)
