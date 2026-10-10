@@ -1,0 +1,3498 @@
+{
+ "summary": "COMPUTE SAIL (baseline): a 279 m square film flown as a diamond (395 m corner to corner), 69543 m2, tensioned at its 4 corners by 4 diagonal 199 m triangular-truss Mg booms behind the film (constant-force tensioners, N = 0.1 N/m, 4 % catenary edges). Non-spinning: spin was rejected because the precession torque that 0.5 % corner vanes can supply limits the spin period to >= ~45 min, giving 0.6-10 mN/m of tension and a 1-3 m edge-bending length, so the 1.63 m fold panels would curl. 1.06e+08 chiplet sites (one 1e8-chip training replica + spares) at 25.4 mm pitch, 14.8 MW to the cores, 14.4 t (0.207 kg/m2, 0.98 g/W; 1.07 g/W with the 10 % overbuild used in research3). The film stack is the architecture stack with the back enamel thickened from 5 to 15 um: the thin-film IR model gives eps_b ~0.61 for 5 um. Front face: no metal (IBC cells), AR-coated glass over textured c-Si, near-black navy (luminous albedo ~0.002-0.005), a magenta-blue AR glint 0.13 % of the Sun. Dark 25 mm hinge strips every 1.63 m. Chiplets, 60 patch laser terminals, hub and booms are all on the back; four 87 m2 Al corner vanes are the brightest parts. POD (parametric, 1 MW): dense memory+logic stack (1.5 m3/MW, 0.8 t/MW) in a 5 g/cm2 Mg/MgO shield, 4431 m2 of wings, 973 m2 of edge-on radiators (4 blades), 4 SO2 two-phase loops, about 4 g/W, 172 x 204 m. Pods that serve sails must fly in the film shell: Starlink-class links close only within ~3,000 km, and 0.86-0.90 AU is >= 3e6 km away. Training islands: 12+1 pods on a 1 km projected circular orbit, shadow-free.",
+ "sail": {
+  "baseline_dims": {
+   "shape": "square flown as a diamond, catenary (scalloped) edges",
+   "side_m": 279.010795637721,
+   "corner_to_corner_m": 394.580851239373,
+   "half_diagonal_m": 197.2904256196865,
+   "film_area_m2": 69543.34151360541,
+   "edge_sag_m": 11.16043182550884,
+   "thickness_um": 80.0,
+   "range_side_m": [
+    87,
+    500
+   ],
+   "range_note": "87 m holds a 1e7-chip replica (or 1e8 sites at 10x memory/site); 500 m if power/site rises to 0.5 W at the same replica"
+  },
+  "sizing_rationale": {
+   "replica": "the largest film training replica (1e8 chiplets) must be one contiguous mesh: 1.03e8 sites incl. 3 % spares -> 279 m side",
+   "fixed_mass": "hub + vanes + tensioners ~0.34 t = 2.4 % of the sail; at a 1e7-chip sail (82 m) fixed mass would be ~19 %",
+   "fault_domain": "14.8 MW per sail; booms SF 3 with 2 tethers per corner; a cut tether or edge cable slackens one edge, power loss is small (cos)",
+   "launch_package": "14.4 t, 2 film rolls R 1.09 m x 1.63 m + 3.4 m hub; fits one mass-driver package (100 g) with a separate EP kick stage",
+   "umbra": "27.6 km behind each sail",
+   "size_trade": [
+    {
+     "chips": 10000000.0,
+     "side_m": 82.16922008560294,
+     "area_m2": 6751.780729476253,
+     "mass_t": 1.9374140432016216,
+     "P_elec_MW": 1.5,
+     "fixed_mass_frac": 0.1909762145568876,
+     "spin_period_min_at_margin2": 17.204152927029817,
+     "N_min": 0.001586964833975824,
+     "slope_deg": 0.9188191271008276,
+     "umbra_km": 8.126535866466131,
+     "package_m3": 1.0127671094214379,
+     "package_diam_m_at_h1p63": 1.3383203311564869,
+     "n_terminals": 6.393731751397968,
+     "frontier_patches_32m": 6.104568612212849
+    },
+    {
+     "chips": 30000000.0,
+     "side_m": 142.3212640065734,
+     "area_m2": 20255.34218842876,
+     "mass_t": 4.971241182584853,
+     "P_elec_MW": 4.5,
+     "fixed_mass_frac": 0.07442809278619919,
+     "spin_period_min_at_margin2": 24.60681829059012,
+     "N_min": 0.0010645399079433626,
+     "slope_deg": 1.0622456140145815,
+     "umbra_km": 14.075573010250109,
+     "package_m3": 3.0383013282643136,
+     "package_diam_m_at_h1p63": 1.836655636302142,
+     "n_terminals": 19.181195254193902,
+     "frontier_patches_32m": 18.313705836638547
+    },
+    {
+     "chips": 100000000.0,
+     "side_m": 259.84188903016104,
+     "area_m2": 67517.80729476253,
+     "mass_t": 15.58517161704857,
+     "P_elec_MW": 15.0,
+     "fixed_mass_frac": 0.02374051496457429,
+     "spin_period_min_at_margin2": 41.57117168603023,
+     "N_min": 0.000721328658358293,
+     "slope_deg": 1.319190411013846,
+     "umbra_km": 25.698362825082928,
+     "package_m3": 10.12767109421438,
+     "package_diam_m_at_h1p63": 2.985132005099287,
+     "n_terminals": 63.93731751397966,
+     "frontier_patches_32m": 61.045686122128494
+    },
+    {
+     "chips": 300000000.0,
+     "side_m": 450.05935373491303,
+     "area_m2": 202553.42188428759,
+     "mass_t": 45.90370046810464,
+     "P_elec_MW": 45.0,
+     "fixed_mass_frac": 0.008060352351268235,
+     "spin_period_min_at_margin2": 70.30975175374752,
+     "N_min": 0.0005969308997126602,
+     "slope_deg": 1.7535539294862958,
+     "umbra_km": 44.5108700843829,
+     "package_m3": 30.383013282643134,
+     "package_diam_m_at_h1p63": 4.973232275251606,
+     "n_terminals": 191.811952541939,
+     "frontier_patches_32m": 183.13705836638547
+    },
+    {
+     "chips": 1000000000.0,
+     "side_m": 821.6922008560293,
+     "area_m2": 675178.0729476253,
+     "mass_t": 152.00443328939232,
+     "P_elec_MW": 150.0,
+     "fixed_mass_frac": 0.0024341395312831348,
+     "spin_period_min_at_margin2": 127.24802038796874,
+     "N_min": 0.0005486894036803225,
+     "slope_deg": 2.7546735232895907,
+     "umbra_km": 81.2653586646613,
+     "package_m3": 101.2767109421438,
+     "package_diam_m_at_h1p63": 8.950426295919144,
+     "n_terminals": 639.3731751397967,
+     "frontier_patches_32m": 610.4568612212848
+    }
+   ]
+  },
+  "structure": {
+   "architecture": "frame + 4 diagonal booms (non-spinning); constant-force corner tensioners; 4 % catenary edges; film attached at the 4 corners only (loose central tether)",
+   "tension_N_per_m": 0.1,
+   "membrane_stress_kPa": 1.25,
+   "membrane_f1_Hz": 0.0025357298789934262,
+   "booms": {
+    "count": 4,
+    "type": "triangular truss, 3 thin-wall Mg-alloy (AZ-type) tube longerons, Mg-alloy battens + Fe-Ni wire diagonals",
+    "length_m": 199.2904256196865,
+    "circumradius_m": 1.5,
+    "triangle_side_m": 2.598076211353316,
+    "longeron_OD_mm": 16.16773427805625,
+    "longeron_wall_mm": 1.2934187422445003,
+    "bay_length_m": 2.598076211353316,
+    "n_bays": 76,
+    "kg_per_m": 0.5486920540267579,
+    "mass_each_kg": 109.3490729811326,
+    "axial_load_N": 141.23912234513878,
+    "safety_factor": 3.0,
+    "position": "root at hub; along +X,-X,+Y,-Y; flat face (2 longerons) 0.30 m behind the film, apex longeron at z = -0.30 - 0.866*side",
+    "temperature_K": 292.75808697058073
+   },
+   "corner_force_N": 141.23912234513878,
+   "loads": {
+    "radiation_pressure_Pa": 4.7775693077204485e-06,
+    "beta": 0.0033437616505376955,
+    "billow_slope_deg": 0.01620156221648167,
+    "through_thickness_dT_K": 0.01226778724918366,
+    "thermal_gradient_curvature_per_m": 0.0005082369003233232,
+    "disturbance_torque_1pct_Nm": 0.11587602026074803,
+    "vane_torque_per_axis_Nm": 0.35262568933588806,
+    "gravity_gradient_Nm": 6.9037733155505415e-06
+   },
+   "flatness": {
+    "driver": "CTE mismatch of the 13 um Mg spreader (free curvature 0.122 /m/K), acting only at free edges (hinge strips, rim) over ell = sqrt(D/N)",
+    "ell_m": 0.17588270675977477,
+    "edge_rotation_deg_at_3K_residual": 3.6992243824478823,
+    "interior_slope_deg": 0.01620156221648167,
+    "power_cost": "edge zones (~22 % of area) tilted <= 3.7 deg: cos loss < 0.2 %",
+    "requirement": "laminate stress-free at 348 K (process at 340-355 K), residual moment <= 3 K-equivalent; fallback stack C (c-Si 46 um as spreader, kappa 3.3x lower, +0.02 kg/m2)"
+   },
+   "rejected": {
+    "spin": {
+     "reason": "precession torque H*n_orbit vs 0.5 % vanes caps spin at a period of >= ~45 min (x2 margin); tension then 0.6-10 mN/m, ell = 2.3 m > 0.81 m half-panel -> fold panels curl (48 deg at 3 K); billow 1.8 deg",
+     "rows": [
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 10,
+       "omega": 0.010471975511965976,
+       "H": 1702346.7674498858,
+       "tau_prec_Nm": 0.3840695248936029,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 0.5255695108925453,
+       "N_hub": 0.19531943397063714,
+       "N_min": 0.01172748861377287,
+       "N_edge": 0.0041377182451208016,
+       "max_billow_slope_deg": 0.08878104620093095,
+       "ell_m": 0.5135948149580215,
+       "edge_rotation_deg_per_dTexc": 10.80209929215189,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 1.9741394975339428,
+       "spinup_days_vanes": 87.82263863805608,
+       "membrane_stress_hub_kPa": 2.5040953073158607,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      },
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 20,
+       "omega": 0.005235987755982988,
+       "H": 851173.3837249429,
+       "tau_prec_Nm": 0.19203476244680145,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 1.0511390217850907,
+       "N_hub": 0.048829858492659285,
+       "N_min": 0.0029318721534432176,
+       "N_edge": 0.0010344295612802004,
+       "max_billow_slope_deg": 0.3551241848037238,
+       "ell_m": 1.027189629916043,
+       "edge_rotation_deg_per_dTexc": 21.60419858430378,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 0.9870697487669714,
+       "spinup_days_vanes": 43.91131931902804,
+       "membrane_stress_hub_kPa": 0.6260238268289652,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      },
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 30,
+       "omega": 0.003490658503988659,
+       "H": 567448.9224832953,
+       "tau_prec_Nm": 0.12802317496453433,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 1.5767085326776358,
+       "N_hub": 0.021702159330070803,
+       "N_min": 0.001303054290419208,
+       "N_edge": 0.0004597464716800891,
+       "max_billow_slope_deg": 0.7990294158083784,
+       "ell_m": 1.5407844448740644,
+       "edge_rotation_deg_per_dTexc": 32.40629787645567,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 0.658046499177981,
+       "spinup_days_vanes": 29.274212879352028,
+       "membrane_stress_hub_kPa": 0.27823281192398464,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      },
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 45,
+       "omega": 0.0023271056693257726,
+       "H": 378299.2816555302,
+       "tau_prec_Nm": 0.08534878330968955,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 2.365062799016454,
+       "N_hub": 0.00964540414669813,
+       "N_min": 0.0005791352401863146,
+       "N_edge": 0.00020433176519115068,
+       "max_billow_slope_deg": 1.7978161855688521,
+       "ell_m": 2.3111766673110967,
+       "edge_rotation_deg_per_dTexc": 48.6094468146835,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 0.43869766611865396,
+       "spinup_days_vanes": 19.516141919568017,
+       "membrane_stress_hub_kPa": 0.12365902752177091,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      },
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 60,
+       "omega": 0.0017453292519943296,
+       "H": 283724.46124164766,
+       "tau_prec_Nm": 0.06401158748226717,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 3.1534170653552716,
+       "N_hub": 0.005425539832517701,
+       "N_min": 0.000325763572604802,
+       "N_edge": 0.00011493661792002228,
+       "max_billow_slope_deg": 3.1961176632335135,
+       "ell_m": 3.081568889748129,
+       "edge_rotation_deg_per_dTexc": 64.81259575291134,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 0.3290232495889905,
+       "spinup_days_vanes": 14.637106439676014,
+       "membrane_stress_hub_kPa": 0.06955820298099616,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      },
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 90,
+       "omega": 0.0011635528346628863,
+       "H": 189149.6408277651,
+       "tau_prec_Nm": 0.042674391654844775,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 4.730125598032908,
+       "N_hub": 0.0024113510366745327,
+       "N_min": 0.00014478381004657864,
+       "N_edge": 5.108294129778767e-05,
+       "max_billow_slope_deg": 7.191264742275409,
+       "ell_m": 4.622353334622193,
+       "edge_rotation_deg_per_dTexc": 97.218893629367,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 0.21934883305932698,
+       "spinup_days_vanes": 9.758070959784009,
+       "membrane_stress_hub_kPa": 0.030914756880442727,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      },
+      {
+       "side_m": 260.1,
+       "stack": "A2_arch+thick_enamel (glass20/Si30/Mg13/enamel15)",
+       "period_min": 120,
+       "omega": 0.0008726646259971648,
+       "H": 141862.23062082383,
+       "tau_prec_Nm": 0.03200579374113358,
+       "tau_prec_avail_Nm": 0.20185523234706315,
+       "prec_margin": 6.306834130710543,
+       "N_hub": 0.0013563849581294252,
+       "N_min": 8.14408931512005e-05,
+       "N_edge": 2.873415448000557e-05,
+       "max_billow_slope_deg": 12.784470652934054,
+       "ell_m": 6.163137779496258,
+       "edge_rotation_deg_per_dTexc": 129.62519150582267,
+       "dT_excursion_K": 3.0,
+       "rim_speed": 0.16451162479449524,
+       "spinup_days_vanes": 7.318553219838007,
+       "membrane_stress_hub_kPa": 0.01738955074524904,
+       "M": 14270.384495445456,
+       "Iz": 162562141.73769516,
+       "beta": 0.003225993786798645,
+       "A_vane": 84.56501250000001,
+       "n_term": 64.06440340909091
+      }
+     ]
+    },
+    "hoop_ring": "in-plane buckling ring mass is comparable, but a 1.2 km-circumference compression hoop has no packaging/deployment path from a 3 m package",
+    "hex_tiles_cable_net": "needs a compression member or spin anyway; a hex outline breaks the square chiplet mesh alignment (gores at 60 deg)",
+    "frame_rigid": "rigidly attached film would see dN = 3178 N/m from a 3e-4 film/boom strain mismatch: tensioners must be load-defined springs"
+   },
+   "meteoroids": {
+    "r_AU": 0.9190436854321097,
+    "impact_speed_kms": 20.862287110264027,
+    "flux_scale": 1.1641124130817926,
+    "perforation_particle_um": 9.478393662638577,
+    "holes": [
+     {
+      "hole_mm": 0.1,
+      "particle_um": 50.0,
+      "per_m2_yr": 3.8966131295892277,
+      "per_sail_yr": 263613.71040910174
+     },
+     {
+      "hole_mm": 0.3,
+      "particle_um": 150.0,
+      "per_m2_yr": 0.2030313609449177,
+      "per_sail_yr": 13735.479660959183
+     },
+     {
+      "hole_mm": 1,
+      "particle_um": 500.0,
+      "per_m2_yr": 0.0033166871787424015,
+      "per_sail_yr": 224.38055418315275
+     },
+     {
+      "hole_mm": 3,
+      "particle_um": 1500.0,
+      "per_m2_yr": 5.1697118716860395e-05,
+      "per_sail_yr": 3.497413992404227
+     },
+     {
+      "hole_mm": 10,
+      "particle_um": 5000.0,
+      "per_m2_yr": 4.5242344719958233e-07,
+      "per_sail_yr": 0.03060735557418062
+     },
+     {
+      "hole_mm": 30,
+      "particle_um": 15000.0,
+      "per_m2_yr": 5.640526452690597e-09,
+      "per_sail_yr": 0.00038159295198268885
+     },
+     {
+      "hole_mm": 100,
+      "particle_um": 50000.0,
+      "per_m2_yr": 4.5121664469717425e-11,
+      "per_sail_yr": 3.0525712959219682e-06
+     }
+    ],
+    "area_fraction_holed_per_yr": 1.8732768039486333e-07,
+    "operating_stress_Pa": 70.88089396232212,
+    "K_IC": 750000.0,
+    "griffith_critical_crack_m": 35638078.610423416,
+    "note": "Holes do not grow: at spin tension the laminate stress is ~71 Pa, and the Griffith crack length is 3.6e+07 m. Rip-stops are needed only for handling/deployment loads; the 25 mm hinge strips (glass-cloth) every 1.63 m and the diagonal tapes act as rip-stops. A hit kills at most its 25 mm tile (0.15 W)."
+   },
+   "rip_stop": "not needed for tear arrest: at 1.2 kPa membrane stress the Griffith crack length is ~1e+05 m. Hinge strips (every 1.63 m) and the hem bound damage during handling/deployment; expected holes >= 3 mm: 3.5 per sail per year; >= 10 mm: one per ~33 years"
+  },
+  "segmentation": {
+   "tile_m": 0.0254,
+   "cell": "2 half-cells 25.4 x 12.7 mm in series per tile (IBC, rear contacts)",
+   "fold_panel_width_m": 1.6256,
+   "hinge_strips": {
+    "count": 243,
+    "width_m": 0.0254,
+    "direction": "parallel to X (boom A)",
+    "material": "dark-enamelled glass cloth with Al jumpers"
+   },
+   "stowage": {
+    "fold": "z-fold (accordion) along hinge lines parallel to X -> strip 1.626 m wide x 395 m long, 242 layers at the centre; then rolled from both X-tips toward the hub into 2 rolls (axis along Y)",
+    "film_volume_m3": 11.126934642176867,
+    "roll_outer_radius_m": 1.0859956134999593,
+    "roll_length_m": 1.6256,
+    "package_envelope_m": [
+     7.743982453999838,
+     3.4,
+     2.1
+    ],
+    "package_mass_t": 14.427070950874766,
+    "launch_accel_g": 100,
+    "deployment": [
+     "kick stage (EP, O2) circularises at 0.92 AU, separates",
+     "+-X booms extend (articulated-truss canisters or in-situ beam builders), carrying the rolls outward; rolls pay out under brake",
+     "+-Y booms extend; their tips pull the outermost accordion panels out to the Y corners; panels unfold",
+     "constant-force tensioners take up slack to N = 0.1 N/m; corner vanes unfurl (TRAC booms); terminals unstow (masts)",
+     "sun-pointing by vanes; chiplets self-test; film mesh boots region by region"
+    ],
+    "min_bend_radius_laminate_m": 0.034,
+    "note": "laminate may be ROLLED (strain <= 0.1 % at r >= 34 mm) but never creased: all folds are in the 25 mm glass-cloth hinge strips"
+   },
+   "seams": "none: one continuous film (the mesh is unbroken); edges hemmed",
+   "electrical": {
+    "tile_m": [
+     0.0254,
+     0.0254
+    ],
+    "half_cells_per_tile": 2,
+    "half_cell_m": [
+     0.0254,
+     0.0127
+    ],
+    "series": "2 half-cells in series per tile",
+    "Vmp_tile_V": 1.0,
+    "Voc_tile_V": 1.1700000000000002,
+    "I_mp_A": 0.15008489682021,
+    "J_mp_mA_cm2": 46.52641106708724,
+    "conversion": "on-die 2:1 switched-capacitor converter + MPPT -> ~0.5 V core, eta 0.93 (research3 mid)",
+    "max_voltage_on_production_film_V": 1.1700000000000002,
+    "service_strings": "1 m2 patches wired 48 half-cells in series (~24 V, Voc ~28 V) for terminals and vane gimbals; below the 80 V sustained-arc threshold (JAXA / NASA Glenn)",
+    "contacts": "interdigitated back contacts (IBC): no metal on the front face",
+    "isolation": "50 um laser scribes between half-cells and tiles, glass-filled"
+   }
+  },
+  "chiplet_layout": {
+   "sites": 105899162,
+   "pitch_m": 0.0254,
+   "side": "back (anti-sun) face, one per tile at the tile centre",
+   "die_m": [
+    0.00245,
+    0.00245,
+    5e-05
+   ],
+   "die_area_range_mm2": [
+    1.5,
+    6.0
+   ],
+   "P_site_W": 0.15008489682021,
+   "P_core_per_site_W": 0.1395789540427953,
+   "mesh": "4-neighbour 2D mesh in the rear metal layer, crossing hinge strips on flexible jumpers",
+   "frontier_patch_m": 32.5,
+   "patches_per_sail": 60,
+   "replica": "one 1e8-chip replica per sail, or ~60 frontier-inference patches of 32.5 m, or ~950 small-model patches of 8 m",
+   "why_back": "front placement would shade cells; the Mg spreader and emitter are on the back; front Si+glass (~12 mg/cm2) shields the die from the sunward side"
+  },
+  "appearance_front": {
+   "material": {
+    "physical": "vacuum | porous-SiO2 AR 110 nm (n 1.25) | 20 um SiO2-rich Mg-aluminosilicate cover glass | TiO2 ARC 55 nm | textured 30 um c-Si (IBC, no front metal)",
+    "principled": {
+     "base_color_linear": [
+      0.00559,
+      0.0004,
+      0.02608
+     ],
+     "base_color_ideal_model": [
+      0.00173,
+      0.0,
+      0.00856
+     ],
+     "roughness": 0.35,
+     "metallic": 0.0,
+     "coat_weight": 1.0,
+     "coat_ior": 1.0753,
+     "coat_roughness": 0.006,
+     "coat_tint": [
+      0.39,
+      0.099,
+      1.0
+     ],
+     "note": "coat IOR 1.075 reproduces the AR-coated top-surface F0 = 0.0013; glint tint is the AR residual (magenta-blue). Bare-glass alternative: coat IOR 1.47 (F0 0.037). Texture scatter leaves ~68 deg off-normal; diffuse base is an approximation."
+    },
+    "luminous_albedo_diffuse": 0.0005891694548438021,
+    "luminous_specular_F0": 0.0013171210677531107,
+    "solar_absorptance": 0.9,
+    "eps_IR": 0.85,
+    "eps_IR_conservative": 0.76,
+    "T_K": 348.15
+   },
+   "luminous_albedo_total": 0.001854229874678097,
+   "luminance_cd_m2": 87.57311448014525,
+   "stops_below_grey_card": 6.6010329858613215,
+   "metal_grid_fraction": 0.0,
+   "scribe_fraction": 0.005905511811023622,
+   "glint": {
+    "F0": 0.0013171210677531107,
+    "radiance_W_m2_sr": 26387.68526210162,
+    "tint": [
+     0.39,
+     0.099,
+     1.0
+    ],
+    "bare_glass_F0": 0.037016868312659615,
+    "where": "only near the viewer's antisolar point (sun-facing mirror)"
+   },
+   "colour": "very dark navy/indigo; computed texture scatter is violet-blue; AR residual reflection is magenta-blue",
+   "visible_pattern": "dark satin stripes (hinge strips) every 1.63 m parallel to X; tile scribes only at < 3 m",
+   "spectra": {
+    "nm": [
+     380.0,
+     400.0,
+     420.0,
+     440.0,
+     460.0,
+     480.0,
+     500.0,
+     520.0,
+     540.0,
+     560.0,
+     580.0,
+     600.0,
+     620.0,
+     640.0,
+     660.0,
+     680.0,
+     700.0,
+     720.0,
+     740.0,
+     760.0,
+     780.0
+    ],
+    "R_total": [
+     0.07539075524694001,
+     0.0394786284684064,
+     0.022336442609857593,
+     0.012154222135461107,
+     0.006370515398522741,
+     0.0035141202046207656,
+     0.002005731943500851,
+     0.00120177188177053,
+     0.0008634509610893643,
+     0.000895652394320509,
+     0.001246046988149885,
+     0.0018699853742302733,
+     0.0027230543927789525,
+     0.003762847318093069,
+     0.00494687489738768,
+     0.0062387561241203275,
+     0.007608043577316025,
+     0.009027702799568254,
+     0.01047363794442674,
+     0.011929440917081473,
+     0.013384255192523294
+    ],
+    "R_top": [
+     0.016847691953699423,
+     0.012574853842846668,
+     0.009068691158155234,
+     0.0063010442925898625,
+     0.004203887178969796,
+     0.0026924751978365446,
+     0.0016790201807272197,
+     0.001080211519613191,
+     0.0008208864232266929,
+     0.0008353985547710971,
+     0.0010676794714626482,
+     0.001470598062862255,
+     0.0020050193120217438,
+     0.002638746041301379,
+     0.0033455009767254422,
+     0.00410398151472436,
+     0.004897027071840642,
+     0.00571090061759851,
+     0.006534677305762899,
+     0.007359733462605456,
+     0.008179320662858458
+    ]
+   }
+  },
+  "appearance_back": {
+   "material": {
+    "physical": "15 um Fe/Mg/Ca-silicate glass enamel, microtextured, over 13 um Mg spreader (patterned per tile) and 0.5 um SiO2",
+    "principled": {
+     "base_color_linear": [
+      0.06,
+      0.054,
+      0.048
+     ],
+     "roughness": 0.65,
+     "metallic": 0.0,
+     "specular_ior_level": 0.4
+    },
+    "luminous_albedo": 0.06,
+    "eps_IR": 0.9,
+    "eps_IR_conservative": 0.73,
+    "T_K": 348.15
+   },
+   "chiplets": {
+    "physical": "Si die 2.45 x 2.45 x 0.05 mm, flip-chip on the rear pads, overcoated with the back enamel",
+    "principled": {
+     "base_color_linear": [
+      0.055,
+      0.052,
+      0.05
+     ],
+     "roughness": 0.35,
+     "metallic": 0.0
+    },
+    "T_K": [
+     355.15,
+     358.15
+    ]
+   },
+   "relief": "2.45 mm square bumps 50 um high at 25.4 mm pitch",
+   "visible": "dark warm grey; under the swarm glow it sits 11.7 (f=0.01) to 6.1 (f=0.5) stops below the sunlit front",
+   "hardware": "booms 0.3 m behind, hub at centre, 60 terminals on 0.6 m masts, hinge strips, corner tensioners",
+   "emissivities": {
+    "front": 0.85,
+    "back": 0.9,
+    "front_conservative_fused_silica": 0.76,
+    "back_conservative_15um": 0.73,
+    "back_5um_fused_silica": 0.61
+   }
+  },
+  "hardware": [
+   {
+    "name": "patch_handover_laser_terminal",
+    "count": 60,
+    "mass_each_kg": 5.0,
+    "mass_total_kg": 300.0,
+    "aperture_m": 0.1,
+    "dims_m": [
+     0.3,
+     0.3,
+     0.75
+    ],
+    "note": "Starlink-class, 0.1-0.4 Tbps to <=3000 km; on the BACK face on a 1x1 m stiff service plate, 0.6 m mast, 2-axis gimbal, 10 cm telescope with 0.2 m sunshade; 60-80 W from a 24 V service string on its own 1 m2 of film. One per 32.5 m patch."
+   },
+   {
+    "name": "corner_relay_laser_terminal",
+    "count": 4,
+    "mass_each_kg": 5.0,
+    "mass_total_kg": 20.0,
+    "aperture_m": 0.1,
+    "dims_m": [
+     0.3,
+     0.3,
+     0.75
+    ],
+    "note": "at each boom tip, sees both hemispheres past the film edge: sail-sail and relay links"
+   },
+   {
+    "name": "corner_vane",
+    "count": 4,
+    "mass_each_kg": 16.20767870970708,
+    "mass_total_kg": 64.83071483882831,
+    "area_m2": 86.92917689200677,
+    "dims_m": [
+     9.323581763035426,
+     9.323581763035426,
+     0.002
+    ],
+    "note": "reflective vane (Al-coated glass cloth, rho_s 0.85) on 2 diagonal Fe-Ni TRAC booms; 2-axis gimbal at the boom tip; centre 6.7 m beyond the film corner; 0.5 % of sail area in total"
+   },
+   {
+    "name": "corner_tensioner",
+    "count": 4,
+    "mass_each_kg": 6.0,
+    "mass_total_kg": 24.0,
+    "note": "constant-force Fe-Ni spring reel + 2 redundant glass-fibre tethers, sets N = 0.10 N/m (adjustable 0.05-0.3)"
+   },
+   {
+    "name": "corner_doubler",
+    "count": 4,
+    "mass_each_kg": 0.4,
+    "mass_total_kg": 1.6,
+    "note": "2.5 m glass-cloth reinforcement triangle with Fe-Ni grommet ring"
+   },
+   {
+    "name": "hub",
+    "count": 1,
+    "mass_each_kg": 250.0,
+    "mass_total_kg": 250.0,
+    "dims_m": [
+     3.4,
+     3.4,
+     1.9
+    ],
+    "note": "octagonal prism behind the film centre: 4 boom deployers (articulated-truss canisters or beam builders), avionics, 3 star trackers (anti-sun face), IMU, S-band beacon, roll cradles (empty after deployment); film tethered loosely at centre"
+   },
+   {
+    "name": "sun_sensor",
+    "count": 4,
+    "mass_each_kg": 0.3,
+    "mass_total_kg": 1.2,
+    "note": "on boom-tip fittings, looking +Z past the film edge"
+   },
+   {
+    "name": "boom",
+    "count": 4,
+    "mass_each_kg": 109.3490729811326,
+    "mass_total_kg": 437.3962919245304,
+    "dims_m": [
+     199.2904256196865,
+     2.598076211353316,
+     2.25
+    ]
+   },
+   {
+    "name": "edge_cable_and_tape",
+    "count": 1,
+    "mass_each_kg": 12.777176621479352,
+    "mass_total_kg": 12.777176621479352,
+    "note": "Fe-Ni 1.2 mm wire (8.9 g/m) in a 50 mm glass-cloth hem (2.5 g/m); catenary, sag 11.2 m"
+   },
+   {
+    "name": "hinge_strips",
+    "count": 1,
+    "mass_each_kg": 67.31735636419437,
+    "mass_total_kg": 67.31735636419437,
+    "length_total_m": 44171.49367729289,
+    "note": "25.4 mm glass-fibre cloth (60 g/m2) carrying Al mesh/power jumpers; no Si; fold lines parallel to X every 1.6256 m"
+   }
+  ],
+  "pointing": "3-axis, non-spinning; 4 corner vanes (2-axis gimbals) give 0.35 N m per axis vs 0.12 N m from a 1 % reflectance asymmetry; star trackers + IMU on the hub, sun sensors at the tips; commands over the film mesh. No liquid-crystal RCDs (organic, need H; not Mercury-native); inorganic MEMS micro-shutter strips are an option.",
+  "mass_breakdown": {
+   "film_stack_kg_m2": {
+    "cover glass 20 um SiO2-rich Mg-aluminosilicate + porous-silica AR": 0.050121000000000006,
+    "TiO2 front ARC 55-68 nm": 0.000273,
+    "c-Si absorber 30 um (IBC, textured)": 0.0699,
+    "rear Al contacts / tile wiring (grid)": 0.004,
+    "rear dielectric 0.5 um SiO2": 0.0010999999999999998,
+    "Mg spreader 13 um (patterned per tile)": 0.022619999999999998,
+    "back emitter enamel 15 um (Fe/Mg/Ca silicate, microtextured)": 0.0405,
+    "chiplets (dies, 6 mm2 x 50 um x1.5)": 0.0016251782503565008,
+    "chiplet mesh wiring": 0.00036
+   },
+   "film_sigma_kg_m2": 0.1904991782503565,
+   "film_kg": 13247.949411125734,
+   "structure_kg": {
+    "boom": 437.3962919245304,
+    "hub": 250.0,
+    "corner_vane": 64.83071483882831,
+    "corner_tensioner": 24.0,
+    "corner_doubler": 1.6,
+    "sun_sensor": 1.2,
+    "edge_cable_and_tape": 12.777176621479352,
+    "hinge_strips": 67.31735636419437
+   },
+   "structure_total_kg": 859.1215397490324,
+   "structure_kg_m2": 0.012353756967242571,
+   "terminals_kg": 320.0,
+   "terminals_kg_m2": 0.004601446997443967,
+   "total_kg": 14427.070950874766,
+   "total_kg_m2": 0.20745438221504303,
+   "g_per_W_core": 0.9760357037266141,
+   "g_per_W_PV": 0.9077132044657512,
+   "g_per_W_core_with_10pct_overbuild": 1.0736392740992755,
+   "architecture_reference": {
+    "film_sigma_kg_m2": 0.1716,
+    "g_per_W": 0.89,
+    "note": "architecture: 5 um back enamel (eps_b 0.90 assumed). optics.py finds 5 um silicate on Mg gives eps_b ~0.61 (fused-silica floor), so the baseline carries 15 um microtextured enamel (+0.027 kg/m2). If a 5 um enamel reaches eps 0.9, subtract 27 g/m2."
+   }
+  },
+  "temperatures": {
+   "film_K": 348.15,
+   "chiplet_die_K": [
+    355.15,
+    358.15
+   ],
+   "hinge_K": 348.15,
+   "booms_K": 292.7580869705807,
+   "hub_K": [
+    270,
+    300
+   ],
+   "terminals_K": [
+    295,
+    315
+   ],
+   "vanes_K": [
+    217.37891740985035,
+    237.05339035384418
+   ],
+   "placement": {
+    "r_AU": 0.9190436854321097,
+    "S_W_m2": 1611.5319867564742,
+    "q_e_W_m2": 232.63205533543618,
+    "eta": 0.14435460000000003
+   }
+  },
+  "counts": {
+   "per_sail": {
+    "P_core_W": 14781294.265968537,
+    "P_PV_W": 15893864.802116705,
+    "chiplets": 105899162,
+    "FLOP_s": 1.8950377264062228e+20
+   },
+   "1TW_total_compute_85pct_on_sails": {
+    "n_sails": 57505.11319952429,
+    "film_area_km2": 3999.0977260130558,
+    "coverage_f": 1.6835616258189963e-14
+   },
+   "1TW_all_on_sails": {
+    "n_sails": 67653.07435238152
+   },
+   "vs_coverage": [
+    {
+     "f": 0.01,
+     "r_AU": 0.9190436854321097,
+     "S": 1611.5319867564742,
+     "q_e": 232.63205533543618,
+     "n_sails": 3.415682106174758e+16,
+     "P_sunlight_W": 3.828e+24,
+     "P_core_total_W": 5.048820233037228e+23,
+     "P_core_per_sail_W": 14781294.265968535,
+     "mass_kg": 4.9278288091416586e+20
+    },
+    {
+     "f": 0.1,
+     "r_AU": 0.9412379663311419,
+     "S": 1536.428545424306,
+     "q_e": 221.79052810330757,
+     "n_sails": 3.582646903486297e+17,
+     "P_sunlight_W": 3.8280000000000003e+25,
+     "P_core_total_W": 5.048820233037228e+24,
+     "P_core_per_sail_W": 14092430.454489356,
+     "mass_kg": 5.168710106852858e+21
+    },
+    {
+     "f": 0.2612,
+     "r_AU": 0.9858653815467104,
+     "S": 1400.4770862107218,
+     "q_e": 202.16530958911426,
+     "n_sails": 1.0266290278515186e+18,
+     "P_sunlight_W": 9.998736e+25,
+     "P_core_total_W": 1.3187518448693238e+25,
+     "P_core_per_sail_W": 12845456.431610417,
+     "mass_kg": 1.4811249825041445e+22
+    },
+    {
+     "f": 0.5,
+     "r_AU": 1.067070895779207,
+     "S": 1195.431489163244,
+     "q_e": 172.56603444556444,
+     "n_sails": 2.3022988019770465e+18,
+     "P_sunlight_W": 1.914e+26,
+     "P_core_total_W": 2.5244101165186143e+25,
+     "P_core_per_sail_W": 10964737.132950922,
+     "mass_kg": 3.3215428166236823e+22
+    },
+    {
+     "f": 1.0,
+     "r_AU": 1.3473973797028809,
+     "S": 749.755817311341,
+     "q_e": 108.23070110565172,
+     "n_sails": 7.341698248413288e+18,
+     "P_sunlight_W": 3.828e+26,
+     "P_core_total_W": 5.048820233037227e+25,
+     "P_core_per_sail_W": 6876910.576007935,
+     "mass_kg": 1.059192015297715e+23
+    }
+   ],
+   "1e26W": {
+    "note": "1e26 W of CHIP power is unreachable: all film at f=1 gives at most eta_PV*eta_conv*L_sun = 5.14e+25 W. Read as 1e26 W of intercepted sunlight: f = 0.261.",
+    "row": {
+     "f": 0.2612,
+     "r_AU": 0.9858653815467104,
+     "S": 1400.4770862107218,
+     "q_e": 202.16530958911426,
+     "n_sails": 1.0266290278515186e+18,
+     "P_sunlight_W": 9.998736e+25,
+     "P_core_total_W": 1.3187518448693238e+25,
+     "P_core_per_sail_W": 12845456.431610417,
+     "mass_kg": 1.4811249825041445e+22
+    },
+    "max_chip_power_W": 5.139081501840002e+25
+   }
+  },
+  "optics_findings": {
+   "ir": {
+    "cases": {
+     "A_front: glass20 | Si30 | Mg (opaque)": {
+      "eps_hemi_total_348K": 0.7591677130980614,
+      "eps_normal_total_348K": 0.7986042278124028
+     },
+     "A_back: enamel5 | Mg": {
+      "eps_hemi_total_348K": 0.6109887877745729,
+      "eps_normal_total_348K": 0.6308215334906705
+     },
+     "A_back: enamel10 | Mg": {
+      "eps_hemi_total_348K": 0.6955666429822797,
+      "eps_normal_total_348K": 0.7257383165876006
+     },
+     "A_back: enamel20 | Mg": {
+      "eps_hemi_total_348K": 0.7527968043133897,
+      "eps_normal_total_348K": 0.7904434048985131
+     },
+     "A_back: enamel40 | Mg": {
+      "eps_hemi_total_348K": 0.7939065001320708,
+      "eps_normal_total_348K": 0.839313803028311
+     },
+     "C_front: glass20 | Si45 | doped1 | Mg contact(opaque)": {
+      "eps_hemi_total_348K": 0.7746480825958593,
+      "eps_normal_total_348K": 0.8186284242625229
+     },
+     "C_front: glass20 | Si45 | doped1 | enamel5 (no metal, 30 % of back)": {
+      "eps_hemi_total_348K": 0.7437943886728036,
+      "eps_normal_total_348K": 0.7827169913402747
+     },
+     "C_back: enamel5 | doped1 | Si45 | glass20 (no metal, 30 % of back)": {
+      "eps_hemi_total_348K": 0.6887707543001148,
+      "eps_normal_total_348K": 0.7204558501891941
+     },
+     "glass10 front over Si30|Mg": {
+      "eps_hemi_total_348K": 0.7065053393591559,
+      "eps_normal_total_348K": 0.7390469902483529
+     },
+     "glass40 front over Si30|Mg": {
+      "eps_hemi_total_348K": 0.7968229695195954,
+      "eps_normal_total_348K": 0.8433361871826538
+     }
+    },
+    "model": "incoherent multilayer, Fresnel s/p, hemispherical, Planck-weighted 1.5-60 um at 348 K; fused silica (Franta 25C) used for every glass: pure SiO2 has the deepest reststrahlen gap, so real Mg/Ca/Fe-silicate enamels with broader bands give HIGHER emissivity (this is a conservative floor).",
+    "assumed_by_architecture": {
+     "eps_f": 0.85,
+     "eps_b": 0.9
+    }
+   },
+   "emissivity_scan": {
+    "enamel_5um_on_Mg": 0.6109887877745729,
+    "cover_5um_on_Si30_Mg": 0.6283323533014925,
+    "enamel_10um_on_Mg": 0.6955666429822797,
+    "cover_10um_on_Si30_Mg": 0.7065053393591559,
+    "enamel_20um_on_Mg": 0.7527968043133897,
+    "cover_20um_on_Si30_Mg": 0.7591677130980614,
+    "enamel_40um_on_Mg": 0.7939065001320708,
+    "cover_40um_on_Si30_Mg": 0.7968229695195954,
+    "enamel_80um_on_Mg": 0.8166698171528233,
+    "cover_80um_on_Si30_Mg": 0.8176033889728093,
+    "enamel_150um_on_Mg": 0.8243288042143443,
+    "cover_150um_on_Si30_Mg": 0.8245738012684787
+   },
+   "placement_sensitivity": [
+    {
+     "eps_f": 0.85,
+     "eps_b": 0.9,
+     "alpha": 0.9,
+     "r_AU": 0.9190436854321097,
+     "q_e": 232.63205533543618
+    },
+    {
+     "eps_f": 0.76,
+     "eps_b": 0.61,
+     "alpha": 0.9,
+     "r_AU": 1.038759079432709,
+     "q_e": 182.10094644737654
+    },
+    {
+     "eps_f": 0.76,
+     "eps_b": 0.61,
+     "alpha": 0.8284051695177009,
+     "r_AU": 0.9969437519618172,
+     "q_e": 197.69721749277784
+    },
+    {
+     "eps_f": 0.8,
+     "eps_b": 0.85,
+     "alpha": 0.9,
+     "r_AU": 0.9463659191973521,
+     "q_e": 219.39346372322035
+    },
+    {
+     "eps_f": 0.76,
+     "eps_b": 0.79,
+     "alpha": 0.9,
+     "r_AU": 0.9763426671776108,
+     "q_e": 206.1281620928312
+    }
+   ],
+   "solar_absorptance": {
+    "cases": [
+     {
+      "stack": "A Si30|Mg",
+      "alpha_solar_flat_rear": 0.8284051695177009,
+      "sub_bandgap_energy_fraction": 0.24214814115156405,
+      "sub_bandgap_absorptance_flat": 0.364840449478562
+     },
+     {
+      "stack": "C Si45|Mg",
+      "alpha_solar_flat_rear": 0.8284984504759217,
+      "sub_bandgap_energy_fraction": 0.24214814115156405,
+      "sub_bandgap_absorptance_flat": 0.36522567216818186
+     }
+    ],
+    "note": "flat-rear lower bound; textured c-Si cells with metal rear typically absorb 30-70 % of sub-gap light (free carriers + rear metal with light trapping), giving alpha 0.85-0.92. Architecture value 0.90 kept."
+   }
+  },
+  "sensitivity": {
+   "power_per_site": [
+    {
+     "P_site_W": 0.03,
+     "pitch_mm": 11.356012149209617,
+     "sites_per_m2": 7754.401844514538,
+     "Mg_um_for_10K": 0.0,
+     "spreader_kg_m2": 0.0,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    },
+    {
+     "P_site_W": 0.05,
+     "pitch_mm": 14.660548644405981,
+     "sites_per_m2": 4652.641106708724,
+     "Mg_um_for_10K": 0.0,
+     "spreader_kg_m2": 0.0,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    },
+    {
+     "P_site_W": 0.1,
+     "pitch_mm": 20.73314672474943,
+     "sites_per_m2": 2326.320553354362,
+     "Mg_um_for_10K": 0.0,
+     "spreader_kg_m2": 0.0,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    },
+    {
+     "P_site_W": 0.15,
+     "pitch_mm": 25.39281511894619,
+     "sites_per_m2": 1550.8803689029078,
+     "Mg_um_for_10K": 13.33333333333333,
+     "spreader_kg_m2": 0.023199999999999995,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    },
+    {
+     "P_site_W": 0.25,
+     "pitch_mm": 32.781983356334166,
+     "sites_per_m2": 930.5282213417447,
+     "Mg_um_for_10K": 40.0,
+     "spreader_kg_m2": 0.0696,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    },
+    {
+     "P_site_W": 0.5,
+     "pitch_mm": 46.36072546401685,
+     "sites_per_m2": 465.26411067087236,
+     "Mg_um_for_10K": 108.9,
+     "spreader_kg_m2": 0.18948600000000002,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    },
+    {
+     "P_site_W": 1.0,
+     "pitch_mm": 65.56396671266833,
+     "sites_per_m2": 232.63205533543618,
+     "Mg_um_for_10K": 248.2,
+     "spreader_kg_m2": 0.4318679999999999,
+     "note": "above ~0.2 W/site the spreader grows ~P (sheet conduction); below ~0.1 W the c-Si alone spreads"
+    }
+   ],
+   "memory_and_energy_per_op": {
+    "rows": [
+     {
+      "mem_mult": 1,
+      "jop_div": 1,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 275.16510504861446,
+      "sail_area_m2": 75715.83503641504,
+      "P_core_MW": 14.376632266407919,
+      "FLOP_s": 1.84315798287281e+20,
+      "frontier_patch_side_m": 32.5,
+      "terminals_10cm": 69.68048035745494,
+      "terminals_10cm_kg_m2": 0.004601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.0007924366147602201
+     },
+     {
+      "mem_mult": 1,
+      "jop_div": 10,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 275.16510504861446,
+      "sail_area_m2": 75715.83503641504,
+      "P_core_MW": 14.376632266407919,
+      "FLOP_s": 1.8431579828728103e+21,
+      "frontier_patch_side_m": 32.5,
+      "terminals_10cm": 696.8048035745494,
+      "terminals_10cm_kg_m2": 0.04601446997443967,
+      "terminals_30cm": 9,
+      "terminals_30cm_kg_m2": 0.0017829823832104953
+     },
+     {
+      "mem_mult": 1,
+      "jop_div": 100,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 275.16510504861446,
+      "sail_area_m2": 75715.83503641504,
+      "P_core_MW": 14.376632266407919,
+      "FLOP_s": 1.84315798287281e+22,
+      "frontier_patch_side_m": 32.5,
+      "terminals_10cm": 6968.048035745494,
+      "terminals_10cm_kg_m2": 0.4601446997443967,
+      "terminals_30cm": 87,
+      "terminals_30cm_kg_m2": 0.017235496371034786
+     },
+     {
+      "mem_mult": 3,
+      "jop_div": 1,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 158.86664747140924,
+      "sail_area_m2": 25238.61167880502,
+      "P_core_MW": 4.7922107554693065,
+      "FLOP_s": 6.143859942909367e+19,
+      "frontier_patch_side_m": 18.76388374866284,
+      "terminals_10cm": 23.22682678581832,
+      "terminals_10cm_kg_m2": 0.004601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.0023773098442806595
+     },
+     {
+      "mem_mult": 3,
+      "jop_div": 10,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 158.86664747140924,
+      "sail_area_m2": 25238.61167880502,
+      "P_core_MW": 4.7922107554693065,
+      "FLOP_s": 6.143859942909368e+20,
+      "frontier_patch_side_m": 18.76388374866284,
+      "terminals_10cm": 232.2682678581832,
+      "terminals_10cm_kg_m2": 0.04601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.0023773098442806595
+     },
+     {
+      "mem_mult": 3,
+      "jop_div": 100,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 158.86664747140924,
+      "sail_area_m2": 25238.61167880502,
+      "P_core_MW": 4.7922107554693065,
+      "FLOP_s": 6.143859942909367e+21,
+      "frontier_patch_side_m": 18.76388374866284,
+      "terminals_10cm": 2322.682678581832,
+      "terminals_10cm_kg_m2": 0.4601446997443967,
+      "terminals_30cm": 29,
+      "terminals_30cm_kg_m2": 0.017235496371034782
+     },
+     {
+      "mem_mult": 10,
+      "jop_div": 1,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 87.0148464553119,
+      "sail_area_m2": 7571.5835036415065,
+      "P_core_MW": 1.4376632266407918,
+      "FLOP_s": 1.84315798287281e+19,
+      "frontier_patch_side_m": 10.277402395547233,
+      "terminals_10cm": 6.968048035745497,
+      "terminals_10cm_kg_m2": 0.004601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.007924366147602198
+     },
+     {
+      "mem_mult": 10,
+      "jop_div": 10,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 87.0148464553119,
+      "sail_area_m2": 7571.5835036415065,
+      "P_core_MW": 1.4376632266407918,
+      "FLOP_s": 1.8431579828728103e+20,
+      "frontier_patch_side_m": 10.277402395547233,
+      "terminals_10cm": 69.68048035745497,
+      "terminals_10cm_kg_m2": 0.04601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.007924366147602198
+     },
+     {
+      "mem_mult": 10,
+      "jop_div": 100,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 87.0148464553119,
+      "sail_area_m2": 7571.5835036415065,
+      "P_core_MW": 1.4376632266407918,
+      "FLOP_s": 1.8431579828728103e+21,
+      "frontier_patch_side_m": 10.277402395547233,
+      "terminals_10cm": 696.8048035745496,
+      "terminals_10cm_kg_m2": 0.4601446997443967,
+      "terminals_30cm": 9,
+      "terminals_30cm_kg_m2": 0.017829823832104946
+     },
+     {
+      "mem_mult": 100,
+      "jop_div": 1,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 27.516510504861454,
+      "sail_area_m2": 757.1583503641507,
+      "P_core_MW": 0.14376632266407918,
+      "FLOP_s": 1.84315798287281e+18,
+      "frontier_patch_side_m": 3.25,
+      "terminals_10cm": 0.6968048035745497,
+      "terminals_10cm_kg_m2": 0.004601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.07924366147602198
+     },
+     {
+      "mem_mult": 100,
+      "jop_div": 10,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 27.516510504861454,
+      "sail_area_m2": 757.1583503641507,
+      "P_core_MW": 0.14376632266407918,
+      "FLOP_s": 1.84315798287281e+19,
+      "frontier_patch_side_m": 3.25,
+      "terminals_10cm": 6.968048035745497,
+      "terminals_10cm_kg_m2": 0.04601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.07924366147602198
+     },
+     {
+      "mem_mult": 100,
+      "jop_div": 100,
+      "P_site_W": 0.15008489682021,
+      "pitch_mm": 25.4,
+      "sail_side_m": 27.516510504861454,
+      "sail_area_m2": 757.1583503641507,
+      "P_core_MW": 0.14376632266407918,
+      "FLOP_s": 1.84315798287281e+20,
+      "frontier_patch_side_m": 3.25,
+      "terminals_10cm": 69.68048035745497,
+      "terminals_10cm_kg_m2": 0.46014469974439665,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.07924366147602198
+     },
+     {
+      "mem_mult": 1,
+      "jop_div": 1,
+      "P_site_W": 0.05,
+      "pitch_mm": 14.660548644405981,
+      "sail_side_m": 158.82170896883048,
+      "sail_area_m2": 25224.33523977989,
+      "P_core_MW": 4.7895,
+      "FLOP_s": 6.140384615384615e+19,
+      "frontier_patch_side_m": 32.5,
+      "terminals_10cm": 23.213688330321045,
+      "terminals_10cm_kg_m2": 0.004601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.0023786553512568824
+     },
+     {
+      "mem_mult": 1,
+      "jop_div": 1,
+      "P_site_W": 0.5,
+      "pitch_mm": 46.36072546401685,
+      "sail_side_m": 502.23834222189663,
+      "sail_area_m2": 252243.35239779897,
+      "P_core_MW": 47.895,
+      "FLOP_s": 6.140384615384615e+20,
+      "frontier_patch_side_m": 32.5,
+      "terminals_10cm": 232.1368833032105,
+      "terminals_10cm_kg_m2": 0.004601446997443967,
+      "terminals_30cm": 4,
+      "terminals_30cm_kg_m2": 0.0002378655351256882
+     }
+    ],
+    "rules": [
+     "Energy per op (J/FLOP) does NOT change sail geometry: area, pitch (at fixed W/site), film, structure and optics are set by sunlight, sheet temperature and PV efficiency. A 10x better J/op gives 10x FLOP/s per sail and, at constant bytes/FLOP of external I/O, 10x link capacity: 10 cm terminals x10 (0.046 kg/m2, +22 % sail mass) or the same count of 30 cm terminals (rate x81 in the far field; ~0.0007 kg/m2).",
+     "Memory per site (bytes per W) sets patch and replica AREA: patch side ~ k^-1/2, replica sites ~ k^-1. If the sail is sized to hold the largest replica, its side ~ k^-1/2: k = 10 -> ~88 m, k = 100 -> ~28 m (then the fixed hub/vane mass, ~2.5 % at 279 m, rises to ~25 % and 250 %).",
+     "Power per site sets pitch = sqrt(P/q_e): 0.05 W -> 14.7 mm, 0.15 W -> 25.4 mm, 0.5 W -> 46 mm; above ~0.2 W the spreader mass climbs (P^1-2)."
+    ]
+   },
+   "tj_and_pv": [
+    {
+     "Tj_C": 60,
+     "f": 0.01,
+     "T_sheet_K": 323.15,
+     "r_AU": 1.0667450442663051,
+     "q_e_W_m2": 195.27893606511594,
+     "pitch_mm_at_0p15W": 27.715194414730195,
+     "sail_P_core_MW_same_film": 12.407900595477592
+    },
+    {
+     "Tj_C": 60,
+     "f": 0.1,
+     "T_sheet_K": 323.15,
+     "r_AU": 1.0925062126801497,
+     "q_e_W_m2": 186.17820443912245,
+     "pitch_mm_at_0p15W": 28.384497539012695,
+     "sail_P_core_MW_same_film": 11.829645840321652
+    },
+    {
+     "Tj_C": 85,
+     "f": 0.01,
+     "T_sheet_K": 348.15,
+     "r_AU": 0.9190436854321097,
+     "q_e_W_m2": 232.63205533543618,
+     "pitch_mm_at_0p15W": 25.39281511894619,
+     "sail_P_core_MW_same_film": 14.781294265968537
+    },
+    {
+     "Tj_C": 85,
+     "f": 0.1,
+     "T_sheet_K": 348.15,
+     "r_AU": 0.9412379663311419,
+     "q_e_W_m2": 221.79052810330757,
+     "pitch_mm_at_0p15W": 26.00603436031675,
+     "sail_P_core_MW_same_film": 14.092430454489357
+    },
+    {
+     "Tj_C": 105,
+     "f": 0.01,
+     "T_sheet_K": 368.15,
+     "r_AU": 0.8219006896186263,
+     "q_e_W_m2": 260.40622047249275,
+     "pitch_mm_at_0p15W": 24.00048137510977,
+     "sail_P_core_MW_same_film": 16.546047224413904
+    },
+    {
+     "Tj_C": 105,
+     "f": 0.1,
+     "T_sheet_K": 368.15,
+     "r_AU": 0.841749033136625,
+     "q_e_W_m2": 248.27031286252299,
+     "pitch_mm_at_0p15W": 24.58007670207263,
+     "sail_P_core_MW_same_film": 15.774939299029707
+    },
+    {
+     "Tj_C": 125,
+     "f": 0.01,
+     "T_sheet_K": 388.15,
+     "r_AU": 0.739383531994358,
+     "q_e_W_m2": 284.1272620496324,
+     "pitch_mm_at_0p15W": 22.976780551017182,
+     "sail_P_core_MW_same_film": 18.05326726483954
+    },
+    {
+     "Tj_C": 125,
+     "f": 0.1,
+     "T_sheet_K": 388.15,
+     "r_AU": 0.7572391421914793,
+     "q_e_W_m2": 270.8858648378009,
+     "pitch_mm_at_0p15W": 23.531654198252934,
+     "sail_P_core_MW_same_film": 17.21191722647773
+    },
+    {
+     "Tj_C": 150,
+     "f": 0.01,
+     "T_sheet_K": 413.15,
+     "r_AU": 0.652609573310295,
+     "q_e_W_m2": 304.30417278766834,
+     "pitch_mm_at_0p15W": 22.201978394197074,
+     "sail_P_core_MW_same_film": 19.3352954641221
+    },
+    {
+     "Tj_C": 150,
+     "f": 0.1,
+     "T_sheet_K": 413.15,
+     "r_AU": 0.6683696513316528,
+     "q_e_W_m2": 290.12245577807215,
+     "pitch_mm_at_0p15W": 22.738141095498236,
+     "sail_P_core_MW_same_film": 18.434198098098005
+    },
+    {
+     "eta0_AM0": 0.18,
+     "q_e_W_m2": 209.36884980189254,
+     "pitch_mm_at_0p15W": 26.76637732647647
+    },
+    {
+     "eta0_AM0": 0.2,
+     "q_e_W_m2": 232.63205533543618,
+     "pitch_mm_at_0p15W": 25.39281511894619
+    },
+    {
+     "eta0_AM0": 0.23,
+     "q_e_W_m2": 267.5268636357516,
+     "pitch_mm_at_0p15W": 23.678922193174653
+    },
+    {
+     "eta0_AM0": 0.26,
+     "q_e_W_m2": 302.421671936067,
+     "pitch_mm_at_0p15W": 22.27097213285253
+    }
+   ],
+   "energy_basis_check": {
+    "E_FLOP_J": 7.8e-14,
+    "sail_P_core_W": 14781294.265968537,
+    "sail_FLOP_s": 1.8950377264062228e+20,
+    "FLOP_s_per_m2": 2724973642567173.5,
+    "FLOP_s_per_chiplet": 1789473769779.427,
+    "FLOP_s_per_kg": 1.313529082139379e+16,
+    "architecture_film_FLOP_s_per_kg": 1.4405070584845868e+16,
+    "ratio_vs_architecture": 0.9118518888211568,
+    "FLOP_per_J_sunlight": 1721151000000.0007,
+    "swarm_f0p01_P_core_W": 5.048820233037228e+23,
+    "swarm_f0p01_FLOP_s": 6.472846452611831e+36,
+    "wafers_300mm_per_sail_at_6mm2": 9987.777837978909,
+    "wafers_per_MW": 675.7038766878554,
+    "architecture_wafers_per_MW": 640,
+    "pod_J_FLOP_at_Tj110": 9.743727393275093e-14,
+    "note": "Per-sail FLOP/s uses the architecture basis; the sail geometry does not depend on it (section 2)."
+   }
+  }
+ },
+ "pod": {
+  "power": {
+   "module_W": 1000000.0,
+   "wing_W": 1156876.1450528328,
+   "aux_W": 17120.0,
+   "conversion_chain": {
+    "panel_dcdc": 0.985,
+    "bus_cable": 0.99,
+    "ibc_800_48": 0.98,
+    "pol": 0.92
+   },
+   "eta_chain": 0.8791952399999999,
+   "bus": "800 V DC (glass-insulated Al), 48 V panel strings (< 80 V arc threshold)",
+   "r_AU": 0.88,
+   "S_W_m2": 1757.7046299180986,
+   "justification": "g/W is flat over 0.3-1 MW (research3 size scan 7.65 -> 7.63); shield mass per W falls as P^-1/3; 4 loops cap a trunk hit at 250 kW; a 1-12 MW training island = 1-12 pods; above ~1 MW bus mass and loop length grow (3 MW: +8 %)"
+  },
+  "module": {
+   "description": "dense memory + logic stack (technology-agnostic): memory-heavy core with logic, two-phase cold plates, power-delivery planes; outer shell of converters, switches/NICs, loop accumulators and pumps; dedicated Mg-alloy + MgO-SiO2 cast-ceramic shield panels bring every line of sight to the memory to >= 5 g/cm2",
+   "volume_m3_per_MW": {
+    "low": 0.5,
+    "mid": 1.5,
+    "high": 4.0
+   },
+   "mass_kg_per_MW": {
+    "low": 400.0,
+    "mid": 800.0,
+    "high": 1500.0
+   },
+   "core_cube_side_m": 1.1447142425533319,
+   "outer_box_side_m": 1.8447142425533318,
+   "shell_equipment_kg": 551.4250223979163,
+   "shell_areal_kg_m2": 41.13569825330824,
+   "dedicated_shield_kg_m2": 8.864301746691758,
+   "dedicated_shield_kg": 180.98975135193254,
+   "shield_scaling": "dedicated shield mass ~ 50 kg/m2 x 6 (V/P)^(2/3) P^(2/3): per W it falls as P^-1/3, favouring larger pods",
+   "shield_material": "Mg alloy + MgO-SiO2 ceramic (low Z, H-free, Mercury-native). Not sulfur (sublimes ~kg/m2/day at 350 K in vacuum); not Fe as bulk shield (more secondaries per g/cm2, no lower Z/A benefit).",
+   "temperatures_K": {
+    "stack_junction": 383.0,
+    "cold_plate": 358.0,
+    "shell_exterior": 300.0
+   },
+   "shield_g_per_W_table": [
+    {
+     "m3_per_MW": 0.5,
+     "P_MW": 0.3,
+     "core_side_m": 0.5313292845913056,
+     "shell_areal_kg_m2": 35.49605362847322,
+     "shield_g_per_W": 0.43980949160170385
+    },
+    {
+     "m3_per_MW": 0.5,
+     "P_MW": 1.0,
+     "core_side_m": 0.7937005259840998,
+     "shell_areal_kg_m2": 70.26039344638541,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 0.5,
+     "P_MW": 3.0,
+     "core_side_m": 1.1447142425533319,
+     "shell_areal_kg_m2": 123.40709475992473,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 1.0,
+     "P_MW": 0.3,
+     "core_side_m": 0.6694329500821695,
+     "shell_areal_kg_m2": 26.53011547948012,
+     "shield_g_per_W": 0.8802833649983726
+    },
+    {
+     "m3_per_MW": 1.0,
+     "P_MW": 1.0,
+     "core_side_m": 1.0,
+     "shell_areal_kg_m2": 50.42752834000148,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 1.0,
+     "P_MW": 3.0,
+     "core_side_m": 1.4422495703074083,
+     "shell_areal_kg_m2": 85.83403007282614,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 1.5,
+     "P_MW": 0.3,
+     "core_side_m": 0.7663094323935531,
+     "shell_areal_kg_m2": 22.125204070324564,
+     "shield_g_per_W": 1.1986515431933948
+    },
+    {
+     "m3_per_MW": 1.5,
+     "P_MW": 1.0,
+     "core_side_m": 1.1447142425533319,
+     "shell_areal_kg_m2": 41.13569825330824,
+     "shield_g_per_W": 0.18098975135193254
+    },
+    {
+     "m3_per_MW": 1.5,
+     "P_MW": 3.0,
+     "core_side_m": 1.6509636244473134,
+     "shell_areal_kg_m2": 68.86175494341549,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 2.5,
+     "P_MW": 0.3,
+     "core_side_m": 0.9085602964160698,
+     "shell_areal_kg_m2": 17.40637837283359,
+     "shield_g_per_W": 1.6866979036525838
+    },
+    {
+     "m3_per_MW": 2.5,
+     "P_MW": 1.0,
+     "core_side_m": 1.3572088082974532,
+     "shell_areal_kg_m2": 31.532756234345978,
+     "shield_g_per_W": 0.4689322294395057
+    },
+    {
+     "m3_per_MW": 2.5,
+     "P_MW": 3.0,
+     "core_side_m": 1.9574338205844317,
+     "shell_areal_kg_m2": 51.7842828356636,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 4.0,
+     "P_MW": 0.3,
+     "core_side_m": 1.0626585691826111,
+     "shell_areal_kg_m2": 13.815991499112336,
+     "shield_g_per_W": 2.2484491269804963
+    },
+    {
+     "m3_per_MW": 4.0,
+     "P_MW": 1.0,
+     "core_side_m": 1.5874010519681994,
+     "shell_areal_kg_m2": 24.484777210917674,
+     "shield_g_per_W": 0.8010050389879434
+    },
+    {
+     "m3_per_MW": 4.0,
+     "P_MW": 3.0,
+     "core_side_m": 2.2894284851066637,
+     "shell_areal_kg_m2": 39.57643538647958,
+     "shield_g_per_W": 0.1863041784318278
+    },
+    {
+     "m3_per_MW": 10.0,
+     "P_MW": 0.3,
+     "core_side_m": 1.4422495703074083,
+     "shell_areal_kg_m2": 8.583403007282612,
+     "shield_g_per_W": 3.80140845679443
+    },
+    {
+     "m3_per_MW": 10.0,
+     "P_MW": 1.0,
+     "core_side_m": 2.154434690031884,
+     "shell_areal_kg_m2": 14.652637234001078,
+     "shield_g_per_W": 1.7280189025773203
+    },
+    {
+     "m3_per_MW": 10.0,
+     "P_MW": 3.0,
+     "core_side_m": 3.1072325059538586,
+     "shell_areal_kg_m2": 23.067434622083553,
+     "shield_g_per_W": 0.780776112832637
+    }
+   ]
+  },
+  "shield": {
+   "areal": ">= 5 g/cm2 on every line of sight to the memory",
+   "composition": "Mg alloy + MgO-SiO2 ceramic (low Z, H-free, Mercury-native). Not sulfur (sublimes ~kg/m2/day at 350 K in vacuum); not Fe as bulk shield (more secondaries per g/cm2, no lower Z/A benefit).",
+   "dedicated_kg": 180.98975135193254,
+   "table": [
+    {
+     "m3_per_MW": 0.5,
+     "P_MW": 0.3,
+     "core_side_m": 0.5313292845913056,
+     "shell_areal_kg_m2": 35.49605362847322,
+     "shield_g_per_W": 0.43980949160170385
+    },
+    {
+     "m3_per_MW": 0.5,
+     "P_MW": 1.0,
+     "core_side_m": 0.7937005259840998,
+     "shell_areal_kg_m2": 70.26039344638541,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 0.5,
+     "P_MW": 3.0,
+     "core_side_m": 1.1447142425533319,
+     "shell_areal_kg_m2": 123.40709475992473,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 1.0,
+     "P_MW": 0.3,
+     "core_side_m": 0.6694329500821695,
+     "shell_areal_kg_m2": 26.53011547948012,
+     "shield_g_per_W": 0.8802833649983726
+    },
+    {
+     "m3_per_MW": 1.0,
+     "P_MW": 1.0,
+     "core_side_m": 1.0,
+     "shell_areal_kg_m2": 50.42752834000148,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 1.0,
+     "P_MW": 3.0,
+     "core_side_m": 1.4422495703074083,
+     "shell_areal_kg_m2": 85.83403007282614,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 1.5,
+     "P_MW": 0.3,
+     "core_side_m": 0.7663094323935531,
+     "shell_areal_kg_m2": 22.125204070324564,
+     "shield_g_per_W": 1.1986515431933948
+    },
+    {
+     "m3_per_MW": 1.5,
+     "P_MW": 1.0,
+     "core_side_m": 1.1447142425533319,
+     "shell_areal_kg_m2": 41.13569825330824,
+     "shield_g_per_W": 0.18098975135193254
+    },
+    {
+     "m3_per_MW": 1.5,
+     "P_MW": 3.0,
+     "core_side_m": 1.6509636244473134,
+     "shell_areal_kg_m2": 68.86175494341549,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 2.5,
+     "P_MW": 0.3,
+     "core_side_m": 0.9085602964160698,
+     "shell_areal_kg_m2": 17.40637837283359,
+     "shield_g_per_W": 1.6866979036525838
+    },
+    {
+     "m3_per_MW": 2.5,
+     "P_MW": 1.0,
+     "core_side_m": 1.3572088082974532,
+     "shell_areal_kg_m2": 31.532756234345978,
+     "shield_g_per_W": 0.4689322294395057
+    },
+    {
+     "m3_per_MW": 2.5,
+     "P_MW": 3.0,
+     "core_side_m": 1.9574338205844317,
+     "shell_areal_kg_m2": 51.7842828356636,
+     "shield_g_per_W": 0.0
+    },
+    {
+     "m3_per_MW": 4.0,
+     "P_MW": 0.3,
+     "core_side_m": 1.0626585691826111,
+     "shell_areal_kg_m2": 13.815991499112336,
+     "shield_g_per_W": 2.2484491269804963
+    },
+    {
+     "m3_per_MW": 4.0,
+     "P_MW": 1.0,
+     "core_side_m": 1.5874010519681994,
+     "shell_areal_kg_m2": 24.484777210917674,
+     "shield_g_per_W": 0.8010050389879434
+    },
+    {
+     "m3_per_MW": 4.0,
+     "P_MW": 3.0,
+     "core_side_m": 2.2894284851066637,
+     "shell_areal_kg_m2": 39.57643538647958,
+     "shield_g_per_W": 0.1863041784318278
+    },
+    {
+     "m3_per_MW": 10.0,
+     "P_MW": 0.3,
+     "core_side_m": 1.4422495703074083,
+     "shell_areal_kg_m2": 8.583403007282612,
+     "shield_g_per_W": 3.80140845679443
+    },
+    {
+     "m3_per_MW": 10.0,
+     "P_MW": 1.0,
+     "core_side_m": 2.154434690031884,
+     "shell_areal_kg_m2": 14.652637234001078,
+     "shield_g_per_W": 1.7280189025773203
+    },
+    {
+     "m3_per_MW": 10.0,
+     "P_MW": 3.0,
+     "core_side_m": 3.1072325059538586,
+     "shell_areal_kg_m2": 23.067434622083553,
+     "shield_g_per_W": 0.780776112832637
+    }
+   ]
+  },
+  "wings": {
+   "count": 2,
+   "area_total_m2": 4430.688235379495,
+   "span_each_m": 68.16443439045378,
+   "chord_m": 32.5,
+   "root_x_m": 18.0,
+   "T_K": 342.6018316547102,
+   "eta": 0.1485490152690391,
+   "q_e_W_m2": 261.10529190816436,
+   "panels_per_wing": 10,
+   "panel_m": [
+    6.816443439045377,
+    32.5
+   ],
+   "film": "same c-Si film as the sail without chiplets/Mg spreader: glass 20 um / Si 30 um / rear contacts / enamel 15 um, ~0.15 kg/m2 incl. frame",
+   "layout": "2 wings in the XY plane (facing +Z), on yoke trusses from x = +-18 m; hinged panels"
+  },
+  "radiators": {
+   "count": 4,
+   "area_planform_m2": 973.061198578398,
+   "blade_len_Y_m": 40.54421660743325,
+   "blade_depth_Z_m": 6.0,
+   "T_K": 353.0,
+   "q_W_m2_planform": 1141.0785976454836,
+   "layout": "YZ plane (faces +-X), knife-edge to the Sun, on +-Y arms, 2 blades in line per arm from y = 20 m, coplanar so they never see each other",
+   "view_factor_to_wings": 0.00261,
+   "areal_kg_m2": 1.3,
+   "construction": "Mg-alloy facesheets 0.15 mm on SO2 heat pipes (Mg tubes 12 mm, 0.10 m pitch, Whipple-bumpered) along Z from a central condenser spine; white Mg/Ca-silicate coating (alpha 0.15-0.2, eps 0.90)"
+  },
+  "loops": {
+   "count": 4,
+   "fluid": "SO2 (Mercury-native S + O; no H)",
+   "Q_per_loop_W": 277584.82697426795,
+   "T_sat_K": 356.0,
+   "P_sat_MPa": 1.92,
+   "mdot_kg_s": 1.2166235403851156,
+   "vapour_line_ID_mm": 45.95815551024367,
+   "liquid_line_ID_mm": 29.558255524325194,
+   "trunk_one_way_m": 101.0884332148665,
+   "pump_power_W": 441.1252865790847,
+   "pump": "canned-motor centrifugal pump, Fe-Ni, A/B redundant per loop",
+   "liquid_inventory_kg": 187.75003199702326,
+   "accumulator_volume_m3": 0.05559434111586983,
+   "accumulator": "Fe-Ni bellows accumulator, 1 per loop, in the module shield shell",
+   "evaporators": "two-phase cold plates (Si microchannel) on the memory+logic stack; Tj 105-120 C; stack drop ~25 K",
+   "condensers": "header (\"spine\") along each blade at z = 0 with SO2 heat pipes every 0.10 m running +-3 m in Z (fishbone)",
+   "heat_pipes_per_blade": 810.884332148665,
+   "isolation": "each loop isolatable; a trunk hit loses 25 %, a heat-pipe hit 0.3 m2"
+  },
+  "lasers": {
+   "DWDM_pod_pod": {
+    "count": 8,
+    "aperture_m": 0.1,
+    "rate": "~9.6 Tbps each at <= 400 km (Suncatcher-class), near-field at 0.5-2 km",
+    "mass_kg": 6.0,
+    "power_W": 80
+   },
+   "handover_to_sails": {
+    "count": 16,
+    "aperture_m": 0.1,
+    "rate": "0.1-0.4 Tbps at <= 3000 km",
+    "mass_kg": 5.0,
+    "power_W": 70
+   },
+   "placement": "on a 4 m terminal mast below the module (anti-sun side, z = -4 to -6 m): clear horizon in the wing plane under the wings and blades"
+  },
+  "propulsion": {
+   "type": "4 electrodeless RF/ECR ion thrusters on O2 (Mercury-native; no Xe, no H; non-condensable plume)",
+   "isp_s": 3000.0,
+   "thrust_each_mN": 40.0,
+   "power_each_kW": 1.5,
+   "dv_per_yr_m_s": 15.630001651671643,
+   "dv_beta_dispersion_m_s_yr": 10.630001651671643,
+   "life_yr": 15.0,
+   "propellant_kg": 30.606668708954796,
+   "tank_kg": 55.09200367611864,
+   "storage": "gaseous O2 at 20 MPa",
+   "alternatives": "SO2 (shares coolant logistics; S deposition risk); Mg/Na metal Hall thrusters rejected: condensable plume coats radiators and PV",
+   "placement": "on 2 short canted booms below the module, plumes 20 deg off the wing plane, away from blades and wings",
+   "needed": "yes: beta dispersion between pods (~5 %) gives ~10.6 m/s/yr of differential drift"
+  },
+  "mass_breakdown": {
+   "best_credible_mid": {
+    "wing": 0.617,
+    "radiator": 1.139,
+    "loops": 0.6,
+    "module": 0.8,
+    "conversion": 0.2,
+    "shielding": 0.2,
+    "misc": 0.3
+   },
+   "total": 3.856,
+   "bottom_up_checks": {
+    "wing": 0.7296643941317074,
+    "radiator": 1.2649795581519176,
+    "module": 0.8,
+    "shielding": 0.18098975135193254,
+    "misc": 0.3736986723850734
+   },
+   "range_total": [
+    2.2,
+    6.6
+   ],
+   "note": "per W of module power; best-credible pod (research3 skeptic checks.py)"
+  },
+  "dims": {
+   "span_X_m": 172.32886878090756,
+   "extent_Y_m": 204.176866429733,
+   "depth_Z_m": 12.0,
+   "projected_footprint_note": "cross: wings along X, blades along Y"
+  },
+  "beta": 0.0008797593575427848,
+  "placement": "training/HBM-class islands at 0.86-0.90 AU; service pods (CPU/DRAM sandboxes, storage, gateways) in pod lanes inside the film shell (0.92 AU, +150-300 km outward, >= 2 km lateral of any sail): Starlink-class links need <= ~3,000 km"
+ },
+ "cluster": {
+  "formation": {
+   "frame": "Hill frame at the cluster reference orbit: x radial (sun line, +x anti-sunward), y along-track, z cross-track",
+   "law": "projected circular orbit: x = rho/2 cos(nt+phi), y = -rho sin(nt+phi), z = (sqrt3/2) rho cos(nt+phi); constant range rho; projected (y,z) separation never below 0.866*rho*2 sin(pi/N)",
+   "rows": [
+    {
+     "N_ring": 3,
+     "hub_pod": true,
+     "rho_m": 600.0,
+     "min_3d_sep_m": 599.9999999999999,
+     "min_projected_sep_m": 519.6152422706632,
+     "required_projected_m": 254.176866429733,
+     "shadow_free": true,
+     "span_m": 1200.0,
+     "max_link_m": 1200.0
+    },
+    {
+     "N_ring": 6,
+     "hub_pod": true,
+     "rho_m": 800.0,
+     "min_3d_sep_m": 799.999999999999,
+     "min_projected_sep_m": 692.8203230275506,
+     "required_projected_m": 254.176866429733,
+     "shadow_free": true,
+     "span_m": 1600.0,
+     "max_link_m": 1600.0
+    },
+    {
+     "N_ring": 12,
+     "hub_pod": true,
+     "rho_m": 1000.0,
+     "min_3d_sep_m": 517.63809020504,
+     "min_projected_sep_m": 448.28773608402616,
+     "required_projected_m": 254.176866429733,
+     "shadow_free": true,
+     "span_m": 2000.0,
+     "max_link_m": 2000.0
+    },
+    {
+     "N_ring": 12,
+     "hub_pod": true,
+     "rho_m": 700.0,
+     "min_3d_sep_m": 362.346663143528,
+     "min_projected_sep_m": 313.80141525881834,
+     "required_projected_m": 254.176866429733,
+     "shadow_free": true,
+     "span_m": 1400.0,
+     "max_link_m": 1400.0
+    }
+   ],
+   "pod_footprint_radius_m": 102.0884332148665,
+   "pod_umbra_km": 20.193092089900595,
+   "orbit_period_days": 301.6571034179802,
+   "baseline": {
+    "N_ring": 12,
+    "hub_pod": 1,
+    "rho_m": 1000.0,
+    "power_MW": "1-13 (one pod per MW)",
+    "island_span_km": 2.0,
+    "intra_island_link": "DWDM 10 cm terminals, 0.5-2 km, near-field (>= 9.6 Tbps each), 6 neighbours per pod"
+   },
+   "island_spacing_km": 60.57927626970178,
+   "rules": [
+    "all pods sun-pointing, wings in the plane normal to the Sun; no pod within its neighbours' sun-line cylinder (radius 2 x footprint + 50 m) inside 30 km",
+    "islands >= 61 km apart along-track (> 3x pod umbra length of 20 km)",
+    "training pods at 0.88 AU are always sunward of the film (0.919+ AU); at >= 6e6 km their penumbra on a sail is < 1e-9 of the disc"
+   ]
+  },
+  "beta": {
+   "sail": 0.0033437616505376955,
+   "pod": 0.0008797593575427848,
+   "delta_accel_m_s2": 1.7299342883404183e-05,
+   "delta_v_per_yr_m_s": 545.9257429773158,
+   "along_track_drift_m_s": 38.31733322803724,
+   "drift_km_per_day": 3310.6175909024178,
+   "co_rotation_radius_AU": 0.919800436539093,
+   "co_rotation_offset_km": 113208.35425457955
+  },
+  "handover": {
+   "rate_model": "10 cm: min(9.6 Tbps, 1.6 Tbps*(1000 km/L)^2); x(D/0.1)^4 in the far field (research3 interconnect fso.py)",
+   "rows": [
+    {
+     "range_km": 100,
+     "rate_Tbps_10cm": 9.6,
+     "rate_Tbps_30cm": 86.39999999999998
+    },
+    {
+     "range_km": 400,
+     "rate_Tbps_10cm": 9.6,
+     "rate_Tbps_30cm": 86.39999999999998
+    },
+    {
+     "range_km": 1000,
+     "rate_Tbps_10cm": 1.6,
+     "rate_Tbps_30cm": 86.39999999999998
+    },
+    {
+     "range_km": 2000,
+     "rate_Tbps_10cm": 0.4,
+     "rate_Tbps_30cm": 32.399999999999984
+    },
+    {
+     "range_km": 3000,
+     "rate_Tbps_10cm": 0.17777777777777778,
+     "rate_Tbps_30cm": 14.399999999999991
+    },
+    {
+     "range_km": 4000,
+     "rate_Tbps_10cm": 0.1,
+     "rate_Tbps_30cm": 8.099999999999996
+    },
+    {
+     "range_km": 10000.0,
+     "rate_Tbps_10cm": 0.016000000000000004,
+     "rate_Tbps_30cm": 1.2959999999999996
+    },
+    {
+     "range_km": 100000.0,
+     "rate_Tbps_10cm": 0.00016,
+     "rate_Tbps_30cm": 0.012959999999999994
+    },
+    {
+     "range_km": 5983914.828,
+     "rate_Tbps_10cm": 4.4683704995197145e-08,
+     "rate_Tbps_30cm": 3.619380104610967e-06
+    }
+   ],
+   "range_for_0p2Tbps_km": 2828.42712474619,
+   "finding": "Starlink-class sail-pod links close only within ~2000-4000 km. Pods at 0.86-0.90 AU are >= 3e6 km (0.02 AU) from the film: ~1e-4 Gbps on 10 cm. So pods that serve sails (CPU/DRAM sandboxes, storage, gateways) must fly IN the film shell, in pod lanes; HBM training islands may sit at 0.86-0.90 AU and talk to the film only by relay chains.",
+   "pod_lane": {
+    "radial_offset_km": "+150 to +300 (anti-sunward of the local sail layer: links look >= 3 deg into the sails' back hemisphere)",
+    "lateral_offset_km": ">= 2 (outside every sail's penumbra cone: 0.0101 rad x 200 km / 2 + sail/2 + pod/2 ~ 1.2 km)",
+    "relative_speed_m_s": 38.31733322803724,
+    "contact_window_h_at_0p2Tbps": 40.9061637855546,
+    "lane_spacing_km": "pods every <= 5643 km along a lane keep >= 1 pod in range of every sail",
+    "mass_cost": "pods at 0.92 AU instead of 0.88 AU: wing +9 %% area (S 1611 vs 1767 W/m2); research3 r-scan g/W 7.19 (0.90) vs 7.25 (1.00): < 1 %% of pod mass"
+   },
+   "alternative": "matching-beta vane on a pod: extra reflective area ~2.6x the wing (~1.3 % of pod mass at 5 g/m2) makes it co-orbit a sail; rejected for the baseline (huge glinting mirror, shades neighbours), kept as an option for dedicated sail gateways"
+  },
+  "penumbral_dimming": [
+   {
+    "distance_m": 1000.0,
+    "pod_on_sail": 1.0,
+    "sail_on_pod": 1.0
+   },
+   {
+    "distance_m": 10000.0,
+    "pod_on_sail": 1.0,
+    "sail_on_pod": 1.0
+   },
+   {
+    "distance_m": 30000.0,
+    "pod_on_sail": 0.4522693004384028,
+    "sail_on_pod": 1.0
+   },
+   {
+    "distance_m": 100000.0,
+    "pod_on_sail": 0.04070423703945624,
+    "sail_on_pod": 0.09705668466584981
+   },
+   {
+    "distance_m": 1000000.0,
+    "pod_on_sail": 0.0004070423703945625,
+    "sail_on_pod": 0.0009705668466584979
+   },
+   {
+    "distance_m": 6000000000.0,
+    "pod_on_sail": 1.1306732510960069e-11,
+    "sail_on_pod": 2.696019018495828e-11
+   }
+  ]
+ },
+ "scene_facts": {
+  "sun": {
+   "by_distance": {
+    "0.919_AU": {
+     "irradiance_W_m2": 1611.5319867564742,
+     "illuminance_lx": 148373.75713761713,
+     "angular_diameter_deg": 0.5798415829992849,
+     "angular_diameter_arcmin": 34.790494979957096,
+     "disc_solid_angle_sr": 8.043838290596348e-05,
+     "disc_radiance_W_m2_sr": 20034365.79077474,
+     "disc_luminance_cd_m2": 1844564146.8336518,
+     "apparent_mag_V": -26.92331922276919
+    },
+    "0.920_AU": {
+     "irradiance_W_m2": 1608.1834421178824,
+     "illuminance_lx": 148065.45661795393,
+     "angular_diameter_deg": 0.579238863974897,
+     "angular_diameter_arcmin": 34.75433183849382,
+     "disc_solid_angle_sr": 8.02712457160743e-05,
+     "disc_radiance_W_m2_sr": 20034365.080195136,
+     "disc_luminance_cd_m2": 1844564081.410585,
+     "apparent_mag_V": -26.92106086327222
+    },
+    "0.880_AU": {
+     "irradiance_W_m2": 1757.7046299180986,
+     "illuminance_lx": 161831.87303904467,
+     "angular_diameter_deg": 0.6055674237162016,
+     "angular_diameter_arcmin": 36.334045422972096,
+     "disc_solid_angle_sr": 8.773434242316618e-05,
+     "disc_radiance_W_m2_sr": 20034396.809406962,
+     "disc_luminance_cd_m2": 1844567002.7192578,
+     "apparent_mag_V": -27.017586639249156
+    },
+    "1.000_AU": {
+     "irradiance_W_m2": 1361.1664654085753,
+     "illuminance_lx": 125322.60248143616,
+     "angular_diameter_deg": 0.5329004520039888,
+     "angular_diameter_arcmin": 31.97402712023933,
+     "disc_solid_angle_sr": 6.794176013850178e-05,
+     "disc_radiance_W_m2_sr": 20034312.66181193,
+     "disc_luminance_cd_m2": 1844559255.2498114,
+     "apparent_mag_V": -26.74
+    }
+   },
+   "T_eff_K": 5772.0,
+   "luminous_efficacy_lm_W": 92.07000441626266,
+   "colour_linear_sRGB": [
+    1.0,
+    0.8790858395264943,
+    0.8210812368342071
+   ],
+   "colour_srgb8": [
+    255,
+    241,
+    234
+   ],
+   "CIE_xy": [
+    0.32646921845922083,
+    0.3360302025123476
+   ],
+   "blender": "Sun lamp strength = irradiance (W/m2), angle = angular diameter, colour = Blackbody 5772 K (render/lib.py add_sun)"
+  },
+  "sail_brightness": {
+   "front_luminous_albedo_total": 0.001854229874678097,
+   "cells_albedo": 0.0006138018252061176,
+   "hinge_strip_area_fraction": 0.015625235594993275,
+   "hinge_strip_albedo": 0.08,
+   "front_radiance_W_m2_sr": 0.9511579263558381,
+   "front_luminance_cd_m2": 87.57311448014525,
+   "grey_card_luminance_cd_m2": 8501.190074484535,
+   "front_vs_grey_card_stops": 6.6010329858613215,
+   "glint_radiance_W_m2_sr": 26387.68526210162,
+   "glint_luminance_cd_m2": 2429514.2986166454,
+   "glint_colour_linear_sRGB_rel": [
+    0.38978651401875164,
+    0.09908932567676626,
+    1.0
+   ],
+   "vane_glint_radiance_W_m2_sr": 17029210.922158528,
+   "rows": [
+    {
+     "distance_km": 1.0,
+     "corner_to_corner_deg": 22.32115771422669,
+     "diffuse_flux_W_m2": 0.0661467005059368,
+     "diffuse_mag": -15.956492362072934,
+     "glint_flux_W_m2": 2.122582731114979,
+     "glint_mag": -19.72238346397119,
+     "one_vane_glint_mag": -26.746866537054924
+    },
+    {
+     "distance_km": 10.0,
+     "corner_to_corner_deg": 2.2604884885357093,
+     "diffuse_flux_W_m2": 0.000661467005059368,
+     "diffuse_mag": -10.956492362072934,
+     "glint_flux_W_m2": 2.122582731114979,
+     "glint_mag": -19.72238346397119,
+     "one_vane_glint_mag": -21.83112212771516
+    },
+    {
+     "distance_km": 100.0,
+     "corner_to_corner_deg": 0.22607788120242125,
+     "diffuse_flux_W_m2": 6.614670050593679e-06,
+     "diffuse_mag": -5.956492362072936,
+     "glint_flux_W_m2": 0.1835087807935865,
+     "glint_mag": -17.06436402211129,
+     "one_vane_glint_mag": -16.83112212771516
+    },
+    {
+     "distance_km": 1000.0,
+     "corner_to_corner_deg": 0.02260781715937024,
+     "diffuse_flux_W_m2": 6.614670050593679e-08,
+     "diffuse_mag": -0.956492362072936,
+     "glint_flux_W_m2": 0.0018350878079358651,
+     "glint_mag": -12.064364022111292,
+     "one_vane_glint_mag": -11.831122127715162
+    },
+    {
+     "distance_km": 10000.0,
+     "corner_to_corner_deg": 0.00226078174497622,
+     "diffuse_flux_W_m2": 6.61467005059368e-10,
+     "diffuse_mag": 4.043507637927064,
+     "glint_flux_W_m2": 1.8350878079358653e-05,
+     "glint_mag": -7.064364022111292,
+     "one_vane_glint_mag": -6.831122127715165
+    }
+   ],
+   "note": "Front face is near-black navy: ~6.6 stops below an 18% grey card in the same sun. The 4 Al corner vanes are by far the brightest parts (each specular glint ~1x the whole film glint)."
+  },
+  "glint": {
+   "geometry": "A sun-facing sail reflects the Sun straight back sunward. A viewer sees the glint only near its own ANTISOLAR point: it must be sunward of the sail and look away from the Sun. All sails share (nearly) the same normal, so in a view toward the antisolar point every sail within the glint half-angle of it glints at once: a \"glint halo\" around the camera's antisolar point.",
+   "half_angle_interior_deg": 0.5223239159326057,
+   "half_angle_hinge_edges_deg": 7.688369556395408,
+   "hinge_edge_area_fraction": 0.21639112544263628,
+   "p_random_direction_interior": 2.077646033854519e-05,
+   "p_random_direction_edges": 0.004494811454284375,
+   "p_random_direction_per_vane": 0.00012670754783555838,
+   "vane_note": "vanes tilt 0-40 deg for control, so their glints point anywhere within ~80 deg of the Sun direction; each vane glints for a random viewer with p ~ 1.3e-04"
+  },
+  "back_face": {
+   "rows": [
+    {
+     "f": 0.01,
+     "anti_sun_sky_radiance_W_m2_sr": 0.0047557896317791904,
+     "anti_sun_sky_luminance_cd_m2": 0.43786557240072627,
+     "back_illuminance_lx": 1.3758452655140112,
+     "back_luminance_cd_m2": 0.026276708992336327,
+     "back_vs_front_stops": 11.70248770797114,
+     "ir_irradiance_on_back_W_m2": 3.540513581747998
+    },
+    {
+     "f": 0.1,
+     "anti_sun_sky_radiance_W_m2_sr": 0.047557896317791906,
+     "anti_sun_sky_luminance_cd_m2": 4.378655724007262,
+     "back_illuminance_lx": 13.756202655140111,
+     "back_luminance_cd_m2": 0.2627241180887285,
+     "back_vs_front_stops": 8.380795564711201,
+     "ir_irradiance_on_back_W_m2": 35.40513581747998
+    },
+    {
+     "f": 0.5,
+     "anti_sun_sky_radiance_W_m2_sr": 0.23778948158895952,
+     "anti_sun_sky_luminance_cd_m2": 21.893278620036313,
+     "back_illuminance_lx": 68.78001327570055,
+     "back_luminance_cd_m2": 1.3136014918504715,
+     "back_vs_front_stops": 6.058888445169502,
+     "ir_irradiance_on_back_W_m2": 177.02567908739988
+    }
+   ],
+   "starlight_zodiacal_lx": 0.00025,
+   "note": "The back looks anti-sunward, at the sunlit FRONTS of sails farther out (they face the Sun, hence the viewer). Their summed glow (sky coverage g ~ f/2) outshines starlight by ~1e3-1e5x. The back emits ~708 W/m2 at 348 K (LWIR) and has no visible thermal glow (348 K blackbody luminance ~1e-20 cd/m2). Model it as a dark (albedo 0.06) surface under a dim, uniform anti-sun dome plus the Sun-side black sky; it is a silhouette against stars when exposed for sunlit parts."
+  },
+  "spacing": {
+   "rows": [
+    {
+     "f": 0.01,
+     "r_inner_AU": 0.9190436854321097,
+     "shell_thickness_AU": 0.1809563145678904,
+     "number_density_per_km3": 5.3385813600269605e-09,
+     "nearest_neighbour_km": 316.98190867628756,
+     "thin_layer_spacing_km": 2.63710715583583,
+     "sails_within": {
+      "10_km": 2.236219730833614e-05,
+      "100_km": 0.02236219730833614,
+      "1000_km": 22.36219730833614,
+      "10000_km": 22362.19730833614
+     },
+     "distance_for_1px_km": 1023.0734389855979,
+     "resolved_sails_in_60deg_frame": 3.991017698290019,
+     "n_sails_total": 3.415682106174758e+16
+    },
+    {
+     "f": 0.1,
+     "r_inner_AU": 0.9412379663311419,
+     "shell_thickness_AU": 0.15876203366885822,
+     "number_density_per_km3": 6.378965710347335e-08,
+     "nearest_neighbour_km": 138.65206503212025,
+     "thin_layer_spacing_km": 0.8339265046369818,
+     "sails_within": {
+      "10_km": 0.0002672014908417118,
+      "100_km": 0.2672014908417118,
+      "1000_km": 267.2014908417118,
+      "10000_km": 267201.4908417118
+     },
+     "distance_for_1px_km": 1023.0734389855979,
+     "resolved_sails_in_60deg_frame": 47.68788434583829,
+     "n_sails_total": 3.582646903486297e+17
+    },
+    {
+     "f": 0.5,
+     "r_inner_AU": 1.067070895779207,
+     "shell_thickness_AU": 0.03292910422079309,
+     "number_density_per_km3": 2.023320016273497e-06,
+     "nearest_neighbour_km": 43.801424902494325,
+     "thin_layer_spacing_km": 0.372943270521417,
+     "sails_within": {
+      "10_km": 0.008475263065314665,
+      "100_km": 8.475263065314666,
+      "1000_km": 8475.263065314664,
+      "10000_km": 8475263.065314665
+     },
+     "distance_for_1px_km": 1023.0734389855979,
+     "resolved_sails_in_60deg_frame": 1512.5939738813302,
+     "n_sails_total": 2.3022988019770465e+18
+    }
+   ],
+   "model": "Poisson in a shell from r_min(f) (sheet 348 K) to 1.1 AU; n = -ln(1-f)/(A_sail * dR); nearest neighbour 0.554 n^-1/3. A thin single layer (all sails at r_min) would give sqrt(A/f) instead; real swarms need ~1e7+ distinct orbit radii to avoid crossings, so the thick-shell numbers are the ones to use for wide shots."
+  },
+  "pod_radiators_visible": {
+   "face_illuminance_lx": 3.8205649066103087,
+   "face_luminance_cd_m2": 0.9728988644647298,
+   "sunlit_white_luminance_cd_m2": 41210.14807037438,
+   "stops_below_sunlit_white": 15.37035028109869,
+   "leading_edge_thickness_m": 0.025,
+   "note": "Blades are edge-on: no direct sunlight on the faces. They see the wings only at grazing angles (view factor 0.0026) and the swarm glow. In a frame exposed for sunlit parts the faces are black; only the 25 mm sunward leading edges and the sunward header lips are lit (thin bright white lines). Wings look as dark as sail fronts; the module and booms are the bright, sunlit parts."
+  },
+  "lwir": {
+   "film_mean_K": 348.15,
+   "chiplet_die_K": [
+    355.15,
+    358.15
+   ],
+   "tile_pattern": "die hot spots +7-10 K at 25.4 mm pitch, ~1 cm wide",
+   "hinge_strip_K": 348.15,
+   "edge_tape_K": 345.15,
+   "corner_doubler_K": 346.15,
+   "booms_in_film_shade_K": 292.7580869705807,
+   "hub_K": [
+    270.0,
+    300.0
+   ],
+   "laser_terminals_K": [
+    295.0,
+    315.0
+   ],
+   "vane_face_on_K": 237.05339035384418,
+   "vane_45deg_K": 217.37891740985035,
+   "pod": {
+    "wing_K": 342.6018316547102,
+    "radiator_root_K": 355.0,
+    "radiator_tip_K": 345.0,
+    "radiator_mean_K": 353.0,
+    "module_exterior_K": 300.0,
+    "stack_junction_K": 383.0,
+    "thrusters_K": [
+     300,
+     420
+    ]
+   },
+   "peak_wavelength_um": {
+    "348K": 8.323998276604913,
+    "353K": 8.209631728045325,
+    "293K": 9.890784982935154
+   },
+   "emissivities": {
+    "film_front": 0.85,
+    "film_back": 0.9,
+    "film_front_conservative": 0.76,
+    "film_back_conservative_15um": 0.73,
+    "radiator": 0.9,
+    "vane_front_Al": 0.05,
+    "vane_back": 0.85,
+    "booms_oxidised_Mg": 0.3,
+    "hub_glass_cloth_blanket": 0.6
+   }
+  },
+  "shadows": {
+   "sail_umbra_km": 27.594167688570607,
+   "pod_umbra_km": 20.193092089900595,
+   "rule": "nothing within 100x its size downstream of any sail; pods sunward of a sail must be >= 300 km away (<0.5 % dimming) or laterally clear of its sun-line cylinder"
+  },
+  "energy_basis_check": {
+   "E_FLOP_J": 7.8e-14,
+   "sail_P_core_W": 14781294.265968537,
+   "sail_FLOP_s": 1.8950377264062228e+20,
+   "FLOP_s_per_m2": 2724973642567173.5,
+   "FLOP_s_per_chiplet": 1789473769779.427,
+   "FLOP_s_per_kg": 1.313529082139379e+16,
+   "architecture_film_FLOP_s_per_kg": 1.4405070584845868e+16,
+   "ratio_vs_architecture": 0.9118518888211568,
+   "FLOP_per_J_sunlight": 1721151000000.0007,
+   "swarm_f0p01_P_core_W": 5.048820233037228e+23,
+   "swarm_f0p01_FLOP_s": 6.472846452611831e+36,
+   "wafers_300mm_per_sail_at_6mm2": 9987.777837978909,
+   "wafers_per_MW": 675.7038766878554,
+   "architecture_wafers_per_MW": 640,
+   "pod_J_FLOP_at_Tj110": 9.743727393275093e-14,
+   "note": "Per-sail FLOP/s uses the architecture basis; the sail geometry does not depend on it (section 2)."
+  }
+ },
+ "render_spec": {
+  "units": "metres, kelvin, W/m2; Cycles sun strength = irradiance",
+  "frame_sail": "+Z toward the Sun (light travels -Z); film in XY at z=0; booms along X and Y behind the film",
+  "frame_pod": "+Z toward the Sun; wings in XY along X; radiator blades in the YZ plane along Y",
+  "sun": {
+   "strength_W_m2": 1611.5319867564742,
+   "angle_deg": 0.5798415829992849,
+   "blackbody_K": 5772.0,
+   "colour_linear_sRGB": [
+    1.0,
+    0.8790858395264943,
+    0.8210812368342071
+   ]
+  },
+  "exposure": "meter an 18 % grey card at 1612 W/m2 (render/lib.py meter); the sail front then sits ~6.6 stops below mid-grey",
+  "world": "black + star field (HYG/BSC); optional anti-sun dome of 4.76e-03 W/m2/sr x (f/0.01) for the swarm glow",
+  "neighbours": "Poisson in a shell r_min(f)..1.1 AU; nearest neighbour 317 km (f=0.01), 139 km (f=0.1), 44 km (f=0.5); all sails share the sun-facing attitude",
+  "lod": "chiplets and scribes only < 5 m; hinge strips as texture stripes beyond ~50 m; booms as lines beyond ~5 km",
+  "materials": {
+   "sail_front_pv": {
+    "physical": "vacuum | porous-SiO2 AR 110 nm (n 1.25) | 20 um SiO2-rich Mg-aluminosilicate cover glass | TiO2 ARC 55 nm | textured 30 um c-Si (IBC, no front metal)",
+    "principled": {
+     "base_color_linear": [
+      0.00559,
+      0.0004,
+      0.02608
+     ],
+     "base_color_ideal_model": [
+      0.00173,
+      0.0,
+      0.00856
+     ],
+     "roughness": 0.35,
+     "metallic": 0.0,
+     "coat_weight": 1.0,
+     "coat_ior": 1.0753,
+     "coat_roughness": 0.006,
+     "coat_tint": [
+      0.39,
+      0.099,
+      1.0
+     ],
+     "note": "coat IOR 1.075 reproduces the AR-coated top-surface F0 = 0.0013; glint tint is the AR residual (magenta-blue). Bare-glass alternative: coat IOR 1.47 (F0 0.037). Texture scatter leaves ~68 deg off-normal; diffuse base is an approximation."
+    },
+    "luminous_albedo_diffuse": 0.0005891694548438021,
+    "luminous_specular_F0": 0.0013171210677531107,
+    "solar_absorptance": 0.9,
+    "eps_IR": 0.85,
+    "eps_IR_conservative": 0.76,
+    "T_K": 348.15
+   },
+   "sail_back_enamel": {
+    "physical": "15 um Fe/Mg/Ca-silicate glass enamel, microtextured, over 13 um Mg spreader (patterned per tile) and 0.5 um SiO2",
+    "principled": {
+     "base_color_linear": [
+      0.06,
+      0.054,
+      0.048
+     ],
+     "roughness": 0.65,
+     "metallic": 0.0,
+     "specular_ior_level": 0.4
+    },
+    "luminous_albedo": 0.06,
+    "eps_IR": 0.9,
+    "eps_IR_conservative": 0.73,
+    "T_K": 348.15
+   },
+   "chiplet_die": {
+    "physical": "Si die 2.45 x 2.45 x 0.05 mm, flip-chip on the rear pads, overcoated with the back enamel",
+    "principled": {
+     "base_color_linear": [
+      0.055,
+      0.052,
+      0.05
+     ],
+     "roughness": 0.35,
+     "metallic": 0.0
+    },
+    "T_K": [
+     355.15,
+     358.15
+    ]
+   },
+   "hinge_strip": {
+    "physical": "25.4 mm glass-fibre (Mg-aluminosilicate) cloth with Al jumper traces, dark enamel coat on both faces (alpha/eps matched to the film so it runs at film temperature)",
+    "principled": {
+     "base_color_linear": [
+      0.08,
+      0.078,
+      0.075
+     ],
+     "roughness": 0.6,
+     "metallic": 0.0,
+     "bump": "plain-weave 0.5 mm, 0.05 mm depth"
+    },
+    "luminous_albedo": 0.08,
+    "eps_IR": 0.88,
+    "T_K": 348.15
+   },
+   "edge_hem_and_doubler": {
+    "physical": "50 mm glass-cloth hem enclosing a 1.2 mm Fe-Ni edge cable; 2.5 m corner doubler triangles; dark enamel coat",
+    "principled": {
+     "base_color_linear": [
+      0.08,
+      0.078,
+      0.075
+     ],
+     "roughness": 0.6
+    },
+    "T_K": 345.15
+   },
+   "boom_mg_oxidised": {
+    "physical": "Mg-alloy thin-wall tubes with thermal oxide (MgO) skin; Fe-Ni wire diagonals",
+    "principled": {
+     "base_color_linear": [
+      0.42,
+      0.42,
+      0.41
+     ],
+     "metallic": 0.6,
+     "roughness": 0.5
+    },
+    "eps_IR": 0.3,
+    "T_K": 293
+   },
+   "vane_reflector_front": {
+    "physical": "100 nm Al on glass-fibre cloth membrane (rho_s 0.85-0.9), slight wrinkles",
+    "principled": {
+     "base_color_linear": [
+      0.91,
+      0.92,
+      0.92
+     ],
+     "metallic": 1.0,
+     "roughness": 0.02,
+     "bump": "wrinkles 0.3-1 m wavelength, 2 mm"
+    },
+    "note": "Al optical constants: render/lib.py aluminium / Rakic 1995",
+    "eps_IR": 0.05,
+    "T_K": 237
+   },
+   "vane_back": {
+    "principled": {
+     "base_color_linear": [
+      0.06,
+      0.055,
+      0.05
+     ],
+     "roughness": 0.65
+    },
+    "eps_IR": 0.85
+   },
+   "hub_blanket": {
+    "physical": "aluminised glass-cloth multilayer blanket (no polymers), as render/lib.py blanket_material",
+    "principled": {
+     "base_color_linear": [
+      0.83,
+      0.82,
+      0.78
+     ],
+     "metallic": 1.0,
+     "roughness": 0.32
+    },
+    "eps_IR": 0.6,
+    "T_K": [
+     270,
+     300
+    ]
+   },
+   "terminal_body": {
+    "physical": "white MgO/Ca-silicate coated Mg housing, black anodic-oxide sunshade interior, dark 10 cm aperture glass",
+    "principled": {
+     "base_color_linear": [
+      0.7,
+      0.7,
+      0.68
+     ],
+     "roughness": 0.8
+    },
+    "aperture": {
+     "base_color_linear": [
+      0.01,
+      0.01,
+      0.015
+     ],
+     "roughness": 0.05,
+     "coat_weight": 1.0
+    }
+   },
+   "pod_wing_front": "same as sail_front_pv (wing film is the sail film without chiplets/Mg spreader)",
+   "pod_wing_back": "same as sail_back_enamel",
+   "pod_radiator": {
+    "physical": "Mg-alloy facesheets on SO2 heat pipes (0.10 m pitch along Z), white Mg/Ca-silicate coating alpha 0.15-0.2 eps 0.90",
+    "principled": {
+     "base_color_linear": [
+      0.8,
+      0.8,
+      0.78
+     ],
+     "roughness": 0.85,
+     "bump": "heat-pipe ridges every 0.10 m along Z, 3 mm high"
+    },
+    "eps_IR": 0.9,
+    "T_K": [
+     345,
+     355
+    ],
+    "visible_note": "faces are never sunlit: ~15 stops below sunlit white"
+   },
+   "pod_module_blanket": "hub_blanket",
+   "pod_truss": "boom_mg_oxidised",
+   "loop_line_sleeve": {
+    "physical": "Whipple sleeve (Mg-alloy bumper) around SO2 vapour/liquid lines",
+    "principled": {
+     "base_color_linear": [
+      0.55,
+      0.55,
+      0.54
+     ],
+     "metallic": 0.7,
+     "roughness": 0.45
+    }
+   }
+  },
+  "parts": [
+   {
+    "name": "sail_film",
+    "object": "sail",
+    "count": 1,
+    "shape": "scalloped diamond (square side 279.01 m rotated 45 deg)",
+    "dims_m": {
+     "corner_to_corner": 394.580851239373,
+     "thickness": 8e-05,
+     "sag_at_mid_edge": 11.16043182550884
+    },
+    "position_rule": "XY plane z=0; corners (+-197.290,0),(0,+-197.290); each edge bows inward by sag*(1-(2u/side)^2) (u along edge from mid)",
+    "material": {
+     "front": "sail_front_pv",
+     "back": "sail_back_enamel"
+    },
+    "area_m2": 69543.34151360541
+   },
+   {
+    "name": "tile_grid_front",
+    "object": "sail",
+    "count": 107706024,
+    "dims_m": {
+     "pitch": 0.0254,
+     "scribe_width": 5e-05,
+     "half_cell_scribe_pitch": 0.0127
+    },
+    "position_rule": "texture on the front: tile scribes every 25.4 mm in X and Y (centred on (i+0.5)p), half-cell scribe along X through each tile centre; visible only < ~3 m",
+    "material": {
+     "scribe": {
+      "base_color_linear": [
+       0.03,
+       0.03,
+       0.035
+      ],
+      "roughness": 0.4
+     }
+    }
+   },
+   {
+    "name": "chiplet",
+    "object": "sail",
+    "count": 105899162,
+    "dims_m": [
+     0.00245,
+     0.00245,
+     5e-05
+    ],
+    "position_rule": "back face (z<0), at tile centres x=(i+0.5)*0.0254, y=(j+0.5)*0.0254, except hinge rows, corner doublers, terminal service plates; instance only within ~5 m of the camera, else a bump/normal texture",
+    "material": "chiplet_die"
+   },
+   {
+    "name": "hinge_strip",
+    "object": "sail",
+    "count": 243,
+    "dims_m": {
+     "width": 0.0254,
+     "length": "2*(LD-|y|) minus scallop"
+    },
+    "position_rule": "lines parallel to X at y = (64k+63.5)*0.0254 m (every 1.6256 m); both faces",
+    "material": "hinge_strip",
+    "y_positions_m": [
+     -196.7103,
+     -195.0847,
+     -193.4591,
+     -191.8335,
+     -190.2079,
+     -188.5823,
+     -186.9567,
+     -185.3311,
+     -183.7055,
+     -182.0799,
+     -180.4543,
+     -178.8287,
+     -177.2031,
+     -175.5775,
+     -173.9519,
+     -172.3263,
+     -170.7007,
+     -169.0751,
+     -167.4495,
+     -165.8239,
+     -164.1983,
+     -162.5727,
+     -160.9471,
+     -159.3215,
+     -157.6959,
+     -156.0703,
+     -154.4447,
+     -152.8191,
+     -151.1935,
+     -149.5679,
+     -147.9423,
+     -146.3167,
+     -144.6911,
+     -143.0655,
+     -141.4399,
+     -139.8143,
+     -138.1887,
+     -136.5631,
+     -134.9375,
+     -133.3119,
+     -131.6863,
+     -130.0607,
+     -128.4351,
+     -126.8095,
+     -125.1839,
+     -123.5583,
+     -121.9327,
+     -120.3071,
+     -118.6815,
+     -117.0559,
+     -115.4303,
+     -113.8047,
+     -112.1791,
+     -110.5535,
+     -108.9279,
+     -107.3023,
+     -105.6767,
+     -104.0511,
+     -102.4255,
+     -100.7999,
+     -99.1743,
+     -97.5487,
+     -95.9231,
+     -94.2975,
+     -92.6719,
+     -91.0463,
+     -89.4207,
+     -87.7951,
+     -86.1695,
+     -84.5439,
+     -82.9183,
+     -81.2927,
+     -79.6671,
+     -78.0415,
+     -76.4159,
+     -74.7903,
+     -73.1647,
+     -71.5391,
+     -69.9135,
+     -68.2879,
+     -66.6623,
+     -65.0367,
+     -63.4111,
+     -61.7855,
+     -60.1599,
+     -58.5343,
+     -56.9087,
+     -55.2831,
+     -53.6575,
+     -52.0319,
+     -50.4063,
+     -48.7807,
+     -47.1551,
+     -45.5295,
+     -43.9039,
+     -42.2783,
+     -40.6527,
+     -39.0271,
+     -37.4015,
+     -35.7759,
+     -34.1503,
+     -32.5247,
+     -30.8991,
+     -29.2735,
+     -27.6479,
+     -26.0223,
+     -24.3967,
+     -22.7711,
+     -21.1455,
+     -19.5199,
+     -17.8943,
+     -16.2687,
+     -14.6431,
+     -13.0175,
+     -11.3919,
+     -9.7663,
+     -8.1407,
+     -6.5151,
+     -4.8895,
+     -3.2639,
+     -1.6383,
+     -0.0127,
+     1.6129,
+     3.2385,
+     4.8641,
+     6.4897,
+     8.1153,
+     9.7409,
+     11.3665,
+     12.9921,
+     14.6177,
+     16.2433,
+     17.8689,
+     19.4945,
+     21.1201,
+     22.7457,
+     24.3713,
+     25.9969,
+     27.6225,
+     29.2481,
+     30.8737,
+     32.4993,
+     34.1249,
+     35.7505,
+     37.3761,
+     39.0017,
+     40.6273,
+     42.2529,
+     43.8785,
+     45.5041,
+     47.1297,
+     48.7553,
+     50.3809,
+     52.0065,
+     53.6321,
+     55.2577,
+     56.8833,
+     58.5089,
+     60.1345,
+     61.7601,
+     63.3857,
+     65.0113,
+     66.6369,
+     68.2625,
+     69.8881,
+     71.5137,
+     73.1393,
+     74.7649,
+     76.3905,
+     78.0161,
+     79.6417,
+     81.2673,
+     82.8929,
+     84.5185,
+     86.1441,
+     87.7697,
+     89.3953,
+     91.0209,
+     92.6465,
+     94.2721,
+     95.8977,
+     97.5233,
+     99.1489,
+     100.7745,
+     102.4001,
+     104.0257,
+     105.6513,
+     107.2769,
+     108.9025,
+     110.5281,
+     112.1537,
+     113.7793,
+     115.4049,
+     117.0305,
+     118.6561,
+     120.2817,
+     121.9073,
+     123.5329,
+     125.1585,
+     126.7841,
+     128.4097,
+     130.0353,
+     131.6609,
+     133.2865,
+     134.9121,
+     136.5377,
+     138.1633,
+     139.7889,
+     141.4145,
+     143.0401,
+     144.6657,
+     146.2913,
+     147.9169,
+     149.5425,
+     151.1681,
+     152.7937,
+     154.4193,
+     156.0449,
+     157.6705,
+     159.2961,
+     160.9217,
+     162.5473,
+     164.1729,
+     165.7985,
+     167.4241,
+     169.0497,
+     170.6753,
+     172.3009,
+     173.9265,
+     175.5521,
+     177.1777,
+     178.8033,
+     180.4289,
+     182.0545,
+     183.6801,
+     185.3057,
+     186.9313,
+     188.5569,
+     190.1825,
+     191.8081,
+     193.4337,
+     195.0593,
+     196.6849
+    ]
+   },
+   {
+    "name": "edge_hem",
+    "object": "sail",
+    "count": 4,
+    "dims_m": {
+     "width": 0.05,
+     "length": 279.010795637721
+    },
+    "position_rule": "along the 4 scalloped edges",
+    "material": "edge_hem_and_doubler"
+   },
+   {
+    "name": "edge_cable",
+    "object": "sail",
+    "count": 4,
+    "dims_m": {
+     "diameter": 0.0012,
+     "length": 280.12683882027187
+    },
+    "position_rule": "inside the hem, catenary corner to corner",
+    "material": "boom_mg_oxidised"
+   },
+   {
+    "name": "corner_doubler",
+    "object": "sail",
+    "count": 4,
+    "dims_m": {
+     "leg": 2.5,
+     "thickness": 0.0003
+    },
+    "position_rule": "triangles at the 4 corners",
+    "material": "edge_hem_and_doubler"
+   },
+   {
+    "name": "corner_tether",
+    "object": "sail",
+    "count": 8,
+    "dims_m": {
+     "diameter": 0.003,
+     "length": 2.0
+    },
+    "position_rule": "2 per corner, from film corner to the boom-tip tensioner, along the boom axis",
+    "material": "edge_hem_and_doubler"
+   },
+   {
+    "name": "boom",
+    "object": "sail",
+    "count": 4,
+    "dims_m": {
+     "length": 199.2904256196865,
+     "triangle_side": 2.598076211353316,
+     "longeron_od": 0.01616773427805625,
+     "longeron_wall": 0.0012934187422445002,
+     "bay": 2.598076211353316,
+     "batten_od": 0.01,
+     "diagonal_wire": 0.002
+    },
+    "position_rule": "triangular truss from the hub along +X,-X,+Y,-Y; two longerons in the plane z=-0.30 at +-side/2 from the axis, apex longeron at z=-0.30-0.866*side; battens every bay, X-bracing wires in each face",
+    "material": "boom_mg_oxidised",
+    "n_bays": 76
+   },
+   {
+    "name": "hub",
+    "object": "sail",
+    "count": 1,
+    "dims_m": {
+     "across_flats": 3.4,
+     "depth": 1.9
+    },
+    "position_rule": "octagonal prism centred on the axis, z from -0.30 to -2.20 (behind the film)",
+    "material": "hub_blanket"
+   },
+   {
+    "name": "hub_star_tracker",
+    "object": "sail",
+    "count": 3,
+    "dims_m": {
+     "diameter": 0.1,
+     "length": 0.25,
+     "baffle_diameter": 0.18
+    },
+    "position_rule": "on the hub -Z face, canted 20 deg outward, 120 deg apart",
+    "material": "terminal_body"
+   },
+   {
+    "name": "tensioner",
+    "object": "sail",
+    "count": 4,
+    "dims_m": [
+     0.3,
+     0.2,
+     0.2
+    ],
+    "position_rule": "at each boom tip, (+-(LD+2.0),0,0)/(0,+-(LD+2.0),0)",
+    "material": "terminal_body"
+   },
+   {
+    "name": "vane",
+    "object": "sail",
+    "count": 4,
+    "dims_m": {
+     "side": 9.323581763035426,
+     "thickness": 0.002,
+     "area": 86.92917689200677
+    },
+    "position_rule": "square vane centred at R=203.95 m on each axis, z=0, diagonal TRAC booms; default face-on (normal +Z); control tilt 0-40 deg about 2 axes",
+    "material": {
+     "front": "vane_reflector_front",
+     "back": "vane_back"
+    }
+   },
+   {
+    "name": "vane_boom",
+    "object": "sail",
+    "count": 8,
+    "dims_m": {
+     "length": 13.185535779179153,
+     "width": 0.04
+    },
+    "position_rule": "2 per vane along its diagonals (TRAC, Fe-Ni)",
+    "material": "boom_mg_oxidised"
+   },
+   {
+    "name": "vane_gimbal",
+    "object": "sail",
+    "count": 4,
+    "dims_m": [
+     0.4,
+     0.4,
+     0.4
+    ],
+    "position_rule": "at R = LD + 2.0 + 0.2 on each axis, z=0",
+    "material": "terminal_body"
+   },
+   {
+    "name": "sun_sensor",
+    "object": "sail",
+    "count": 4,
+    "dims_m": [
+     0.08,
+     0.08,
+     0.04
+    ],
+    "position_rule": "on the tensioner, facing +Z",
+    "material": "terminal_body"
+   },
+   {
+    "name": "patch_terminal",
+    "object": "sail",
+    "count": 60,
+    "dims_m": {
+     "service_plate": [
+      1.0,
+      1.0,
+      0.02
+     ],
+     "mast": {
+      "diameter": 0.08,
+      "length": 0.6
+     },
+     "yoke": 0.3,
+     "telescope": {
+      "diameter": 0.14,
+      "length": 0.35,
+      "aperture": 0.1
+     },
+     "sunshade_length": 0.2
+    },
+    "position_rule": "on the BACK face at the listed (x,y), plate at z=-0.02..0, mast to z=-0.62, gimbal + telescope pointing into the -Z hemisphere toward pod lanes (>=3 deg behind the film plane)",
+    "xy_m": [
+     [
+      -146.304,
+      -15.43
+     ],
+     [
+      -146.304,
+      17.081
+     ],
+     [
+      -113.792,
+      -47.942
+     ],
+     [
+      -113.792,
+      -15.43
+     ],
+     [
+      -113.792,
+      17.081
+     ],
+     [
+      -113.792,
+      49.593
+     ],
+     [
+      -81.28,
+      -80.454
+     ],
+     [
+      -81.28,
+      -47.942
+     ],
+     [
+      -81.28,
+      -15.43
+     ],
+     [
+      -81.28,
+      17.081
+     ],
+     [
+      -81.28,
+      49.593
+     ],
+     [
+      -81.28,
+      82.105
+     ],
+     [
+      -48.768,
+      -112.966
+     ],
+     [
+      -48.768,
+      -80.454
+     ],
+     [
+      -48.768,
+      -47.942
+     ],
+     [
+      -48.768,
+      -15.43
+     ],
+     [
+      -48.768,
+      17.081
+     ],
+     [
+      -48.768,
+      49.593
+     ],
+     [
+      -48.768,
+      82.105
+     ],
+     [
+      -48.768,
+      114.617
+     ],
+     [
+      -16.256,
+      -145.478
+     ],
+     [
+      -16.256,
+      -112.966
+     ],
+     [
+      -16.256,
+      -80.454
+     ],
+     [
+      -16.256,
+      -47.942
+     ],
+     [
+      -16.256,
+      -15.43
+     ],
+     [
+      -16.256,
+      17.081
+     ],
+     [
+      -16.256,
+      49.593
+     ],
+     [
+      -16.256,
+      82.105
+     ],
+     [
+      -16.256,
+      114.617
+     ],
+     [
+      -16.256,
+      147.13
+     ],
+     [
+      16.256,
+      -145.478
+     ],
+     [
+      16.256,
+      -112.966
+     ],
+     [
+      16.256,
+      -80.454
+     ],
+     [
+      16.256,
+      -47.942
+     ],
+     [
+      16.256,
+      -15.43
+     ],
+     [
+      16.256,
+      17.081
+     ],
+     [
+      16.256,
+      49.593
+     ],
+     [
+      16.256,
+      82.105
+     ],
+     [
+      16.256,
+      114.617
+     ],
+     [
+      16.256,
+      147.13
+     ],
+     [
+      48.768,
+      -112.966
+     ],
+     [
+      48.768,
+      -80.454
+     ],
+     [
+      48.768,
+      -47.942
+     ],
+     [
+      48.768,
+      -15.43
+     ],
+     [
+      48.768,
+      17.081
+     ],
+     [
+      48.768,
+      49.593
+     ],
+     [
+      48.768,
+      82.105
+     ],
+     [
+      48.768,
+      114.617
+     ],
+     [
+      81.28,
+      -80.454
+     ],
+     [
+      81.28,
+      -47.942
+     ],
+     [
+      81.28,
+      -15.43
+     ],
+     [
+      81.28,
+      17.081
+     ],
+     [
+      81.28,
+      49.593
+     ],
+     [
+      81.28,
+      82.105
+     ],
+     [
+      113.792,
+      -47.942
+     ],
+     [
+      113.792,
+      -15.43
+     ],
+     [
+      113.792,
+      17.081
+     ],
+     [
+      113.792,
+      49.593
+     ],
+     [
+      146.304,
+      -15.43
+     ],
+     [
+      146.304,
+      17.081
+     ]
+    ],
+    "material": "terminal_body"
+   },
+   {
+    "name": "corner_relay_terminal",
+    "object": "sail",
+    "count": 4,
+    "dims_m": {
+     "telescope": {
+      "diameter": 0.14,
+      "length": 0.35,
+      "aperture": 0.1
+     }
+    },
+    "position_rule": "on each tensioner box, 0.4 m outboard; sees both hemispheres",
+    "material": "terminal_body"
+   },
+   {
+    "name": "service_pv_patch",
+    "object": "sail",
+    "count": 64,
+    "dims_m": [
+     1.0,
+     1.0
+    ],
+    "position_rule": "film directly in front of each terminal plate and at (+-(LD-4),0),(0,+-(LD-4)); same look as sail_front_pv",
+    "material": "sail_front_pv"
+   },
+   {
+    "name": "pod_module",
+    "object": "pod",
+    "count": 1,
+    "dims_m": [
+     1.8447142425533318,
+     1.8447142425533318,
+     1.8447142425533318
+    ],
+    "position_rule": "centred at the origin (pod frame: +Z sunward, wings along X, blades along Y)",
+    "material": "pod_module_blanket",
+    "contents": "dense memory + logic stack core 1.14 m cube (1.5 m3/MW), shell of converters/switches/accumulators, shield panels"
+   },
+   {
+    "name": "pod_wing",
+    "object": "pod",
+    "count": 2,
+    "dims_m": [
+     68.16443439045378,
+     32.5,
+     0.0001
+    ],
+    "panels_per_wing": 10,
+    "panel_m": [
+     6.816443439045377,
+     32.5
+    ],
+    "position_rule": "XY plane z=0, x from +-18.0 to +-86.2, y in [-16.25, 16.25]; 0.10 m hinge gaps between panels",
+    "material": {
+     "front": "sail_front_pv",
+     "back": "sail_back_enamel"
+    }
+   },
+   {
+    "name": "pod_wing_frame",
+    "object": "pod",
+    "count": 20,
+    "dims_m": {
+     "tube_od": 0.04
+    },
+    "position_rule": "perimeter tubes of each wing panel, behind the film (z=-0.05)",
+    "material": "pod_truss"
+   },
+   {
+    "name": "pod_wing_yoke_and_spar",
+    "object": "pod",
+    "count": 2,
+    "dims_m": {
+     "truss_side": 0.8,
+     "length": 86.16443439045378
+    },
+    "position_rule": "triangular truss along +-X at y=0, z=-0.5, from the module to the wing tip",
+    "material": "pod_truss"
+   },
+   {
+    "name": "pod_radiator_blade",
+    "object": "pod",
+    "count": 4,
+    "dims_m": [
+     0.025,
+     40.54421660743325,
+     6.0
+    ],
+    "position_rule": "YZ plane at x=0 (faces +-X, edge-on to the Sun), z in [-3,3]; y in [20.0, 60.5] and [61.5, 102.1] on each side (mirrored)",
+    "material": "pod_radiator",
+    "T_K": 353.0
+   },
+   {
+    "name": "pod_radiator_spine",
+    "object": "pod",
+    "count": 4,
+    "dims_m": {
+     "diameter": 0.08,
+     "length": 40.54421660743325
+    },
+    "position_rule": "condenser header along each blade at z=0",
+    "material": "loop_line_sleeve"
+   },
+   {
+    "name": "pod_heat_pipe",
+    "object": "pod",
+    "count": 3243,
+    "dims_m": {
+     "diameter": 0.012,
+     "length": 3.0,
+     "pitch": 0.1
+    },
+    "position_rule": "inside each blade, +-Z from the spine every 0.10 m (render as bump ridges)",
+    "material": "pod_radiator"
+   },
+   {
+    "name": "pod_radiator_arm",
+    "object": "pod",
+    "count": 2,
+    "dims_m": {
+     "truss_side": 0.8,
+     "length": 20.0
+    },
+    "position_rule": "triangular truss along +-Y at x=0, z=-0.5, module to first blade; carries 2 loop trunks",
+    "material": "pod_truss"
+   },
+   {
+    "name": "pod_loop_trunk",
+    "object": "pod",
+    "count": 4,
+    "dims_m": {
+     "sleeve_diameter": 0.15,
+     "vapour_id": 0.045958155510243674,
+     "liquid_id": 0.029558255524325193,
+     "length": 101.0884332148665
+    },
+    "position_rule": "along the radiator arms and blade roots",
+    "material": "loop_line_sleeve"
+   },
+   {
+    "name": "pod_terminal_mast",
+    "object": "pod",
+    "count": 1,
+    "dims_m": {
+     "diameter": 0.3,
+     "length": 4.0
+    },
+    "position_rule": "from the module -Z face to z=-(1.84/2+4)",
+    "material": "pod_truss"
+   },
+   {
+    "name": "pod_dwdm_terminal",
+    "object": "pod",
+    "count": 8,
+    "dims_m": {
+     "telescope_diameter": 0.14,
+     "aperture": 0.1,
+     "length": 0.35
+    },
+    "position_rule": "ring of 8 on the mast at 2/3 height, 45 deg apart",
+    "material": "terminal_body"
+   },
+   {
+    "name": "pod_handover_terminal",
+    "object": "pod",
+    "count": 16,
+    "dims_m": {
+     "telescope_diameter": 0.14,
+     "aperture": 0.1,
+     "length": 0.35
+    },
+    "position_rule": "two rings of 8 near the mast tip",
+    "material": "terminal_body"
+   },
+   {
+    "name": "pod_thruster",
+    "object": "pod",
+    "count": 4,
+    "dims_m": {
+     "diameter": 0.25,
+     "length": 0.4,
+     "boom": 2.0
+    },
+    "position_rule": "on 2 canted booms below the module, plumes 20 deg below the wing plane, between wing and blade arms (azimuths 45,135,225,315 deg)",
+    "material": "boom_mg_oxidised"
+   },
+   {
+    "name": "pod_O2_tank",
+    "object": "pod",
+    "count": 2,
+    "dims_m": {
+     "diameter": 0.45
+    },
+    "position_rule": "spheres on the module -Z face",
+    "material": "boom_mg_oxidised"
+   }
+  ],
+  "cluster": {
+   "pods_on_ring": 12,
+   "hub_pods": 1,
+   "rho_m": 1000.0,
+   "law": "x = rho/2 cos(phi), y = -rho sin(phi), z = (sqrt3/2) rho cos(phi), phi = 2 pi k/12 + phase (x radial anti-sunward)",
+   "attitude": "all pods identical attitude, +Z to the Sun"
+  }
+ },
+ "sources": [
+  "JAXA IKAROS (14 m square, 7.5 um polyimide, spin deployment, LCD reflectivity control devices): https://www.isas.jaxa.jp/e/forefront/2011/tsuda/02.shtml ; https://eoportal.org/satellite-missions/ikaros",
+  "NASA ACS3 (80 m2, 7 m composite booms 0.9 kg each, 2000 m2 scalability): https://planetary.org/space-missions/acs3",
+  "NASA Solar Cruiser (1653 m2, 2.5 um CP1, 29.5 m booms, RCDs): https://science.nasa.gov/heliophysics/programs/solar-cruiser ; quadrant paper https://www.citytech.cuny.edu/isss2023/docs/proceedings/19 - Development of a Flight-Like Solar Sail Quadrant for NASA%27s Solar Cruiser - Maddox Kirk Maddox.pdf",
+  "Solar Cruiser RCD optics (SPIE): https://opticalengineering.spiedigitallibrary.org/conference-proceedings-of-spie/PC12664/PC1266405/Optical-performance-of-reflectivity-control-devices-for-solar-sail-applications/10.1117/12.2676775.full",
+  "NASA NEA Scout (86 m2 single sail, 4 x 6.8 m Elgiloy TRAC booms): https://ntrs.nasa.gov/api/citations/20160008143/downloads/20160008143.pdf",
+  "Tesat SCOT80 (80 mm, up to 100 Gbps, 11.9 kg per channel, 260x190x240 mm, 60-80 W, 8000 km): https://satnow.com/products/laser-communication-terminals/tesat-spacecom-gmbh-co-kg/155-1423-scot80 ; https://event.dlr.de/en/hm2025/tesat-scot80/",
+  "Mynaric CONDOR Mk3 (80 mm, optical head 372x282x257 mm): https://www.satnow.com/products/laser-communication-terminals/mynaric/155-1475-condor-mk3",
+  "Starlink optical links (V2 mini 3 x up to 200 Gbps; V3 6 x 400 Gbps; mini laser 25 Gbps to 4000 km): https://newspaceeconomy.ca/2026/05/29/how-does-starlink-use-satellite-laser-communications/ ; https://www.gophotonics.com/news/details/8975-starcloud-signs-deal-with-spacex-starlink-to-integrate-mini-laser-terminals",
+  "Google Suncatcher (81-satellite cluster, 1 km radius, 100-200 m spacing, 1.6 Tbps bench link): https://research.google/blog/exploring-a-space-based-scalable-ai-infrastructure-system-design/ ; arXiv:2511.19468",
+  "Optical constants (refractiveindex.info database, CC0): https://github.com/polyanskiy/refractiveindex.info-database -- Si: Green 2008 doi:10.1016/j.solmat.2008.06.009 and Chandler-Horowitz & Amirtharaj 2005; SiO2: Malitson 1965, Franta et al.; TiO2: Devore 1951; Mg: Hagemann 1975; Al: Rakic 1995",
+  "CIE 1931 analytic fit: Wyman, Sloan, Shirley 2013, JCGT 2(2): https://jcgt.org/published/0002/02/01/",
+  "Fused silica reststrahlen limits emittance (and thin coatings to raise it): US patent 4783373 https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/4783373",
+  "Grun 1985 meteoroid flux via SPENVIS: https://spenvis.oma.be/help/background/metdeb/metdeb.html",
+  "IAU 2015 nominal solar values (L, R, Teff); CODATA 2018 sigma",
+  "Project: /home/user/dyson/docs/architecture.md; research3 thermal_mass (film.py/json, conc.json, fluids.json, reliability.json), research3 skeptic checks.py/json, research3 interconnect_final.json (FSO link model), research2 research_ai1.json (lessons only)"
+ ],
+ "open_questions": [
+  "IR emissivity is the largest physics risk. With fused-silica optical constants (a floor), 20 um cover glass gives eps_f ~0.76 and 5 um enamel on Mg gives eps_b ~0.61, against 0.85/0.90 assumed; at 0.76/0.61 the film must sit at 1.04 AU with q_e -22 %. Baseline carries 15 um microtextured Fe/Mg/Ca-silicate enamel (+27 g/m2). Needs measured hemispherical eps of Mercury-composition enamels (5-20 um, textured) at 348 K.",
+  "Residual laminate moment (intrinsic film stress of evaporated Mg and deposited glass) must stay <= ~3 K-equivalent, or the hinge-strip edges tilt > 4 deg; fallback stack C (Si spreader) costs +0.02 kg/m2.",
+  "Boom deployment: 199 m triangular trusses from a 3.4 m hub have no heritage (largest deployed truss mast ~60 m, SRTM). Options: articulated truss canister or in-situ beam builder from Mg strip; judgement call.",
+  "Sail-pod link geometry conflicts with the architecture text: pods at 0.86-0.90 AU are >= 3e6 km from the film, where 10 cm links give ~1e-4 Gbps. Service pods must share the film shell (pod lanes); confirm the split between in-shell service pods and inner training islands.",
+  "Laser terminal mass assumed 5 kg (Mercury-built 10 cm); SCOT80 is 11.9 kg per channel. At 12 kg the terminals are 0.011 kg/m2 (+5 % sail mass).",
+  "Front-face diffuse albedo: ideal ray optics gives ~0.0006 (cells) but real texture/edge scatter is likely 3-10x higher; render value uses 3x. Needs a measured BRDF of AR-glass/textured c-Si.",
+  "Flexible mesh and power jumpers across ~240 hinge lines per sail: fatigue during fold/roll at 100 g launch and deployment.",
+  "Thick-shell spacing assumes Poisson placement; a real orbit plan (distinct radii per ring to avoid crossings) changes the neighbour pattern (rings, not random).",
+  "Pod shielding depends on stack density: 0.18 g/W at 1.5 m3/MW but 0.8 g/W at 4 m3/MW; with HBM-class parts obsolete by 2070-2300, revisit the 5 g/cm2 requirement against future memory radiation tolerance.",
+  "SO2 compatibility with Mg-alloy loop hardware (sulfidation) and O2 ion-thruster lifetime are untested on Mercury-native materials.",
+  "1e26 W read as intercepted sunlight (f = 0.26, 1.0e18 sails); 1e26 W of chip power exceeds eta*L_sun = 5.1e25 W and is unreachable.",
+  "Porous-silica AR and TiO2 ARC durability under 0.92 AU proton/UV fluence; without AR the glint F0 rises to 3.7 % and q_e drops ~3 %."
+ ]
+}
