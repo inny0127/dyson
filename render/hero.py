@@ -32,6 +32,70 @@ VIEWS = {
 }
 
 
+INFERNO = [(0.0015, 0.0005, 0.0139), (0.0874, 0.0447, 0.2245), (0.2582, 0.0386, 0.4065),
+           (0.4162, 0.0902, 0.4329), (0.5783, 0.148, 0.4044), (0.7357, 0.2159, 0.3302),
+           (0.8650, 0.3168, 0.2261), (0.9540, 0.4692, 0.0992), (0.9876, 0.6453, 0.0399),
+           (0.9640, 0.8434, 0.2730), (0.9884, 0.9984, 0.6449)]
+
+
+def inferno(t):
+    t = min(1, max(0, t)) * (len(INFERNO) - 1)
+    i = min(len(INFERNO) - 2, int(t))
+    f = t - i
+    c = [a + (b - a) * f for a, b in zip(INFERNO[i], INFERNO[i + 1])]
+    return [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c]   # to linear
+
+
+def thermal_view(sc, root, temps, lo=250.0, hi=450.0):
+    """Replace every material by its brightness temperature in false colour (like an LWIR camera
+    with a fixed 250-450 K scale) and remove the Sun: a thermal camera sees emitted light only."""
+    for o in list(bpy.data.objects):
+        if o.type == 'LIGHT':
+            bpy.data.objects.remove(o)
+    def kind(name):
+        n = name.split('.')[0]
+        if n.startswith('PV_'):
+            return 'pv'
+        if n.startswith(('Radiator', 'Header', 'EdgeGuard', 'FlexLine')):
+            return 'rad'
+        if n.startswith(('ComputeModule', 'Manifold', 'PumpPackage', 'AvionicsRadiator', 'Rail')):
+            return 'module'
+        if n.startswith('PVFrame'):
+            return 'pv'
+        return 'structure'
+    cache = {}
+    # coolant enters each blade at the root and leaves 10 K cooler at the tip
+    blades = [o for o in root.children_recursive if o.name.startswith('Radiator_')]
+    ymax = max((abs(o.location.y) for o in blades), default=1.0)
+    ymin = min((abs(o.location.y) for o in blades), default=0.0)
+    for o in root.children_recursive:
+        if o.type != 'MESH':
+            continue
+        k = kind(o.name)
+        T = temps.get(k, temps.get('structure', 300))
+        if o.name.startswith('Radiator_') and ymax > ymin:
+            frac = (abs(o.location.y) - ymin) / (ymax - ymin)
+            T = T + 5 - 10 * frac
+            k = f'rad{round(T)}'
+        if k not in cache:
+            m = bpy.data.materials.new(f'IR_{k}')
+            m.use_nodes = True
+            nt = m.node_tree
+            for n in list(nt.nodes):
+                nt.nodes.remove(n)
+            out = nt.nodes.new('ShaderNodeOutputMaterial')
+            em = nt.nodes.new('ShaderNodeEmission')
+            em.inputs['Color'].default_value = (*inferno((T - lo) / (hi - lo)), 1)
+            em.inputs['Strength'].default_value = 1.0
+            nt.links.new(em.outputs[0], out.inputs['Surface'])
+            cache[k] = m
+        o.data.materials.clear()
+        o.data.materials.append(cache[k])
+    sc.view_settings.view_transform = 'Standard'
+    sc.view_settings.look = 'None'
+    sc.view_settings.exposure = 0
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument('spec')
@@ -40,6 +104,7 @@ def main(argv):
     ap.add_argument('--view', default='three_quarter')
     ap.add_argument('--samples', type=int, default=256)
     ap.add_argument('--res', default='1920x1080')
+    ap.add_argument('--thermal', default='', help='JSON {"pv":K,"rad":K,"module":K,"structure":K}: render as an 8-14 um camera')
     a = ap.parse_args(argv)
     spec = None
     if a.spec != '-':
@@ -58,6 +123,8 @@ def main(argv):
     tgt = Vector(v['target']) * span
     lib.camera(cam, tgt, lens=v['lens'], dof=8.0)
     lib.meter(sc, lib.flux(a.r), ev_offset=-0.3)
+    if a.thermal:
+        thermal_view(sc, root, json.loads(a.thermal))
     lib.save(sc, a.out)
     print('WROTE', a.out)
 
