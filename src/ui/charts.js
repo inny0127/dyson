@@ -124,3 +124,46 @@ export function sedChart(el, { f, T }) {
   svg += `</svg>`;
   el.innerHTML = svg;
 }
+
+/**
+ * Top-down map of the inner solar system to scale, in a frame that turns with Earth (Earth fixed on
+ * the right). Draws the far-side co-orbital cloud as bands on Earth's orbit (projected radius
+ * cos(lat)·1 AU for the inclined orbits), the L3 gap, the L1 thermostat and the rejected inner shell.
+ */
+export function orbitMap(el, { spans = [[90, 174], [186, 270]], latMax = 30, density = 0.5, shell = [0.86, 0.91], showShell = true }) {
+  const W = 900, H = 560, cx = W / 2 - 40, cy = H / 2, s = 236;   // px per AU
+  const P = (rAU, deg) => [cx + rAU * s * Math.cos((deg * Math.PI) / 180), cy - rAU * s * Math.sin((deg * Math.PI) / 180)];
+  const ring = (r, style) => `<circle cx="${cx}" cy="${cy}" r="${r * s}" fill="none" style="${style}"/>`;
+  const arcBand = (r0, r1, a0, a1) => {
+    const [x0, y0] = P(r1, a0), [x1, y1] = P(r1, a1), [x2, y2] = P(r0, a1), [x3, y3] = P(r0, a0);
+    const large = a1 - a0 > 180 ? 1 : 0;
+    return `M${x0},${y0} A${r1 * s},${r1 * s} 0 ${large} 0 ${x1},${y1} L${x2},${y2} A${r0 * s},${r0 * s} 0 ${large} 1 ${x3},${y3} Z`;
+  };
+  const r0 = Math.cos((latMax * Math.PI) / 180);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of where the sails fly, to scale, turning with Earth">`;
+  svg += `<defs><radialGradient id="sunglow"><stop offset="0" stop-color="var(--sun)" stop-opacity="0.9"/><stop offset="1" stop-color="var(--sun)" stop-opacity="0"/></radialGradient></defs>`;
+  svg += ring(0.387, `stroke:var(--line);stroke-width:1`) + ring(0.723, `stroke:var(--line);stroke-width:1`);
+  svg += ring(1.0, `stroke:var(--cool);stroke-opacity:0.45;stroke-width:1`);
+  if (showShell) svg += `<circle cx="${cx}" cy="${cy}" r="${((shell[0] + shell[1]) / 2) * s}" fill="none" style="stroke:var(--warn);stroke-opacity:0.7;stroke-width:1.5;stroke-dasharray:4 5"/>`;
+  for (const [a0, a1] of spans) svg += `<path d="${arcBand(r0, 1.0, a0, a1)}" fill="var(--sun)" fill-opacity="${(0.18 + 0.6 * density).toFixed(2)}" stroke="var(--sun)" stroke-width="1"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="26" fill="url(#sunglow)"/><circle cx="${cx}" cy="${cy}" r="6" fill="var(--sun)"/>`;
+  const [ex, ey] = P(1, 0);
+  svg += `<circle cx="${ex}" cy="${ey}" r="6" fill="var(--cool)"/>`;
+  const [lx, ly] = P(0.99, 0);
+  svg += `<circle cx="${lx - 9}" cy="${ly}" r="2.5" fill="var(--ok)"/>`;
+  const T = (x, y, t, style, anchor = 'start') => `<text x="${x}" y="${y}" text-anchor="${anchor}" style="${style}">${t}</text>`;
+  const lab = 'fill:var(--fg);font:500 12px var(--font-mono)';
+  const mut = 'fill:var(--muted);font:11px var(--font-mono)';
+  svg += T(ex + 12, ey + 4, 'Earth', lab);
+  svg += T(ex + 12, ey + 20, 'L1 shade, 1.6 million km sunward', 'fill:var(--ok);font:11px var(--font-mono)');
+  svg += T(cx, cy + 46, 'Sun', lab, 'middle');
+  const [vx, vy] = P(0.723, 58); svg += T(vx - 6, vy + 14, 'Venus orbit', mut, 'end');
+  const [mx, my] = P(0.387, 52); svg += T(mx - 6, my + 14, 'Mercury orbit', mut, 'end');
+  const [cx1, cy1] = P(1.05, 132); svg += T(cx1, cy1 - 6, 'sails, on Earth’s orbit', 'fill:var(--sun);font:600 12px var(--font-mono)', 'end');
+  const [cx2, cy2] = P(1.05, 228); svg += T(cx2, cy2 + 16, `±${latMax}° above and below the ecliptic`, mut, 'end');
+  const [gx, gy] = P(1.08, 180); svg += T(gx - 4, gy + 4, 'gap', mut, 'end');
+  if (showShell) { const [sx, sy] = P(0.885, -38); svg += T(sx - 4, sy + 16, 'rejected: shell inside Earth’s orbit', 'fill:var(--warn);font:11px var(--font-mono)', 'start'); }
+  svg += T(W - 16, H - 14, 'to scale · frame turns with Earth', mut, 'end');
+  svg += `</svg>`;
+  el.innerHTML = svg;
+}

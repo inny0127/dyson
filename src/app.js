@@ -5,7 +5,7 @@ import { EARTH, MERCURY, PHYS } from './model/constants.js';
 import { earthImpact } from './model/model.js';
 import { sci, pct, kelvin, watts, kg, length } from './util/format.js';
 import { renderParams } from './ui/params.js';
-import { buildChart, earthChart, sedChart } from './ui/charts.js';
+import { buildChart, earthChart, sedChart, orbitMap } from './ui/charts.js';
 
 const { YEAR, AU } = PHYS;
 const $ = id => document.getElementById(id);
@@ -186,6 +186,7 @@ function renderEarth() {
   const safe = d.earthSafeCoverage;
   const ySafe = d.yearsToCoverage(safe);
   earthChart($('earth-chart'), { pts, safeF: safe, ceilingF: ceil, runaway, co2: EARTH.co2DoublingForcing });
+  orbitMap($('orbit-map'), { density: Math.min(1, ceil / 0.2) });
   $('earth-legend').innerHTML = `<span><i style="background:var(--cool)"></i>extra energy absorbed by Earth, W/m², sails spread evenly round the Sun</span>`;
   $('earth-prose').innerHTML = `
     <p>Every watt the sails intercept leaves them as infrared, and Earth absorbs its share whether or not a sail ever passes in front of the Sun. With the sails spread evenly around the Sun, Earth gains about ${n(`${forcingAt(p, 0.01).toFixed(1)} W/m²`, 'warn')} for every 1% of sunlight captured. Doubling CO₂ adds ${n(`${EARTH.co2DoublingForcing} W/m²`)}.</p>

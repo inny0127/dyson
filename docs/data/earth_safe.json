@@ -1,0 +1,5076 @@
+{
+ "summary": "IR, not shadow, sets the limit. Exact point-source integration (verified against both shell closed forms to 1e-4) gives, per 1 % coverage, 4.16 W/m2 of absorbed IR from a uniform 0.91 AU shell (42 % from far-side fronts seen through the gaps), offset by 2.38 of self-dimming: net +1.5-1.8 per 1 %, and +41-45 W/m2 at the 22 % ceiling (279-283 W/m2 absorbed: at the runaway threshold). Per sail the forcing is alpha_E J r^2 |cos gamma|/d^2 and r^2 cancels, so only distance to Earth and face angle matter: hot inner shells and polar rings change IR by <= 30 %, a keep-out cap halves IR but loses the dimming, exterior shells fall as 1/r^2 but cost r^2 in mass (3/5/10 AU: 2.1/0.8/0.2 % coverage from the whole fleet). Best: a far-side co-orbital cloud (a = 0.9987 AU, L3 +-90 deg, |lat| <= 30 deg): no shadow, held with ~1e-8 m/s2 (1/2500 of the authority), uncontrolled sails librate no closer than 0.29 AU. Earth always lies in its sails' sunward hemisphere, so an IR-dark low-e front (eps 0.05-0.10, chiplets 105-110 C, -16-19 % FLOP/J) cuts IR to 0.15-0.29 W/m2 per 1 % (1.43 as designed, 0.85 at 85 C); +35-46 % mass per W. An L1 thermostat of ordinary sails (0.42 % of sunlight per W/m2, ~1e-10 of the swarm) cancels the global mean, but each W/m2 cancelled costs -0.76 % precipitation, +0.23 W/m2 at the poles, +0.27 K stratosphere. With cancelled IR <= 2.5 X: X = 1 W/m2 allows f = 14 % (5.6e+39 FLOP/s, 50 % of the 1.1e40 ceiling; 13 % at 85 C); X = 0.1: 1.6 % (6 %); X = 4: 19 % (68 %). Passive (no thermostat), 1 W/m2 allows 6.2 % (shell 0.68 %). Fine dust must stay < 1e-7-3e-6 of the 3e19 kg/yr loss stream. The cloud glows at 1.7-4.8 cd/m2 per 1 % within 45 deg of the Sun (0.3 lux per 1 % after twilight): holding that under full-moon level caps f at ~0.8 % (2.4 % with a rho_v 0.001 front), so visible light, not heat, may bind first.",
+ "ir_model": {
+  "method": "Point-source sum over sails on a sphere of radius r (grid of 1.15e6 cells centred on Earth's direction, refined near it): each face is Lambertian with radiosity J (front: eps_f sigma T^4 / (1 - g(1 - eps_f)) incl. front-to-front exchange, g = f; back: eps_b sigma T^4); Earth (alpha_IR 0.95) absorbs alpha_E J A cos(gamma) / (4 pi d^2) per sail as an Earth-surface average; front rays that cross the sphere again are blocked with probability tau(exit); rays grazing the Sun are blocked. Sub-bandgap reflection (1 - alpha = 0.20 of sunlight, 2100+ film) is either diffuse (Lambertian front) or specular (retro-reflected toward the Sun in a 2.9 deg cone: film slope 1.3 deg + pointing + solar disk) and absorbed by Earth at 0.70. Film T from the model.js radiosity formula with 2100+ optics (alpha 0.80, eps 0.86/0.93). Scripts: irlib.py, ir_model.py.",
+  "closed_forms": {
+   "per_sail": "Earth-average absorbed = alpha_E J A |cos gamma| / (4 pi d^2); with J ~ alpha S0 / (r^2 (eps_f + eps_b)) the r^2 cancels: F/f = alpha_E alpha S0 [eps_face/(eps_f+eps_b)] |cos gamma| / d^2 (d in AU). Only the distance to Earth and the face angle matter, not the distance to the Sun.",
+   "interior_shell": "F = alpha_E f alpha_eff S0 / 4 x 2/(1 + cos theta_s), sin theta_s = r (energy conservation + uniform disk of radiance (f J_b + (1-f) f J_f)/pi); dimming f x 238 W/m2.",
+   "exterior_shell": "F = alpha_E f J_f, J_f = eps_f sigma T^4/(1 - f(1 - eps_f)) (Earth inside an isotropic cavity field).",
+   "coorbital_1AU": "cos(gamma)/d^2 = 1/(4 sin(psi/2)) for a sail at heliocentric angle psi from Earth on the 1 AU circle: 0.25 at L3, 0.29 at 120 deg, 0.35 at 90 deg, 0.50 at 60 deg; far-hemisphere solid-angle mean 0.293."
+  },
+  "verification": {
+   "max_relative_error": 8.46e-05,
+   "examples": [
+    {
+     "kind": "interior",
+     "r": 0.91,
+     "f": 0.01,
+     "numeric": 3.664,
+     "analytic_disk": 3.664,
+     "analytic_energy": 3.664,
+     "rel_err": -1.223e-05,
+     "near_cap_back": 1.911,
+     "far_side_front": 1.752,
+     "share_far_side": 0.4783,
+     "sphere_factor": 1.414,
+     "T": 337.9
+    },
+    {
+     "kind": "interior",
+     "r": 0.91,
+     "f": 0.22,
+     "numeric": 84.14,
+     "analytic_disk": 84.14,
+     "analytic_energy": 84.14,
+     "rel_err": -1.087e-05,
+     "near_cap_back": 48.24,
+     "far_side_front": 35.9,
+     "share_far_side": 0.4267,
+     "sphere_factor": 1.414,
+     "T": 349.7
+    },
+    {
+     "kind": "exterior",
+     "r": 3.0,
+     "f": 0.01,
+     "numeric": 0.5564,
+     "analytic": 0.5564,
+     "rel_err": -4.468e-06,
+     "T": 186.1
+    }
+   ]
+  },
+  "interior_shell_0p91_per_1pct": {
+   "thermal_IR": 3.664,
+   "near_cap_back_faces": 1.911,
+   "far_side_fronts_through_gaps": 1.752,
+   "NIR_absorbed": 0.4909,
+   "dimming": -2.382,
+   "net": 1.773,
+   "net_if_NIR_diffuse": 1.95
+  },
+  "ceiling_check": {
+   "f": 0.2217,
+   "r_AU": 0.913,
+   "net_Wm2_specular_NIR": 41.3,
+   "net_Wm2_diffuse_NIR": 44.6,
+   "absorbed_Wm2": [
+    279.5,
+    282.8
+   ],
+   "runaway_limit": 282.0,
+   "co2_doublings": [
+    10.51,
+    11.35
+   ],
+   "vs_skeptic": "skeptic +49 W/m2 (287 absorbed) assumed all intercepted light re-emitted as IR absorbed at 0.95; with alpha 0.80 the 20 % NIR is absorbed like sunlight (0.70): +41 to +45 W/m2, 279-283 W/m2 absorbed - at the runaway threshold rather than 5 W/m2 beyond it. Conclusion unchanged."
+  },
+  "uniform_shell_vs_r_per_1pct": [
+   {
+    "r": 0.2,
+    "T": 720.8,
+    "gross_specular": 2.963,
+    "net_specular": 0.5813,
+    "gross_diffuse": 3.094
+   },
+   {
+    "r": 0.3,
+    "T": 588.5,
+    "gross_specular": 3.062,
+    "net_specular": 0.6797,
+    "gross_diffuse": 3.136
+   },
+   {
+    "r": 0.4,
+    "T": 509.6,
+    "gross_specular": 3.143,
+    "net_specular": 0.7607,
+    "gross_diffuse": 3.197
+   },
+   {
+    "r": 0.5,
+    "T": 455.8,
+    "gross_specular": 3.234,
+    "net_specular": 0.8522,
+    "gross_diffuse": 3.284
+   },
+   {
+    "r": 0.6,
+    "T": 416.1,
+    "gross_specular": 3.349,
+    "net_specular": 0.9672,
+    "gross_diffuse": 3.404
+   },
+   {
+    "r": 0.7,
+    "T": 385.3,
+    "gross_specular": 3.504,
+    "net_specular": 1.122,
+    "gross_diffuse": 3.575
+   },
+   {
+    "r": 0.8,
+    "T": 360.4,
+    "gross_specular": 3.728,
+    "net_specular": 1.346,
+    "gross_diffuse": 3.83
+   },
+   {
+    "r": 0.85,
+    "T": 349.6,
+    "gross_specular": 3.858,
+    "net_specular": 1.476,
+    "gross_diffuse": 4.014
+   },
+   {
+    "r": 0.91,
+    "T": 337.9,
+    "gross_specular": 4.155,
+    "net_specular": 1.773,
+    "gross_diffuse": 4.332
+   },
+   {
+    "r": 0.95,
+    "T": 330.7,
+    "gross_specular": 4.421,
+    "net_specular": 2.039,
+    "gross_diffuse": 4.67
+   },
+   {
+    "r": 0.98,
+    "T": 325.6,
+    "gross_specular": 4.78,
+    "net_specular": 2.398,
+    "gross_diffuse": 5.111
+   },
+   {
+    "r": 1.02,
+    "T": 319.2,
+    "gross_specular": 5.796,
+    "net_specular": 5.796,
+    "gross_diffuse": 6.649
+   },
+   {
+    "r": 1.1,
+    "T": 307.3,
+    "gross_specular": 5.083,
+    "net_specular": 5.083,
+    "gross_diffuse": 5.717
+   },
+   {
+    "r": 1.2,
+    "T": 294.2,
+    "gross_specular": 4.419,
+    "net_specular": 4.419,
+    "gross_diffuse": 4.804
+   },
+   {
+    "r": 1.36,
+    "T": 276.4,
+    "gross_specular": 3.676,
+    "net_specular": 3.676,
+    "gross_diffuse": 3.74
+   },
+   {
+    "r": 1.5,
+    "T": 263.2,
+    "gross_specular": 3.19,
+    "net_specular": 3.19,
+    "gross_diffuse": 3.074
+   },
+   {
+    "r": 2.0,
+    "T": 227.9,
+    "gross_specular": 2.197,
+    "net_specular": 2.197,
+    "gross_diffuse": 1.729
+   },
+   {
+    "r": 3.0,
+    "T": 186.1,
+    "gross_specular": 1.504,
+    "net_specular": 1.504,
+    "gross_diffuse": 0.7686
+   },
+   {
+    "r": 5.0,
+    "T": 144.2,
+    "gross_specular": 1.142,
+    "net_specular": 1.142,
+    "gross_diffuse": 0.2767
+   },
+   {
+    "r": 10.0,
+    "T": 101.9,
+    "gross_specular": 0.9881,
+    "net_specular": 0.9881,
+    "gross_diffuse": 0.06917
+   }
+  ],
+  "kernel_per_1pct_if_all_coverage_at_psi": {
+   "r0.3": [
+    {
+     "psi_deg": 1.0,
+     "W_m2_per_1pct": 10.96,
+     "face": "back",
+     "d_AU": 0.7001,
+     "gamma_deg": 1.429
+    },
+    {
+     "psi_deg": 5.0,
+     "W_m2_per_1pct": 10.83,
+     "face": "back",
+     "d_AU": 0.7016,
+     "gamma_deg": 7.136
+    },
+    {
+     "psi_deg": 10.0,
+     "W_m2_per_1pct": 10.44,
+     "face": "back",
+     "d_AU": 0.7065,
+     "gamma_deg": 14.23
+    },
+    {
+     "psi_deg": 20.0,
+     "W_m2_per_1pct": 9.008,
+     "face": "back",
+     "d_AU": 0.7254,
+     "gamma_deg": 28.13
+    },
+    {
+     "psi_deg": 30.0,
+     "W_m2_per_1pct": 7.062,
+     "face": "back",
+     "d_AU": 0.7552,
+     "gamma_deg": 41.46
+    },
+    {
+     "psi_deg": 45.0,
+     "W_m2_per_1pct": 4.028,
+     "face": "back",
+     "d_AU": 0.8159,
+     "gamma_deg": 60.07
+    },
+    {
+     "psi_deg": 60.0,
+     "W_m2_per_1pct": 1.531,
+     "face": "back",
+     "d_AU": 0.8888,
+     "gamma_deg": 77.0
+    },
+    {
+     "psi_deg": 90.0,
+     "W_m2_per_1pct": 1.31,
+     "face": "front",
+     "d_AU": 1.044,
+     "gamma_deg": 73.3
+    },
+    {
+     "psi_deg": 120.0,
+     "W_m2_per_1pct": 2.426,
+     "face": "front",
+     "d_AU": 1.179,
+     "gamma_deg": 47.27
+    },
+    {
+     "psi_deg": 150.0,
+     "W_m2_per_1pct": 2.838,
+     "face": "front",
+     "d_AU": 1.269,
+     "gamma_deg": 23.21
+    },
+    {
+     "psi_deg": 180.0,
+     "W_m2_per_1pct": 2.941,
+     "face": "front",
+     "d_AU": 1.3,
+     "gamma_deg": 0.0
+    }
+   ],
+   "r0.5": [
+    {
+     "psi_deg": 1.0,
+     "W_m2_per_1pct": 21.47,
+     "face": "back",
+     "d_AU": 0.5002,
+     "gamma_deg": 2.0
+    },
+    {
+     "psi_deg": 5.0,
+     "W_m2_per_1pct": 20.86,
+     "face": "back",
+     "d_AU": 0.5038,
+     "gamma_deg": 9.962
+    },
+    {
+     "psi_deg": 10.0,
+     "W_m2_per_1pct": 19.08,
+     "face": "back",
+     "d_AU": 0.515,
+     "gamma_deg": 19.71
+    },
+    {
+     "psi_deg": 20.0,
+     "W_m2_per_1pct": 13.67,
+     "face": "back",
+     "d_AU": 0.5571,
+     "gamma_deg": 37.88
+    },
+    {
+     "psi_deg": 30.0,
+     "W_m2_per_1pct": 8.268,
+     "face": "back",
+     "d_AU": 0.6197,
+     "gamma_deg": 53.79
+    },
+    {
+     "psi_deg": 45.0,
+     "W_m2_per_1pct": 2.783,
+     "face": "back",
+     "d_AU": 0.7368,
+     "gamma_deg": 73.68
+    },
+    {
+     "psi_deg": 60.0,
+     "W_m2_per_1pct": 1.278e-15,
+     "face": "back",
+     "d_AU": 0.866,
+     "gamma_deg": 90.0
+    },
+    {
+     "psi_deg": 90.0,
+     "W_m2_per_1pct": 1.778,
+     "face": "front",
+     "d_AU": 1.118,
+     "gamma_deg": 63.43
+    },
+    {
+     "psi_deg": 120.0,
+     "W_m2_per_1pct": 2.147,
+     "face": "front",
+     "d_AU": 1.323,
+     "gamma_deg": 40.89
+    },
+    {
+     "psi_deg": 150.0,
+     "W_m2_per_1pct": 2.206,
+     "face": "front",
+     "d_AU": 1.455,
+     "gamma_deg": 20.1
+    },
+    {
+     "psi_deg": 180.0,
+     "W_m2_per_1pct": 2.209,
+     "face": "front",
+     "d_AU": 1.5,
+     "gamma_deg": 0.0
+    }
+   ],
+   "r0.91": [
+    {
+     "psi_deg": 1.0,
+     "W_m2_per_1pct": 629.8,
+     "face": "back",
+     "d_AU": 0.09153,
+     "gamma_deg": 10.99
+    },
+    {
+     "psi_deg": 5.0,
+     "W_m2_per_1pct": 251.5,
+     "face": "back",
+     "d_AU": 0.1226,
+     "gamma_deg": 45.32
+    },
+    {
+     "psi_deg": 10.0,
+     "W_m2_per_1pct": 59.48,
+     "face": "back",
+     "d_AU": 0.1891,
+     "gamma_deg": 66.69
+    },
+    {
+     "psi_deg": 20.0,
+     "W_m2_per_1pct": 3.944,
+     "face": "back",
+     "d_AU": 0.3433,
+     "gamma_deg": 85.04
+    },
+    {
+     "psi_deg": 30.0,
+     "W_m2_per_1pct": 1.728,
+     "face": "front",
+     "d_AU": 0.5019,
+     "gamma_deg": 84.97
+    },
+    {
+     "psi_deg": 45.0,
+     "W_m2_per_1pct": 2.533,
+     "face": "front",
+     "d_AU": 0.7356,
+     "gamma_deg": 73.99
+    },
+    {
+     "psi_deg": 60.0,
+     "W_m2_per_1pct": 2.316,
+     "face": "front",
+     "d_AU": 0.9582,
+     "gamma_deg": 64.67
+    },
+    {
+     "psi_deg": 90.0,
+     "W_m2_per_1pct": 1.83,
+     "face": "front",
+     "d_AU": 1.352,
+     "gamma_deg": 47.7
+    },
+    {
+     "psi_deg": 120.0,
+     "W_m2_per_1pct": 1.547,
+     "face": "front",
+     "d_AU": 1.655,
+     "gamma_deg": 31.56
+    },
+    {
+     "psi_deg": 150.0,
+     "W_m2_per_1pct": 1.405,
+     "face": "front",
+     "d_AU": 1.845,
+     "gamma_deg": 15.72
+    },
+    {
+     "psi_deg": 180.0,
+     "W_m2_per_1pct": 1.362,
+     "face": "front",
+     "d_AU": 1.91,
+     "gamma_deg": 0.0
+    }
+   ],
+   "r1.0": [
+    {
+     "psi_deg": 1.0,
+     "W_m2_per_1pct": 142.4,
+     "face": "front",
+     "d_AU": 0.01745,
+     "gamma_deg": 89.5
+    },
+    {
+     "psi_deg": 5.0,
+     "W_m2_per_1pct": 28.49,
+     "face": "front",
+     "d_AU": 0.08724,
+     "gamma_deg": 87.5
+    },
+    {
+     "psi_deg": 10.0,
+     "W_m2_per_1pct": 14.26,
+     "face": "front",
+     "d_AU": 0.1743,
+     "gamma_deg": 85.0
+    },
+    {
+     "psi_deg": 20.0,
+     "W_m2_per_1pct": 7.156,
+     "face": "front",
+     "d_AU": 0.3473,
+     "gamma_deg": 80.0
+    },
+    {
+     "psi_deg": 30.0,
+     "W_m2_per_1pct": 4.801,
+     "face": "front",
+     "d_AU": 0.5176,
+     "gamma_deg": 75.0
+    },
+    {
+     "psi_deg": 45.0,
+     "W_m2_per_1pct": 3.247,
+     "face": "front",
+     "d_AU": 0.7654,
+     "gamma_deg": 67.5
+    },
+    {
+     "psi_deg": 60.0,
+     "W_m2_per_1pct": 2.485,
+     "face": "front",
+     "d_AU": 1.0,
+     "gamma_deg": 60.0
+    },
+    {
+     "psi_deg": 90.0,
+     "W_m2_per_1pct": 1.757,
+     "face": "front",
+     "d_AU": 1.414,
+     "gamma_deg": 45.0
+    },
+    {
+     "psi_deg": 120.0,
+     "W_m2_per_1pct": 1.435,
+     "face": "front",
+     "d_AU": 1.732,
+     "gamma_deg": 30.0
+    },
+    {
+     "psi_deg": 150.0,
+     "W_m2_per_1pct": 1.286,
+     "face": "front",
+     "d_AU": 1.932,
+     "gamma_deg": 15.0
+    },
+    {
+     "psi_deg": 180.0,
+     "W_m2_per_1pct": 1.243,
+     "face": "front",
+     "d_AU": 2.0,
+     "gamma_deg": 0.0
+    }
+   ],
+   "r1.5": [
+    {
+     "psi_deg": 1.0,
+     "W_m2_per_1pct": 19.83,
+     "face": "front",
+     "d_AU": 0.5005,
+     "gamma_deg": 1.998
+    },
+    {
+     "psi_deg": 5.0,
+     "W_m2_per_1pct": 18.73,
+     "face": "front",
+     "d_AU": 0.5113,
+     "gamma_deg": 9.815
+    },
+    {
+     "psi_deg": 10.0,
+     "W_m2_per_1pct": 15.93,
+     "face": "front",
+     "d_AU": 0.5437,
+     "gamma_deg": 18.63
+    },
+    {
+     "psi_deg": 20.0,
+     "W_m2_per_1pct": 9.845,
+     "face": "front",
+     "d_AU": 0.6564,
+     "gamma_deg": 31.4
+    },
+    {
+     "psi_deg": 30.0,
+     "W_m2_per_1pct": 5.986,
+     "face": "front",
+     "d_AU": 0.8074,
+     "gamma_deg": 38.26
+    },
+    {
+     "psi_deg": 45.0,
+     "W_m2_per_1pct": 3.286,
+     "face": "front",
+     "d_AU": 1.062,
+     "gamma_deg": 41.73
+    },
+    {
+     "psi_deg": 60.0,
+     "W_m2_per_1pct": 2.147,
+     "face": "front",
+     "d_AU": 1.323,
+     "gamma_deg": 40.89
+    },
+    {
+     "psi_deg": 90.0,
+     "W_m2_per_1pct": 1.272,
+     "face": "front",
+     "d_AU": 1.803,
+     "gamma_deg": 33.69
+    },
+    {
+     "psi_deg": 120.0,
+     "W_m2_per_1pct": 0.9602,
+     "face": "front",
+     "d_AU": 2.179,
+     "gamma_deg": 23.41
+    },
+    {
+     "psi_deg": 150.0,
+     "W_m2_per_1pct": 0.8315,
+     "face": "front",
+     "d_AU": 2.418,
+     "gamma_deg": 11.93
+    },
+    {
+     "psi_deg": 180.0,
+     "W_m2_per_1pct": 0.7952,
+     "face": "front",
+     "d_AU": 2.5,
+     "gamma_deg": 0.0
+    }
+   ],
+   "r3.0": [
+    {
+     "psi_deg": 1.0,
+     "W_m2_per_1pct": 1.242,
+     "face": "front",
+     "d_AU": 2.0,
+     "gamma_deg": 0.4999
+    },
+    {
+     "psi_deg": 5.0,
+     "W_m2_per_1pct": 1.234,
+     "face": "front",
+     "d_AU": 2.006,
+     "gamma_deg": 2.491
+    },
+    {
+     "psi_deg": 10.0,
+     "W_m2_per_1pct": 1.21,
+     "face": "front",
+     "d_AU": 2.023,
+     "gamma_deg": 4.925
+    },
+    {
+     "psi_deg": 20.0,
+     "W_m2_per_1pct": 1.124,
+     "face": "front",
+     "d_AU": 2.089,
+     "gamma_deg": 9.425
+    },
+    {
+     "psi_deg": 30.0,
+     "W_m2_per_1pct": 1.007,
+     "face": "front",
+     "d_AU": 2.192,
+     "gamma_deg": 13.19
+    },
+    {
+     "psi_deg": 45.0,
+     "W_m2_per_1pct": 0.8249,
+     "face": "front",
+     "d_AU": 2.399,
+     "gamma_deg": 17.14
+    },
+    {
+     "psi_deg": 60.0,
+     "W_m2_per_1pct": 0.6709,
+     "face": "front",
+     "d_AU": 2.646,
+     "gamma_deg": 19.11
+    },
+    {
+     "psi_deg": 90.0,
+     "W_m2_per_1pct": 0.4715,
+     "face": "front",
+     "d_AU": 3.162,
+     "gamma_deg": 18.43
+    },
+    {
+     "psi_deg": 120.0,
+     "W_m2_per_1pct": 0.3711,
+     "face": "front",
+     "d_AU": 3.606,
+     "gamma_deg": 13.9
+    },
+    {
+     "psi_deg": 150.0,
+     "W_m2_per_1pct": 0.3244,
+     "face": "front",
+     "d_AU": 3.898,
+     "gamma_deg": 7.369
+    },
+    {
+     "psi_deg": 180.0,
+     "W_m2_per_1pct": 0.3106,
+     "face": "front",
+     "d_AU": 4.0,
+     "gamma_deg": 0.0
+    }
+   ]
+  },
+  "anisotropy_findings": [
+   "Interior shells: IR per coverage is set by energy conservation; only the sphere factor 2/(1+cos theta_s) depends on r: 2.65 (0.3 AU) vs 3.66 (0.91 AU) W/m2 per 1 %. Self-dimming (-2.38) is the same, so net per coverage falls from 1.77 to 0.68.",
+   "Time-averaged rings (r < 1, synodic drift): polar ring 0.83x the uniform IR at 0.91 AU (0.85x at 0.3 AU); i = 60 deg 0.88x; ecliptic ring 4.8x (it passes 0.09 AU from Earth) plus 23x the dimming. Inclination buys <= 17 %.",
+   "Polar caps (|lat| > 30-60 deg) would give 0.48-0.65x, but Keplerian orbits cross the ecliptic: not realisable without g_sun-scale thrust (1e2x the sail authority).",
+   "A co-moving keep-out cap of 24.5 deg at 0.91 AU (no back faces visible) cuts IR 3.66 -> 1.85 W/m2 per 1 % but also removes the self-dimming: passive net 1.77 -> 2.34. Wider caps barely help (1.46 at 120 deg): the far-side front faces seen through the gaps remain.",
+   "Co-orbital at 1 AU (fixed in Earth's frame): front faces face Earth across the Sun; per 1 %: 1.24 at L3 only, 1.43 for L3+-90/|lat|<=30, 1.47 for the whole far hemisphere, 2.6 at the L4/L5 points. Far-side placement is 2.7x better than the 0.85-0.92 AU shell IR, not 10x.",
+   "Exterior shells: thermal IR per 1 % 4.8 (1.02 AU), 2.7 (1.36), 1.25 (2), 0.56 (3), 0.20 (5), 0.05 (10 AU) ~ 1/r^2. Specular retro-reflection from an exterior shell converges back on Earth ((1-alpha) f S0 at any r: +0.95 W/m2 per 1 %), so exterior films need diffuse or absorbed NIR.",
+   "Front-face emissivity is the strongest lever for any population whose fronts face Earth: tuning eps_f to 0.37 (film at the 85 C design point at 1 AU) cuts co-orbital IR 40 %; a directional front (eps 0.15 within 50 deg of the normal) cuts it 76 %."
+  ],
+  "day_night": {
+   "night_fraction_of_IR": {
+    "a_shell_0.91_uniform": 0.143,
+    "a_shell_0.91_keepout24": 0.143,
+    "b_coorbital_L3pm90_lat30": 0.0553,
+    "d_hot_shell_0.3": 0.0103,
+    "c_exterior_isotropic": 0.498
+   },
+   "IR_elongation_90pct_deg": {
+    "a_shell_0.91_uniform": 61.7,
+    "a_shell_0.91_keepout24": 61.7,
+    "b_coorbital_L3pm90_lat30": 41.3,
+    "d_hot_shell_0.3": 16.7,
+    "c_exterior_isotropic": 154.0
+   }
+  },
+  "nonlinearity": [
+   {
+    "f": 0.01,
+    "shell091_IR": 3.664,
+    "shell091_net": 1.773,
+    "shell091_absorbed": 240.0,
+    "coorb_L3pm90_lat30_IR": 1.415,
+    "coorb_T": 322.3
+   },
+   {
+    "f": 0.05,
+    "shell091_IR": 18.47,
+    "shell091_net": 8.931,
+    "shell091_absorbed": 247.1,
+    "coorb_L3pm90_lat30_IR": 7.296,
+    "coorb_T": 324.3
+   },
+   {
+    "f": 0.1,
+    "shell091_IR": 37.31,
+    "shell091_net": 18.03,
+    "shell091_absorbed": 256.2,
+    "coorb_L3pm90_lat30_IR": 15.17,
+    "coorb_T": 326.9
+   },
+   {
+    "f": 0.22,
+    "shell091_IR": 84.14,
+    "shell091_net": 40.62,
+    "shell091_absorbed": 278.8,
+    "coorb_L3pm90_lat30_IR": 36.8,
+    "coorb_T": 333.6
+   }
+  ]
+ },
+ "architectures": [
+  {
+   "name": "a_uniform_shell_0.85-0.92AU",
+   "geometry": "Uniform shell of sun-facing sails, thermal placement 0.852 AU (f=1 %) to 0.913 AU (f=22 %), all inclinations",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.3855,
+     "sunlight_removed": 0.2382,
+     "net": 0.1473
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 1.93,
+     "sunlight_removed": 1.191,
+     "net": 0.7387
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 3.865,
+     "sunlight_removed": 2.382,
+     "net": 1.483
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 19.57,
+     "sunlight_removed": 11.91,
+     "net": 7.656
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 39.82,
+     "sunlight_removed": 23.82,
+     "net": 15.99
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 93.38,
+     "sunlight_removed": 52.4,
+     "net": 40.97
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 3.865,
+    "net": 1.483
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.01,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.2217,
+    "geometric": null,
+    "used": 0.2217
+   },
+   "g_per_W": 0.5553,
+   "g_per_W_penalty": 0.0,
+   "flops_per_J_sun": 131500000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 1.0,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.0006789,
+     "passive_vs_ceiling": 0.003063,
+     "passive_year": 2107.0,
+     "with_thermostat_max_f": 0.0006485,
+     "with_thermostat_vs_ceiling": 0.002925,
+     "thermostat_shade_fraction": 0.0006184
+    },
+    "1.0": {
+     "passive_max_f": 0.006757,
+     "passive_vs_ceiling": 0.03048,
+     "passive_year": 2115.0,
+     "with_thermostat_max_f": 0.006474,
+     "with_thermostat_vs_ceiling": 0.02921,
+     "thermostat_shade_fraction": 0.004266
+    },
+    "4.0": {
+     "passive_max_f": 0.02646,
+     "passive_vs_ceiling": 0.1193,
+     "passive_year": 2144.0,
+     "with_thermostat_max_f": 0.02569,
+     "with_thermostat_vs_ceiling": 0.1159,
+     "thermostat_shade_fraction": 0.02141
+    }
+   },
+   "stationkeeping": "Shadow-corridor phasing ~1 m/s per 6.6-yr synodic period; a phased 24.5 deg keep-out cap up to ~210 m/s/yr (22 % of the 950 m/s/yr radiation-force authority) (shadow.json phasing)",
+   "stability": "N-body 1000 yr: circular derelicts at 0.85-0.91 AU stay within r = 0.847-0.919 AU; at 0.95 AU low-i orbits are scattered by Earth to 0.988 AU (keep sails <= 0.92 AU)",
+   "notes": "Self-dimming (-2.38 W/m2 per 1 %) offsets 57 % of its IR; the rest (+1.8 per 1 %) is net heating. The IR comes from a 65 deg disk around the Sun; 14 % of it lands on the night side.",
+   "film_at_f0p01": {
+    "rAU": 0.8523,
+    "T_K": 349.1,
+    "Tj_C": 85.0,
+    "pv_eff_incl_packing": 0.2034,
+    "chip_W_m2": 343.0,
+    "sail_g_per_W": 0.5335
+   }
+  },
+  {
+   "name": "a2_shell_with_24.5deg_keepout",
+   "geometry": "As (a) but no sail within 24.5 deg of Earth (no back faces seen): orbits i >= 30 deg phased so conjunctions occur near max latitude",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.2249,
+     "sunlight_removed": 0.0,
+     "net": 0.2249
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 1.127,
+     "sunlight_removed": 0.0,
+     "net": 1.127
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 2.261,
+     "sunlight_removed": 0.0,
+     "net": 2.261
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 11.59,
+     "sunlight_removed": 0.0,
+     "net": 11.59
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 24.01,
+     "sunlight_removed": 0.0,
+     "net": 24.01
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 60.3,
+     "sunlight_removed": 0.0,
+     "net": 60.3
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 2.261,
+    "net": 2.261
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.2217,
+    "geometric": null,
+    "used": 0.2217
+   },
+   "g_per_W": 0.5553,
+   "g_per_W_penalty": 0.0,
+   "flops_per_J_sun": 131500000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 1.0,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.0004446,
+     "passive_vs_ceiling": 0.002006,
+     "passive_year": 2106.0,
+     "with_thermostat_max_f": 0.001111,
+     "with_thermostat_vs_ceiling": 0.005014,
+     "thermostat_shade_fraction": 0.001193
+    },
+    "1.0": {
+     "passive_max_f": 0.004437,
+     "passive_vs_ceiling": 0.02002,
+     "passive_year": 2114.0,
+     "with_thermostat_max_f": 0.01104,
+     "with_thermostat_vs_ceiling": 0.04981,
+     "thermostat_shade_fraction": 0.0119
+    },
+    "4.0": {
+     "passive_max_f": 0.01754,
+     "passive_vs_ceiling": 0.07913,
+     "passive_year": 2133.0,
+     "with_thermostat_max_f": 0.04324,
+     "with_thermostat_vs_ceiling": 0.1951,
+     "thermostat_shade_fraction": 0.04512
+    }
+   },
+   "stationkeeping": "Phase shifts up to 90 deg per synodic period: ~1370 m/s per period, ~210 m/s/yr (22 % of the 3e-5 m/s2 authority)",
+   "stability": "as (a)",
+   "notes": "Halves the IR but also removes the self-dimming, so passive net forcing is unchanged (worse with a thermostat only by sunlight lost)."
+  },
+  {
+   "name": "b_coorbital_far_side_eps0.86",
+   "geometry": "Co-orbital cloud a = (1-beta)^(1/3) = 0.9987 AU, heliocentric longitude L3 +-90 deg (minus L3 +-6 deg), |lat| <= 30 deg (i <= 30 deg), film as designed (eps_f 0.86, 322 K)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.1418,
+     "sunlight_removed": 0.0,
+     "net": 0.1418
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.7111,
+     "sunlight_removed": 0.0,
+     "net": 0.7111
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 1.428,
+     "sunlight_removed": 0.0,
+     "net": 1.428
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 7.36,
+     "sunlight_removed": 0.0,
+     "net": 7.36
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 15.3,
+     "sunlight_removed": 0.0,
+     "net": 15.3
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 37.12,
+     "sunlight_removed": 0.0,
+     "net": 37.12
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 1.428,
+    "net": 1.428
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.1866,
+    "geometric": 0.21,
+    "used": 0.1866
+   },
+   "g_per_W": 0.6987,
+   "g_per_W_penalty": 0.2583,
+   "flops_per_J_sun": 141800000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.9083,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.0007052,
+     "passive_vs_ceiling": 0.003432,
+     "passive_year": 2107.0,
+     "with_thermostat_max_f": 0.001761,
+     "with_thermostat_vs_ceiling": 0.008572,
+     "thermostat_shade_fraction": 0.001436
+    },
+    "1.0": {
+     "passive_max_f": 0.007018,
+     "passive_vs_ceiling": 0.03416,
+     "passive_year": 2115.0,
+     "with_thermostat_max_f": 0.01733,
+     "with_thermostat_vs_ceiling": 0.08434,
+     "thermostat_shade_fraction": 0.0145
+    },
+    "4.0": {
+     "passive_max_f": 0.02749,
+     "passive_vs_ceiling": 0.1338,
+     "passive_year": 2145.0,
+     "with_thermostat_max_f": 0.06684,
+     "with_thermostat_vs_ceiling": 0.3253,
+     "thermostat_shade_fraction": 0.04486
+    }
+   },
+   "stationkeeping": "Longitude hold costs 1e-8 m/s2 (Delta-v per yr by start longitude, m/s: 90: 0.37, 90: 0.37, 120: 0.40, 120: 0.40, 150: 0.25, 150: 0.25, 180: 0.00, 180: 0.00), ~1/2500 of the radiation-force authority; latitude is not held (natural +-i oscillation).",
+   "stability": "Uncontrolled far-side sails librate on tadpoles toward Earth: from L3 they reach 13 deg (0.30 AU) within ~one 200-yr libration; N-body (Venus-Saturn) agrees (16 deg). L3 e-folding 56.307 yr. Derelicts with beta 0.002 never closer than 0.21 AU in 3000 yr; dense debris (beta 0) passes within 0.035-0.05 AU dozens of times (i = 20 deg).",
+   "notes": "No shadow on Earth. Front faces face Earth across the Sun (cos(gamma)/d^2 = 1/(4 sin(psi/2))): only 3x better than the shell IR per coverage. Specular NIR must retro-reflect (else +0.5 W/m2 per 1 %); L3 +-6 deg keep-out avoids NIR glints onto Earth.",
+   "film_at_f0p01": {
+    "rAU": 0.9987,
+    "T_K": 322.5,
+    "Tj_C": 58.39,
+    "pv_eff_incl_packing": 0.2195,
+    "chip_W_m2": 269.6,
+    "sail_g_per_W": 0.6777
+   }
+  },
+  {
+   "name": "b2_coorbital_far_side_tuned_eps",
+   "geometry": "As (b) with the front emissivity lowered (low-e TCO stack, eps_f ~0.37 at f=1 %) so the film runs at the 85 C design point at 1 AU",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.08336,
+     "sunlight_removed": 0.0,
+     "net": 0.08336
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.4197,
+     "sunlight_removed": 0.0,
+     "net": 0.4197
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.8466,
+     "sunlight_removed": 0.0,
+     "net": 0.8466
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 4.537,
+     "sunlight_removed": 0.0,
+     "net": 4.537
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 9.916,
+     "sunlight_removed": 0.0,
+     "net": 9.916
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 27.3,
+     "sunlight_removed": 0.0,
+     "net": 27.3
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.8466,
+    "net": 0.8466
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.187,
+    "geometric": 0.21,
+    "used": 0.187
+   },
+   "g_per_W": 0.7521,
+   "g_per_W_penalty": 0.3544,
+   "flops_per_J_sun": 131200000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.8417,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.001199,
+     "passive_vs_ceiling": 0.005396,
+     "passive_year": 2109.0,
+     "with_thermostat_max_f": 0.002985,
+     "with_thermostat_vs_ceiling": 0.01344,
+     "thermostat_shade_fraction": 0.001309
+    },
+    "1.0": {
+     "passive_max_f": 0.01173,
+     "passive_vs_ceiling": 0.05281,
+     "passive_year": 2121.0,
+     "with_thermostat_max_f": 0.02824,
+     "with_thermostat_vs_ceiling": 0.1271,
+     "thermostat_shade_fraction": 0.01355
+    },
+    "4.0": {
+     "passive_max_f": 0.04431,
+     "passive_vs_ceiling": 0.1995,
+     "passive_year": 2159.0,
+     "with_thermostat_max_f": 0.1007,
+     "with_thermostat_vs_ceiling": 0.4532,
+     "thermostat_shade_fraction": 0.04224
+    }
+   },
+   "stationkeeping": "Longitude hold costs 1e-8 m/s2 (Delta-v per yr by start longitude, m/s: 90: 0.37, 90: 0.37, 120: 0.40, 120: 0.40, 150: 0.25, 150: 0.25, 180: 0.00, 180: 0.00), ~1/2500 of the radiation-force authority; latitude is not held (natural +-i oscillation).",
+   "stability": "Uncontrolled far-side sails librate on tadpoles toward Earth: from L3 they reach 13 deg (0.30 AU) within ~one 200-yr libration; N-body (Venus-Saturn) agrees (16 deg). L3 e-folding 56.307 yr. Derelicts with beta 0.002 never closer than 0.21 AU in 3000 yr; dense debris (beta 0) passes within 0.035-0.05 AU dozens of times (i = 20 deg).",
+   "notes": "Back face carries 72 % of the heat; IR toward Earth -40 % vs (b).",
+   "film_at_f0p01": {
+    "rAU": 0.9987,
+    "T_K": 349.5,
+    "Tj_C": 85.31,
+    "pv_eff_incl_packing": 0.2032,
+    "chip_W_m2": 249.6,
+    "sail_g_per_W": 0.7316
+   }
+  },
+  {
+   "name": "b3_coorbital_far_side_directional_front",
+   "geometry": "As (b2) with a directional front emitter: eps 0.15 within 50 deg of the normal (where Earth always is), ~0.67 at grazing (same hemispherical eps, same T)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.03417,
+     "sunlight_removed": 0.0,
+     "net": 0.03417
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.1713,
+     "sunlight_removed": 0.0,
+     "net": 0.1713
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.3436,
+     "sunlight_removed": 0.0,
+     "net": 0.3436
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 1.761,
+     "sunlight_removed": 0.0,
+     "net": 1.761
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 3.629,
+     "sunlight_removed": 0.0,
+     "net": 3.629
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 8.475,
+     "sunlight_removed": 0.0,
+     "net": 8.475
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.3436,
+    "net": 0.3436
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.187,
+    "geometric": 0.21,
+    "used": 0.187
+   },
+   "g_per_W": 0.7555,
+   "g_per_W_penalty": 0.3605,
+   "flops_per_J_sun": 129400000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.8303,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.002922,
+     "passive_vs_ceiling": 0.01297,
+     "passive_year": 2112.0,
+     "with_thermostat_max_f": 0.007286,
+     "with_thermostat_vs_ceiling": 0.03235,
+     "thermostat_shade_fraction": 0.001112
+    },
+    "1.0": {
+     "passive_max_f": 0.02863,
+     "passive_vs_ceiling": 0.1271,
+     "passive_year": 2146.0,
+     "with_thermostat_max_f": 0.06996,
+     "with_thermostat_vs_ceiling": 0.3106,
+     "thermostat_shade_fraction": 0.01119
+    },
+    "4.0": {
+     "passive_max_f": 0.1095,
+     "passive_vs_ceiling": 0.4861,
+     "passive_year": 2292.0,
+     "with_thermostat_max_f": 0.187,
+     "with_thermostat_vs_ceiling": 0.8303,
+     "thermostat_shade_fraction": 0.03139
+    }
+   },
+   "stationkeeping": "Longitude hold costs 1e-8 m/s2 (Delta-v per yr by start longitude, m/s: 90: 0.37, 90: 0.37, 120: 0.40, 120: 0.40, 150: 0.25, 150: 0.25, 180: 0.00, 180: 0.00), ~1/2500 of the radiation-force authority; latitude is not held (natural +-i oscillation).",
+   "stability": "Uncontrolled far-side sails librate on tadpoles toward Earth: from L3 they reach 13 deg (0.30 AU) within ~one 200-yr libration; N-body (Venus-Saturn) agrees (16 deg). L3 e-folding 56.307 yr. Derelicts with beta 0.002 never closer than 0.21 AU in 3000 yr; dense debris (beta 0) passes within 0.035-0.05 AU dozens of times (i = 20 deg).",
+   "notes": "Gradient-ENZ directional emitters exist (Xu, Mandal & Raman 2021) but only p-polarised and over ~8-14 um; a visible-transparent broadband version is a technology bet.",
+   "film_at_f0p01": {
+    "rAU": 0.9987,
+    "T_K": 351.0,
+    "Tj_C": 86.88,
+    "pv_eff_incl_packing": 0.2023,
+    "chip_W_m2": 248.4,
+    "sail_g_per_W": 0.735
+   }
+  },
+  {
+   "name": "b4_coorbital_far_side_lowe0.10_Tj105",
+   "geometry": "As (b) with a low-e front (eps_f 0.10, TCO-type) and chiplets at Tj ~105 C (film 369 K at 1 AU): the back face sheds 90 % of the heat away from Earth",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.02866,
+     "sunlight_removed": 0.0,
+     "net": 0.02866
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.144,
+     "sunlight_removed": 0.0,
+     "net": 0.144
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.2895,
+     "sunlight_removed": 0.0,
+     "net": 0.2895
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 1.515,
+     "sunlight_removed": 0.0,
+     "net": 1.515
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 3.214,
+     "sunlight_removed": 0.0,
+     "net": 3.214
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 8.238,
+     "sunlight_removed": 0.0,
+     "net": 8.238
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.2895,
+    "net": 0.2895
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.1873,
+    "geometric": 0.21,
+    "used": 0.1873
+   },
+   "g_per_W": 0.7988,
+   "g_per_W_penalty": 0.4385,
+   "flops_per_J_sun": 110100000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.7073,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.003477,
+     "passive_vs_ceiling": 0.01313,
+     "passive_year": 2113.0,
+     "with_thermostat_max_f": 0.008645,
+     "with_thermostat_vs_ceiling": 0.03265,
+     "thermostat_shade_fraction": 0.001087
+    },
+    "1.0": {
+     "passive_max_f": 0.03338,
+     "passive_vs_ceiling": 0.1261,
+     "passive_year": 2151.0,
+     "with_thermostat_max_f": 0.07933,
+     "with_thermostat_vs_ceiling": 0.2996,
+     "thermostat_shade_fraction": 0.01111
+    },
+    "4.0": {
+     "passive_max_f": 0.1201,
+     "passive_vs_ceiling": 0.4536,
+     "passive_year": 2347.0,
+     "with_thermostat_max_f": 0.1873,
+     "with_thermostat_vs_ceiling": 0.7073,
+     "thermostat_shade_fraction": 0.03027
+    }
+   },
+   "stationkeeping": "Longitude hold costs 1e-8 m/s2 (Delta-v per yr by start longitude, m/s: 90: 0.37, 90: 0.37, 120: 0.40, 120: 0.40, 150: 0.25, 150: 0.25, 180: 0.00, 180: 0.00), ~1/2500 of the radiation-force authority; latitude is not held (natural +-i oscillation).",
+   "stability": "Uncontrolled far-side sails librate on tadpoles toward Earth: from L3 they reach 13 deg (0.30 AU) within ~one 200-yr libration; N-body (Venus-Saturn) agrees (16 deg). L3 e-folding 56.307 yr. Derelicts with beta 0.002 never closer than 0.21 AU in 3000 yr; dense debris (beta 0) passes within 0.035-0.05 AU dozens of times (i = 20 deg).",
+   "notes": "Trades ~16 % of FLOP per joule (energy/op x1.12 at 105 C for 2100+ logic, PV -6 %) for 65 % less IR toward Earth than (b2). Mature-in-kind coatings; no directional optics needed.",
+   "film_at_f0p01": {
+    "rAU": 0.9987,
+    "T_K": 370.0,
+    "Tj_C": 105.8,
+    "pv_eff_incl_packing": 0.1908,
+    "chip_W_m2": 234.4,
+    "sail_g_per_W": 0.7788
+   }
+  },
+  {
+   "name": "b5_coorbital_far_side_lowe0.05_Tj110",
+   "geometry": "As (b4) with eps_f 0.05 and Tj ~110 C (film 374 K)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.01506,
+     "sunlight_removed": 0.0,
+     "net": 0.01506
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.07567,
+     "sunlight_removed": 0.0,
+     "net": 0.07567
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.1522,
+     "sunlight_removed": 0.0,
+     "net": 0.1522
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 0.7979,
+     "sunlight_removed": 0.0,
+     "net": 0.7979
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 1.697,
+     "sunlight_removed": 0.0,
+     "net": 1.697
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 4.381,
+     "sunlight_removed": 0.0,
+     "net": 4.381
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.1522,
+    "net": 0.1522
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.1873,
+    "geometric": 0.21,
+    "used": 0.1873
+   },
+   "g_per_W": 0.8102,
+   "g_per_W_penalty": 0.459,
+   "flops_per_J_sun": 105800000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.6803,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.006592,
+     "passive_vs_ceiling": 0.02394,
+     "passive_year": 2115.0,
+     "with_thermostat_max_f": 0.01619,
+     "with_thermostat_vs_ceiling": 0.0588,
+     "thermostat_shade_fraction": 0.001451
+    },
+    "1.0": {
+     "passive_max_f": 0.06152,
+     "passive_vs_ceiling": 0.2234,
+     "passive_year": 2185.0,
+     "with_thermostat_max_f": 0.138,
+     "with_thermostat_vs_ceiling": 0.5012,
+     "thermostat_shade_fraction": 0.01173
+    },
+    "4.0": {
+     "passive_max_f": 0.1873,
+     "passive_vs_ceiling": 0.6803,
+     "passive_year": 2612.0,
+     "with_thermostat_max_f": 0.1873,
+     "with_thermostat_vs_ceiling": 0.6803,
+     "thermostat_shade_fraction": 0.01609
+    }
+   },
+   "stationkeeping": "Longitude hold costs 1e-8 m/s2 (Delta-v per yr by start longitude, m/s: 90: 0.37, 90: 0.37, 120: 0.40, 120: 0.40, 150: 0.25, 150: 0.25, 180: 0.00, 180: 0.00), ~1/2500 of the radiation-force authority; latitude is not held (natural +-i oscillation).",
+   "stability": "Uncontrolled far-side sails librate on tadpoles toward Earth: from L3 they reach 13 deg (0.30 AU) within ~one 200-yr libration; N-body (Venus-Saturn) agrees (16 deg). L3 e-folding 56.307 yr. Derelicts with beta 0.002 never closer than 0.21 AU in 3000 yr; dense debris (beta 0) passes within 0.035-0.05 AU dozens of times (i = 20 deg).",
+   "notes": "Upper end of the low-e lever: eps_f -> 0 requires Tj ~115 C (back-only radiator at 1 AU, film 379 K).",
+   "film_at_f0p01": {
+    "rAU": 0.9987,
+    "T_K": 374.6,
+    "Tj_C": 110.4,
+    "pv_eff_incl_packing": 0.188,
+    "chip_W_m2": 230.9,
+    "sail_g_per_W": 0.7903
+   }
+  },
+  {
+   "name": "c_exterior_shell_2.0AU",
+   "geometry": "Uniform shell at 2.0 AU (cold film 228 K), diffuse NIR (specular retro-reflection from an exterior shell focuses (1-alpha) f S0 back onto Earth)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.172,
+     "sunlight_removed": 0.0,
+     "net": 0.172
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.8621,
+     "sunlight_removed": 0.0,
+     "net": 0.8621
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 1.729,
+     "sunlight_removed": 0.0,
+     "net": 1.729
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 8.86,
+     "sunlight_removed": 0.0,
+     "net": 8.86
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 18.28,
+     "sunlight_removed": 0.0,
+     "net": 18.28
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 43.52,
+     "sunlight_removed": 0.0,
+     "net": 43.52
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 1.729,
+    "net": 1.729
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.04786,
+    "geometric": null,
+    "used": 0.04786
+   },
+   "g_per_W": 2.297,
+   "g_per_W_penalty": 3.137,
+   "flops_per_J_sun": 168300000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.2764,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.0005814,
+     "passive_vs_ceiling": 0.003357,
+     "passive_year": 2107.0,
+     "with_thermostat_max_f": 0.001453,
+     "with_thermostat_vs_ceiling": 0.008389,
+     "thermostat_shade_fraction": 0.001394
+    },
+    "1.0": {
+     "passive_max_f": 0.005796,
+     "passive_vs_ceiling": 0.03347,
+     "passive_year": 2115.0,
+     "with_thermostat_max_f": 0.01438,
+     "with_thermostat_vs_ceiling": 0.08302,
+     "thermostat_shade_fraction": 0.01401
+    },
+    "4.0": {
+     "passive_max_f": 0.02284,
+     "passive_vs_ceiling": 0.1319,
+     "passive_year": 2140.0,
+     "with_thermostat_max_f": 0.04786,
+     "with_thermostat_vs_ceiling": 0.2764,
+     "thermostat_shade_fraction": 0.03638
+    }
+   },
+   "stationkeeping": "None special (no Earth encounters); Jupiter perturbations beyond ~3 AU",
+   "stability": "Long-term stable away from Jupiter resonances (not integrated)",
+   "notes": "Forcing per coverage falls as 1/r^2 but area and mass per W rise as r^2; the whole night sky is lit day and night."
+  },
+  {
+   "name": "c_exterior_shell_3.0AU",
+   "geometry": "Uniform shell at 3.0 AU (cold film 186 K), diffuse NIR (specular retro-reflection from an exterior shell focuses (1-alpha) f S0 back onto Earth)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.07644,
+     "sunlight_removed": 0.0,
+     "net": 0.07644
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.3831,
+     "sunlight_removed": 0.0,
+     "net": 0.3831
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.7686,
+     "sunlight_removed": 0.0,
+     "net": 0.7686
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 3.938,
+     "sunlight_removed": 0.0,
+     "net": 3.938
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 8.126,
+     "sunlight_removed": 0.0,
+     "net": 8.126
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 19.34,
+     "sunlight_removed": 0.0,
+     "net": 19.34
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.7686,
+    "net": 0.7686
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.02141,
+    "geometric": null,
+    "used": 0.02141
+   },
+   "g_per_W": 5.134,
+   "g_per_W_penalty": 8.246,
+   "flops_per_J_sun": 168300000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.1236,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.001308,
+     "passive_vs_ceiling": 0.007551,
+     "passive_year": 2109.0,
+     "with_thermostat_max_f": 0.003265,
+     "with_thermostat_vs_ceiling": 0.01885,
+     "thermostat_shade_fraction": 0.001267
+    },
+    "1.0": {
+     "passive_max_f": 0.01296,
+     "passive_vs_ceiling": 0.07484,
+     "passive_year": 2124.0,
+     "with_thermostat_max_f": 0.02141,
+     "with_thermostat_vs_ceiling": 0.1236,
+     "thermostat_shade_fraction": 0.009521
+    },
+    "4.0": {
+     "passive_max_f": 0.02141,
+     "passive_vs_ceiling": 0.1236,
+     "passive_year": 2138.0,
+     "with_thermostat_max_f": 0.02141,
+     "with_thermostat_vs_ceiling": 0.1236,
+     "thermostat_shade_fraction": 0.009521
+    }
+   },
+   "stationkeeping": "None special (no Earth encounters); Jupiter perturbations beyond ~3 AU",
+   "stability": "Long-term stable away from Jupiter resonances (not integrated)",
+   "notes": "Forcing per coverage falls as 1/r^2 but area and mass per W rise as r^2; the whole night sky is lit day and night."
+  },
+  {
+   "name": "c_exterior_shell_5.0AU",
+   "geometry": "Uniform shell at 5.0 AU (cold film 144 K), diffuse NIR (specular retro-reflection from an exterior shell focuses (1-alpha) f S0 back onto Earth)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.02752,
+     "sunlight_removed": 0.0,
+     "net": 0.02752
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.1379,
+     "sunlight_removed": 0.0,
+     "net": 0.1379
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.2767,
+     "sunlight_removed": 0.0,
+     "net": 0.2767
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 1.418,
+     "sunlight_removed": 0.0,
+     "net": 1.418
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 2.925,
+     "sunlight_removed": 0.0,
+     "net": 2.925
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 6.963,
+     "sunlight_removed": 0.0,
+     "net": 6.963
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.2767,
+    "net": 0.2767
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.007738,
+    "geometric": null,
+    "used": 0.007738
+   },
+   "g_per_W": 14.21,
+   "g_per_W_penalty": 24.59,
+   "flops_per_J_sun": 168300000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.04468,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.003627,
+     "passive_vs_ceiling": 0.02094,
+     "passive_year": 2113.0,
+     "with_thermostat_max_f": 0.007738,
+     "with_thermostat_vs_ceiling": 0.04468,
+     "thermostat_shade_fraction": 0.0009461
+    },
+    "1.0": {
+     "passive_max_f": 0.007738,
+     "passive_vs_ceiling": 0.04468,
+     "passive_year": 2116.0,
+     "with_thermostat_max_f": 0.007738,
+     "with_thermostat_vs_ceiling": 0.04468,
+     "thermostat_shade_fraction": 0.0009461
+    },
+    "4.0": {
+     "passive_max_f": 0.007738,
+     "passive_vs_ceiling": 0.04468,
+     "passive_year": 2116.0,
+     "with_thermostat_max_f": 0.007738,
+     "with_thermostat_vs_ceiling": 0.04468,
+     "thermostat_shade_fraction": 0.0009461
+    }
+   },
+   "stationkeeping": "None special (no Earth encounters); Jupiter perturbations beyond ~3 AU",
+   "stability": "Long-term stable away from Jupiter resonances (not integrated)",
+   "notes": "Forcing per coverage falls as 1/r^2 but area and mass per W rise as r^2; the whole night sky is lit day and night."
+  },
+  {
+   "name": "c_exterior_shell_10.0AU",
+   "geometry": "Uniform shell at 10.0 AU (cold film 102 K), diffuse NIR (specular retro-reflection from an exterior shell focuses (1-alpha) f S0 back onto Earth)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.00688,
+     "sunlight_removed": 0.0,
+     "net": 0.00688
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 0.03448,
+     "sunlight_removed": 0.0,
+     "net": 0.03448
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 0.06917,
+     "sunlight_removed": 0.0,
+     "net": 0.06917
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 0.3544,
+     "sunlight_removed": 0.0,
+     "net": 0.3544
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 0.7313,
+     "sunlight_removed": 0.0,
+     "net": 0.7313
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 1.741,
+     "sunlight_removed": 0.0,
+     "net": 1.741
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 0.06917,
+    "net": 0.06917
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.0,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.001938,
+    "geometric": null,
+    "used": 0.001938
+   },
+   "g_per_W": 56.73,
+   "g_per_W_penalty": 101.2,
+   "flops_per_J_sun": 168300000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.01119,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.001938,
+     "passive_vs_ceiling": 0.01119,
+     "passive_year": 2110.0,
+     "with_thermostat_max_f": 0.001938,
+     "with_thermostat_vs_ceiling": 0.01119,
+     "thermostat_shade_fraction": 7.652e-05
+    },
+    "1.0": {
+     "passive_max_f": 0.001938,
+     "passive_vs_ceiling": 0.01119,
+     "passive_year": 2110.0,
+     "with_thermostat_max_f": 0.001938,
+     "with_thermostat_vs_ceiling": 0.01119,
+     "thermostat_shade_fraction": 7.652e-05
+    },
+    "4.0": {
+     "passive_max_f": 0.001938,
+     "passive_vs_ceiling": 0.01119,
+     "passive_year": 2110.0,
+     "with_thermostat_max_f": 0.001938,
+     "with_thermostat_vs_ceiling": 0.01119,
+     "thermostat_shade_fraction": 7.652e-05
+    }
+   },
+   "stationkeeping": "None special (no Earth encounters); Jupiter perturbations beyond ~3 AU",
+   "stability": "Long-term stable away from Jupiter resonances (not integrated)",
+   "notes": "Forcing per coverage falls as 1/r^2 but area and mass per W rise as r^2; the whole night sky is lit day and night."
+  },
+  {
+   "name": "d_hot_shell_Tj125C_0.69AU",
+   "geometry": "Uniform shell at 0.69 AU, chiplets at 125 C",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.3486,
+     "sunlight_removed": 0.2382,
+     "net": 0.1104
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 1.743,
+     "sunlight_removed": 1.191,
+     "net": 0.5525
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 3.488,
+     "sunlight_removed": 2.382,
+     "net": 1.106
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 17.48,
+     "sunlight_removed": 11.91,
+     "net": 5.571
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 35.07,
+     "sunlight_removed": 23.82,
+     "net": 11.25
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 77.73,
+     "sunlight_removed": 52.4,
+     "net": 25.33
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 3.488,
+    "net": 1.106
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.01,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.3141,
+    "geometric": null,
+    "used": 0.3141
+   },
+   "g_per_W": 0.4169,
+   "g_per_W_penalty": -0.2493,
+   "flops_per_J_sun": 93320000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 1.006,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.0009057,
+     "passive_vs_ceiling": 0.002901,
+     "passive_year": 2108.0,
+     "with_thermostat_max_f": 0.0007171,
+     "with_thermostat_vs_ceiling": 0.002297,
+     "thermostat_shade_fraction": 0.0004635
+    },
+    "1.0": {
+     "passive_max_f": 0.009043,
+     "passive_vs_ceiling": 0.02896,
+     "passive_year": 2116.0,
+     "with_thermostat_max_f": 0.007168,
+     "with_thermostat_vs_ceiling": 0.02296,
+     "thermostat_shade_fraction": 0.003527
+    },
+    "4.0": {
+     "passive_max_f": 0.03595,
+     "passive_vs_ceiling": 0.1151,
+     "passive_year": 2153.0,
+     "with_thermostat_max_f": 0.02863,
+     "with_thermostat_vs_ceiling": 0.09168,
+     "thermostat_shade_fraction": 0.01689
+    }
+   },
+   "stationkeeping": "as (a)",
+   "stability": "Venus-crossing below 0.73 AU",
+   "notes": "Smaller sphere factor and the same self-dimming roughly halve net forcing per coverage, but FLOP per joule of sunlight falls 29-72 %."
+  },
+  {
+   "name": "d_hot_shell_Tj200C_0.48AU",
+   "geometry": "Uniform shell at 0.48 AU, chiplets at 200 C",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.3228,
+     "sunlight_removed": 0.2382,
+     "net": 0.08456
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 1.614,
+     "sunlight_removed": 1.191,
+     "net": 0.4231
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 3.229,
+     "sunlight_removed": 2.382,
+     "net": 0.8471
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 16.18,
+     "sunlight_removed": 11.91,
+     "net": 4.271
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 32.45,
+     "sunlight_removed": 23.82,
+     "net": 8.632
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 71.89,
+     "sunlight_removed": 52.4,
+     "net": 19.49
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 3.229,
+    "net": 0.8471
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.01,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.4971,
+    "geometric": null,
+    "used": 0.4971
+   },
+   "g_per_W": 0.2867,
+   "g_per_W_penalty": -0.4837,
+   "flops_per_J_sun": 37050000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.6321,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.001183,
+     "passive_vs_ceiling": 0.001504,
+     "passive_year": 2108.0,
+     "with_thermostat_max_f": 0.0007746,
+     "with_thermostat_vs_ceiling": 0.0009849,
+     "thermostat_shade_fraction": 0.000355
+    },
+    "1.0": {
+     "passive_max_f": 0.01179,
+     "passive_vs_ceiling": 0.015,
+     "passive_year": 2121.0,
+     "with_thermostat_max_f": 0.007743,
+     "with_thermostat_vs_ceiling": 0.009845,
+     "thermostat_shade_fraction": 0.002899
+    },
+    "4.0": {
+     "passive_max_f": 0.04684,
+     "passive_vs_ceiling": 0.05956,
+     "passive_year": 2160.0,
+     "with_thermostat_max_f": 0.03092,
+     "with_thermostat_vs_ceiling": 0.03932,
+     "thermostat_shade_fraction": 0.01364
+    }
+   },
+   "stationkeeping": "as (a)",
+   "stability": "Venus-crossing below 0.73 AU",
+   "notes": "Smaller sphere factor and the same self-dimming roughly halve net forcing per coverage, but FLOP per joule of sunlight falls 29-72 %."
+  },
+  {
+   "name": "d2_hot_polar_ring_0.48AU",
+   "geometry": "Polar ring at 0.48 AU (time-averaged over the synodic cycle)",
+   "forcing_W_m2": [
+    {
+     "f": 0.001,
+     "gross_IR": 0.2697,
+     "sunlight_removed": 0.153,
+     "net": 0.1167
+    },
+    {
+     "f": 0.005,
+     "gross_IR": 1.35,
+     "sunlight_removed": 0.765,
+     "net": 0.5845
+    },
+    {
+     "f": 0.01,
+     "gross_IR": 2.702,
+     "sunlight_removed": 1.53,
+     "net": 1.172
+    },
+    {
+     "f": 0.05,
+     "gross_IR": 13.61,
+     "sunlight_removed": 7.65,
+     "net": 5.962
+    },
+    {
+     "f": 0.1,
+     "gross_IR": 27.5,
+     "sunlight_removed": 15.3,
+     "net": 12.2
+    },
+    {
+     "f": 0.22,
+     "gross_IR": 62.03,
+     "sunlight_removed": 33.66,
+     "net": 28.37
+    }
+   ],
+   "forcing_per_1pct_at_f0p01": {
+    "gross": 2.702,
+    "net": 1.172
+   },
+   "sunlight_loss": {
+    "per_1pct_coverage": 0.006423,
+    "note": "fraction of sunlight reaching Earth removed by the swarm itself (no thermostat)"
+   },
+   "max_coverage": {
+    "fleet_limited": 0.4971,
+    "geometric": null,
+    "used": 0.4971
+   },
+   "g_per_W": 0.2867,
+   "g_per_W_penalty": -0.4837,
+   "flops_per_J_sun": 37050000000000.0,
+   "compute_at_max_coverage_vs_ceiling": 0.6321,
+   "limits_by_forcing": {
+    "0.1": {
+     "passive_max_f": 0.0008569,
+     "passive_vs_ceiling": 0.00109,
+     "passive_year": 2108.0,
+     "with_thermostat_max_f": 0.000927,
+     "with_thermostat_vs_ceiling": 0.001179,
+     "thermostat_shade_fraction": 0.0004899
+    },
+    "1.0": {
+     "passive_max_f": 0.00854,
+     "passive_vs_ceiling": 0.01086,
+     "passive_year": 2116.0,
+     "with_thermostat_max_f": 0.009255,
+     "with_thermostat_vs_ceiling": 0.01177,
+     "thermostat_shade_fraction": 0.004643
+    },
+    "4.0": {
+     "passive_max_f": 0.03369,
+     "passive_vs_ceiling": 0.04284,
+     "passive_year": 2151.0,
+     "with_thermostat_max_f": 0.03678,
+     "with_thermostat_vs_ceiling": 0.04677,
+     "thermostat_shade_fraction": 0.0212
+    }
+   },
+   "stationkeeping": "as (a)",
+   "stability": "as (d)",
+   "notes": "Ring gives 13-15 % less IR than a uniform shell but concentrates shadow into two eclipse seasons a year (see shadow.json)."
+  },
+  {
+   "name": "e_L1_thermostat",
+   "geometry": "Cloud of ordinary compute sails near the beta = 0.004 L1 point (1.568e6 km sunward of Earth; 1.498e6 km for beta = 0), radius ~1 R_E around the Sun-Earth line, removing a fraction s of the sunlight that reaches Earth.",
+   "forcing_W_m2": "-238 s (absorbed sunlight removed); its own IR reaches Earth at (R_E/d)^2 = 1.65e-5 of what it blocks",
+   "shade_fraction_needed": "s = net_IR / 238 = 0.42 % of sunlight per W/m2 to cancel",
+   "shade_fraction_vs_coverage": {
+    "a_uniform_shell_0.85-0.92AU": [
+     {
+      "f": 0.001,
+      "s": 0.0006184
+     },
+     {
+      "f": 0.005,
+      "s": 0.003101
+     },
+     {
+      "f": 0.01,
+      "s": 0.006226
+     },
+     {
+      "f": 0.05,
+      "s": 0.03214
+     },
+     {
+      "f": 0.1,
+      "s": 0.06713
+     },
+     {
+      "f": 0.22,
+      "s": 0.172
+     }
+    ],
+    "b_coorbital_far_side_eps0.86": [
+     {
+      "f": 0.001,
+      "s": 0.0005953
+     },
+     {
+      "f": 0.005,
+      "s": 0.002985
+     },
+     {
+      "f": 0.01,
+      "s": 0.005995
+     },
+     {
+      "f": 0.05,
+      "s": 0.0309
+     },
+     {
+      "f": 0.1,
+      "s": 0.06423
+     },
+     {
+      "f": 0.22,
+      "s": 0.1558
+     }
+    ],
+    "b2_coorbital_far_side_tuned_eps": [
+     {
+      "f": 0.001,
+      "s": 0.00035
+     },
+     {
+      "f": 0.005,
+      "s": 0.001762
+     },
+     {
+      "f": 0.01,
+      "s": 0.003554
+     },
+     {
+      "f": 0.05,
+      "s": 0.01905
+     },
+     {
+      "f": 0.1,
+      "s": 0.04163
+     },
+     {
+      "f": 0.22,
+      "s": 0.1146
+     }
+    ],
+    "b3_coorbital_far_side_directional_front": [
+     {
+      "f": 0.001,
+      "s": 0.0001434
+     },
+     {
+      "f": 0.005,
+      "s": 0.0007191
+     },
+     {
+      "f": 0.01,
+      "s": 0.001442
+     },
+     {
+      "f": 0.05,
+      "s": 0.007393
+     },
+     {
+      "f": 0.1,
+      "s": 0.01523
+     },
+     {
+      "f": 0.22,
+      "s": 0.03558
+     }
+    ]
+   },
+   "shade_area": {
+    "per_1pct_of_sunlight_m2": 2420000000000.0,
+    "efficiency_vs_cloud_radius": {
+     "0.25": 0.74,
+     "0.5": 0.679,
+     "1.0": 0.526,
+     "1.5": 0.378,
+     "2.0": 0.248
+    },
+    "vs_10pct_swarm": 8.62e-11
+   },
+   "can_be_compute_sails": "Yes. A 279 m sail at L1 is an ordinary 349 K sail at 0.99 AU; a 1 % shade is 2.4e12 m2 (3.5e7 sails, 4e11 kg, ~6e14 W of chips): 1e-10 of a 10 % swarm. Its back faces point at Earth but Earth fills only 1.65e-5 of their hemisphere.",
+   "sunlight_loss": "s (by design); the far-side swarm itself removes none",
+   "max_coverage": "not a compute architecture; sized to the swarm",
+   "g_per_W_penalty": 0.0,
+   "stationkeeping": "L1 e-folding 24.505 days (beta 0.004); a sail displaced dx along the unstable direction needs ~lambda^2 dx = 2.2e-6 m/s2 per 10,000 km, so a cloud 1 R_E wide and +-1e4 km long fits the 3e-5 m/s2 authority, while Angel-type +-5e4 km clouds use most of it: use forced Lissajous/halo-type orbits (Sanchez & McInnes 2015) or thinner thermostat sails (beta ~0.01).",
+   "stability": "Unstable (24-day e-folding); a dead shade sail leaves within months, so the shade fails safe (sunlight returns), and the swarm itself can be throttled by tilting (IR down within hours) - no termination shock if attitude control survives.",
+   "notes": "The thermostat converts a global-mean warming into a sunlight-for-IR substitution; it is cheap in mass (1e-10 of the swarm) but not free in climate: side effects scale with the IR it cancels (see climate_side_effects_per_Wm2_cancelled).",
+   "climate_side_effects_per_Wm2_cancelled": {
+    "precipitation_fast_pct": -0.758,
+    "polar_60_90_annual_residual_Wm2": 0.229,
+    "tropics_0_20_residual_Wm2": -0.163,
+    "ebm_polar_warming_K": {
+     "D0.4": 0.0686,
+     "D0.55": 0.0552,
+     "D0.8": 0.0416
+    },
+    "stratospheric_warming_K": 0.273,
+    "greenland_june_ice_surface_residual_Wm2": 0.948,
+    "night_fraction_of_IR": 0.0553,
+    "vertical": {
+     "stratosphere": 0.125,
+     "troposphere_and_cloud_tops": 0.795,
+     "surface": 0.0795
+    }
+   },
+   "regional_seasonal_notes": [
+    "Pattern: the swarm IR (absorbed at 0.95 everywhere) replaces sunlight that would have been absorbed at 1 - albedo; bright regions (ice sheets, sea ice, snow, cloud decks) gain net heat, dark oceans and forests lose it. With a far-side swarm the IR arrives from within 45 deg of the Sun, so the diurnal and seasonal timing matches sunlight (5.5 % at night).",
+    "Per W/m2 cancelled: poles 60-90 +0.23 W/m2 annual (+0.41 in polar summer, +0.95 over a 0.8-albedo ice surface in June), tropics -0.16 W/m2; a diffusive EBM gives +0.04-0.07 K polar, -0.02 K tropical (no ice-albedo feedback; real polar amplification larger).",
+    "Vertical: 92 % of the swarm IR is absorbed in the atmosphere (only the clear-sky 8-12 um window reaches the surface, ~8 %), while the shade removes sunlight that was 67 % surface-absorbed: the surface loses ~0.59 W/m2 per W/m2 cancelled, the atmosphere gains it. Fast response: global precipitation -0.76 % per W/m2 (Andrews et al. 2010 energetics; cf. GeoMIP G1 -4.5 %, Tilmes et al. 2013).",
+    "Stratosphere warms ~0.27 K per W/m2 (CO2 15 um core absorbed above ~20 km) - the opposite sign to CO2 forcing.",
+    "Exterior swarms are worst for pattern: their IR is isotropic (50 % at night, same at all latitudes and seasons) while the shade removes daytime, low-latitude sunlight: polar residual +0.60, tropics -0.35 W/m2 per W/m2.",
+    "Cloud shape at L1 can tailor the dimming across Earth's disk (a cloud of radius 1 R_E dims the limb to ~0.53 of the sub-solar point; 2 R_E dims uniformly at 25 % efficiency): partially counter the polar residual by shading high latitudes (Sanchez & McInnes 2015)."
+   ],
+   "literature": [
+    "Early 1989 (first L1 shade)",
+    "Angel 2006 PNAS: 1.8 % reduction, ~20 Mt cloud of 1-g flyers, 100,000 km long, 25 yr",
+    "Govindasamy & Caldeira 2000: ~1.8 % solar reduction offsets 2xCO2 with small regional residuals",
+    "Kravitz et al. 2013 (GeoMIP G1, 4xCO2 offset by 3.2-5 % solar reduction): tropics -0.3 K, poles +0.8 K",
+    "Tilmes et al. 2013: G1 global precipitation -4.5 %, monsoon land -5 to -7 %",
+    "Bala et al. 2008: hydrological cycle more sensitive to solar than to CO2 forcing",
+    "Sanchez & McInnes 2015: two-disk L1 configurations reduce latitudinal/seasonal residuals"
+   ]
+  },
+  {
+   "name": "f_recommended_combination: b5 (b4/b2) far-side co-orbital + e L1 thermostat",
+   "geometry": "Far-side co-orbital cloud (L3 +-90 deg minus +-6 deg, |lat| <= 30 deg, a = 0.9987 AU) of sails with low-e fronts (eps_f 0.05-0.10, chiplets at 105-110 C; conservative: eps_f 0.37 at 85 C) and specular sub-bandgap filters; an L1 thermostat cancels the residual; coverage capped by cancelled IR <= 2.5 X.",
+   "forcing_W_m2": "net ~0 with the thermostat; gross IR per 1 %: 0.15 (b5) / 0.29 (b4) / 0.85 (b2) / 0.34 (b3)",
+   "sunlight_loss": "0.06 % (b5) to 0.36 % (b2) of sunlight per 1 % coverage, all from the L1 shade",
+   "max_coverage": {
+    "X=0.1": {
+     "b5": 0.01619,
+     "b4": 0.008645,
+     "b2": 0.002985,
+     "b3": 0.007286
+    },
+    "X=1": {
+     "b5": 0.138,
+     "b4": 0.07933,
+     "b2": 0.02824,
+     "b3": 0.06996
+    },
+    "X=4": {
+     "b5": 0.1873,
+     "b4": 0.1873,
+     "b2": 0.1007,
+     "b3": 0.187
+    }
+   },
+   "g_per_W_penalty": {
+    "b5": 0.459,
+    "b4": 0.4385,
+    "b2": 0.3544
+   },
+   "stationkeeping": "as b plus e",
+   "stability": "as b plus e",
+   "notes": "Interior shell + thermostat is worse: its gross substitution is 3.9 W/m2 per 1 % (all of it sunlight-for-IR)."
+  }
+ ],
+ "shadow": {
+  "single_sail": {
+   "r0.3": {
+    "umbra_km": 8.998,
+    "umbra_over_size": 32.25,
+    "sun_half_angle_deg": 0.8882
+   },
+   "r0.5": {
+    "umbra_km": 15.0,
+    "umbra_over_size": 53.76,
+    "sun_half_angle_deg": 0.5329
+   },
+   "r0.91": {
+    "umbra_km": 27.3,
+    "umbra_over_size": 97.84,
+    "sun_half_angle_deg": 0.2928
+   },
+   "r0.99": {
+    "umbra_km": 29.7,
+    "umbra_over_size": 106.4,
+    "sun_half_angle_deg": 0.2691
+   },
+   "spot_shell_0.91": {
+    "distance_to_earth_km": 13460000.0,
+    "penumbral_spot_radius_km": 68810.0,
+    "spot_radius_over_R_earth": 10.8,
+    "peak_fractional_dimming_per_sail": 4.676e-12
+   },
+   "spot_L1": {
+    "distance_to_earth_km": 1568000.0,
+    "penumbral_spot_radius_km": 7368.0,
+    "spot_radius_over_R_earth": 1.156,
+    "peak_fractional_dimming_per_sail": 4.078e-10
+   }
+  },
+  "phasing": {
+   "corridor_dodge_dv_m_s_per_synodic": 0.965,
+   "keepout_24p5_dv_m_s_per_synodic": 1370.0,
+   "keepout_24p5_dv_m_s_per_yr": 209.0,
+   "authority_dv_m_s_per_yr": 947.0,
+   "note": "keep-out phasing: conjunction must fall within +-45 deg of the orbit's highest/lowest point: up to 90 deg of phase per synodic period"
+  },
+  "interior_shell_0p91": {
+   "penumbral_cone_half_width_km": 75180.0,
+   "cone_half_width_deg_from_sun": 0.03164,
+   "sail_period_yr": 0.8681,
+   "synodic_period_yr": 6.581,
+   "transit_probability_per_synodic_encounter_analytic": 0.0005522,
+   "transit_probability_mc": 0.000557,
+   "transits_per_sail_per_year": 8.392e-05,
+   "transit_duration_h_median": 1.421,
+   "transit_duration_h_i0": 10.14,
+   "transit_duration_h_i30": 2.675,
+   "corridor_shell_fraction": 0.0005522,
+   "note": "Time-mean dimming of Earth = coverage on its sun-line = f for a uniform shell. Corridor = band of the shell that Earth's penumbral cone sweeps in a year: 2 sin(w) of the sphere / 2 = sin(w)."
+  },
+  "interior_flicker": [
+   {
+    "f": 0.0001,
+    "sails_in_cone": 21400000.0,
+    "relative_flicker": 0.000216,
+    "absolute_flicker_of_sunlight": 2.16e-08,
+    "flicker_Wm2": 5.15e-06
+   },
+   {
+    "f": 0.001,
+    "sails_in_cone": 214000000.0,
+    "relative_flicker": 6.84e-05,
+    "absolute_flicker_of_sunlight": 6.84e-08,
+    "flicker_Wm2": 1.63e-05
+   },
+   {
+    "f": 0.01,
+    "sails_in_cone": 2140000000.0,
+    "relative_flicker": 2.16e-05,
+    "absolute_flicker_of_sunlight": 2.16e-07,
+    "flicker_Wm2": 5.15e-05
+   },
+   {
+    "f": 0.1,
+    "sails_in_cone": 21400000000.0,
+    "relative_flicker": 6.84e-06,
+    "absolute_flicker_of_sunlight": 6.84e-07,
+    "flicker_Wm2": 0.000163
+   },
+   {
+    "f": 0.22,
+    "sails_in_cone": 47100000000.0,
+    "relative_flicker": 4.61e-06,
+    "absolute_flicker_of_sunlight": 1.01e-06,
+    "flicker_Wm2": 0.000242
+   }
+  ],
+  "rings": [
+   {
+    "r": 0.3,
+    "ring_half_width_deg": 1.0,
+    "f": 0.01,
+    "tau_in_ring": 0.573,
+    "polar_ring_eclipse_days_each": 2.03,
+    "eclipse_depth": 0.573,
+    "ecliptic_ring_permanent_dimming": 0.573
+   },
+   {
+    "r": 0.3,
+    "ring_half_width_deg": 5.0,
+    "f": 0.01,
+    "tau_in_ring": 0.115,
+    "polar_ring_eclipse_days_each": 10.1,
+    "eclipse_depth": 0.115,
+    "ecliptic_ring_permanent_dimming": 0.115
+   },
+   {
+    "r": 0.3,
+    "ring_half_width_deg": 15.0,
+    "f": 0.01,
+    "tau_in_ring": 0.0386,
+    "polar_ring_eclipse_days_each": 30.4,
+    "eclipse_depth": 0.0386,
+    "ecliptic_ring_permanent_dimming": 0.0386
+   },
+   {
+    "r": 0.5,
+    "ring_half_width_deg": 1.0,
+    "f": 0.01,
+    "tau_in_ring": 0.573,
+    "polar_ring_eclipse_days_each": 2.03,
+    "eclipse_depth": 0.573,
+    "ecliptic_ring_permanent_dimming": 0.573
+   },
+   {
+    "r": 0.5,
+    "ring_half_width_deg": 5.0,
+    "f": 0.01,
+    "tau_in_ring": 0.115,
+    "polar_ring_eclipse_days_each": 10.1,
+    "eclipse_depth": 0.115,
+    "ecliptic_ring_permanent_dimming": 0.115
+   },
+   {
+    "r": 0.5,
+    "ring_half_width_deg": 15.0,
+    "f": 0.01,
+    "tau_in_ring": 0.0386,
+    "polar_ring_eclipse_days_each": 30.4,
+    "eclipse_depth": 0.0386,
+    "ecliptic_ring_permanent_dimming": 0.0386
+   },
+   {
+    "r": 0.91,
+    "ring_half_width_deg": 1.0,
+    "f": 0.01,
+    "tau_in_ring": 0.573,
+    "polar_ring_eclipse_days_each": 2.03,
+    "eclipse_depth": 0.573,
+    "ecliptic_ring_permanent_dimming": 0.573
+   },
+   {
+    "r": 0.91,
+    "ring_half_width_deg": 5.0,
+    "f": 0.01,
+    "tau_in_ring": 0.115,
+    "polar_ring_eclipse_days_each": 10.1,
+    "eclipse_depth": 0.115,
+    "ecliptic_ring_permanent_dimming": 0.115
+   },
+   {
+    "r": 0.91,
+    "ring_half_width_deg": 15.0,
+    "f": 0.01,
+    "tau_in_ring": 0.0386,
+    "polar_ring_eclipse_days_each": 30.4,
+    "eclipse_depth": 0.0386,
+    "ecliptic_ring_permanent_dimming": 0.0386
+   }
+  ],
+  "rings_note": "A polar ring is seen from the Sun as a great-circle band; Earth crosses it twice a year and is dimmed by the band optical depth tau = f / sin(half-width) for 2 x half-width / 0.986 days. An ecliptic ring dims Earth permanently by tau. Rings concentrate shadow in time or space.",
+  "L1_thermostat": {
+   "spot_radius_km": 7368.0,
+   "efficiency_by_cloud_radius": {
+    "0.25": 0.74,
+    "0.5": 0.679,
+    "1.0": 0.526,
+    "1.5": 0.378,
+    "2.0": 0.248
+   },
+   "dimming_profile": [
+    {
+     "cloud_radius_over_RE": 0.5,
+     "relative_dimming_at_projected_radius": {
+      "0": 1.0,
+      "0.5": 1.0,
+      "0.8": 0.891,
+      "0.95": 0.713
+     }
+    },
+    {
+     "cloud_radius_over_RE": 1.0,
+     "relative_dimming_at_projected_radius": {
+      "0": 1.0,
+      "0.5": 0.811,
+      "0.8": 0.62,
+      "0.95": 0.528
+     }
+    },
+    {
+     "cloud_radius_over_RE": 2.0,
+     "relative_dimming_at_projected_radius": {
+      "0": 1.0,
+      "0.5": 1.0,
+      "0.8": 1.0,
+      "0.95": 0.979
+     }
+    }
+   ]
+  },
+  "coorbital": "Far-side sails (|lon - L3| <= 90 deg) are never between the Sun and Earth: zero transits, zero dimming.",
+  "exterior": "Exterior sails never lie between the Sun and Earth (Earth is inside the shell): zero dimming.",
+  "summary": "One 279 m sail casts a 27 km umbra at 0.91 AU (98x its size); at Earth (0.09 AU away) its penumbral spot is 68,800 km in radius (10.8 R_E) and only 4.7e-12 deep, so shading is purely collective. A uniform 0.91 AU shell dims Earth by exactly f on average; each sail transits once per 6.6-yr synodic period with probability 5.5e-4 (Monte Carlo 5.6e-4), lasting 1.4 h median (10 h for i = 0, 2.7 h for i = 30 deg); 2.1e9 sails shade Earth at once at f = 1 %, so flicker is ~2e-7 of sunlight. A shadow-free corridor costs 0.055 % of the shell and ~1 m/s per synodic period, but it removes the self-dimming that offsets 57-62 % of the IR. Rings concentrate shadow: a polar ring of +-1 deg at f = 1 % dims Earth 57 % for 2 days twice a year; an ecliptic ring dims it permanently. Far-side co-orbital and exterior swarms never transit. L1 thermostat: penumbral spot 7,370 km (1.16 R_E); a cloud of radius <= 1 R_E puts 53-74 % of what it blocks on Earth."
+ },
+ "debris": {
+  "beta": {
+   "flakes": [
+    {
+     "item": "film flake sigma=0.165 kg/m2",
+     "beta_face_on": 0.00464,
+     "beta_tumbling": 0.00232
+    },
+    {
+     "item": "film flake sigma=0.2 kg/m2",
+     "beta_face_on": 0.00383,
+     "beta_tumbling": 0.00191
+    },
+    {
+     "item": "film flake sigma=0.05 kg/m2",
+     "beta_face_on": 0.0153,
+     "beta_tumbling": 0.00766
+    }
+   ],
+   "grains": [
+    {
+     "radius_um": 0.2,
+     "beta": 0.689,
+     "aphelion_from_0p91": Infinity,
+     "earth_crossing_from_0p91": true,
+     "unbound": true
+    },
+    {
+     "radius_um": 0.5,
+     "beta": 0.459,
+     "aphelion_from_0p91": 11.2,
+     "earth_crossing_from_0p91": true,
+     "unbound": false
+    },
+    {
+     "radius_um": 1.0,
+     "beta": 0.23,
+     "aphelion_from_0p91": 1.68,
+     "earth_crossing_from_0p91": true,
+     "unbound": false
+    },
+    {
+     "radius_um": 2.0,
+     "beta": 0.115,
+     "aphelion_from_0p91": 1.18,
+     "earth_crossing_from_0p91": true,
+     "unbound": false
+    },
+    {
+     "radius_um": 5.0,
+     "beta": 0.0459,
+     "aphelion_from_0p91": 1.0,
+     "earth_crossing_from_0p91": true,
+     "unbound": false
+    },
+    {
+     "radius_um": 10.0,
+     "beta": 0.023,
+     "aphelion_from_0p91": 0.954,
+     "earth_crossing_from_0p91": false,
+     "unbound": false
+    },
+    {
+     "radius_um": 30.0,
+     "beta": 0.00766,
+     "aphelion_from_0p91": 0.924,
+     "earth_crossing_from_0p91": false,
+     "unbound": false
+    },
+    {
+     "radius_um": 100.0,
+     "beta": 0.0023,
+     "aphelion_from_0p91": 0.914,
+     "earth_crossing_from_0p91": false,
+     "unbound": false
+    }
+   ],
+   "rules": {
+    "earth_crossing_beta_from_r0": {
+     "r0_0p85": 0.06765,
+     "r0_0p91": 0.03713
+    },
+    "grain_radius_um_for_crossing_from_0p91": 6.186,
+    "note": "Flakes keep the film beta (~0.004, 0.002 tumbling) and stay in the swarm orbit; only grains below ~5 um (beta > 0.04) released at 0.91 AU reach Earth's orbit; below ~0.4 um they leave the Solar System."
+   }
+  },
+  "earth_hit_probability": {
+   "unbound_one_pass": 4.53e-10,
+   "bound_median_by_f": {
+    "0.001": 7.46e-06,
+    "0.01": 9.07e-07,
+    "0.22": 4.12e-08
+   }
+  },
+  "loss_stream": {
+   "scenarios": [
+    {
+     "fine_fraction_of_loss": 1e-08,
+     "dust_kind": "unbound",
+     "earth_influx_kg_yr": 136.0,
+     "vs_natural": 3.4e-06
+    },
+    {
+     "fine_fraction_of_loss": 1e-08,
+     "dust_kind": "bound_f0.01",
+     "earth_influx_kg_yr": 272000.0,
+     "vs_natural": 0.0068
+    },
+    {
+     "fine_fraction_of_loss": 1e-08,
+     "dust_kind": "bound_f0.22",
+     "earth_influx_kg_yr": 12400.0,
+     "vs_natural": 0.000309
+    },
+    {
+     "fine_fraction_of_loss": 1e-06,
+     "dust_kind": "unbound",
+     "earth_influx_kg_yr": 13600.0,
+     "vs_natural": 0.00034
+    },
+    {
+     "fine_fraction_of_loss": 1e-06,
+     "dust_kind": "bound_f0.01",
+     "earth_influx_kg_yr": 27200000.0,
+     "vs_natural": 0.68
+    },
+    {
+     "fine_fraction_of_loss": 1e-06,
+     "dust_kind": "bound_f0.22",
+     "earth_influx_kg_yr": 1240000.0,
+     "vs_natural": 0.0309
+    },
+    {
+     "fine_fraction_of_loss": 0.0001,
+     "dust_kind": "unbound",
+     "earth_influx_kg_yr": 1360000.0,
+     "vs_natural": 0.034
+    },
+    {
+     "fine_fraction_of_loss": 0.0001,
+     "dust_kind": "bound_f0.01",
+     "earth_influx_kg_yr": 2720000000.0,
+     "vs_natural": 68.0
+    },
+    {
+     "fine_fraction_of_loss": 0.0001,
+     "dust_kind": "bound_f0.22",
+     "earth_influx_kg_yr": 124000000.0,
+     "vs_natural": 3.09
+    },
+    {
+     "fine_fraction_of_loss": 0.01,
+     "dust_kind": "unbound",
+     "earth_influx_kg_yr": 136000000.0,
+     "vs_natural": 3.4
+    },
+    {
+     "fine_fraction_of_loss": 0.01,
+     "dust_kind": "bound_f0.01",
+     "earth_influx_kg_yr": 272000000000.0,
+     "vs_natural": 6800.0
+    },
+    {
+     "fine_fraction_of_loss": 0.01,
+     "dust_kind": "bound_f0.22",
+     "earth_influx_kg_yr": 12400000000.0,
+     "vs_natural": 309.0
+    }
+   ],
+   "allowed_fine_dust_kg_yr_for_10pct_of_natural": {
+    "unbound": 8820000000000000.0,
+    "bound_f0.01": 4410000000000.0,
+    "bound_f0.22": 97100000000000.0
+   },
+   "natural_influx_kg_yr": 40000000.0
+  },
+  "meteoroid_ejecta": {
+   "gruen_unswept": [
+    {
+     "f": 0.01,
+     "meteoroid_mass_hitting_kg_yr": 82100000000000.0,
+     "ejecta_yield": 10.0,
+     "ejecta_kg_yr": 821000000000000.0,
+     "earth_influx_if_all_bound_kg_yr": 744000000.0,
+     "vs_natural": 18.6
+    },
+    {
+     "f": 0.01,
+     "meteoroid_mass_hitting_kg_yr": 82100000000000.0,
+     "ejecta_yield": 100.0,
+     "ejecta_kg_yr": 8210000000000000.0,
+     "earth_influx_if_all_bound_kg_yr": 7440000000.0,
+     "vs_natural": 186.0
+    },
+    {
+     "f": 0.01,
+     "meteoroid_mass_hitting_kg_yr": 82100000000000.0,
+     "ejecta_yield": 1000.0,
+     "ejecta_kg_yr": 8.21e+16,
+     "earth_influx_if_all_bound_kg_yr": 74400000000.0,
+     "vs_natural": 1860.0
+    },
+    {
+     "f": 0.22,
+     "meteoroid_mass_hitting_kg_yr": 1900000000000000.0,
+     "ejecta_yield": 10.0,
+     "ejecta_kg_yr": 1.9e+16,
+     "earth_influx_if_all_bound_kg_yr": 781000000.0,
+     "vs_natural": 19.5
+    },
+    {
+     "f": 0.22,
+     "meteoroid_mass_hitting_kg_yr": 1900000000000000.0,
+     "ejecta_yield": 100.0,
+     "ejecta_kg_yr": 1.9e+17,
+     "earth_influx_if_all_bound_kg_yr": 7810000000.0,
+     "vs_natural": 195.0
+    },
+    {
+     "f": 0.22,
+     "meteoroid_mass_hitting_kg_yr": 1900000000000000.0,
+     "ejecta_yield": 1000.0,
+     "ejecta_kg_yr": 1.9e+18,
+     "earth_influx_if_all_bound_kg_yr": 78100000000.0,
+     "vs_natural": 1950.0
+    }
+   ],
+   "zodiacal_sweep": [
+    {
+     "f": 0.01,
+     "unswept_hit_kg_yr": 82100000000000.0,
+     "cloud_mass_kg": 644000000000000.0,
+     "sweep_time_yr": 7.85
+    },
+    {
+     "f": 0.22,
+     "unswept_hit_kg_yr": 1900000000000000.0,
+     "cloud_mass_kg": 644000000000000.0,
+     "sweep_time_yr": 0.34
+    }
+   ],
+   "supply_limited": [
+    {
+     "supply_kg_s": 1000.0,
+     "ejecta_yield": 10.0,
+     "ejecta_kg_yr": 316000000000.0,
+     "earth_influx_kg_yr_f0p01": 286000.0,
+     "vs_natural_f0p01": 0.00715,
+     "earth_influx_kg_yr_f0p22": 13000.0,
+     "vs_natural_f0p22": 0.000325
+    },
+    {
+     "supply_kg_s": 1000.0,
+     "ejecta_yield": 100.0,
+     "ejecta_kg_yr": 3160000000000.0,
+     "earth_influx_kg_yr_f0p01": 2860000.0,
+     "vs_natural_f0p01": 0.0715,
+     "earth_influx_kg_yr_f0p22": 130000.0,
+     "vs_natural_f0p22": 0.00325
+    },
+    {
+     "supply_kg_s": 10000.0,
+     "ejecta_yield": 10.0,
+     "ejecta_kg_yr": 3160000000000.0,
+     "earth_influx_kg_yr_f0p01": 2860000.0,
+     "vs_natural_f0p01": 0.0715,
+     "earth_influx_kg_yr_f0p22": 130000.0,
+     "vs_natural_f0p22": 0.00325
+    },
+    {
+     "supply_kg_s": 10000.0,
+     "ejecta_yield": 100.0,
+     "ejecta_kg_yr": 31600000000000.0,
+     "earth_influx_kg_yr_f0p01": 28600000.0,
+     "vs_natural_f0p01": 0.715,
+     "earth_influx_kg_yr_f0p22": 1300000.0,
+     "vs_natural_f0p22": 0.0325
+    }
+   ]
+  },
+  "derelicts": {
+   "coorbital_cr3bp": [
+    {
+     "phi0": 90.0,
+     "inc": 0.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.395,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 90.0,
+     "inc": 20.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.3279,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 90.0,
+     "inc": 0.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.1845,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 90.0,
+     "inc": 20.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.07499,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 120.0,
+     "inc": 0.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.3415,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 120.0,
+     "inc": 20.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.267,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 120.0,
+     "inc": 0.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.1719,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 120.0,
+     "inc": 20.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.05734,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 150.0,
+     "inc": 0.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.3075,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 150.0,
+     "inc": 20.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.2272,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 150.0,
+     "inc": 0.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.1623,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 150.0,
+     "inc": 20.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.04045,
+     "passes_within_0p05AU": 17.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 180.0,
+     "inc": 0.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.2963,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 180.0,
+     "inc": 20.0,
+     "beta_after": 0.002,
+     "min_dist_AU": 0.2139,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 180.0,
+     "inc": 0.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.159,
+     "passes_within_0p05AU": 0.0,
+     "passes_within_hill": 0.0
+    },
+    {
+     "phi0": 180.0,
+     "inc": 20.0,
+     "beta_after": 0.0,
+     "min_dist_AU": 0.03463,
+     "passes_within_0p05AU": 32.0,
+     "passes_within_hill": 0.0
+    }
+   ],
+   "coorbital_live_uncontrolled_min_dist_AU": 0.2944,
+   "interior_nbody_rmax_AU": 0.9883,
+   "dense_coorbital_upper_bound": {
+    "encounter_speed_km_s": 3.0,
+    "focused_radius_RE": 3.86,
+    "p_per_synodic_pass": 8.21e-06,
+    "synodic_yr": 125.0,
+    "p_per_yr": 6.57e-08
+   },
+   "sails_per_1pct_at_1AU": 4.044e+16
+  },
+  "findings": [
+   "Fragments of the film keep the film's areal density, so beta stays 0.004 (0.002 tumbling): flakes stay in the swarm's orbits. Only grains below ~5 um (beta > 0.04) released at 0.91 AU reach Earth's orbit (aphelion r0/(1-2 beta)); below ~0.4 um they are blown out.",
+   "Earth sweeps up an unbound grain with probability (R_E/2 AU)^2 = 4.5e-10; a bound Earth-crossing grain with ~1e-6 (f = 1 %) to 4e-8 (f = 22 %): the swarm itself removes Earth-crossing dust within ~1/f orbits (each perihelion crosses the sail layer).",
+   "Loss stream: with ~3e19 kg/yr unrecycled at the ceiling, keeping Earth's dust influx within 10 % of the natural 4e7 kg/yr needs fine (< 5 um) dust production below ~4e12 kg/yr (f = 1 %) to 1e14 kg/yr (f = 22 %), i.e. < 1e-7-3e-6 of the loss stream. Retired film must be recycled or returned as coarse slag, never ground, ablated or shattered in orbit.",
+   "Meteoroid erosion: the Gruen flux would put 8e13 kg/yr (f = 1 %) of meteoroids into the sails, but that would sweep the inner zodiacal cloud (~6e14 kg) in ~8 yr; in steady state impacts are limited by the cloud supply (1e3-1e4 kg/s), giving 3e11-3e13 kg/yr of ejecta (yield 10-100) and an Earth influx of 0.7-70 % (f = 1 %) or 0.03-3 % (f = 22 %) of natural. The swarm is a net dust sink.",
+   "Zodiacal light: the swarm's own cross-section at f = 1 % (2.6e21 m2) is ~1e4x the whole zodiacal cloud (1.7-3.5e17 m2), so dust brightening is negligible next to the swarm itself (see sky).",
+   "Derelicts: interior sails at 0.85-0.91 AU stay within +-0.008 AU for 1000 yr (N-body); at 0.95 AU low-inclination orbits are scattered by Earth to 0.89-0.99 AU, so the shell must stay below ~0.92 AU. Far-side co-orbital sails are in Earth's orbit by design: uncontrolled live sails librate to 0.29 AU (13 deg) of Earth; tumbling derelicts (beta 0.002) to 0.21 AU; dense debris (beta 0) passes within 0.035-0.05 AU dozens of times in 3 kyr (none inside the Hill sphere). Upper bound for dense debris that leaves the horseshoe zone: ~7e-8 impacts per object per year - dense parts (hubs, booms, pods, slag) must be tugged out of 1 AU.",
+   "Whole sails that do enter (0.2 kg/m2) ablate above ~120 km: a meteoric-smoke source, not an impactor. Satellites in Earth orbit see the same relative change as the influx (keep < 10 %)."
+  ]
+ },
+ "sky": {
+  "references": {
+   "natural_dark_sky_cd_m2": 0.00017,
+   "natural_dark_sky_mu": 22.0,
+   "full_moon_lux": 0.25,
+   "civil_twilight_end_lux": 3.4,
+   "rho_vis": 0.003,
+   "mu_formula": "mu = -2.5 log10(L / 1.08e5 cd/m2)"
+  },
+  "architectures": [
+   {
+    "label": "a_shell_0.91_f0.0056",
+    "peak_L_cd_m2": 1.33,
+    "peak_mu": 12.3,
+    "elongation_50pct_deg": 45.0,
+    "elongation_90pct_deg": 61.8,
+    "total_illuminance_lux": 2.99,
+    "integrated_V_mag": -15.2,
+    "ground_lux_vs_solar_depression": {
+     "D6": 0.515,
+     "D12": 0.416,
+     "D18": 0.326,
+     "D30": 0.176,
+     "D45": 0.052,
+     "D60": 0.00237,
+     "D90": 0.0
+    },
+    "profile_by_elongation": {
+     "1-5": {
+      "L_cd_m2": 0.814,
+      "mu": 12.8,
+      "L_over_natural": 4790.0,
+      "IR_W_m2_sr": 2.35
+     },
+     "5-10": {
+      "L_cd_m2": 0.813,
+      "mu": 12.8,
+      "L_over_natural": 4780.0,
+      "IR_W_m2_sr": 2.35
+     },
+     "10-20": {
+      "L_cd_m2": 0.813,
+      "mu": 12.8,
+      "L_over_natural": 4780.0,
+      "IR_W_m2_sr": 2.35
+     },
+     "20-30": {
+      "L_cd_m2": 0.813,
+      "mu": 12.8,
+      "L_over_natural": 4780.0,
+      "IR_W_m2_sr": 2.35
+     },
+     "30-45": {
+      "L_cd_m2": 0.813,
+      "mu": 12.8,
+      "L_over_natural": 4780.0,
+      "IR_W_m2_sr": 2.35
+     },
+     "45-60": {
+      "L_cd_m2": 0.813,
+      "mu": 12.8,
+      "L_over_natural": 4780.0,
+      "IR_W_m2_sr": 2.35
+     },
+     "60-90": {
+      "L_cd_m2": 0.138,
+      "mu": 14.7,
+      "L_over_natural": 814.0,
+      "IR_W_m2_sr": 0.4
+     },
+     "90-120": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "120-180": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     }
+    }
+   },
+   {
+    "label": "a_shell_0.91_f0.22",
+    "peak_L_cd_m2": 41.6,
+    "peak_mu": 8.54,
+    "elongation_50pct_deg": 45.2,
+    "elongation_90pct_deg": 62.1,
+    "total_illuminance_lux": 92.6,
+    "integrated_V_mag": -18.9,
+    "ground_lux_vs_solar_depression": {
+     "D6": 16.1,
+     "D12": 13.0,
+     "D18": 10.2,
+     "D30": 5.54,
+     "D45": 1.68,
+     "D60": 0.0871,
+     "D90": 0.0
+    },
+    "profile_by_elongation": {
+     "1-5": {
+      "L_cd_m2": 25.0,
+      "mu": 9.09,
+      "L_over_natural": 147000.0,
+      "IR_W_m2_sr": 95.9
+     },
+     "5-10": {
+      "L_cd_m2": 24.9,
+      "mu": 9.09,
+      "L_over_natural": 146000.0,
+      "IR_W_m2_sr": 95.7
+     },
+     "10-20": {
+      "L_cd_m2": 24.9,
+      "mu": 9.09,
+      "L_over_natural": 146000.0,
+      "IR_W_m2_sr": 95.7
+     },
+     "20-30": {
+      "L_cd_m2": 24.9,
+      "mu": 9.09,
+      "L_over_natural": 146000.0,
+      "IR_W_m2_sr": 95.7
+     },
+     "30-45": {
+      "L_cd_m2": 24.9,
+      "mu": 9.09,
+      "L_over_natural": 146000.0,
+      "IR_W_m2_sr": 95.7
+     },
+     "45-60": {
+      "L_cd_m2": 24.9,
+      "mu": 9.09,
+      "L_over_natural": 146000.0,
+      "IR_W_m2_sr": 95.7
+     },
+     "60-90": {
+      "L_cd_m2": 4.57,
+      "mu": 10.9,
+      "L_over_natural": 26900.0,
+      "IR_W_m2_sr": 17.6
+     },
+     "90-120": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "120-180": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     }
+    }
+   },
+   {
+    "label": "b_coorbital_L3pm90_lat30_f0.012",
+    "peak_L_cd_m2": 7.15,
+    "peak_mu": 10.4,
+    "elongation_50pct_deg": 25.5,
+    "elongation_90pct_deg": 41.4,
+    "total_illuminance_lux": 5.15,
+    "integrated_V_mag": -15.8,
+    "ground_lux_vs_solar_depression": {
+     "D6": 0.746,
+     "D12": 0.543,
+     "D18": 0.368,
+     "D30": 0.112,
+     "D45": 0.0,
+     "D60": 0.0,
+     "D90": 0.0
+    },
+    "profile_by_elongation": {
+     "1-5": {
+      "L_cd_m2": 5.79,
+      "mu": 10.7,
+      "L_over_natural": 34100.0,
+      "IR_W_m2_sr": 8.05
+     },
+     "5-10": {
+      "L_cd_m2": 5.81,
+      "mu": 10.7,
+      "L_over_natural": 34200.0,
+      "IR_W_m2_sr": 8.08
+     },
+     "10-20": {
+      "L_cd_m2": 4.74,
+      "mu": 10.9,
+      "L_over_natural": 27900.0,
+      "IR_W_m2_sr": 6.59
+     },
+     "20-30": {
+      "L_cd_m2": 2.65,
+      "mu": 11.5,
+      "L_over_natural": 15600.0,
+      "IR_W_m2_sr": 3.69
+     },
+     "30-45": {
+      "L_cd_m2": 2.01,
+      "mu": 11.8,
+      "L_over_natural": 11800.0,
+      "IR_W_m2_sr": 2.79
+     },
+     "45-60": {
+      "L_cd_m2": 0.0106,
+      "mu": 17.5,
+      "L_over_natural": 62.5,
+      "IR_W_m2_sr": 0.0148
+     },
+     "60-90": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "90-120": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "120-180": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     }
+    }
+   },
+   {
+    "label": "b_coorbital_L3pm90_lat30_f0.10",
+    "peak_L_cd_m2": 59.6,
+    "peak_mu": 8.15,
+    "elongation_50pct_deg": 25.5,
+    "elongation_90pct_deg": 41.4,
+    "total_illuminance_lux": 42.9,
+    "integrated_V_mag": -18.1,
+    "ground_lux_vs_solar_depression": {
+     "D6": 6.21,
+     "D12": 4.53,
+     "D18": 3.07,
+     "D30": 0.93,
+     "D45": 0.0,
+     "D60": 0.0,
+     "D90": 0.0
+    },
+    "profile_by_elongation": {
+     "1-5": {
+      "L_cd_m2": 48.3,
+      "mu": 8.37,
+      "L_over_natural": 284000.0,
+      "IR_W_m2_sr": 71.8
+     },
+     "5-10": {
+      "L_cd_m2": 48.4,
+      "mu": 8.37,
+      "L_over_natural": 285000.0,
+      "IR_W_m2_sr": 72.0
+     },
+     "10-20": {
+      "L_cd_m2": 39.5,
+      "mu": 8.59,
+      "L_over_natural": 232000.0,
+      "IR_W_m2_sr": 58.7
+     },
+     "20-30": {
+      "L_cd_m2": 22.1,
+      "mu": 9.22,
+      "L_over_natural": 130000.0,
+      "IR_W_m2_sr": 32.9
+     },
+     "30-45": {
+      "L_cd_m2": 16.7,
+      "mu": 9.53,
+      "L_over_natural": 98400.0,
+      "IR_W_m2_sr": 24.9
+     },
+     "45-60": {
+      "L_cd_m2": 0.0885,
+      "mu": 15.2,
+      "L_over_natural": 521.0,
+      "IR_W_m2_sr": 0.132
+     },
+     "60-90": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "90-120": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "120-180": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     }
+    }
+   },
+   {
+    "label": "d_hot_shell_0.3_f0.015",
+    "peak_L_cd_m2": 20.6,
+    "peak_mu": 9.3,
+    "elongation_50pct_deg": 12.3,
+    "elongation_90pct_deg": 16.6,
+    "total_illuminance_lux": 5.74,
+    "integrated_V_mag": -15.9,
+    "ground_lux_vs_solar_depression": {
+     "D6": 0.136,
+     "D12": 0.0224,
+     "D18": 0.0,
+     "D30": 0.0,
+     "D45": 0.0,
+     "D60": 0.0,
+     "D90": 0.0
+    },
+    "profile_by_elongation": {
+     "1-5": {
+      "L_cd_m2": 19.9,
+      "mu": 9.34,
+      "L_over_natural": 117000.0,
+      "IR_W_m2_sr": 58.0
+     },
+     "5-10": {
+      "L_cd_m2": 19.8,
+      "mu": 9.34,
+      "L_over_natural": 117000.0,
+      "IR_W_m2_sr": 57.9
+     },
+     "10-20": {
+      "L_cd_m2": 13.4,
+      "mu": 9.76,
+      "L_over_natural": 79100.0,
+      "IR_W_m2_sr": 39.3
+     },
+     "20-30": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "30-45": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "45-60": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "60-90": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "90-120": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     },
+     "120-180": {
+      "L_cd_m2": 0.0,
+      "mu": 87.6,
+      "L_over_natural": 0.0,
+      "IR_W_m2_sr": 0.0
+     }
+    }
+   },
+   {
+    "label": "c_exterior_3.0AU_f0.013",
+    "peak_L_cd_m2": 0.175,
+    "peak_mu": 14.5,
+    "elongation_90pct_deg": 180.0,
+    "L_over_natural": 1030.0,
+    "ground_lux_night": 0.549,
+    "note": "uniform over the whole sky, day and night (Earth inside the shell)"
+   },
+   {
+    "label": "c_exterior_5.0AU_f0.0077",
+    "peak_L_cd_m2": 0.0372,
+    "peak_mu": 16.2,
+    "elongation_90pct_deg": 180.0,
+    "L_over_natural": 219.0,
+    "ground_lux_night": 0.117,
+    "note": "uniform over the whole sky, day and night (Earth inside the shell)"
+   },
+   {
+    "label": "c_exterior_1.36AU_f0.1",
+    "peak_L_cd_m2": 6.54,
+    "peak_mu": 10.5,
+    "elongation_90pct_deg": 180.0,
+    "L_over_natural": 38400.0,
+    "ground_lux_night": 20.5,
+    "note": "uniform over the whole sky, day and night (Earth inside the shell)"
+   }
+  ],
+  "glints": {
+   "vane_87m2_Al_at_0p09AU": 8.75,
+   "vane_87m2_Al_at_2AU": 15.5,
+   "sail_AR_glint_0p13pct_at_0p09AU": 8.6,
+   "sail_NIR_specular_20pct_at_2AU_nir_mag_equiv": 9.86,
+   "note": "Individual glints are 9th-16th magnitude (invisible to the eye, bright for survey telescopes). Collectively, specular Al vanes (0.5 % of the area, rho 0.9) seen within ~2x their tilt spread of the specular direction are brighter than the film's diffuse 0.003: for far-side co-orbital sails Earth sits within 45 deg of the Sun as seen from each sail, so vanes must be matte or use switchable-reflectance (IKAROS-type) control."
+  },
+  "render_numbers": {
+   "a_shell_0p91": {
+    "extent": "uniform disk of radius 62-65 deg centred on the Sun",
+    "L_cd_m2_per_1pct": 1.452,
+    "mu_at_1pct": 12.2,
+    "ground_lux_D18_per_1pct": 0.5821,
+    "note": "lit far-side fronts seen through the gaps; back faces dark"
+   },
+   "b_coorbital_far_side": {
+    "extent": "within 41-45 deg of the Sun (behind it), brightest within 10 deg",
+    "L_cd_m2_per_1pct_inner_10deg": 4.833,
+    "L_cd_m2_per_1pct_30_45deg": 1.667,
+    "ground_lux_per_1pct": {
+     "D6": 0.62,
+     "D18": 0.31,
+     "D30": 0.093,
+     "D45+": 0.0
+    },
+    "mu_inner_at_1pct": 10.9
+   },
+   "c_exterior": {
+    "extent": "whole sky, day and night",
+    "L_cd_m2": "f rho_v E_v / (pi r^2): 0.175 at 3 AU, f 1.3 %; 0.037 at 5 AU, f 0.77 %",
+    "ground_lux": "pi L: 0.55 / 0.12 lux all night (full moon 0.25)"
+   },
+   "d_hot_0p3": {
+    "extent": "within 17 deg of the Sun",
+    "L_cd_m2_at_1p5pct": 20.0,
+    "note": "lost in twilight; 0.02 lux at D = 12 deg"
+   },
+   "L1_shade": "invisible: projected on the solar disk (cloud radius 0.24 deg vs Sun 0.27 deg), dims the Sun by s",
+   "NIR_and_thermal": "in an IR view the far-side cloud is a 330-350 K glow of 3-8 W m-2 sr-1 per 1 % (thermal) behind the Sun; sub-bandgap fronts are bright at 1.1-2.5 um (reflectance 0.6-0.8) but retro-reflect toward the Sun"
+  },
+  "findings": [
+   "Every architecture lights Earth's sky long before it threatens the climate. At the 1 W/m2 limits the sky is 1e3-1e5x the natural night-sky luminance (1.7e-4 cd/m2, 22 mag/arcsec2) wherever the swarm is above the horizon.",
+   "Interior shell: a uniform glow of 1.45 cd/m2 per 1 % (12.2 mag/arcsec2 at 1 %) out to 62-65 deg from the Sun; after astronomical twilight the ground still gets 0.58 lux per 1 % (2.3x full moon) until the Sun is 60 deg down. At the 22 % ceiling: 25 cd/m2, 10 lux.",
+   "Far-side co-orbital: the glow is confined within 41-45 deg of the Sun: 4.8 cd/m2 per 1 % within 10 deg, 1.7 at 30-45 deg; ground 0.31 lux per 1 % at astronomical twilight, 0 once the Sun is > 45 deg below the horizon. At high latitudes in summer the Sun never gets that low: an all-night glow.",
+   "Exterior: uniform over the whole sky all night: 0.04-0.18 cd/m2 at the fleet-limited coverage (14.5-16 mag/arcsec2, 0.1-0.55 lux).",
+   "To keep post-twilight ground light below full moon (0.25 lux at a 18 deg solar depression): co-orbital f <= 0.8 % at rho_v 0.003, 2.4 % at rho_v 0.001; interior shell f <= 0.43 %. A blacker front (rho_v <= 0.001) is the main lever.",
+   "Individual glints are 9th (0.09 AU) to 16th (2 AU) magnitude. Collectively, specular Al vanes would outshine the film near the retro-direction - for far-side sails that is toward Earth: vanes must be matte or switchable-reflectance (IKAROS RCD-type)."
+  ]
+ },
+ "recommendation": {
+  "architecture": "Far-side co-orbital compute cloud with low-e fronts, plus an L1 thermostat. Sails share Earth's orbit (a = (1-beta)^(1/3) = 0.9987 AU, period 1 yr) and are parked at heliocentric longitudes 90-174 deg and 186-270 deg from Earth (L3 +-90 deg minus a +-6 deg keep-out) on orbits with i <= 30 deg, so they are never between the Sun and Earth and never closer than 1.41 AU. Every far-side sail sees Earth in its sunward hemisphere and never in its anti-sun one, so the front face is made IR-dark (transparent-conductive low-e coating, eps_f 0.05-0.10) and the back face (eps 0.93) sheds 90-95 % of the heat away from Earth; at 1 AU this runs the film at 370-375 K, i.e. chiplets at 105-110 C (b4/b5; energy per op x1.12-1.15 for 2100+ logic). Conservative variant b2: eps_f 0.37 at the 85 C design point. A front-side specular sub-bandgap filter retro-reflects the 20 % NIR toward the Sun; vanes are matte. Longitude is held with ~1e-8 m/s2 (~0.4 m/s/yr, 1/2500 of the radiation-force authority). A small cloud of ordinary sails near L1 (1.57e6 km) removes 0.42 % of sunlight per W/m2 of swarm IR so the global net forcing is ~0; the swarm can also be throttled by tilting if the shade fails. The interior 0.85-0.92 AU shell is retired as the default: per unit coverage it heats Earth as much and trades 3.9 W/m2 of sunlight for IR per 1 %.",
+  "why": [
+   "Far side: no shadow, no transits, no sunlight-for-IR trade from the swarm itself, and 2.7x (film as designed), 4.6x (b2), 13x (b4) or 25x (b5) less gross IR per coverage than the shell.",
+   "Co-orbital is the only placement that keeps a fixed geometry relative to Earth with a 0.004-beta sail; everything at r != 1 AU sweeps past Earth every synodic period, and interior/exterior sails show Earth their back or front faces in turn.",
+   "Running chiplets 20-25 K hotter costs 16-19 % of FLOP per joule but cuts IR toward Earth 3-6x: under a forcing cap it is worth 2.5-4.6x more compute than the 85 C film (hot_power: 105-125 C is within +-4 % of FLOP/s per kg for 2100+ logic).",
+   "Hot (0.3-0.7 AU) and exterior (2-10 AU) placements lose: hot halves net forcing per coverage but loses 29-72 % of FLOP per joule; exterior cuts IR as 1/r^2 but needs r^2 more area, so the mass-limited swarm at 3/5/10 AU reaches only 2.1/0.77/0.19 % coverage (12/4.5/1.1 % of the ceiling compute) and lights the whole night sky."
+  ],
+  "coverage_limits_by_forcing": {
+   "0.1_Wm2": {
+    "recommended_b5_lowe_Tj110_plus_thermostat": {
+     "max_coverage": 0.01619,
+     "flops": 6.559e+38,
+     "vs_ceiling": 0.0588,
+     "shade_fraction_of_sunlight": 0.001451,
+     "gross_IR_cancelled_Wm2": 0.25,
+     "year_reached_mid": 2130.0
+    },
+    "b4_lowe_Tj105_plus_thermostat": {
+     "max_coverage": 0.008645,
+     "flops": 3.642e+38,
+     "vs_ceiling": 0.03265,
+     "shade_fraction_of_sunlight": 0.001087,
+     "gross_IR_cancelled_Wm2": 0.25,
+     "year_reached_mid": 2116.0
+    },
+    "conservative_b2_tuned_85C_plus_thermostat": {
+     "max_coverage": 0.002985,
+     "flops": 1.499e+38,
+     "vs_ceiling": 0.01344,
+     "shade_fraction_of_sunlight": 0.001309,
+     "gross_IR_cancelled_Wm2": 0.25,
+     "year_reached_mid": 2112.0
+    },
+    "b3_directional_85C_plus_thermostat": {
+     "max_coverage": 0.007286,
+     "flops": 3.609e+38,
+     "vs_ceiling": 0.03235,
+     "shade_fraction_of_sunlight": 0.001112,
+     "gross_IR_cancelled_Wm2": 0.25,
+     "year_reached_mid": 2116.0
+    },
+    "b5_passive_no_thermostat": {
+     "max_coverage": 0.006592,
+     "flops": 2.67e+38,
+     "vs_ceiling": 0.02394,
+     "year_reached_mid": 2115.0
+    },
+    "b2_passive_no_thermostat": {
+     "max_coverage": 0.001199,
+     "flops": 6.019e+37,
+     "vs_ceiling": 0.005396,
+     "year_reached_mid": 2109.0
+    },
+    "baseline_shell_passive": {
+     "max_coverage": 0.0006789,
+     "flops": 3.416e+37,
+     "vs_ceiling": 0.003063,
+     "year_reached_mid": 2107.0
+    }
+   },
+   "1_Wm2": {
+    "recommended_b5_lowe_Tj110_plus_thermostat": {
+     "max_coverage": 0.138,
+     "flops": 5.59e+39,
+     "vs_ceiling": 0.5012,
+     "shade_fraction_of_sunlight": 0.01173,
+     "gross_IR_cancelled_Wm2": 2.5,
+     "year_reached_mid": 2430.0
+    },
+    "b4_lowe_Tj105_plus_thermostat": {
+     "max_coverage": 0.07933,
+     "flops": 3.342e+39,
+     "vs_ceiling": 0.2996,
+     "shade_fraction_of_sunlight": 0.01111,
+     "gross_IR_cancelled_Wm2": 2.5,
+     "year_reached_mid": 2213.0
+    },
+    "conservative_b2_tuned_85C_plus_thermostat": {
+     "max_coverage": 0.02824,
+     "flops": 1.418e+39,
+     "vs_ceiling": 0.1271,
+     "shade_fraction_of_sunlight": 0.01355,
+     "gross_IR_cancelled_Wm2": 2.5,
+     "year_reached_mid": 2146.0
+    },
+    "b3_directional_85C_plus_thermostat": {
+     "max_coverage": 0.06996,
+     "flops": 3.465e+39,
+     "vs_ceiling": 0.3106,
+     "shade_fraction_of_sunlight": 0.01119,
+     "gross_IR_cancelled_Wm2": 2.5,
+     "year_reached_mid": 2199.0
+    },
+    "b5_passive_no_thermostat": {
+     "max_coverage": 0.06152,
+     "flops": 2.492e+39,
+     "vs_ceiling": 0.2234,
+     "year_reached_mid": 2185.0
+    },
+    "b2_passive_no_thermostat": {
+     "max_coverage": 0.01173,
+     "flops": 5.891e+38,
+     "vs_ceiling": 0.05281,
+     "year_reached_mid": 2121.0
+    },
+    "baseline_shell_passive": {
+     "max_coverage": 0.006757,
+     "flops": 3.4e+38,
+     "vs_ceiling": 0.03048,
+     "year_reached_mid": 2115.0
+    }
+   },
+   "4_Wm2": {
+    "recommended_b5_lowe_Tj110_plus_thermostat": {
+     "max_coverage": 0.1873,
+     "flops": 7.588e+39,
+     "vs_ceiling": 0.6803,
+     "shade_fraction_of_sunlight": 0.01609,
+     "gross_IR_cancelled_Wm2": 10.0,
+     "year_reached_mid": 2612.0
+    },
+    "b4_lowe_Tj105_plus_thermostat": {
+     "max_coverage": 0.1873,
+     "flops": 7.889e+39,
+     "vs_ceiling": 0.7073,
+     "shade_fraction_of_sunlight": 0.03027,
+     "gross_IR_cancelled_Wm2": 10.0,
+     "year_reached_mid": 2612.0
+    },
+    "conservative_b2_tuned_85C_plus_thermostat": {
+     "max_coverage": 0.1007,
+     "flops": 5.055e+39,
+     "vs_ceiling": 0.4532,
+     "shade_fraction_of_sunlight": 0.04224,
+     "gross_IR_cancelled_Wm2": 10.0,
+     "year_reached_mid": 2242.0
+    },
+    "b3_directional_85C_plus_thermostat": {
+     "max_coverage": 0.187,
+     "flops": 9.262e+39,
+     "vs_ceiling": 0.8303,
+     "shade_fraction_of_sunlight": 0.03139,
+     "gross_IR_cancelled_Wm2": 10.0,
+     "year_reached_mid": 2611.0
+    },
+    "b5_passive_no_thermostat": {
+     "max_coverage": 0.1873,
+     "flops": 7.588e+39,
+     "vs_ceiling": 0.6803,
+     "year_reached_mid": 2612.0
+    },
+    "b2_passive_no_thermostat": {
+     "max_coverage": 0.04431,
+     "flops": 2.225e+39,
+     "vs_ceiling": 0.1995,
+     "year_reached_mid": 2159.0
+    },
+    "baseline_shell_passive": {
+     "max_coverage": 0.02646,
+     "flops": 1.331e+39,
+     "vs_ceiling": 0.1193,
+     "year_reached_mid": 2144.0
+    }
+   }
+  },
+  "coverage_limits_rule": "X is the added global-mean forcing. Passive = no thermostat: net <= X. With the thermostat the net is ~0 and the limit is set by the cancelled gross IR, capped at 2.5 X: a net X warms ~0.8X K and raises precipitation ~2X %, a cancelled gross G leaves ~0 K but cuts precipitation ~0.76 G % and adds +0.23 G W/m2 at the poles, so G = 2.5 X is the hydrologically equivalent load.",
+  "compute_vs_unconstrained": {
+   "unconstrained": {
+    "coverage": 0.2217,
+    "flops": 1.115e+40,
+    "rAU": 0.9134
+   },
+   "at_1_Wm2": {
+    "b5_thermostat": 0.5012,
+    "b4_thermostat": 0.2996,
+    "b2_thermostat": 0.1271,
+    "b3_thermostat": 0.3106,
+    "b5_passive": 0.2234,
+    "b2_passive": 0.05281,
+    "shell_passive": 0.03048
+   },
+   "at_0p1_Wm2": {
+    "b5_thermostat": 0.0588,
+    "b4_thermostat": 0.03265,
+    "b2_thermostat": 0.01344,
+    "b5_passive": 0.02394
+   },
+   "at_4_Wm2": {
+    "b5_thermostat": 0.6803,
+    "b4_thermostat": 0.7073,
+    "b2_thermostat": 0.4532,
+    "b5_passive": 0.6803
+   },
+   "at_4_Wm2_note": "At 4 W/m2 the fleet mass (18.7 % coverage at 1 AU) binds before the forcing for b3-b5; a front tuned between b2 and b4 (eps ~0.2, ~95 C) then maximises compute at ~70-80 % of the ceiling (b4 71 %, b3 83 %).",
+   "given_up_at_1_Wm2": "50 % (b5) / 70 % (b4) / 87 % (b2) of the 1.1e40 FLOP/s ceiling",
+   "sky_limited": {
+    "rule": "ground illuminance <= full moon (0.25 lux) at a 18 deg solar depression, ecliptic vertical",
+    "lux_per_1pct": 0.3067,
+    "rho_v_0p003": {
+     "max_f": 0.008152,
+     "vs_ceiling": 0.0296
+    },
+    "rho_v_0p001": {
+     "max_f": 0.02446,
+     "vs_ceiling": 0.0888
+    }
+   },
+   "sky_limit_note": "Keeping post-twilight skylight under full-moon level would cap the far-side cloud at ~0.8 % (rho_v 0.003) to 2.4 % (rho_v 0.001) - tighter than the 1 W/m2 climate cap for b4/b5. Visible light, not heat, may be the binding Earth constraint."
+  },
+  "model_changes": [
+   "earthImpact(): replace the single interior formula with a placement table: gross IR per unit coverage k_IR and self-dimming k_dim (shell 0.85-0.92 AU: k_IR 387-424, k_dim 238 W/m2 per unit f; far-side co-orbital, film as designed: 143; eps_f 0.37 at 85 C: 85; eps_f 0.10 at 105 C: 29; eps_f 0.05 at 110 C: 15; directional: 34; exterior at r AU: (497 thermal + 191 diffuse NIR)/r^2; hot 0.48-0.69 AU: 323-349, k_dim 238), with the nonlinear curves in research6/earth/architectures.json.",
+   "Split intercepted light: thermal f alpha_eff S0 (Earth absorptance 0.95) and sub-bandgap NIR (1 - alpha) f S0 (absorptance 0.70); specular NIR must be zero for the co-orbital cloud (L3 keep-out) and is forbidden for exterior shells (it converges on Earth).",
+   "Add placement \"coorbital\": r = (1 - beta)^(1/3) AU; film T at 1 AU from the radiosity formula with eps_f as a parameter (0.05-0.86) and Tj following from it (eps_f 0.37 -> 85 C, 0.10 -> 105 C, 0.05 -> 110 C, 0 -> 115 C); longitude/latitude spans; geometric cap 0.9 x patch solid angle / 4 pi (21 % for L3+-90/30).",
+   "Add the L1 thermostat: shade fraction s = max(0, net)/238, outputs sunlight lost (self-dimming + s), gross IR, net, precipitation (-0.76 % per W/m2 cancelled), polar residual (+0.23 W/m2 per W/m2), stratospheric warming (+0.27 K per W/m2).",
+   "Add an Earth-safe coverage cap: coverage <= f_safe(placement, X) (table in recommendation.coverage_limits_by_forcing); the growth timeline plateaus at the cap (1 W/m2, b5 + thermostat: f = 13.8 %, reached ~2430; b2: 2.8 %, ~2146) instead of the 22 % ceiling.",
+   "Fix the skeptic's Earth flag numbers: at the 22 % ceiling the interior shell gives +41 to +45 W/m2 (279-283 W/m2 absorbed, at the 282 W/m2 runaway threshold), not +49.",
+   "Sky: add luminance outputs per placement (cd/m2 per 1 % and angular extent from sky.json) and a rho_v parameter (0.001-0.005).",
+   "Debris: add a fine-dust fraction of the loss stream with Earth influx = 3e19 x fraction x 1e-6 (f = 1 %) vs 4e7 kg/yr natural."
+  ],
+  "render_changes": [
+   "1. Honest placement map: the swarm as a crescent-shaped cloud on Earth's orbit opposite Earth (longitudes 90-270 deg from Earth, +-30 deg out of the ecliptic, an L3 +-6 deg gap) that co-rotates with Earth; no sails inside Earth's orbit; a tiny thermostat cloud 1.57e6 km sunward of Earth. Keep the 0.85-0.92 AU shell only as a labelled \"unconstrained / unsafe\" comparison.",
+   "2. Earth-impact readout: gross IR absorbed, sunlight removed (shade + self-dimming), net forcing, CO2-doubling equivalent, distance to the 282 W/m2 runaway limit, precipitation change, polar residual, with traffic lights at 0.1 / 1 / 4 W/m2.",
+   "3. Timeline: coverage vs year with the Earth-safe cap drawn (1 W/m2: 13.8 % ~2430 for b5, 2.8 % ~2146 for the 85 C variant) and the 22 % unconstrained ceiling dotted; mark where the 0.1 W/m2 cap binds (~2130) and where the shell would have crossed 1 W/m2 (~2115).",
+   "4. Sky from Earth: an evening/morning glow confined within 45 deg of the Sun (~4.8 cd/m2 per 1 % near the Sun, 1.7 at 30-45 deg); no glow when the Sun is > 45 deg below the horizon; the shell alternative as a 65 deg disk; the exterior alternative as an all-sky glow.",
+   "5. Sail close-ups: matte vanes, a faintly bluish low-e front sheen over the dark navy film; in an IR view the far-side cloud is dark toward Earth (low-e fronts) with bright 370 K backs visible only from outside 1 AU.",
+   "6. Dynamics overlay (optional): tadpole paths a derelict would follow (to 13-25 deg of Earth over ~200 yr) and the 24-day L1 instability."
+  ]
+ },
+ "sources": [
+  "IPCC AR6 WG1 Ch. 7 (Forster et al. 2021): ERF 1750-2019 = 2.72 W/m2; 2xCO2 = 3.93 W/m2; ECS best 3 K.",
+  "Goldblatt, Robinson, Zahnle & Crisp 2013, Nature Geosci. 6, 661: runaway greenhouse at ~282 W/m2 absorbed (project constant).",
+  "Early 1989, J. Brit. Interplanet. Soc. 42, 567: space-based solar shield at L1.",
+  "Angel 2006, PNAS 103(46), 17184-17189: cloud of small flyers near L1 blocking 1.8 % of sunlight, ~20 Mt, 100,000 km long.",
+  "Govindasamy & Caldeira 2000, GRL 27, 2141 (doi 10.1029/1999GL006086): ~1.8 % solar reduction offsets 2xCO2.",
+  "Kravitz et al. 2013, JGR Atmos. 118, 8320: GeoMIP G1 (3.2-5 % solar reduction vs 4xCO2) leaves tropics -0.3 K, poles +0.8 K.",
+  "Tilmes et al. 2013, JGR Atmos. 118, 11036: GeoMIP G1 global precipitation -4.5 %, monsoon land -5 to -7 %.",
+  "Bala, Duffy & Taylor 2008, PNAS 105, 7664: hydrological cycle responds more to solar than to CO2 forcing.",
+  "Andrews, Forster, Boucher, Bellouin & Jones 2010, GRL 37, L14701: fast precipitation response tracks the atmospheric component of forcing; slow 2-3 %/K.",
+  "Sanchez & McInnes 2015, PLoS ONE 10(8), e0136648: L1 sunshade orbits and two-disk configurations that reduce regional residuals.",
+  "Lunt, Ridgwell, Valdes & Seale 2008, GRL 35, L12710: \"Sunshade World\" GCM experiment.",
+  "Wild et al. 2013, Clim. Dyn. 40, 3107: global energy balance (atmosphere absorbs ~79 of ~240 W/m2 of sunlight).",
+  "Adler et al. 2018, Atmosphere 9, 138 (GPCP v2.3): global precipitation ~2.7 mm/day (~78 W/m2 latent heat).",
+  "North, Cahalan & Coakley 1981, Rev. Geophys. 19, 91: diffusive energy-balance climate models (form of the EBM and P2 albedo fit used here).",
+  "Murray & Dermott 1999, Solar System Dynamics (CUP): tadpole/horseshoe dynamics, L4 libration period 2 pi/(n sqrt(27 mu/4)), L3 growth rate sqrt(21 mu/8) n.",
+  "Schuerman 1980, ApJ 238, 337: restricted three-body problem with radiation pressure (photogravitational equilibria).",
+  "McInnes 1999, Solar Sailing: Technology, Dynamics and Mission Applications (Springer): artificial equilibria and sail control.",
+  "Connors, Wiegert & Veillet 2011, Nature 475, 481: 2010 TK7, first Earth Trojan.",
+  "Zhou, Xu, Zhou, Dvorak & Li 2019, A&A 622, A97: Earth Trojan stability at i < ~15 deg and ~24-37 deg; Dvorak, Lhotka & Zhou 2012, A&A 541, A127.",
+  "Standish (JPL SSD), Keplerian Elements for Approximate Positions of the Major Planets, table 1 (J2000): N-body initial conditions.",
+  "Gruen, Zook, Fechtig & Giese 1985, Icarus 62, 244: interplanetary meteoroid flux model.",
+  "Love & Brownlee 1993, Science 262, 550: terrestrial accretion of cosmic dust 40 +- 20 x 10^6 kg/yr.",
+  "Burns, Lamy & Soter 1979, Icarus 40, 1: radiation forces on small particles (beta, P-R drag).",
+  "Wyatt & Whipple 1950, ApJ 111, 134: Poynting-Robertson lifetimes (400 r^2/beta yr).",
+  "Kessler 1981, Icarus 48, 39: spatial density of orbiting objects (used for Earth-impact rates of bound dust).",
+  "Nesvorny et al. 2010, ApJ 713, 816 (zodiacal cloud input ~1000-1500 kg/s); Nesvorny et al. 2011, ApJ 743, 129 (cross-section 1.7-3.5e11 km2).",
+  "Kocifaj, Kundracik, Barentine & Bara 2021, MNRAS Letters 504, L40: space objects raise night-sky brightness >10 % of natural.",
+  "Falchi et al. 2016, Science Advances 2, e1600377: natural night sky ~22.0 mag/arcsec2 (~1.7e-4 cd/m2).",
+  "Xu, Mandal & Raman 2021, Science 372, 393: broadband directional thermal emission (gradient epsilon-near-zero), >0.6-0.7 at 60-85 deg, p-pol.",
+  "Tsuda et al. 2013, Acta Astronautica 82, 183: IKAROS attitude control with reflectivity control devices.",
+  "Project: docs/architecture.md, docs/data/design_spec.json, src/model/{model,hybrid,constants}.js; research5/future/{scenarios,skeptic,hot_power}/result.json (model v4, 2100+ mid era, B_ss = 9.9e21 kg)."
+ ],
+ "open_questions": [
+  "Front-face emissivity engineering: a visible-transparent low-e front (eps 0.05-0.10, TCO or thin-metal/dielectric stack) is mature in kind (low-e glass) but untested on 30 um c-Si film at 370 K, and its free-carrier absorption costs some PV current; a broadband, unpolarised directional emitter (b3) has only been shown p-polarised over 8-14 um.",
+  "Chiplets at 105-110 C (b4/b5): SRAM leakage (already 10-59 % of a 0.15 W chiplet at 85 C) and NVM retention at 110 C must be checked; the 2100+ energy slope (x1.12-1.15) is from the hot-logic study, not a demonstration.",
+  "Specular vs diffuse sub-bandgap reflection: a textured cell with a back reflector scatters NIR diffusely (+0.5 W/m2 per 1 % for the co-orbital cloud); a front multilayer is specular. Which stack keeps alpha 0.80 and light trapping?",
+  "Thermostat climate response: the residual (polar summer +0.4 W/m2 per W/m2, precipitation -0.76 %/W/m2, stratosphere +0.27 K/W/m2) comes from an EBM and a band-partition estimate; it needs a GCM experiment with a 330-350 K diluted source near the Sun.",
+  "The 2.5x rule that maps cancelled IR to an equivalent net forcing is a hydrological argument; with ice-albedo feedback the polar residual may bind first.",
+  "Collision-free choreography of ~1e17-1e18 co-orbital sails on i <= 30 deg orbits (relative speeds up to ~15 km/s at nodes) and shading losses inside the cloud (assumed tau <= 0.9).",
+  "Night-sky light: is 0.3-1 lux of post-twilight glow within 45 deg of the Sun acceptable? It may bind before 1 W/m2 unless rho_v <= 0.001.",
+  "Dense co-orbital debris: long-term (Myr) impact probability of beta = 0 fragments that leave the horseshoe zone, and a retrieval rate requirement; the CR3BP/N-body runs cover only 1-3 kyr.",
+  "Exterior concentrators (thin Al mirrors feeding edge-on radiators at 3-5 AU) could escape the r^2 mass penalty and the 1/r^2 IR law at once, but would light the whole night sky; not quantified here.",
+  "L1 thermostat station-keeping with beta 0.004 uses most of the control authority; thinner (beta ~0.01) thermostat sails or forced Lissajous orbits are needed."
+ ],
+ "dynamics": {
+  "equilibria": {
+   "beta0.0": {
+    "L1_distance_from_Earth_km": 1498000.0,
+    "L1_efold_days": 22.95,
+    "L3_x_AU": -1.0,
+    "L3_efold_yr": 56.34,
+    "coorbital_radius_AU": 1.0,
+    "L4_longitude_deg": 60.0,
+    "L4_libration_period_yr": 220.7
+   },
+   "beta0.0005": {
+    "L1_distance_from_Earth_km": 1506000.0,
+    "L1_efold_days": 23.14,
+    "L3_x_AU": -0.9998,
+    "L3_efold_yr": 56.33,
+    "coorbital_radius_AU": 0.9998,
+    "L4_longitude_deg": 60.01,
+    "L4_libration_period_yr": 220.7
+   },
+   "beta0.002": {
+    "L1_distance_from_Earth_km": 1532000.0,
+    "L1_efold_days": 23.71,
+    "L3_x_AU": -0.9993,
+    "L3_efold_yr": 56.32,
+    "coorbital_radius_AU": 0.9993,
+    "L4_longitude_deg": 60.02,
+    "L4_libration_period_yr": 220.7
+   },
+   "beta0.004": {
+    "L1_distance_from_Earth_km": 1568000.0,
+    "L1_efold_days": 24.5,
+    "L3_x_AU": -0.9987,
+    "L3_efold_yr": 56.31,
+    "coorbital_radius_AU": 0.9987,
+    "L4_longitude_deg": 60.04,
+    "L4_libration_period_yr": 220.6
+   },
+   "beta0.005": {
+    "L1_distance_from_Earth_km": 1586000.0,
+    "L1_efold_days": 24.92,
+    "L3_x_AU": -0.9983,
+    "L3_efold_yr": 56.3,
+    "coorbital_radius_AU": 0.9983,
+    "L4_longitude_deg": 60.05,
+    "L4_libration_period_yr": 220.6
+   }
+  },
+  "static_hold": [
+   {
+    "phi_deg": 30.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 5.81e-08,
+    "along_track_m_s2": -5.61e-08,
+    "dv_per_yr_m_s": 1.83,
+    "authority_ratio": 517.0
+   },
+   {
+    "phi_deg": 45.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 1.7e-08,
+    "along_track_m_s2": -1.57e-08,
+    "dv_per_yr_m_s": 0.537,
+    "authority_ratio": 1760.0
+   },
+   {
+    "phi_deg": 60.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 3.61e-11,
+    "along_track_m_s2": -3.13e-11,
+    "dv_per_yr_m_s": 0.00114,
+    "authority_ratio": 831000.0
+   },
+   {
+    "phi_deg": 75.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 9.76e-09,
+    "along_track_m_s2": 7.75e-09,
+    "dv_per_yr_m_s": 0.308,
+    "authority_ratio": 3070.0
+   },
+   {
+    "phi_deg": 90.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 1.65e-08,
+    "along_track_m_s2": 1.16e-08,
+    "dv_per_yr_m_s": 0.519,
+    "authority_ratio": 1820.0
+   },
+   {
+    "phi_deg": 120.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 2.52e-08,
+    "along_track_m_s2": 1.26e-08,
+    "dv_per_yr_m_s": 0.795,
+    "authority_ratio": 1190.0
+   },
+   {
+    "phi_deg": 150.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 3e-08,
+    "along_track_m_s2": 7.76e-09,
+    "dv_per_yr_m_s": 0.946,
+    "authority_ratio": 1000.0
+   },
+   {
+    "phi_deg": 170.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 3.14e-08,
+    "along_track_m_s2": 2.73e-09,
+    "dv_per_yr_m_s": 0.989,
+    "authority_ratio": 957.0
+   },
+   {
+    "phi_deg": 180.0,
+    "lat_deg": 0.0,
+    "hold_acc_m_s2": 3.15e-08,
+    "along_track_m_s2": 1.93e-24,
+    "dv_per_yr_m_s": 0.995,
+    "authority_ratio": 952.0
+   }
+  ],
+  "closed_loop_hold": [
+   {
+    "phi0": 90.0,
+    "cap_m_s2": 1e-07,
+    "phi_range": [
+     89.96,
+     90.0
+    ],
+    "mean_acc_m_s2": 1.164e-08,
+    "dv_per_yr_m_s": 0.3672,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 90.0,
+    "cap_m_s2": 1e-06,
+    "phi_range": [
+     89.96,
+     90.0
+    ],
+    "mean_acc_m_s2": 1.164e-08,
+    "dv_per_yr_m_s": 0.3672,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 120.0,
+    "cap_m_s2": 1e-07,
+    "phi_range": [
+     120.0,
+     120.0
+    ],
+    "mean_acc_m_s2": 1.261e-08,
+    "dv_per_yr_m_s": 0.3979,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 120.0,
+    "cap_m_s2": 1e-06,
+    "phi_range": [
+     120.0,
+     120.0
+    ],
+    "mean_acc_m_s2": 1.261e-08,
+    "dv_per_yr_m_s": 0.3979,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 150.0,
+    "cap_m_s2": 1e-07,
+    "phi_range": [
+     150.0,
+     150.0
+    ],
+    "mean_acc_m_s2": 7.774e-09,
+    "dv_per_yr_m_s": 0.2453,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 150.0,
+    "cap_m_s2": 1e-06,
+    "phi_range": [
+     150.0,
+     150.0
+    ],
+    "mean_acc_m_s2": 7.774e-09,
+    "dv_per_yr_m_s": 0.2453,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 180.0,
+    "cap_m_s2": 1e-07,
+    "phi_range": [
+     180.0,
+     180.0
+    ],
+    "mean_acc_m_s2": 1.006e-10,
+    "dv_per_yr_m_s": 0.003174,
+    "lat_max": 0.0
+   },
+   {
+    "phi0": 180.0,
+    "cap_m_s2": 1e-06,
+    "phi_range": [
+     180.0,
+     180.0
+    ],
+    "mean_acc_m_s2": 1.006e-10,
+    "dv_per_yr_m_s": 0.003174,
+    "lat_max": 0.0
+   }
+  ],
+  "free_libration_3000yr_cr3bp": [
+   {
+    "phi0": 60.0,
+    "inc": 0.0,
+    "phi_min": 59.97,
+    "phi_max": 60.12,
+    "sep_from_earth_min_deg": 59.97,
+    "min_dist_AU": 0.9989,
+    "t_min_dist_yr": 850.3,
+    "r_min": 0.9987,
+    "r_max": 0.9987,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2792
+   },
+   {
+    "phi0": 60.0,
+    "inc": 15.0,
+    "phi_min": 58.03,
+    "phi_max": 60.95,
+    "sep_from_earth_min_deg": 58.03,
+    "min_dist_AU": 0.9759,
+    "t_min_dist_yr": 2825.0,
+    "r_min": 0.9986,
+    "r_max": 0.9987,
+    "lat_max": 15.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.7117
+   },
+   {
+    "phi0": 60.0,
+    "inc": 30.0,
+    "phi_min": 52.04,
+    "phi_max": 64.0,
+    "sep_from_earth_min_deg": 52.04,
+    "min_dist_AU": 0.9091,
+    "t_min_dist_yr": 2764.0,
+    "r_min": 0.9986,
+    "r_max": 0.9988,
+    "lat_max": 30.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.6852
+   },
+   {
+    "phi0": 90.0,
+    "inc": 0.0,
+    "phi_min": 39.6,
+    "phi_max": 90.0,
+    "sep_from_earth_min_deg": 39.6,
+    "min_dist_AU": 0.677,
+    "t_min_dist_yr": 1263.0,
+    "r_min": 0.9974,
+    "r_max": 1.0,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3772
+   },
+   {
+    "phi0": 90.0,
+    "inc": 15.0,
+    "phi_min": 37.48,
+    "phi_max": 90.95,
+    "sep_from_earth_min_deg": 37.48,
+    "min_dist_AU": 0.6524,
+    "t_min_dist_yr": 1528.0,
+    "r_min": 0.9974,
+    "r_max": 1.0,
+    "lat_max": 15.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3965
+   },
+   {
+    "phi0": 90.0,
+    "inc": 30.0,
+    "phi_min": 31.4,
+    "phi_max": 94.0,
+    "sep_from_earth_min_deg": 31.4,
+    "min_dist_AU": 0.5872,
+    "t_min_dist_yr": 2631.0,
+    "r_min": 0.9974,
+    "r_max": 1.0,
+    "lat_max": 30.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.4144
+   },
+   {
+    "phi0": 120.0,
+    "inc": 0.0,
+    "phi_min": 29.84,
+    "phi_max": 120.0,
+    "sep_from_earth_min_deg": 29.84,
+    "min_dist_AU": 0.5146,
+    "t_min_dist_yr": 386.4,
+    "r_min": 0.9965,
+    "r_max": 1.001,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2967
+   },
+   {
+    "phi0": 120.0,
+    "inc": 15.0,
+    "phi_min": 27.34,
+    "phi_max": 121.0,
+    "sep_from_earth_min_deg": 27.34,
+    "min_dist_AU": 0.4847,
+    "t_min_dist_yr": 395.3,
+    "r_min": 0.9965,
+    "r_max": 1.001,
+    "lat_max": 15.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2905
+   },
+   {
+    "phi0": 120.0,
+    "inc": 30.0,
+    "phi_min": 20.35,
+    "phi_max": 124.0,
+    "sep_from_earth_min_deg": 20.35,
+    "min_dist_AU": 0.4089,
+    "t_min_dist_yr": 420.3,
+    "r_min": 0.9966,
+    "r_max": 1.001,
+    "lat_max": 30.02,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3288
+   },
+   {
+    "phi0": 150.0,
+    "inc": 0.0,
+    "phi_min": 25.29,
+    "phi_max": 150.0,
+    "sep_from_earth_min_deg": 25.29,
+    "min_dist_AU": 0.4374,
+    "t_min_dist_yr": 161.2,
+    "r_min": 0.996,
+    "r_max": 1.001,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2022
+   },
+   {
+    "phi0": 150.0,
+    "inc": 15.0,
+    "phi_min": 22.49,
+    "phi_max": 151.0,
+    "sep_from_earth_min_deg": 22.49,
+    "min_dist_AU": 0.4035,
+    "t_min_dist_yr": 164.4,
+    "r_min": 0.996,
+    "r_max": 1.001,
+    "lat_max": 15.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2155
+   },
+   {
+    "phi0": 150.0,
+    "inc": 30.0,
+    "phi_min": 14.9,
+    "phi_max": 154.0,
+    "sep_from_earth_min_deg": 14.9,
+    "min_dist_AU": 0.3204,
+    "t_min_dist_yr": 173.9,
+    "r_min": 0.9961,
+    "r_max": 1.001,
+    "lat_max": 30.02,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2479
+   },
+   {
+    "phi0": 170.0,
+    "inc": 0.0,
+    "phi_min": 24.09,
+    "phi_max": 170.0,
+    "sep_from_earth_min_deg": 24.09,
+    "min_dist_AU": 0.4171,
+    "t_min_dist_yr": 2865.0,
+    "r_min": 0.9958,
+    "r_max": 1.001,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1529
+   },
+   {
+    "phi0": 170.0,
+    "inc": 15.0,
+    "phi_min": 21.17,
+    "phi_max": 171.0,
+    "sep_from_earth_min_deg": 21.17,
+    "min_dist_AU": 0.3809,
+    "t_min_dist_yr": 223.9,
+    "r_min": 0.9959,
+    "r_max": 1.001,
+    "lat_max": 15.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1633
+   },
+   {
+    "phi0": 170.0,
+    "inc": 30.0,
+    "phi_min": 13.42,
+    "phi_max": 174.0,
+    "sep_from_earth_min_deg": 13.42,
+    "min_dist_AU": 0.2945,
+    "t_min_dist_yr": 234.9,
+    "r_min": 0.9959,
+    "r_max": 1.001,
+    "lat_max": 30.02,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1612
+   },
+   {
+    "phi0": 180.0,
+    "inc": 0.0,
+    "phi_min": 23.95,
+    "phi_max": 336.1,
+    "sep_from_earth_min_deg": 23.95,
+    "min_dist_AU": 0.4146,
+    "t_min_dist_yr": 2337.0,
+    "r_min": 0.9958,
+    "r_max": 1.002,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.0653
+   },
+   {
+    "phi0": 180.0,
+    "inc": 15.0,
+    "phi_min": 21.01,
+    "phi_max": 339.0,
+    "sep_from_earth_min_deg": 21.01,
+    "min_dist_AU": 0.3789,
+    "t_min_dist_yr": 2372.0,
+    "r_min": 0.9958,
+    "r_max": 1.001,
+    "lat_max": 15.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.06977
+   },
+   {
+    "phi0": 180.0,
+    "inc": 30.0,
+    "phi_min": 13.35,
+    "phi_max": 346.7,
+    "sep_from_earth_min_deg": 13.33,
+    "min_dist_AU": 0.3001,
+    "t_min_dist_yr": 1484.0,
+    "r_min": 0.9959,
+    "r_max": 1.001,
+    "lat_max": 30.02,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.08043
+   },
+   {
+    "phi0": 190.0,
+    "inc": 0.0,
+    "phi_min": 190.0,
+    "phi_max": 335.9,
+    "sep_from_earth_min_deg": 24.09,
+    "min_dist_AU": 0.4171,
+    "t_min_dist_yr": 1103.0,
+    "r_min": 0.9958,
+    "r_max": 1.001,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1529
+   },
+   {
+    "phi0": 190.0,
+    "inc": 15.0,
+    "phi_min": 189.0,
+    "phi_max": 338.8,
+    "sep_from_earth_min_deg": 21.16,
+    "min_dist_AU": 0.3807,
+    "t_min_dist_yr": 2919.0,
+    "r_min": 0.9959,
+    "r_max": 1.001,
+    "lat_max": 15.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1633
+   },
+   {
+    "phi0": 190.0,
+    "inc": 30.0,
+    "phi_min": 186.0,
+    "phi_max": 346.6,
+    "sep_from_earth_min_deg": 13.43,
+    "min_dist_AU": 0.2944,
+    "t_min_dist_yr": 1648.0,
+    "r_min": 0.9959,
+    "r_max": 1.001,
+    "lat_max": 30.02,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1613
+   }
+  ],
+  "derelicts_3000yr_cr3bp": [
+   {
+    "phi0": 90.0,
+    "inc": 0.0,
+    "beta_after": 0.002,
+    "phi_min": 22.79,
+    "phi_max": 337.2,
+    "sep_from_earth_min_deg": 22.79,
+    "min_dist_AU": 0.395,
+    "t_min_dist_yr": 279.1,
+    "r_min": 0.9944,
+    "r_max": 1.004,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.1917
+   },
+   {
+    "phi0": 90.0,
+    "inc": 20.0,
+    "beta_after": 0.002,
+    "phi_min": 17.27,
+    "phi_max": 342.7,
+    "sep_from_earth_min_deg": 17.25,
+    "min_dist_AU": 0.3279,
+    "t_min_dist_yr": 2220.0,
+    "r_min": 0.9944,
+    "r_max": 1.004,
+    "lat_max": 20.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2132
+   },
+   {
+    "phi0": 90.0,
+    "inc": 0.0,
+    "beta_after": 0.0,
+    "phi_min": 10.59,
+    "phi_max": 349.4,
+    "sep_from_earth_min_deg": 10.59,
+    "min_dist_AU": 0.1845,
+    "t_min_dist_yr": 1651.0,
+    "r_min": 0.9906,
+    "r_max": 1.01,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.317
+   },
+   {
+    "phi0": 90.0,
+    "inc": 20.0,
+    "beta_after": 0.0,
+    "phi_min": 1.96,
+    "phi_max": 357.6,
+    "sep_from_earth_min_deg": 1.96,
+    "min_dist_AU": 0.07499,
+    "t_min_dist_yr": 2939.0,
+    "r_min": 0.9854,
+    "r_max": 1.014,
+    "lat_max": 20.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3466
+   },
+   {
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta_after": 0.002,
+    "phi_min": 19.67,
+    "phi_max": 340.3,
+    "sep_from_earth_min_deg": 19.67,
+    "min_dist_AU": 0.3415,
+    "t_min_dist_yr": 2021.0,
+    "r_min": 0.9939,
+    "r_max": 1.005,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2541
+   },
+   {
+    "phi0": 120.0,
+    "inc": 20.0,
+    "beta_after": 0.002,
+    "phi_min": 13.68,
+    "phi_max": 346.3,
+    "sep_from_earth_min_deg": 13.66,
+    "min_dist_AU": 0.267,
+    "t_min_dist_yr": 2555.0,
+    "r_min": 0.9939,
+    "r_max": 1.005,
+    "lat_max": 20.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2643
+   },
+   {
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta_after": 0.0,
+    "phi_min": 9.86,
+    "phi_max": 350.1,
+    "sep_from_earth_min_deg": 9.86,
+    "min_dist_AU": 0.1719,
+    "t_min_dist_yr": 2912.0,
+    "r_min": 0.9903,
+    "r_max": 1.01,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.317
+   },
+   {
+    "phi0": 120.0,
+    "inc": 20.0,
+    "beta_after": 0.0,
+    "phi_min": 0.6291,
+    "phi_max": 358.7,
+    "sep_from_earth_min_deg": 0.6291,
+    "min_dist_AU": 0.05734,
+    "t_min_dist_yr": 2785.0,
+    "r_min": 0.9803,
+    "r_max": 1.021,
+    "lat_max": 20.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3469
+   },
+   {
+    "phi0": 150.0,
+    "inc": 0.0,
+    "beta_after": 0.002,
+    "phi_min": 17.7,
+    "phi_max": 342.3,
+    "sep_from_earth_min_deg": 17.69,
+    "min_dist_AU": 0.3075,
+    "t_min_dist_yr": 122.2,
+    "r_min": 0.9936,
+    "r_max": 1.005,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2759
+   },
+   {
+    "phi0": 150.0,
+    "inc": 20.0,
+    "beta_after": 0.002,
+    "phi_min": 11.34,
+    "phi_max": 348.7,
+    "sep_from_earth_min_deg": 11.33,
+    "min_dist_AU": 0.2272,
+    "t_min_dist_yr": 1379.0,
+    "r_min": 0.9936,
+    "r_max": 1.005,
+    "lat_max": 20.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2921
+   },
+   {
+    "phi0": 150.0,
+    "inc": 0.0,
+    "beta_after": 0.0,
+    "phi_min": 9.312,
+    "phi_max": 350.7,
+    "sep_from_earth_min_deg": 9.312,
+    "min_dist_AU": 0.1623,
+    "t_min_dist_yr": 1845.0,
+    "r_min": 0.9901,
+    "r_max": 1.01,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3204
+   },
+   {
+    "phi0": 150.0,
+    "inc": 20.0,
+    "beta_after": 0.0,
+    "phi_min": 0.009218,
+    "phi_max": 360.0,
+    "sep_from_earth_min_deg": 0.003723,
+    "min_dist_AU": 0.04045,
+    "t_min_dist_yr": 2918.0,
+    "r_min": 0.9683,
+    "r_max": 1.029,
+    "lat_max": 20.0,
+    "n_within_0p05AU": 17.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.35
+   },
+   {
+    "phi0": 180.0,
+    "inc": 0.0,
+    "beta_after": 0.002,
+    "phi_min": 17.05,
+    "phi_max": 343.0,
+    "sep_from_earth_min_deg": 17.05,
+    "min_dist_AU": 0.2963,
+    "t_min_dist_yr": 2985.0,
+    "r_min": 0.9934,
+    "r_max": 1.005,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.2838
+   },
+   {
+    "phi0": 180.0,
+    "inc": 20.0,
+    "beta_after": 0.002,
+    "phi_min": 10.57,
+    "phi_max": 349.5,
+    "sep_from_earth_min_deg": 10.55,
+    "min_dist_AU": 0.2139,
+    "t_min_dist_yr": 2107.0,
+    "r_min": 0.9935,
+    "r_max": 1.005,
+    "lat_max": 20.01,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3071
+   },
+   {
+    "phi0": 180.0,
+    "inc": 0.0,
+    "beta_after": 0.0,
+    "phi_min": 9.122,
+    "phi_max": 350.9,
+    "sep_from_earth_min_deg": 9.122,
+    "min_dist_AU": 0.159,
+    "t_min_dist_yr": 1458.0,
+    "r_min": 0.99,
+    "r_max": 1.01,
+    "lat_max": 0.0,
+    "n_within_0p05AU": 0.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3294
+   },
+   {
+    "phi0": 180.0,
+    "inc": 20.0,
+    "beta_after": 0.0,
+    "phi_min": 0.00316,
+    "phi_max": 360.0,
+    "sep_from_earth_min_deg": 0.00316,
+    "min_dist_AU": 0.03463,
+    "t_min_dist_yr": 2990.0,
+    "r_min": 0.9632,
+    "r_max": 1.039,
+    "lat_max": 20.0,
+    "n_within_0p05AU": 32.0,
+    "n_within_hill": 0.0,
+    "time_frac_sep_lt_60": 0.3567
+   }
+  ],
+  "nbody_1000yr": [
+   {
+    "tag": "live",
+    "phi0": 60.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 59.9,
+    "sep_from_earth_max_deg": 60.19,
+    "min_dist_AU": 0.9815,
+    "lat_max_deg": 0.1299
+   },
+   {
+    "tag": "live",
+    "phi0": 60.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 56.39,
+    "sep_from_earth_max_deg": 61.8,
+    "min_dist_AU": 0.9423,
+    "lat_max_deg": 20.08
+   },
+   {
+    "tag": "live",
+    "phi0": 90.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 37.98,
+    "sep_from_earth_max_deg": 90.1,
+    "min_dist_AU": 0.6409,
+    "lat_max_deg": 0.1299
+   },
+   {
+    "tag": "live",
+    "phi0": 90.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 34.99,
+    "sep_from_earth_max_deg": 91.78,
+    "min_dist_AU": 0.605,
+    "lat_max_deg": 20.08
+   },
+   {
+    "tag": "live",
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 27.22,
+    "sep_from_earth_max_deg": 120.2,
+    "min_dist_AU": 0.4653,
+    "lat_max_deg": 0.1297
+   },
+   {
+    "tag": "live",
+    "phi0": 120.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 24.67,
+    "sep_from_earth_max_deg": 121.8,
+    "min_dist_AU": 0.4301,
+    "lat_max_deg": 20.07
+   },
+   {
+    "tag": "live",
+    "phi0": 150.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 22.09,
+    "sep_from_earth_max_deg": 150.3,
+    "min_dist_AU": 0.3803,
+    "lat_max_deg": 0.1298
+   },
+   {
+    "tag": "live",
+    "phi0": 150.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 18.81,
+    "sep_from_earth_max_deg": 151.8,
+    "min_dist_AU": 0.3522,
+    "lat_max_deg": 20.04
+   },
+   {
+    "tag": "live",
+    "phi0": 180.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 20.46,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.354,
+    "lat_max_deg": 0.1299
+   },
+   {
+    "tag": "live",
+    "phi0": 180.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 16.41,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.3425,
+    "lat_max_deg": 20.01
+   },
+   {
+    "tag": "live",
+    "phi0": -150.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 22.1,
+    "sep_from_earth_max_deg": 150.3,
+    "min_dist_AU": 0.3799,
+    "lat_max_deg": 0.1301
+   },
+   {
+    "tag": "live",
+    "phi0": -150.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 18.15,
+    "sep_from_earth_max_deg": 151.8,
+    "min_dist_AU": 0.3635,
+    "lat_max_deg": 20.01
+   },
+   {
+    "tag": "live",
+    "phi0": -120.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 27.22,
+    "sep_from_earth_max_deg": 120.2,
+    "min_dist_AU": 0.4646,
+    "lat_max_deg": 0.13
+   },
+   {
+    "tag": "live",
+    "phi0": -120.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 24.33,
+    "sep_from_earth_max_deg": 121.8,
+    "min_dist_AU": 0.4382,
+    "lat_max_deg": 20.0
+   },
+   {
+    "tag": "live",
+    "phi0": -90.0,
+    "inc": 0.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 37.99,
+    "sep_from_earth_max_deg": 90.13,
+    "min_dist_AU": 0.6406,
+    "lat_max_deg": 0.1301
+   },
+   {
+    "tag": "live",
+    "phi0": -90.0,
+    "inc": 20.0,
+    "beta": 0.004,
+    "sep_from_earth_min_deg": 35.27,
+    "sep_from_earth_max_deg": 91.83,
+    "min_dist_AU": 0.6089,
+    "lat_max_deg": 20.0
+   },
+   {
+    "tag": "derelict_beta0.002",
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 27.19,
+    "sep_from_earth_max_deg": 120.2,
+    "min_dist_AU": 0.465,
+    "lat_max_deg": 0.1292
+   },
+   {
+    "tag": "derelict_beta0.002",
+    "phi0": 180.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 20.44,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.3537,
+    "lat_max_deg": 0.1295
+   }
+  ],
+  "nbody_interior_1000yr": [
+   {
+    "tag": "interior_0.85",
+    "phi0": 0.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1333,
+    "lat_max_deg": 0.4213,
+    "r0": 0.85,
+    "r_max_AU": 0.8517,
+    "r_min_AU": 0.8481
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.005714,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.133,
+    "lat_max_deg": 0.4217,
+    "r0": 0.85,
+    "r_max_AU": 0.8529,
+    "r_min_AU": 0.8471
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 240.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001199,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1337,
+    "lat_max_deg": 0.4209,
+    "r0": 0.85,
+    "r_max_AU": 0.8529,
+    "r_min_AU": 0.8472
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 0.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1333,
+    "lat_max_deg": 30.02,
+    "r0": 0.85,
+    "r_max_AU": 0.8507,
+    "r_min_AU": 0.8492
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 120.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001739,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1433,
+    "lat_max_deg": 30.05,
+    "r0": 0.85,
+    "r_max_AU": 0.851,
+    "r_min_AU": 0.8491
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 240.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.00843,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1406,
+    "lat_max_deg": 30.0,
+    "r0": 0.85,
+    "r_max_AU": 0.8508,
+    "r_min_AU": 0.8493
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 0.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1333,
+    "lat_max_deg": 60.01,
+    "r0": 0.85,
+    "r_max_AU": 0.8507,
+    "r_min_AU": 0.8493
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 120.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0008607,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1438,
+    "lat_max_deg": 60.02,
+    "r0": 0.85,
+    "r_max_AU": 0.8507,
+    "r_min_AU": 0.8493
+   },
+   {
+    "tag": "interior_0.85",
+    "phi0": 240.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.003768,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1404,
+    "lat_max_deg": 60.0,
+    "r0": 0.85,
+    "r_max_AU": 0.8507,
+    "r_min_AU": 0.8493
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 0.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1033,
+    "lat_max_deg": 0.2928,
+    "r0": 0.88,
+    "r_max_AU": 0.883,
+    "r_min_AU": 0.8765
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001388,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1026,
+    "lat_max_deg": 0.2927,
+    "r0": 0.88,
+    "r_max_AU": 0.885,
+    "r_min_AU": 0.8751
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 240.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.003635,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.104,
+    "lat_max_deg": 0.2912,
+    "r0": 0.88,
+    "r_max_AU": 0.8842,
+    "r_min_AU": 0.8758
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 0.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1033,
+    "lat_max_deg": 30.02,
+    "r0": 0.88,
+    "r_max_AU": 0.8809,
+    "r_min_AU": 0.8791
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 120.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0003841,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1137,
+    "lat_max_deg": 30.05,
+    "r0": 0.88,
+    "r_max_AU": 0.8813,
+    "r_min_AU": 0.8785
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 240.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.006006,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1111,
+    "lat_max_deg": 30.0,
+    "r0": 0.88,
+    "r_max_AU": 0.8811,
+    "r_min_AU": 0.8788
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 0.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1033,
+    "lat_max_deg": 60.0,
+    "r0": 0.88,
+    "r_max_AU": 0.8808,
+    "r_min_AU": 0.8792
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 120.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.002604,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1132,
+    "lat_max_deg": 60.02,
+    "r0": 0.88,
+    "r_max_AU": 0.8808,
+    "r_min_AU": 0.8792
+   },
+   {
+    "tag": "interior_0.88",
+    "phi0": 240.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.003054,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.1106,
+    "lat_max_deg": 60.0,
+    "r0": 0.88,
+    "r_max_AU": 0.8808,
+    "r_min_AU": 0.8792
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 0.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.07331,
+    "lat_max_deg": 0.2195,
+    "r0": 0.91,
+    "r_max_AU": 0.9172,
+    "r_min_AU": 0.9019
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.002855,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.07301,
+    "lat_max_deg": 0.2182,
+    "r0": 0.91,
+    "r_max_AU": 0.9188,
+    "r_min_AU": 0.9012
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 240.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.002943,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.07386,
+    "lat_max_deg": 0.2184,
+    "r0": 0.91,
+    "r_max_AU": 0.9187,
+    "r_min_AU": 0.9016
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 0.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.07331,
+    "lat_max_deg": 30.01,
+    "r0": 0.91,
+    "r_max_AU": 0.9108,
+    "r_min_AU": 0.9091
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 120.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001214,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.08251,
+    "lat_max_deg": 30.05,
+    "r0": 0.91,
+    "r_max_AU": 0.9111,
+    "r_min_AU": 0.909
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 240.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001947,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.08044,
+    "lat_max_deg": 30.0,
+    "r0": 0.91,
+    "r_max_AU": 0.9111,
+    "r_min_AU": 0.9091
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 0.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.07331,
+    "lat_max_deg": 60.0,
+    "r0": 0.91,
+    "r_max_AU": 0.9107,
+    "r_min_AU": 0.9092
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 120.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.01162,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.0849,
+    "lat_max_deg": 60.02,
+    "r0": 0.91,
+    "r_max_AU": 0.9107,
+    "r_min_AU": 0.9092
+   },
+   {
+    "tag": "interior_0.91",
+    "phi0": 240.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0001029,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.08114,
+    "lat_max_deg": 60.0,
+    "r0": 0.91,
+    "r_max_AU": 0.9108,
+    "r_min_AU": 0.9093
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 0.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.02538,
+    "lat_max_deg": 0.1355,
+    "r0": 0.95,
+    "r_max_AU": 0.9883,
+    "r_min_AU": 0.8884
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 120.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001358,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.04508,
+    "lat_max_deg": 0.1571,
+    "r0": 0.95,
+    "r_max_AU": 0.9849,
+    "r_min_AU": 0.9156
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 240.0,
+    "inc": 0.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.000255,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.04351,
+    "lat_max_deg": 0.1562,
+    "r0": 0.95,
+    "r_max_AU": 0.9838,
+    "r_min_AU": 0.9168
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 0.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.03331,
+    "lat_max_deg": 30.01,
+    "r0": 0.95,
+    "r_max_AU": 0.9515,
+    "r_min_AU": 0.948
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 120.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.004249,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.05091,
+    "lat_max_deg": 30.05,
+    "r0": 0.95,
+    "r_max_AU": 0.9518,
+    "r_min_AU": 0.9482
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 240.0,
+    "inc": 30.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.01188,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.03948,
+    "lat_max_deg": 30.0,
+    "r0": 0.95,
+    "r_max_AU": 0.952,
+    "r_min_AU": 0.9482
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 0.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.0,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.03331,
+    "lat_max_deg": 60.0,
+    "r0": 0.95,
+    "r_max_AU": 0.9508,
+    "r_min_AU": 0.949
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 120.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001121,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.0603,
+    "lat_max_deg": 60.02,
+    "r0": 0.95,
+    "r_max_AU": 0.951,
+    "r_min_AU": 0.949
+   },
+   {
+    "tag": "interior_0.95",
+    "phi0": 240.0,
+    "inc": 60.0,
+    "beta": 0.002,
+    "sep_from_earth_min_deg": 0.001272,
+    "sep_from_earth_max_deg": 180.0,
+    "min_dist_AU": 0.04911,
+    "lat_max_deg": 60.0,
+    "r0": 0.95,
+    "r_max_AU": 0.9509,
+    "r_min_AU": 0.9491
+   }
+  ]
+ },
+ "files": [
+  "common.py",
+  "irlib.py",
+  "ir_model.py -> ir_model.json",
+  "coorbital.py -> coorbital.json",
+  "ctrl_test.py -> ctrl_test.json",
+  "nbody.mjs -> nbody.json",
+  "nbody_interior.mjs -> nbody_interior.json",
+  "v4_mass.mjs -> v4_mass.json",
+  "climate_pattern.py -> climate_pattern.json",
+  "architectures.py -> architectures.json",
+  "shadow.py -> shadow.json",
+  "debris.py -> debris.json",
+  "sky.py -> sky.json",
+  "build_result.py -> result.json"
+ ]
+}
