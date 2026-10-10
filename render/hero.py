@@ -25,6 +25,9 @@ VIEWS = {
     'three_quarter': dict(cam=(-0.55, -0.70, 0.45), target=(0.03, 0.0, -0.02), lens=35, tilt=(1.2, -0.8)),
     'raking_radiator': dict(cam=(0.10, -0.32, 0.10), target=(0.0, -0.18, -0.03), lens=28, tilt=(0.6, -2.0)),
     'backlit': dict(cam=(0.35, 0.25, -0.75), target=(0.0, 0.0, 0.15), lens=24, tilt=(2.5, 1.5)),
+    # camera on the sunward side looking down the wing: the Sun's reflection in the cover glass sits
+    # at the antisolar point, which this framing puts on the left wing
+    'glint': dict(cam=(-0.30, -0.05, 0.72), target=(-0.14, 0.06, 0.0), lens=28, tilt=(0.4, -0.3)),
     'module_close': dict(cam=(-0.09, -0.07, -0.06), target=(0.0, 0.0, -0.01), lens=50, tilt=(1.0, -1.0)),
 }
 
