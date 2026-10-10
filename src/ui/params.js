@@ -2,21 +2,25 @@ import { sci } from '../util/format.js';
 
 function fmt(spec, v) {
   if (spec.options) return v;
+  if (v === null || v === undefined) return 'measured table';
+  if (spec.key === 'seedYear') return String(Math.round(v));
   if (spec.unit === '' && v <= 1) return `${(v * 100).toFixed(spec.step && spec.step < 0.01 ? 1 : 0)}%`;
   if (spec.unit === '/K') return `${(v * 100).toFixed(2)} %/K`;
   if (spec.unit === 'K') return `${Math.round(v)} K (${Math.round(v - 273.15)} °C)`;
+  if (spec.unit === '°C') return `${Math.round(v)} °C`;
   return `${sci(v, 2)} ${spec.unit}`;
 }
 
 /**
- * Builds the Assumptions drawer. Returns { sync } to push external param changes back into the inputs.
+ * Builds the Assumptions drawer from the model's PARAMS. Returns { sync, rebind }: sync pushes
+ * external changes into the inputs; rebind points the inputs at a new params object.
  */
 export function renderParams(root, specs, params, onChange) {
   root.innerHTML = '';
+  const ref = { params };
   const inputs = new Map();
   let group = null;
   for (const spec of specs) {
-    if (spec.key === 'year') continue;
     if (spec.group !== group) {
       group = spec.group;
       const g = document.createElement('div');
@@ -40,7 +44,7 @@ export function renderParams(root, specs, params, onChange) {
         opt.value = o; opt.textContent = o;
         input.appendChild(opt);
       }
-      input.addEventListener('change', () => { params[spec.key] = input.value; out.textContent = fmt(spec, input.value); onChange(); });
+      input.addEventListener('change', () => { ref.params[spec.key] = input.value; out.textContent = fmt(spec, input.value); onChange(); });
     } else {
       input = document.createElement('input');
       input.type = 'range';
@@ -53,18 +57,18 @@ export function renderParams(root, specs, params, onChange) {
       }
       input.addEventListener('input', () => {
         const raw = Number(input.value);
-        params[spec.key] = spec.log ? 10 ** raw : raw;
-        out.textContent = fmt(spec, params[spec.key]);
+        ref.params[spec.key] = spec.log ? 10 ** raw : raw;
+        out.textContent = fmt(spec, ref.params[spec.key]);
         onChange();
       });
     }
     input.id = id;
     wrap.appendChild(input);
     if (spec.help) {
-      const h = document.createElement('div');
-      h.className = 'help';
-      h.textContent = spec.help;
-      wrap.appendChild(h);
+      const hlp = document.createElement('div');
+      hlp.className = 'help';
+      hlp.textContent = spec.help;
+      wrap.appendChild(hlp);
     }
     root.appendChild(wrap);
     inputs.set(spec.key, { input, out, spec });
@@ -72,11 +76,12 @@ export function renderParams(root, specs, params, onChange) {
 
   function sync() {
     for (const { input, out, spec } of inputs.values()) {
-      const v = params[spec.key];
-      input.value = spec.options ? v : String(spec.log ? Math.log10(v) : v);
+      const v = ref.params[spec.key];
+      if (spec.options) input.value = v;
+      else if (v !== null && v !== undefined) input.value = String(spec.log ? Math.log10(v) : v);
       out.textContent = fmt(spec, v);
     }
   }
   sync();
-  return { sync };
+  return { sync, rebind(p) { ref.params = p; sync(); } };
 }

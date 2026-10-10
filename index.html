@@ -6,274 +6,268 @@
 <title>Mercury Swarm Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Saira+Condensed:wght@500;600;700&display=swap">
 <style>
-/* Layout: full-bleed WebGL stage; a ledger of live numbers docked right; story caption and
-   timeline float over the stage bottom-left. Single dark look on purpose: it is space, and
-   physically based exposure only reads on black. */
+/* Layout: a photo essay in a reading column (photographs exposed like real cameras, so they only
+   read on black) with a docked ledger of live numbers on the right. One dark world on purpose.
+   Colour: sunlight amber is the one accent; infrared orange marks heat; cool blue marks Earth. */
 :root {
   --bg: #05070b;
-  --panel: rgba(8, 11, 17, 0.84);
-  --panel-solid: #0a0e15;
+  --panel: #0a0e15;
+  --raise: #0f141d;
   --line: rgba(150, 163, 186, 0.18);
   --fg: #ece6d8;
-  --muted: #9097a5;
+  --soft: #cfc9bc;
+  --muted: #8f96a4;
   --sun: #ffb547;
   --ir: #ff6a3d;
   --cool: #86b6ff;
   --warn: #ff7a59;
   --ok: #8fd3a6;
+  --swarm: #9a73ec;
   --font-display: 'Saira Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
   --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  --ledger-w: 372px;
+  --ledger-w: 360px;
+  --measure: 66ch;
   color-scheme: dark;
 }
-html, body { height: 100%; }
-body {
-  margin: 0; background: var(--bg); color: var(--fg);
-  font: 14px/1.45 var(--font-body); overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-}
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+img { max-width: 100%; display: block; }
+a { color: var(--sun); }
 
-#app { position: fixed; inset: 0; display: grid; grid-template-columns: 1fr var(--ledger-w); }
-#stage-wrap { position: relative; min-width: 0; overflow: hidden; }
-#stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.lbl {
-  position: absolute; left: 0; top: 0; white-space: nowrap; pointer-events: none;
-  font: 500 11px/1.2 var(--font-mono); color: var(--fg); letter-spacing: 0.02em;
-  padding: 2px 5px 2px 12px; text-shadow: 0 0 4px #000, 0 0 2px #000;
-  background: linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 9px); border-radius: 3px;
-}
-.lbl::before { content: ''; position: absolute; left: 0; top: 0; width: 5px; height: 5px; border: 1px solid currentColor; border-radius: 50%; transform: translate(-50%, -50%); margin-left: 2px; }
-.lbl.nodot::before { display: none; }
-.lbl.nodot { padding-left: 5px; background: rgba(0,0,0,0.55); }
-.lbl.sun { color: var(--sun); }
-.lbl.ir { color: var(--ir); }
-.lbl.cool { color: var(--cool); }
-.lbl.muted { color: var(--muted); }
-.lbl.big { font-size: 12px; }
-.lbl small { display: block; color: var(--muted); font-size: 10px; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) var(--ledger-w); min-height: 100vh; }
 
-/* Header */
-header.top {
-  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
-  display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 0;
-  pointer-events: none;
-}
-header.top > * { pointer-events: auto; }
-.brand { display: flex; flex-direction: column; gap: 2px; margin-right: 8px; }
-.brand h1 { margin: 0; font: 700 22px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
-.brand h1 span { color: var(--sun); }
-.brand p { margin: 0; font: 400 11px/1.3 var(--font-mono); color: var(--muted); letter-spacing: 0.04em; }
-nav.chapters { display: flex; gap: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px; backdrop-filter: blur(6px); }
-nav.chapters button {
-  display: flex; align-items: baseline; gap: 6px; border: 0; background: transparent; padding: 6px 11px; border-radius: 4px;
-  font: 600 14px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
-}
-nav.chapters button b { font: 500 10px/1 var(--font-mono); color: var(--muted); opacity: 0.7; }
-nav.chapters button[aria-pressed="true"] { background: rgba(255, 181, 71, 0.12); color: var(--fg); }
-nav.chapters button[aria-pressed="true"] b { color: var(--sun); opacity: 1; }
-.viewtoggles { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-.seg { display: flex; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px; backdrop-filter: blur(6px); }
-.seg button { border: 0; background: transparent; padding: 5px 9px; border-radius: 4px; font: 500 11px/1 var(--font-mono); color: var(--muted); letter-spacing: 0.03em; }
-.seg button[aria-pressed="true"] { background: rgba(236, 230, 216, 0.1); color: var(--fg); }
-.seg button.ir[aria-pressed="true"] { background: rgba(255, 106, 61, 0.16); color: var(--ir); }
+/* ---------- essay */
+.essay { min-width: 0; padding-inline: clamp(16px, 4vw, 56px); padding-block: 28px 140px; }
+.masthead { max-width: 1100px; margin: 0 auto 26px; display: grid; gap: 14px; }
+.masthead .eyebrow { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--sun); }
+.masthead h1 { margin: 0; font: 700 clamp(34px, 6vw, 64px)/0.95 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; text-wrap: balance; }
+.masthead h1 span { color: var(--sun); }
+.masthead p.lede { margin: 0; max-width: var(--measure); color: var(--soft); font-size: 17px; line-height: 1.55; }
+.eras { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.eras > span { font: 500 11px/1 var(--font-mono); color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-right: 4px; }
+.eras button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font: 500 12px/1 var(--font-mono); color: var(--soft); }
+.eras button:hover { border-color: var(--muted); }
+.eras button[aria-pressed="true"] { border-color: var(--sun); color: var(--bg); background: var(--sun); }
 
-/* Caption */
-.caption {
-  position: absolute; left: 18px; bottom: 96px; z-index: 4; max-width: min(460px, calc(100% - 36px));
-  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px 12px;
-  backdrop-filter: blur(6px);
-}
-.caption .eyebrow { font: 500 10px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sun); }
-.caption h2 { margin: 6px 0 6px; font: 600 24px/1.05 var(--font-display); letter-spacing: 0.02em; text-wrap: balance; }
-.caption p { margin: 0 0 6px; color: #cfc9bc; font-size: 13px; line-height: 1.5; }
-.caption p:last-child { margin-bottom: 0; }
-.caption .num { font-family: var(--font-mono); color: var(--fg); font-size: 12.5px; white-space: nowrap; }
-.caption .hot { color: var(--warn); }
-.caption .hint { font: 400 11px/1.4 var(--font-mono); color: var(--muted); margin-top: 8px; }
-.caption button.collapse { position: absolute; top: 8px; right: 8px; border: 0; background: transparent; color: var(--muted); font: 500 11px var(--font-mono); padding: 4px 6px; }
-.caption.collapsed p, .caption.collapsed .hint, .caption.collapsed .presets { display: none; }
-.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.presets:empty { display: none; }
-.presets button { border: 1px solid var(--line); background: rgba(236,230,216,0.04); border-radius: 4px; padding: 5px 8px; font: 500 11px/1 var(--font-mono); color: var(--fg); }
-.presets button:hover { border-color: var(--sun); color: var(--sun); }
+.chapter { max-width: 1100px; margin: 0 auto; padding-block: 36px; border-top: 1px solid var(--line); display: grid; gap: 18px; }
+.chapter > header { display: grid; gap: 6px; }
+.chapter .eyebrow { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.chapter h2 { margin: 0; font: 600 clamp(26px, 3.4vw, 38px)/1.02 var(--font-display); letter-spacing: 0.02em; text-wrap: balance; }
+.prose { max-width: var(--measure); display: grid; gap: 12px; }
+.prose p { margin: 0; color: var(--soft); }
+.prose b, .prose strong { color: var(--fg); font-weight: 600; }
+.n { font-family: var(--font-mono); font-size: 0.93em; color: var(--fg); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.n.sun { color: var(--sun); } .n.ir { color: var(--ir); } .n.warn { color: var(--warn); } .n.cool { color: var(--cool); }
 
-/* Timeline */
-.timeline {
-  position: absolute; left: 18px; right: 18px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 4;
-  display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; backdrop-filter: blur(6px);
-}
-.timeline .play { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: rgba(255, 181, 71, 0.12); color: var(--sun); font-size: 13px; grid-row: span 2; }
-.timeline .readout { display: flex; gap: 6px 16px; flex-wrap: wrap; font: 400 11.5px/1.2 var(--font-mono); color: var(--muted); }
-.timeline .readout b { color: var(--fg); font-weight: 500; }
-.timeline .readout .yr b { color: var(--sun); font-size: 13px; }
-.track { position: relative; height: 22px; }
-.track input[type=range] { position: absolute; inset: 0; width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; }
-.track input[type=range]::-webkit-slider-runnable-track { height: 4px; background: linear-gradient(90deg, rgba(255,181,71,.6) var(--p, 50%), var(--line) var(--p, 50%)); border-radius: 2px; }
-.track input[type=range]::-moz-range-track { height: 4px; background: var(--line); border-radius: 2px; }
-.track input[type=range]::-moz-range-progress { height: 4px; background: rgba(255,181,71,.6); }
-.track input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--sun); margin-top: -5px; border: 2px solid var(--bg); }
-.track input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--sun); border: 2px solid var(--bg); }
-.ticks { position: absolute; left: 7px; right: 7px; top: 14px; height: 10px; pointer-events: none; }
-.ticks i { position: absolute; top: 0; width: 1px; height: 6px; background: var(--muted); }
-.ticks i span { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 400 9px/1 var(--font-mono); color: var(--muted); }
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figure img { width: 100%; height: auto; border-radius: 3px; background: #000; }
+figcaption { font: 400 12px/1.5 var(--font-mono); color: var(--muted); max-width: var(--measure); }
+figcaption b { color: var(--soft); font-weight: 500; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.scale { display: flex; align-items: center; gap: 8px; font: 400 11px/1 var(--font-mono); color: var(--muted); }
+.scale i { display: block; height: 8px; width: 160px; border-radius: 2px;
+  background: linear-gradient(90deg, #000004, #320a5e, #781c6d, #bb3754, #ed6925, #fbb61a, #fcffa4); }
 
-/* Ledger */
-aside.ledger {
-  position: relative; z-index: 6; background: var(--panel-solid); border-left: 1px solid var(--line);
-  display: flex; flex-direction: column; min-height: 0; height: 100%;
-}
-.ledger-head { padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.ledger-head h2 { margin: 0; font: 600 16px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
-.ledger-head .btns { display: flex; gap: 6px; }
-.btn { border: 1px solid var(--line); background: transparent; border-radius: 5px; padding: 5px 9px; font: 500 11px/1 var(--font-mono); color: var(--fg); }
+/* comparison table */
+.tablewrap { overflow-x: auto; max-width: 100%; }
+table.compare { border-collapse: collapse; min-width: 440px; width: 100%; font-size: 13.5px; }
+table.compare th, table.compare td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.compare th { font: 600 12px/1.2 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+table.compare td.v { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--fg); }
+table.compare td.k { width: 34%; }
+table.compare td.k { color: var(--soft); }
+table.compare tr.win td.v.best { color: var(--sun); }
+
+/* build-out chart */
+.chartcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 14px 10px; display: grid; gap: 10px; min-width: 0; }
+.chartcard svg { width: 100%; height: auto; display: block; touch-action: none; }
+.chartcard .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font: 400 11px/1.3 var(--font-mono); color: var(--muted); }
+.chartcard .legend i { display: inline-block; width: 12px; height: 2px; vertical-align: 3px; margin-right: 6px; border-radius: 1px; }
+.scrub { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
+.scrub button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--sun); }
+.scrub input[type=range] { width: 100%; accent-color: var(--sun); margin: 0; }
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
+.readout div { display: grid; gap: 2px; padding-top: 6px; border-top: 1px solid var(--line); }
+.readout span { font: 400 11px/1.3 var(--font-mono); color: var(--muted); }
+.readout b { font: 500 15px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--fg); }
+.readout b.sun { color: var(--sun); } .readout b.warn { color: var(--warn); }
+
+/* ---------- ledger */
+aside.ledger { position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.ledger-head { padding: 16px 18px 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ledger-head h2 { margin: 0; font: 600 16px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; }
+.ledger-head .yr { font: 500 12px/1 var(--font-mono); color: var(--sun); }
+.btn { border: 1px solid var(--line); background: transparent; border-radius: 5px; padding: 6px 10px; font: 500 11px/1 var(--font-mono); color: var(--fg); }
 .btn:hover { border-color: var(--muted); }
-.btn.accent { border-color: rgba(255,181,71,.5); color: var(--sun); }
-.ledger-body { overflow-y: auto; padding: 4px 18px calc(24px + env(safe-area-inset-bottom, 0px)); min-height: 0; flex: 1; }
-.ledger section { padding: 14px 0 6px; border-bottom: 1px solid var(--line); }
+.btn.accent { border-color: rgba(255, 181, 71, 0.5); color: var(--sun); }
+.ledger-body { overflow-y: auto; padding: 4px 18px 28px; min-height: 0; flex: 1; }
+.ledger section { padding: 12px 0 6px; border-bottom: 1px solid var(--line); }
 .ledger section:last-child { border-bottom: 0; }
-.ledger h3 { margin: 0 0 8px; font: 600 13px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
-.ledger h3 span { color: var(--sun); font-family: var(--font-mono); letter-spacing: 0; font-weight: 400; font-size: 10px; }
-.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 4px 0; align-items: baseline; }
-.row .k { color: #c6c0b3; font-size: 12.5px; min-width: 0; }
+.ledger h3 { margin: 0 0 6px; font: 600 12.5px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.ledger h3 span { color: var(--sun); font: 400 10.5px/1 var(--font-mono); letter-spacing: 0; text-transform: none; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 12px; padding: 4px 0; align-items: baseline; }
+.row .k { color: var(--soft); font-size: 12.5px; min-width: 0; }
 .row .v { font: 500 12.5px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.row .n { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-.row.shock .v { color: var(--sun); }
-.row.bad .v { color: var(--warn); }
-.row.good .v { color: var(--ok); }
-.pill { display: inline-block; font: 500 10px/1 var(--font-mono); padding: 3px 6px; border-radius: 10px; border: 1px solid currentColor; vertical-align: 1px; margin-left: 6px; }
-.pill.bad { color: var(--warn); } .pill.ok { color: var(--ok); } .pill.sun { color: var(--sun); }
-.ledger .chart { margin: 4px 0 6px; }
-.myths ol { margin: 0; padding: 0 0 6px; list-style: none; display: grid; gap: 8px; counter-reset: m; }
-.myths li { font-size: 12.5px; line-height: 1.45; color: #d2ccbf; padding-left: 22px; position: relative; counter-increment: m; }
-.myths li::before { content: counter(m); position: absolute; left: 0; top: 1px; font: 500 10px/16px var(--font-mono); color: var(--sun); width: 16px; height: 16px; text-align: center; border: 1px solid rgba(255,181,71,.4); border-radius: 50%; }
-.myths s { color: var(--muted); text-decoration-color: rgba(255,122,89,.8); text-decoration-thickness: 1.5px; }
-.myths b { color: var(--fg); font-weight: 600; }
-.ledger .chart svg { width: 100%; height: auto; display: block; touch-action: none; }
-.ledger .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 10.5px/1.3 var(--font-mono); color: var(--muted); margin-top: 4px; }
-.ledger .legend i { display: inline-block; width: 10px; height: 2px; vertical-align: 3px; margin-right: 5px; border-radius: 1px; }
-.ledger .legend .unit { margin-left: auto; }
+.row .note { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.row.sun .v { color: var(--sun); } .row.warn .v { color: var(--warn); } .row.ok .v { color: var(--ok); }
 
-/* Assumptions drawer */
-.drawer {
-  position: absolute; top: 0; bottom: 0; right: 0; width: min(var(--ledger-w), 100%); z-index: 8; background: var(--panel-solid);
-  border-left: 1px solid var(--line); display: flex; flex-direction: column; transform: translateX(100%); transition: transform .25s ease;
-}
+.drawer { position: fixed; top: 0; bottom: 0; right: 0; width: min(var(--ledger-w), 100%); z-index: 20; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.25s ease; padding-top: env(safe-area-inset-top, 0px); }
 .drawer.open { transform: none; }
 .param { padding: 10px 0; border-bottom: 1px solid var(--line); }
-.param label { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: #d2ccbf; }
+.param label { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--soft); }
 .param label output { font: 500 12px var(--font-mono); color: var(--sun); white-space: nowrap; }
 .param input[type=range] { width: 100%; accent-color: var(--sun); margin: 6px 0 0; }
 .param select { width: 100%; margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px; }
 .param .help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 .param-group { font: 600 12px/1 var(--font-display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); padding: 16px 0 2px; }
+.ledger-toggle { display: none; }
 
-.mobile-ledger-btn { display: none; }
+footer.sources { max-width: 1100px; margin: 0 auto; padding-block: 30px 0; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+footer.sources .eyebrow { margin: 0; font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+footer.sources p, footer.sources li { color: var(--muted); font-size: 13px; max-width: var(--measure); }
+footer.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 
-@media (max-width: 900px) {
-  :root { --ledger-w: 100%; }
-  #app { grid-template-columns: 1fr; }
-  aside.ledger { position: absolute; left: 0; right: 0; bottom: 0; top: auto; height: 62%; transform: translateY(100%); transition: transform .25s ease; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  aside.ledger { position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: 64vh; z-index: 15; transform: translateY(100%); transition: transform 0.25s ease; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
   aside.ledger.open { transform: none; }
-  .mobile-ledger-btn { display: inline-block; }
-  .viewtoggles { margin-left: 0; }
-  .caption { bottom: 108px; left: 16px; right: 16px; max-width: none; }
-  .caption h2 { font-size: 20px; }
-  .timeline { left: 16px; right: 16px; }
-  header.top { padding-left: 16px; padding-right: 16px; gap: 10px; }
-  .brand h1 { font-size: 18px; }
+  .ledger-toggle { display: inline-block; position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 16; background: var(--sun); color: var(--bg); border: 0; border-radius: 999px; padding: 10px 16px; font: 600 13px/1 var(--font-mono); }
 }
-@media (max-width: 600px) {
-  .timeline .readout span:nth-child(n+4) { display: none; }
-  .timeline { padding: 8px 12px; }
-  .caption { padding: 10px 12px 10px; bottom: 92px; }
-  .caption p { font-size: 12.5px; }
-  .brand p { display: none; }
-  .lbl { font-size: 10px; }
+@media (max-width: 640px) {
+  .pair { grid-template-columns: minmax(0, 1fr); }
+  body { font-size: 14.5px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .drawer, aside.ledger { transition: none; }
-}
+@media (prefers-reduced-motion: reduce) { .drawer, aside.ledger { transition: none; } }
 </style>
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
 </head>
 <body>
-<div id="app">
-  <div id="stage-wrap">
-    <canvas id="stage" aria-label="3D view of the swarm"></canvas>
-    <div id="labels"></div>
-
-    <header class="top">
-      <div class="brand">
-        <h1>Mercury <span>Swarm</span> Ledger</h1>
-        <p>A PV + AI-compute Dyson swarm, built from Mercury, at true numbers</p>
-      </div>
-      <nav class="chapters" id="chapters" aria-label="Chapters"></nav>
-      <div class="viewtoggles">
-        <div class="seg" role="group" aria-label="Light">
-          <button id="mode-visible" aria-pressed="true" title="What a camera or eye would record">Visible</button>
-          <button id="mode-thermal" class="ir" aria-pressed="false" title="Long-wave infrared, 8–14 µm, false colour">Thermal IR</button>
-        </div>
-        <div class="seg" role="group" aria-label="Scale">
-          <button id="scale-true" aria-pressed="true" title="Every size at its real value">True scale</button>
-          <button id="scale-exag" aria-pressed="false" title="Enlarge bodies and satellites so they can be seen">Enlarged</button>
-        </div>
-        <button class="btn mobile-ledger-btn" id="ledger-toggle">Numbers</button>
+<div class="app">
+  <main class="essay" id="essay">
+    <header class="masthead">
+      <div class="eyebrow">A Dyson swarm, built from Mercury, by the numbers</div>
+      <h1>Mercury <span>Swarm</span> Ledger</h1>
+      <p class="lede">Solar panels that are also computers, made from Mercury's rock and flown around the Sun. Every photograph and number on this page comes from one physics model. Change an assumption and the whole page recomputes.</p>
+      <div class="eras" role="group" aria-label="Hardware era">
+        <span>Hardware</span>
+        <button data-era="2026" aria-pressed="false">2026, today</button>
+        <button data-era="low" aria-pressed="false">Mature, pessimistic</button>
+        <button data-era="mid" aria-pressed="true">Mature, central</button>
+        <button data-era="high" aria-pressed="false">Mature, optimistic</button>
       </div>
     </header>
 
-    <div class="caption" id="caption">
-      <button class="collapse" id="caption-collapse" aria-label="Collapse caption">–</button>
-      <div class="eyebrow" id="cap-eyebrow"></div>
-      <h2 id="cap-title"></h2>
-      <div id="cap-body"></div>
-      <div class="presets" id="cap-presets"></div>
-      <div class="hint" id="cap-hint"></div>
-    </div>
+    <section class="chapter" id="sail">
+      <figure>
+        <img src="renders/sail-hero.jpg" alt="A dark navy diamond-shaped solar sail against black space, with a line of bright glints across one side" width="2560" height="1440">
+        <figcaption><b>One compute sail, photographed from 1 km on the sunward side.</b> Cycles path tracing with the Sun at its true brightness and size, exposed like a camera metered on sunlit grey. The film reflects about 0.2 % of visible light, so it records as near-black navy. The bright line is the Sun's reflection in the cover glass, broken into segments where each 1.6 m fold panel curls a few degrees beside its hinge. Stars are about 20 stops too faint to appear at this exposure.</figcaption>
+      </figure>
+      <header><div class="eyebrow">The satellite</div><h2 id="sail-title">A computer the size of four city blocks, thinner than paper</h2></header>
+      <div class="prose" id="sail-prose"></div>
+    </section>
 
-    <div class="timeline" id="timeline">
-      <button class="play" id="play" aria-label="Play the build-out">▶</button>
-      <div class="readout" id="tl-readout"></div>
-      <div class="track">
-        <input type="range" id="year" min="0" max="120" step="0.1" value="60" aria-label="Years since first launch from Mercury">
-        <div class="ticks" id="ticks"></div>
+    <section class="chapter" id="computer">
+      <header><div class="eyebrow">Thermal infrared, 8–14 µm</div><h2>The panel is the computer</h2></header>
+      <div class="pair">
+        <figure>
+          <img src="renders/sail-back-lwir-macro.jpg" alt="False-colour thermal image of the back of the film: a fine grid of warm dots with a cold black truss in front" width="1920" height="1080" loading="lazy">
+          <figcaption><b>The back, half a metre away.</b> Each dot is a chiplet a few kelvin warmer than the film. The black lines are a support boom, cold because it sees deep space.</figcaption>
+        </figure>
+        <figure>
+          <img src="renders/sail-hub-lwir.jpg" alt="Thermal image of the sail's hub: a cold dark octagon with laser terminals, booms radiating outward over a glowing film" width="1920" height="1080" loading="lazy">
+          <figcaption><b>The hub, seen from behind.</b> The film glows at about 76 °C. The hub, booms and laser terminals are colder and read dark.</figcaption>
+        </figure>
       </div>
-    </div>
-  </div>
+      <div class="scale"><span id="ir-lo">320 K</span><i></i><span id="ir-hi">350 K</span><span>brightness temperature</span></div>
+      <div class="prose" id="computer-prose"></div>
+    </section>
 
-  <aside class="ledger" id="ledger">
+    <section class="chapter" id="why">
+      <header><div class="eyebrow">Concentrated or spread out</div><h2>Why the chips are not in one box</h2></header>
+      <div class="prose" id="why-prose"></div>
+      <div class="tablewrap"><table class="compare" id="why-table"></table></div>
+    </section>
+
+    <section class="chapter" id="mercury">
+      <header><div class="eyebrow">The mine</div><h2>Mercury, before and after</h2></header>
+      <div class="pair">
+        <figure>
+          <img src="renders/mercury-pristine.jpg" alt="Mercury from orbit, grey and cratered, half lit" width="1600" height="1600" loading="lazy">
+          <figcaption><b>Today.</b> MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance.</figcaption>
+        </figure>
+        <figure>
+          <img src="renders/mercury-heatwall.jpg" alt="Mercury with pale excavated fields on the day side and glowing radiator fields on the night side" width="1600" height="1600" loading="lazy">
+          <figcaption><b>At the heat wall.</b> Excavated ground is brighter than weathered regolith. On the night side, radiator fields shed the waste heat of mining, and they glow faintly red.</figcaption>
+        </figure>
+      </div>
+      <div class="prose" id="mercury-prose"></div>
+    </section>
+
+    <section class="chapter" id="buildout">
+      <header><div class="eyebrow">Timeline</div><h2>How fast it can be built, and where it stops</h2></header>
+      <div class="prose" id="build-prose"></div>
+      <div class="chartcard">
+        <div id="build-chart"></div>
+        <div class="legend" id="build-legend"></div>
+        <div class="scrub">
+          <button id="play" aria-label="Play the build-out">▶</button>
+          <input type="range" id="year" min="0" max="1000" step="1" value="300" aria-label="Year">
+        </div>
+        <div class="readout" id="build-readout"></div>
+      </div>
+    </section>
+
+    <section class="chapter" id="earth">
+      <header><div class="eyebrow">The binding constraint</div><h2>Earth decides how big it may get</h2></header>
+      <div class="prose" id="earth-prose"></div>
+      <div class="chartcard"><div id="earth-chart"></div><div class="legend" id="earth-legend"></div></div>
+    </section>
+
+    <section class="chapter" id="star">
+      <header><div class="eyebrow">Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2></header>
+      <div class="prose" id="star-prose"></div>
+      <div class="chartcard"><div id="sed-chart"></div><div class="legend" id="sed-legend"></div></div>
+    </section>
+
+    <section class="chapter" id="future">
+      <header><div class="eyebrow">Built later than you think</div><h2>Today's hardware never flies</h2></header>
+      <div class="prose" id="future-prose"></div>
+      <div class="tablewrap"><table class="compare" id="future-table"></table></div>
+    </section>
+
+    <footer class="sources">
+      <h2 class="eyebrow">How this was made</h2>
+      <p>The model, the Blender scenes and the research behind them are in the project repository: <span class="n">docs/architecture.md</span> (why sails and pods), <span class="n">docs/future-tech.md</span> (what hardware actually flies), <span class="n">docs/data/</span> (every study's numbers and sources) and <span class="n">src/model/hybrid.js</span> (the model, with tests). Photographs are path traced in Blender Cycles at the true solar irradiance for the orbit, with physical units throughout; thermal images map 8–14 µm band radiance to a fixed false-colour scale.</p>
+      <ul id="sources-list"></ul>
+    </footer>
+  </main>
+
+  <aside class="ledger" id="ledger" aria-label="Live numbers">
     <div class="ledger-head">
-      <h2>The Ledger</h2>
-      <div class="btns">
-        <button class="btn accent" id="open-assumptions">Assumptions</button>
-      </div>
+      <h2>Ledger</h2>
+      <span class="yr" id="ledger-year"></span>
+      <button class="btn accent" id="open-assumptions">Assumptions</button>
     </div>
     <div class="ledger-body" id="ledger-body"></div>
-    <div class="drawer" id="drawer" aria-label="Assumptions">
-      <div class="ledger-head">
-        <h2>Assumptions</h2>
-        <div class="btns">
-          <button class="btn" id="reset-params">Reset</button>
-          <button class="btn accent" id="close-assumptions">Done</button>
-        </div>
-      </div>
-      <div class="ledger-body" id="params"></div>
-    </div>
   </aside>
+  <button class="ledger-toggle" id="ledger-toggle" aria-controls="ledger">Numbers</button>
+
+  <div class="drawer" id="drawer" aria-label="Assumptions">
+    <div class="ledger-head">
+      <h2>Assumptions</h2>
+      <div style="display:flex;gap:6px">
+        <button class="btn" id="reset-params">Reset</button>
+        <button class="btn accent" id="close-assumptions">Done</button>
+      </div>
+    </div>
+    <div class="ledger-body" id="params"></div>
+  </div>
 </div>
-<script type="module" src="./src/main.js"></script>
+<script type="module" src="src/app.js"></script>
 </body>
 </html>

@@ -40,5 +40,13 @@ function walk(dir) {
   }
 }
 walk(join(root, 'src'));
+// photographs the page shows
+for (const name of readdirSync(join(root, 'renders'))) {
+  if (!name.endsWith('.jpg')) continue;
+  const rel = join('renders', name);
+  mkdirSync(join(out, 'renders'), { recursive: true });
+  copyFileSync(join(root, rel), join(out, rel));
+  files[rel] = join(out, rel);
+}
 writeFileSync(join(out, 'files.json'), JSON.stringify(files, null, 2));
 console.log(`staged ${Object.keys(files).length + 1} files in ${out}`);

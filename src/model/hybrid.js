@@ -86,7 +86,8 @@ export const PARAMS = [
     help: 'SO2 heat-pipe blades sized for ≤1 %/yr meteoroid loss.' },
   { key: 'podKgPerKW', group: 'Pods', label: 'Module, loops, shielding, bus', unit: 'kg/kW', min: 0.5, max: 10, step: 0.1, value: 1.0 },
   // swarm
-  { key: 'coverage', group: 'Swarm', label: 'Sunlight captured (target)', unit: '', min: 1e-6, max: 1, log: true, value: 0.1 },
+  { key: 'coverage', group: 'Swarm', label: 'Stop building at this share of sunlight', unit: '', min: 1e-6, max: 1, log: true, value: 1,
+    help: '100 % = no target: industry builds until refresh, rock or heat stops it.' },
   { key: 'placement', group: 'Swarm', label: 'Sail placement', unit: '', options: ['thermal', 'manual'], value: 'thermal',
     help: 'Thermal: as close to the Sun as the chiplet limit allows, given how much of the sky the swarm already fills.' },
   { key: 'rManual', group: 'Swarm', label: 'Manual sail orbit radius', unit: 'AU', min: 0.5, max: 2, step: 0.01, value: 0.92 },
