@@ -8,7 +8,8 @@ PV film itself as sub-watt chiplets, so the panel is the radiator?
 **compute sails**: thin c-Si film with 0.15 W chiplets every 2.5 cm. About **15 %** goes into
 **concentrated pods**: shielded HBM/DRAM/flash modules with pumped two-phase loops feeding knife-edge
 radiators. The split can range from 80/20 to 90/10. Pods are kept as small as demand allows,
-because every 1 % of power moved into pods adds about 7 % to total mass.
+because every 1 % of power moved into pods adds about 3 % (best-credible pods) to 7 % (the pods
+as first studied) to the mass of an all-sail swarm.
 
 The research ran in four passes, each with its own scripts: interconnect physics, workloads,
 thermal/mass/reliability, and an adversarial review of the first three. The review overturned
