@@ -64,6 +64,7 @@ function curveFor(p, d, table) {
 function recompute() {
   const p = state.params;
   state.d = h.compute(p);
+  state.earth = h.earthLimits(p);
   state.table = coverageTable(p);
   state.curve = curveFor(p, state.d, state.table);
   // faint comparison curves for the other presets (cached; they do not depend on slider edits)
@@ -142,7 +143,8 @@ function readoutHTML(a, d) {
     ['Sails flying', sci(a.nSails, 2)],
     ['Mercury removed', pct(a.mercuryRemoved, 2)],
     ['Output replacing old sails', pct(a.replacementShare, 0)],
-    ['Extra heat on Earth', `+${sci(a.earth.forcing, 2)} W/m²`, a.earth.forcing > 1 ? 'warn' : ''],
+    ['Extra heat on Earth', `+${sci(a.earth.forcing, 2)} W/m²`, a.earth.forcing > state.params.forcingLimit ? 'warn' : ''],
+    ['Night sky after dusk', `${sci(h.FIXED.skyLuxPerFRho * state.params.rhoVis * a.f, 2)} lux`, a.f > state.earth.sky ? 'warn' : ''],
   ];
   return items.map(([k, v, c]) => `<div><span>${k}</span><b class="${c || ''}">${v}</b></div>`).join('');
 }
@@ -169,10 +171,10 @@ function renderBuild() {
   curves.push({ pts: state.curve, color: 'var(--sun)', width: 2.6 });
   buildChart($('build-chart'), {
     curves, markers, xOf, seedYear: p.seedYear, span: SPAN,
-    hlines: [{ f: d.earthSafeCoverage, label: `Earth-safe limit ${pct(d.earthSafeCoverage, 2)}`, color: 'var(--ok)' }],
+    hlines: [{ f: state.earth.cap, label: `Earth's limit ${pct(state.earth.cap, 2)} (${state.earth.binding})`, color: 'var(--ok)' }],
     cursor: { t: s, f: a.f },
   });
-  $('build-legend').innerHTML = `<span><i style="background:var(--sun)"></i>${h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions'}</span><span><i style="background:var(--muted)"></i>other hardware presets</span><span><i style="background:var(--ok)"></i>keeps Earth's added heat under 1 W/m² (uniform shell)</span>`;
+  $('build-legend').innerHTML = `<span><i style="background:var(--sun)"></i>${h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions'}</span><span><i style="background:var(--muted)"></i>other hardware presets</span><span><i style="background:var(--ok)"></i>what Earth allows: night sky no brighter than full moon, heat under ${state.params.forcingLimit} W/m²</span>`;
   $('build-readout').innerHTML = readoutHTML(a, d);
   $('year').value = String(Math.round(xOf(s) * 1000));
 }
@@ -183,15 +185,24 @@ function renderEarth() {
   const runaway = EARTH.runawayAbsorbedLimit - EARTH.absorbedSolar;
   const ceil = d.reachableCoverage;
   const fc = forcingAt(p, ceil);
-  const safe = d.earthSafeCoverage;
-  const ySafe = d.yearsToCoverage(safe);
-  earthChart($('earth-chart'), { pts, safeF: safe, ceilingF: ceil, runaway, co2: EARTH.co2DoublingForcing });
-  orbitMap($('orbit-map'), { density: Math.min(1, ceil / 0.2) });
-  $('earth-legend').innerHTML = `<span><i style="background:var(--cool)"></i>extra energy absorbed by Earth, W/m², sails spread evenly round the Sun</span>`;
+  const E = state.earth;
+  const yCap = d.yearsToCoverage(E.cap);
+  const far = h.earthLimits({ ...p, earthPlacement: 'farside' });
+  earthChart($('earth-chart'), { pts, safeF: E.shell, ceilingF: ceil, runaway, co2: EARTH.co2DoublingForcing });
+  $('earth-legend').innerHTML = `<span><i style="background:var(--cool)"></i>extra energy absorbed by Earth, W/m², sails spread evenly inside Earth's orbit (their infrared minus the sunlight they block)</span>`;
+  orbitMap($('orbit-map'), {
+    density: Math.min(1, far.farside / 0.08),
+    shellLabel: `allowed now: sails inside Earth’s orbit, ${pct(E.cap, 2)}`,
+    cloudLabel: `option: on Earth’s orbit, ${pct(far.farside, 1)}`,
+  });
   $('earth-prose').innerHTML = `
-    <p>Every watt the sails intercept leaves them as infrared, and Earth absorbs its share whether or not a sail ever passes in front of the Sun. With the sails spread evenly around the Sun, Earth gains about ${n(`${forcingAt(p, 0.01).toFixed(1)} W/m²`, 'warn')} for every 1% of sunlight captured. Doubling CO₂ adds ${n(`${EARTH.co2DoublingForcing} W/m²`)}.</p>
-    <p>At the ceiling the industry can reach (${n(pct(ceil, 1))}), Earth would gain ${n(`${fc.toFixed(0)} W/m²`, 'warn')}${fc > runaway ? `, past the ${n(`${Math.round(runaway)} W/m²`)} that tips it into a runaway greenhouse` : ''}. Holding the added heat under ${n('1 W/m²')} allows only ${n(pct(safe, 2), 'sun')} of the Sun, reached around ${n(yr(p.seedYear + ySafe))}. A study of where to put the sails so that less of their heat reaches Earth is under way; until it reports, this is the limit.</p>`;
+    <p>Industry could take this swarm to ${n(pct(ceil, 1))} of the Sun's light. Earth cannot live with that. Every watt the sails intercept leaves them as infrared, and Earth absorbs its share. Spread evenly inside Earth's orbit, they add about ${n(`${forcingAt(p, 0.01).toFixed(1)} W/m²`, 'warn')} of heat for every 1% of sunlight captured, after subtracting the sunlight they block. At the ceiling that is ${n(`${fc.toFixed(0)} W/m²`, 'warn')}${fc > runaway ? `, past the ${n(`${Math.round(runaway)} W/m²`)} that tips Earth into a runaway greenhouse` : `, ${(fc / EARTH.co2DoublingForcing).toFixed(0)} times the effect of doubling CO₂`}.</p>
+    <p>The night sky gives out first. Sails on the far side of the Sun show Earth their sunlit faces through the gaps, so after dusk a glow rises along the ecliptic where the Sun went down. With ${n(pct(p.rhoVis, 1))} of light reflected by film and hardware together, the ground is lit as brightly as by a full Moon once the swarm captures ${n(pct(E.sky, 2), 'sun')}. Keeping Earth's extra heat under ${n(`${p.forcingLimit} W/m²`)} gives almost the same limit for sails spread inside Earth's orbit: ${n(pct(E.shell, 2), 'sun')}.</p>
+    <p>So the swarm Earth allows is about ${n(pct(E.cap, 2), 'sun')} of the Sun: ${n(`${sci(E.flops, 2)} FLOP/s`, 'sun')}, about ${n(sci(E.flops / WORLD_AI_FLOPS_2025, 1))} times all AI hardware on Earth in 2025, reached around ${n(yr(p.seedYear + yCap))}. Industry could build ${n(`${(h.swarmAt(p, ceil).flops / E.flops).toFixed(0)}×`)} more.</p>`;
+  $('earth-prose-2').innerHTML = `
+    <p>A better placement exists if a brighter night sky is accepted. Sails can share Earth's own orbit on the far side of the Sun, where they never pass in front of it. There each sail always faces both the Sun and Earth, so a fine aluminium mesh in the front glass can make that face dark in the infrared and push the heat out of the back, away from Earth. A small cloud of sails at the L1 point, 1.6 million km sunward of Earth, can offset what remains. That allows ${n(pct(far.farside, 1), 'sun')} of the Sun at ${n(`${p.forcingLimit} W/m²`)}. It costs about a third of the compute per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth. The map shows both placements.</p>`;
 }
+
 /** Extra energy absorbed by Earth (W/m²) with sails spread evenly on their thermal orbits. */
 function forcingAt(p, f) {
   const s = h.swarmAt(p, f);
@@ -274,9 +285,13 @@ function renderLedger() {
       row('Energy to make 1 kg', `${Math.round(p.energyPerKg)} MJ`),
       row('Rock exhausted', g.tRockOut != null ? `${yr(p.seedYear + g.tRockOut)}` : 'not within the timeline'),
     ]),
-    sec('Earth', '', [
-      row('Earth-safe coverage (≤ 1 W/m²)', pct(d.earthSafeCoverage, 2), { cls: 'ok' }),
-      row('Heat at the ceiling', `+${forcingAt(p, ceil).toFixed(1)} W/m²`, { cls: 'warn' }),
+    sec('What Earth allows', pct(state.earth.cap, 2), [
+      row('Coverage', pct(state.earth.cap, 2), { cls: 'ok', note: `Set by the ${state.earth.binding}.` }),
+      row('Computing', `${sci(state.earth.flops, 2)} FLOP/s`, { cls: 'ok' }),
+      row('Night-sky limit', pct(state.earth.sky, 2), { note: `${p.skyLimitLux} lux on the ground after dusk.` }),
+      row('Climate limit, shell inside Earth’s orbit', pct(state.earth.shell, 2)),
+      row('Climate limit, far side with L1 shade', pct(h.earthLimits({ ...p, earthPlacement: 'farside' }).farside, 2)),
+      row('Heat at the industry’s ceiling', `+${forcingAt(p, ceil).toFixed(1)} W/m²`, { cls: 'warn' }),
     ]),
   ].join('');
   body.scrollTop = scroll;

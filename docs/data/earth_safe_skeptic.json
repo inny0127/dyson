@@ -1,0 +1,742 @@
+{
+ "verdict": "partly refuted",
+ "verdict_summary": "The IR geometry holds: shell budget and co-orbital kernel reproduced exactly (3.66/1.91/1.75 W/m2 per 1 %, kernel 0.284, 1.428 W/m2 per 1 %), and far-side placement is the best IR geometry. The headline limits do not hold. They rest on an unachievable eps_f 0.05 front at no PV cost, a superseded parameter set (22 % ceiling), a tau <= 0.9 cloud with no collision or shading cost, and a 2.5x thermostat credit that the study's own polar residuals cap near 2x. Revised central: 0.4-0.5 % / 3.7-4.9 % / 9.6 % at 0.1/1/4 W/m2 (1.0-1.4e38 / 1.0-1.3e39 / 2.5e39 FLOP/s), vs 1.6 / 13.8 / 18.7 %. The sky binds first (0.44-1.0 %). The far-side cloud also creates an Earth-debris hazard the shell does not have.",
+ "errors": [
+  {
+   "claim": "Ceiling 22 % / 1.1e40 FLOP/s; 1 W/m2 allows 13.8 % (50 % of ceiling); 4 W/m2 is fleet-limited at 18.7 %",
+   "problem": "All mass/compute numbers use the superseded research5 \"2100 mid\" set (eta0 0.25, -0.26 %/K, eps 0.86/0.93, packing 0.93, film 0.165 kg/m2), not the repo's current v4 mid (0.215, -0.34 %/K, 0.85/0.90, 0.92, 0.195 kg/m2, podFrac 0.06). Coverage of a mass-limited fleet does not depend on PV efficiency, so the r^2 and areal-density changes dominate.",
+   "correct_value": "repo ceiling f 0.142 (0.899 AU), 5.78e39 FLOP/s, B_ss 7.96e21 kg; fleet-limited at 1 AU 0.121 (no shading), 0.094-0.097 with overlap shading",
+   "severity": "high"
+  },
+  {
+   "claim": "Low-e front eps_f 0.05-0.10 (\"transparent-conductive low-e coating\") over the PV, at no PV cost",
+   "problem": "No PV-compatible front reaches 0.05. TMM/Drude: ITO 5 ohm/sq eps_h 0.108 (PV x0.86, alpha +0.06); IO:H 5 ohm/sq 0.103 (PV x0.93) but indium is short x3e4-5e4 of a BSE-bounded Mercury inventory; AZO floor 0.14-0.16 (PV x0.81-0.89, Zn short x9); FTO/ATO/TNO floor 0.19-0.32 at PV x0.5-0.85 (Sn short x1e4, Nb x70); Ag DMD 0.10 at PV x0.76 (Ag short x5e3); Al DMD transmits 0.2-0.5; FeCl3-graphene needs 40 layers for 0.10 (PV x0.69: its 2-D Drude weight is too small, omega*tau >> 1 in the IR). Mercury-native Al/Mg nanomesh must have pitch >= 0.6 um (holes below waveguide cutoff block 1.1 um light): eps_h 0.11-0.15 at PV x0.72-0.79.",
+   "correct_value": "plan with eps_h ~0.15 (0.13 toward Earth), PV x0.79, alpha 0.81, 1 % NIR leakage: gross IR 0.40 W/m2 per 1 % (f 1 %) to 0.45 (f 14 %), not 0.15",
+   "severity": "high"
+  },
+  {
+   "claim": "Film 370-375 K, chiplets 105-110 C",
+   "problem": "Uses eps_b 0.93. Design/repo eps_b 0.90 gives 375-380 K (Tj 111-116 C) for eps_f 0.10-0.05; the design spec's own computed floor for a 15 um enamel (0.73) gives 393-399 K (Tj 129-135 C, energy/op x1.28-1.32). With 85-95 % of the heat now leaving the back, eps_b is first-order and unmeasured.",
+   "correct_value": "T 375-399 K, Tj 111-135 C (eps_f 0.05-0.10, eps_b 0.90-0.73)",
+   "severity": "medium"
+  },
+  {
+   "claim": "Energy/op x1.12-1.15, -16-19 % FLOP/J, +35-46 % mass per W",
+   "problem": "Repo params with the study's ideal front: -19/-23 % FLOP/J, +40/+43 % g/W. Real fronts (PV loss + alpha): -27 to -43 % FLOP/J, +52 to +91 % g/W; with eps_b 0.73 down to -52 % / +105 %. The required front NIR mirror (40-60 TiO2/SiO2 layers, 5-8 um, +12-20 g/m2, -3-5 % PV) is not costed.",
+   "correct_value": "central Mercury-native: FLOP/J 6.98e13 (-34 % vs shell 1.06e14), 1.54 g/W (+72 %)",
+   "severity": "medium"
+  },
+  {
+   "claim": "Cancelling up to 2.5 X of gross IR with an L1 shade is hydrologically equivalent to an uncancelled X",
+   "problem": "Single metric with an inconsistent yardstick: the uncancelled case ignores the swarm IR's own fast precipitation response (92 % absorbed in the atmosphere); a CO2-like X (dP +1.6 X %) gives 2.1 X even by that metric. The study's own residuals (June 70-90N +0.41, annual 60-90 +0.23 W/m2 per W/m2 cancelled) exceed a CO2-like X at G = 1.9 X (full cancellation) / 2.0 X (optimal partial shade); over coefficient uncertainty the multi-metric allowance is 1.4-1.8 X median, 0.8-1.2 X at the 10th percentile. Passive swarm IR is also worse than CO2 per W/m2 at the summer pole (G <= 0.57 X by the same metrics).",
+   "correct_value": "k <= 2.0 nominal, 1.5 for planning, shade sized by optimisation (partial offset), pending a GCM ensemble",
+   "severity": "medium-high"
+  },
+  {
+   "claim": "Geometric cap 0.9 x 23.3 % = 21 %; coverage up to 13.8-18.7 % in the L3 +-84/|lat|<=30 patch",
+   "problem": "All co-orbital sails share a = 0.9987 AU, so radial separation exists only through eccentricity. A random-phase cloud has 3-56 collisions per sail per year (dv_r 0.3-0.8 km/s, dv_t ~9 km/s; tau 0.3-0.9, e_max 0.005-0.05). Collision-free requires node-stacked lattices with metre-level radial clearance passing at up to 15 km/s. Overlap shading wastes 25-34 % (random) or 20-31 % (stacked) of sail area at tau 0.6-0.9: intercepted share at tau_sum 0.9 is 13.8 %, not 21 %. Derelicts collide 9-19 times per year in the cloud (0.6-2.8 in the shell).",
+   "correct_value": "plan tau_sum <= 0.4-0.6 (f <= 7.6-10.5 % in this patch) with a 1.2-1.3x mass penalty; derelict capture < ~3 weeks",
+   "severity": "high"
+  },
+  {
+   "claim": "Uncontrolled sails never come within 0.29 AU of Earth",
+   "problem": "Holds only for sails that stay sun-pointed with no control; real uncontrolled sails tumble (beta 0.002: 0.21 AU) and break up. Each sail carries ~69 low-beta parts (250 kg hub, 4 x 109 kg booms, 64 x 5 kg terminals) that pass within 0.035 AU dozens of times in 3 kyr; Myr horseshoe-to-Earth-crossing transitions are not integrated. Interior-shell derelicts never reach Earth.",
+   "correct_value": "uncontrolled loss probability <= 1e-14-1e-12 per sail (f 1-14 %) to keep dense-part impacts < 10 % of the natural >= 10 kg flux, or every separable part with beta >= 0.002",
+   "severity": "high"
+  },
+  {
+   "claim": "Fine dust < 1e-7-3e-6 of the 3e19 kg/yr loss stream; the swarm is a net dust sink",
+   "problem": "Computed for release at 0.91 AU. At 1 AU (the recommended placement) the study's own per-grain Earth-hit probability is 4e-5-2e-2 without re-sweeping; only re-sweeping by the cloud keeps it near 1e-7-1e-6. Meteoroid ejecta are released in Earth's orbit.",
+   "correct_value": "allowed fine-dust fraction 6e-12 (no re-sweep) to 2e-6 (re-swept); meteoroid ejecta 1e-4-0.2x natural influx (re-swept), up to 5e3x (not)",
+   "severity": "medium"
+  },
+  {
+   "claim": "Sky: 0.31 lux per 1 % at rho_v 0.003; full-moon cap 0.8 %, 2.4 % with rho_v 0.001",
+   "problem": "Geometry re-verified (0.33 lux per 1 %), but the design-spec reflectance toward Earth is film ~0.00035 + hinge strips 0.0008 + scribes 0.0006 + hems 0.0004 = 0.0021 before vanes; matte white vanes (the study's fix) add 0.0035; specular vanes average about the same when their glints sweep Earth; only black vanes keep ~0.0024. rho 0.001 is below the hardware floor.",
+   "correct_value": "full-moon cap 0.44 % (matte vanes) to 1.0-1.15 % (black or specular vanes)",
+   "severity": "medium"
+  },
+  {
+   "claim": "L3 +-6 deg keep-out stops specular NIR glints (beam half-angle 2.9 deg)",
+   "problem": "Design spec edge zones (22 % of area) tilt up to 3.7 deg at a 3 K residual, so the NIR retro-beam spans 7.4 deg: sails at psi 165-174 glint at Earth, +0.67 W/m2 per 1 % (4x the claimed b5 IR). Running the film 27 K above its 348 K stress-free temperature curls free edges ~33 deg (0.122 /m/K x dT x 0.176 m).",
+   "correct_value": "keep-out +-15 deg (kernel +1 %) and laminate stress-free at the hot operating temperature",
+   "severity": "medium"
+  },
+  {
+   "claim": "Faces emit Lambertian with the hemispherical emissivity",
+   "problem": "Glass emits more toward Earth (0-45 deg: 0.87) than hemispherically (0.82); low-e conductors emit ~15 % less.",
+   "correct_value": "design glass front 1.48 W/m2 per 1 % (not 1.43); low-e toward-Earth eps ~0.85x hemispherical",
+   "severity": "low"
+  },
+  {
+   "claim": "At the 22 % ceiling the interior shell reaches 279-283 W/m2, at the runaway limit",
+   "problem": "Physics verified (3.66 IR + 0.49 NIR - 2.38 dimming per 1 %; 47.8 % far-side fronts at 1 %, 42.7 % at 22 %), but the ceiling is superseded.",
+   "correct_value": "at the repo ceiling (14.2 %, 0.899 AU): +25.7 W/m2, 264 W/m2 absorbed, 6.5 CO2 doublings (repo earthImpact: +30, 268)",
+   "severity": "low"
+  },
+  {
+   "claim": "Longitude held with ~1e-8 m/s2",
+   "problem": "Closed-loop test is CR3BP, circular Earth orbit, i = 0 only. Plausible (Venus passes ~3e-3 m/s each, Jupiter tide ~1e-7 m/s2 periodic, authority 2.4e-5 m/s2) but untested. The binding control problem is the metre-level collision lattice and derelict capture.",
+   "correct_value": "not binding; budget 1e-8-1e-7 m/s2",
+   "severity": "low"
+  },
+  {
+   "claim": "Sub-bandgap light reflected to Earth is absorbed at 0.70",
+   "problem": "1.1-2.5 um planetary absorptance is ~0.75-0.80 (water-vapour bands, lower NIR cloud albedo).",
+   "correct_value": "0.75-0.80 (NIR terms +7-14 %)",
+   "severity": "low"
+  }
+ ],
+ "too_optimistic": [
+  "eps_f 0.05 with no PV, absorptance or filter penalty: the headline 13.8 % at 1 W/m2 rests on it; realistic Mercury-native fronts give 2.5-3x the gross IR per coverage and -34 % FLOP/J.",
+  "Superseded research5 parameters: ceiling 22 % / 1.1e40 instead of the repo's 14.2 % / 5.8e39; fleet-limited 18.7 % instead of 9.6 %.",
+  "tau up to 0.9 in a co-orbital patch with no collision, choreography or shading cost.",
+  "Thermostat credit 2.5 X: the study's own polar-summer residuals cap it near 2 X (median 1.4-1.8 X under uncertainty).",
+  "Passive limits treat swarm IR like CO2 per W/m2; its near-Sun origin puts 1.4x the global mean on the summer pole (vs ~0.8x for CO2), so passive G <= ~0.6 X by the polar metric.",
+  "\"Uncontrolled sails never within 0.29 AU\": uncontrolled sails tumble (0.21 AU) and dense parts reach 0.035 AU; Myr fate not integrated.",
+  "Dust and ejecta budgets computed for 0.91 AU release, not for the recommended 1 AU placement.",
+  "rho_v 0.001 and \"matte vanes\" for the sky: matte white vanes brighten the cloud; 0.001 is below the hinge-strip and scribe floor.",
+  "eps_b 0.93 assumed for a back that now carries 85-95 % of the heat; the design spec's computed floor is 0.73.",
+  "Retro-reflected NIR and the low-e layer are not reconciled: the conductor must be outermost (a 5-8 um dielectric NIR mirror above it restores eps ~0.6-0.8), and the conductor absorbs 1-12 % of the 1.1-2.5 um band on the way in and out."
+ ],
+ "too_conservative": [
+  "Latitude band |lat| <= 30 deg: lon 75-174 x |lat| <= 60 has 2.04x the solid angle for only +6 % IR per coverage (kernel 0.303 vs 0.284); the whole far hemisphere costs +3 % for 2.1x. Using it halves tau, halving collision rates and shading losses.",
+  "All absorbed IR counted as forcing with efficacy 1: 92 % is absorbed in the atmosphere, much of it near the emission level, so the ERF may be 0.6-0.9 of the absorbed flux (temperature limits looser by 10-60 %; the precipitation penalty is larger).",
+  "Directional front (b3) set aside as a technology bet: against realistic low-e penalties, b3 (85 C chips, no PV loss, 0.34 W/m2 per 1 %) gives ~1.75x more FLOP/s per W/m2 of IR than a Mercury-native low-e front and should get equal R&D priority.",
+  "Uniform L1 shade: shifting the shade cloud toward the summer pole (penumbral spot radius 1.16 R_E) can cut the polar-summer residual that binds k ~2; with T and P alone an optimised partial shade allows 4.2 X."
+ ],
+ "missing": [
+  "Sail-sail collision rates and a derelict-cascade criterion (computed here: random cloud 3-56 per sail-year; derelicts 9-19 per year in the cloud, 0.6-2.8 in the shell).",
+  "A dense-part rule: every separable part needs beta >= 0.002 (or a tether), else loss probability <= 1e-14-1e-12 per sail.",
+  "Earth links: the 60 patch terminals are on the back and never see Earth (always 3-45 deg from the Sun in the sunward hemisphere); only the 4 corner terminals see past the edge. 10 cm apertures give 20-80 bit/s at 1.41 AU, so Earth traffic needs dedicated 10-30 m relays at psi <= 120 deg (>= 30 deg elongation). Lines to psi >= 165 pass 11-56 R_sun from the Sun. One-way latency is 11.8-16.6 min, and capacity per aperture pair is ~250x lower than from the shell's 0.09 AU near cap.",
+  "Pod beta mismatch: pods have beta ~0.0017 (4 t, 4431 m2 of wings per MW), so co-orbital a = 0.99943 AU, 1.1e8 m outside the sail layer: out of Starlink-class range and in the sails' shadow. Fix with ~6000 m2 of thin absorbing film per MW pod (~30-60 kg) to match beta 0.004.",
+  "Front NIR-mirror specification: <= 1 % leakage (each 1 % of sunlight returned diffusely adds 0.027 W/m2 per 1 %; the design spec's textured cell returns 20 % diffusely = +0.54), mass, PV loss, ordering under the conductor.",
+  "Stress-free lamination temperature for a 375-400 K film (edge curl ~33 deg otherwise).",
+  "An explicit sky policy: full moon (0.44-1.0 %), quarter moon (0.04-0.1 %), or 10x zodiacal light (2-5e-5). The sky binds at or below the 0.1 W/m2 climate limit.",
+  "Secular differential precession of the lattice (planetary node and e-vector drift) needs continuous metre-level relative navigation for every sail.",
+  "Thermostat failure mode: with G up to 2 X cancelled, losing the shade must trigger swarm feathering within months; this needs a control channel independent of the shade.",
+  "A GCM ensemble (GeoMIP-G1-like) with a 330-400 K diluted source within 45 deg of the Sun plus an L1 shade, before any thermostat credit is taken."
+ ],
+ "revised_limits": {
+  "basis": "Repo model v4 mid (src/model copied unchanged to skeptic/model): ceiling f = 0.142, 5.78e+39 FLOP/s, steady fleet 7.96e+21 kg. Central front = Mercury-native Al mesh (0.6 um pitch, 48 nm lines): eps_h 0.146, 0.128 toward Earth, PV x0.79, alpha +0.01, 1 % diffuse NIR leakage; eps_b 0.90; IR 0.396 W/m2 per 1 %; FLOP/J 6.98e+13 (shell 1.06e14). Thermostat credit k = gross/X: 1.5 (robust, planning) and 2.0 (nominal multi-metric); passive k = 1. Fleet mass includes random-overlap shading in the 23 % patch.",
+  "repo_unconstrained_ceiling": {
+   "coverage": 0.142,
+   "flops": 5.78e+39,
+   "note": "the study used the superseded research5 ceiling 0.2217 / 1.115e40"
+  },
+  "0.1_Wm2": {
+   "central_k1p5": {
+    "coverage": 0.00381,
+    "flops": 1.02e+38,
+    "vs_repo_ceiling": 0.0176,
+    "binding": "IR",
+    "year": 2114
+   },
+   "central_k2": {
+    "coverage": 0.00508,
+    "flops": 1.36e+38,
+    "vs_repo_ceiling": 0.0235,
+    "binding": "IR",
+    "year": 2116
+   },
+   "central_passive": {
+    "coverage": 0.00255,
+    "flops": 6.81e+37,
+    "vs_repo_ceiling": 0.0118,
+    "binding": "IR",
+    "year": 2111
+   },
+   "optimistic_k2": {
+    "coverage": 0.00672,
+    "flops": 1.57e+38,
+    "vs_repo_ceiling": 0.0272,
+    "binding": "IR",
+    "year": 2119
+   },
+   "pessimistic_epsb0p73_k1p5": {
+    "coverage": 0.00323,
+    "flops": 7.36e+37,
+    "vs_repo_ceiling": 0.0127,
+    "binding": "IR",
+    "year": 2115
+   },
+   "study_b5_front_recomputed_repo_k2p5": {
+    "coverage": 0.0158,
+    "flops": 4.95e+38,
+    "vs_repo_ceiling": 0.0857,
+    "binding": "IR",
+    "year": 2144
+   },
+   "design_glass_front_k2": {
+    "coverage": 0.00136,
+    "flops": 6.11e+37,
+    "vs_repo_ceiling": 0.0106,
+    "binding": "IR",
+    "year": 2111
+   },
+   "interior_shell_passive": {
+    "coverage": 0.000653,
+    "flops": 2.66e+37
+   },
+   "study_claim": {
+    "coverage": 0.0162,
+    "flops": 6.56e+38,
+    "passive": 0.0066
+   }
+  },
+  "1_Wm2": {
+   "central_k1p5": {
+    "coverage": 0.0369,
+    "flops": 9.8e+38,
+    "vs_repo_ceiling": 0.17,
+    "binding": "IR",
+    "year": 2201
+   },
+   "central_k2": {
+    "coverage": 0.0486,
+    "flops": 1.29e+39,
+    "vs_repo_ceiling": 0.223,
+    "binding": "IR",
+    "year": 2246
+   },
+   "central_passive": {
+    "coverage": 0.0249,
+    "flops": 6.63e+38,
+    "vs_repo_ceiling": 0.115,
+    "binding": "IR",
+    "year": 2164
+   },
+   "optimistic_k2": {
+    "coverage": 0.0634,
+    "flops": 1.47e+39,
+    "vs_repo_ceiling": 0.254,
+    "binding": "IR",
+    "year": 2321
+   },
+   "pessimistic_epsb0p73_k1p5": {
+    "coverage": 0.0314,
+    "flops": 7.1e+38,
+    "vs_repo_ceiling": 0.123,
+    "binding": "IR",
+    "year": 2185
+   },
+   "study_b5_front_recomputed_repo_k2p5": {
+    "coverage": 0.0944,
+    "flops": 2.91e+39,
+    "vs_repo_ceiling": 0.504,
+    "binding": "fleet mass + shading",
+    "year": 2917
+   },
+   "design_glass_front_k2": {
+    "coverage": 0.0135,
+    "flops": 6.04e+38,
+    "vs_repo_ceiling": 0.105,
+    "binding": "IR",
+    "year": 2138
+   },
+   "interior_shell_passive": {
+    "coverage": 0.00649,
+    "flops": 2.64e+38
+   },
+   "study_claim": {
+    "coverage": 0.138,
+    "flops": 5.59e+39,
+    "passive": 0.0615
+   }
+  },
+  "4_Wm2": {
+   "central_k1p5": {
+    "coverage": 0.0959,
+    "flops": 2.52e+39,
+    "vs_repo_ceiling": 0.436,
+    "binding": "fleet mass + shading",
+    "year": 2873
+   },
+   "central_k2": {
+    "coverage": 0.0959,
+    "flops": 2.52e+39,
+    "vs_repo_ceiling": 0.436,
+    "binding": "fleet mass + shading",
+    "year": 2873
+   },
+   "central_passive": {
+    "coverage": 0.0928,
+    "flops": 2.44e+39,
+    "vs_repo_ceiling": 0.422,
+    "binding": "IR",
+    "year": 2856
+   },
+   "optimistic_k2": {
+    "coverage": 0.0965,
+    "flops": 2.22e+39,
+    "vs_repo_ceiling": 0.384,
+    "binding": "fleet mass + shading",
+    "year": 2857
+   },
+   "pessimistic_epsb0p73_k1p5": {
+    "coverage": 0.0962,
+    "flops": 2.15e+39,
+    "vs_repo_ceiling": 0.371,
+    "binding": "fleet mass + shading",
+    "year": 2918
+   },
+   "study_b5_front_recomputed_repo_k2p5": {
+    "coverage": 0.0944,
+    "flops": 2.91e+39,
+    "vs_repo_ceiling": 0.504,
+    "binding": "fleet mass + shading",
+    "year": 2917
+   },
+   "design_glass_front_k2": {
+    "coverage": 0.0524,
+    "flops": 2.33e+39,
+    "vs_repo_ceiling": 0.403,
+    "binding": "IR",
+    "year": 2277
+   },
+   "interior_shell_passive": {
+    "coverage": 0.0254,
+    "flops": 1.03e+39
+   },
+   "study_claim": {
+    "coverage": 0.187,
+    "flops": 7.59e+39
+   }
+  },
+  "sky_limit": {
+   "criterion": "post-twilight ground illuminance <= full moon (0.25 lux) at an 18 deg solar depression, ecliptic vertical (study rule; geometry re-verified: 0.33 vs 0.31 lux per 1 % at rho 0.003)",
+   "rho_eff_range": [
+    0.0024,
+    0.0056
+   ],
+   "black_vanes": {
+    "rho": 0.00237,
+    "coverage": 0.0103,
+    "flops": 2.75e+38
+   },
+   "matte_white_vanes": {
+    "rho": 0.0056,
+    "coverage": 0.00436,
+    "flops": 1.17e+38
+   },
+   "quarter_moon_0p025lux_coverage": [
+    0.000436,
+    0.00103
+   ],
+   "ten_x_zodiacal_light_coverage": [
+    1.8e-05,
+    4.1e-05
+   ],
+   "study_claim": {
+    "coverage": 0.0082,
+    "dark_variant": 0.0245
+   },
+   "note": "rho_v 0.001 (the study's 2.4 %) is below the hardware floor of 0.0021 (hinge strips, scribe lines, hems) unless those are blackened too."
+  },
+  "binding_order_central": "sky full-moon 0.44-1.0 % ~ climate 0.1 W/m2 0.38-0.51 % << climate 1 W/m2 3.7-4.9 % < fleet mass + shading 9.6 %. At the 1 W/m2 limit the post-twilight glow is ~1-3 lux (civil-twilight level) for 1-2 h every night."
+ },
+ "revised_recommendation": "Keep the far-side co-orbital cloud as the IR-preferred geometry, but restate it. (1) Make the sky the headline Earth constraint and choose a sky policy first: with design-spec hardware the post-twilight glow reaches full-moon level at 0.44-1.0 % coverage (1.2-2.7e38 FLOP/s), about the same as the 0.1 W/m2 climate limit. (2) For a climate cap, plan with a Mercury-native low-e front (Al/Mg mesh, pitch >= 0.6 um, eps_h ~0.15, PV x0.79, Tj ~106-112 C), a measured eps_b >= 0.85, and an optimised partial L1 shade with k <= 1.5-2. That gives 1 W/m2 -> 3.7-4.9 % (1.0-1.3e39 FLOP/s, 17-22 % of the repo's 5.8e39 ceiling, ~2200-2250); 0.1 W/m2 -> 0.4-0.5 %; 4 W/m2 -> ~9.6 %, limited by mass plus shading. (3) Prerequisites before it becomes the headline: a collision-free node-stacked orbit lattice with metre-level relative navigation and < 3-week derelict capture; beta >= 0.002 for every separable part; stress-free lamination at the hot temperature; NIR keep-out +-15 deg and a front NIR mirror with <= 1 % leakage; relay craft for Earth links; a GeoMIP-style GCM ensemble for the thermostat. (4) Widen the cloud to |lat| <= 60 deg (2x room, +6 % IR) and fund directional-emitter fronts (b3), which avoid the hot-chip and PV penalties and give ~1.75x more compute per W/m2. (5) Keep the 0.85-0.92 AU shell as the fallback: debris-safe for Earth, but passive-limited to 0.065 % / 0.65 % / 2.5 % at 0.1/1/4 W/m2.",
+ "model_changes": [
+  "Use the repo's own v4 mid parameters everywhere (ceiling 14.2 %, 5.78e39 FLOP/s); drop the research5 22 %/1.1e40 numbers from the Earth-safe tables.",
+  "earthImpact(): placement table k_IR (W/m2 per unit f): shell 0.85-0.92 AU 387-424 (with k_dim 238); far-side co-orbital glass front 148; Mercury-native low-e (eps_h 0.15) 40-45 incl. 1 % NIR leakage; optimistic (eps_h 0.11) 30-34; eps 0.05 (15-16) only as a stretch case. Split intercepted light into alpha (IR, 0.95) and 1-alpha (NIR, 0.75-0.80); the repo currently sends all f S0 to IR.",
+  "Low-e front parameters: pvEta0 x (0.72-0.86), alpha +0.01-0.06, eps_toward_Earth = 0.85 eps_h for conductors; expose eps_b with range 0.73-0.90 (it now sets Tj).",
+  "Co-orbital cloud: patch fraction (0.233 for |lat| <= 30; 0.476 for |lat| <= 60, lon 75-174), tau_sum = -ln(1 - f/patch), mass penalty 1/[(1-e^-tau)/tau], and a planning cap tau_sum <= 0.6.",
+  "Thermostat: gross cap k X with k = 1.5 (default) to 2.0; size the shade by optimisation (output dT, dP incl. -1.18 % per W/m2 of swarm IR fast response, polar annual and June residuals), not by full cancellation.",
+  "Sky: luminance 1730 x rho_eff cd/m2 per 1 % in the patch, ground light 0.33 x rho_eff/0.003 lux per 1 % at 18 deg depression; rho_eff default 0.0024 (black vanes), 0.0056 (matte vanes); a selectable sky criterion, shown as the first binding limit.",
+  "Debris: co-orbital-specific outputs (dense-part loss probability limit, derelict collision rate 9-19 /yr x tau/0.6, re-swept dust p_hit 1e-7-1e-6).",
+  "Earth flag text: shell at the repo ceiling +26-30 W/m2 (264-268 absorbed, ~6.5 doublings), not \"at the runaway limit\"."
+ ],
+ "render_notes": [
+  "From Earth at night: two luminous wings along the ecliptic flanking the Sun, like an exaggerated zodiacal light, from ~3-15 deg to 45 deg elongation and +-15-20 deg in ecliptic latitude. Brightest within 10 deg of the Sun. Luminance ~1730 x rho cd/m2 per 1 % (4-10 cd/m2 per 1 %; 16-50 cd/m2 near the Sun at a 4-5 % cloud). That is ~1e3-1e4x the zodiacal light (~1.7e-3 cd/m2 at 30 deg).",
+  "After dusk in the west and before dawn in the east: a tilted cone along the ecliptic, as bright as civil twilight once coverage exceeds ~3 %; 0.25-0.6 lux per 1 % at an 18 deg solar depression; gone once the Sun is > 45 deg down. At latitudes >= ~45 deg in summer it never sets: low in the north at midnight, 0.001-0.035 lux per 1 % at 50-60 N.",
+  "Colour: near-white with a faint violet-blue cast. The integrated glow is dominated by hardware (vanes, hinge strips, scribes, hems), not the navy film.",
+  "Daytime: invisible except in the solar aureole; during total eclipses, two bright wings out to 45 deg along the ecliptic, with a dark gap within 3-15 deg of the Sun (keep-out).",
+  "Telescopically: granular glitter of 9-16 mag glints (vanes, film edge zones); near L3 (elongation < 7.5 deg) a specular retro-reflection surge visible only in coronagraphs and eclipses.",
+  "No shadows, transits or flicker on Earth. The L1 thermostat (1-2 R_E across, 1.57e6 km sunward) is invisible to the eye: a faint haze on the solar disk in a filtered solar telescope.",
+  "Thermal IR: the wings glow at ~1.5 W/m2/sr per 1 % with low-e fronts (7.5 with glass fronts), invisible to the eye.",
+  "System view: two crescent arcs on Earth's orbit centred ~130 deg ahead of and behind Earth, each ~75-84 deg long (90-165/174 deg from Earth), +-0.5 AU tall (|lat| <= 30; +-0.87 AU if extended to 60). Gap around L3; nothing inside Earth's orbit except the tiny L1 cloud. Co-rotates with Earth: stationary in Earth's frame, one turn per year against the stars.",
+  "Close-up: 279 m navy diamonds with a faint metallic sheen (mesh low-e, specular, seen only near the Sun-viewer line). Backs glow at 370-400 K in thermal IR; corner vanes are the brightest visible parts (black if the sky policy demands it).",
+  "Texture: not a smooth shell. Local optical depth 0.2-0.5, with sails stacked along shared node lines (overlap bands) and gaps. Each sail bobs +-i in latitude once a year and traces a small epicycle; pods carry extra absorbing film to match the sails' beta.",
+  "Default coverage to render: <= 1 % (sky limit) or ~4-5 % (1 W/m2 with k 1.5-2), not 13.8-22 %. Keep the 0.85-0.92 AU shell only as the labelled \"unconstrained / unsafe\" comparison.",
+  "Dynamics overlay: tumbling-derelict tadpoles to 0.21 AU of Earth, dense-part horseshoes to 0.035 AU, the L1 24-day instability."
+ ],
+ "sources": [
+  "Kravitz B. et al. 2013, Climate model response from the Geoengineering Model Intercomparison Project (GeoMIP), JGR Atmos 118, 8320 (G1: 4xCO2 offset by ~4 % solar reduction).",
+  "Tilmes S. et al. 2013, The hydrological impact of geoengineering in GeoMIP, JGR Atmos 118, 11036 (global precipitation -4.5 +- 0.5 % in G1).",
+  "Bala G., Duffy P.B., Taylor K.E. 2008, Impact of geoengineering schemes on the global hydrological cycle, PNAS 105, 7664.",
+  "Govindasamy B., Caldeira K. 2000, Geoengineering Earth's radiation balance to mitigate CO2-induced climate change, GRL 27, 2141.",
+  "Andrews T. et al. 2010, Precipitation, radiative forcing and global temperature change, GRL 37, L14701 (fast response ~ -dQ_atm/L).",
+  "Irvine P. et al. 2019, Halving warming with idealized solar geoengineering moderates key climate hazards, Nature Climate Change 9, 295.",
+  "Kravitz B. et al. 2017, First simulations of designing stratospheric sulfate aerosol geoengineering to meet multiple simultaneous climate objectives, JGR Atmos 122, 12616 (latitude-targeted SRM).",
+  "Jones A. et al. 2013, The impact of abrupt suspension of solar radiation management (termination effect) in GeoMIP G2, JGR Atmos 118, 9743.",
+  "Stjern C.W. et al. 2017, Rapid adjustments cause weak surface temperature response to increased black carbon concentrations, JGR Atmos 122, 11462.",
+  "Angel R. 2006, Feasibility of cooling the Earth with a cloud of small spacecraft near the inner Lagrange point (L1), PNAS 103, 17184.",
+  "Wild M. et al. 2013, The global energy balance from a surface perspective, Climate Dynamics 40, 3107.",
+  "Goldblatt C. et al. 2013, Low simulated radiation limit for runaway greenhouse climates, Nature Geoscience 6, 661.",
+  "Granqvist C.G. 2007, Transparent conductors as solar energy materials: a panoramic review, Sol. Energy Mater. Sol. Cells 91, 1529.",
+  "Ellmer K. 2012, Past achievements and future challenges in the development of optically transparent electrodes, Nature Photonics 6, 809.",
+  "Koida T., Fujiwara H., Kondo M. 2007, Hydrogen-doped In2O3 as high-mobility transparent conductive oxide, Jpn. J. Appl. Phys. 46, L685.",
+  "Furubayashi Y. et al. 2005, A transparent metal: Nb-doped anatase TiO2, Appl. Phys. Lett. 86, 252101.",
+  "Khrapach I. et al. 2012, Novel highly conductive and transparent graphene-based conductors, Adv. Mater. 24, 2844 (FeCl3-FLG 8.8 ohm/sq, 84 %).",
+  "Zhang L. et al. 2016, Correlated metals as transparent conductors, Nature Materials 15, 204.",
+  "Rakic A.D. et al. 1998, Optical properties of metallic films for vertical-cavity optoelectronic devices, Appl. Opt. 37, 5271 (Ag, Al Lorentz-Drude).",
+  "Ulrich R. 1967, Far-infrared properties of metallic mesh and its complementary structure, Infrared Physics 7, 37; Marcuvitz N. 1951, Waveguide Handbook (inductive grids).",
+  "McDonough W.F., Sun S.-s. 1995, The composition of the Earth, Chem. Geol. 120, 223 (BSE In 11 ppb, Sn 130 ppb, Zn 55 ppm, Nb 0.66 ppm, Ag 8 ppb, F 25 ppm).",
+  "Peplowski P.N. et al. 2016, Remote sensing evidence for an ancient carbon-bearing crust on Mercury, Nature Geoscience 9, 273.",
+  "Murray C.D., Dermott S.F. 1999, Solar System Dynamics (tadpole/horseshoe, L3 instability).",
+  "Namouni F. 1999, Secular interactions of coorbiting objects, Icarus 137, 293; Christou A.A. 2000, A numerical survey of transient co-orbitals of the terrestrial planets, Icarus 144, 1.",
+  "Morais M.H.M., Morbidelli A. 2002, The population of near-Earth asteroids in coorbital motion with the Earth, Icarus 160, 1.",
+  "Kessler D.J., Cour-Palais B.G. 1978, Collision frequency of artificial satellites: the creation of a debris belt, JGR 83, 2637; Kessler D.J. 1981, Icarus 48, 39.",
+  "Grun E. et al. 1985, Collisional balance of the meteoritic complex, Icarus 62, 244; Love S.G., Brownlee D.E. 1993, Science 262, 550.",
+  "Brown P. et al. 2002, The flux of small near-Earth objects colliding with the Earth, Nature 420, 294.",
+  "Leinert C. et al. 1998, The 1997 reference of diffuse night sky brightness, A&AS 127, 1.",
+  "Falchi F. et al. 2016, The new world atlas of artificial night sky brightness, Science Advances 2, e1600377; Gaston K.J. et al. 2013, Biol. Rev. 88, 912.",
+  "Project: /home/user/dyson src/model (v4), docs/architecture.md, docs/future-tech.md, docs/data/design_spec.json (edge rotation 3.7 deg at 3 K, eps floors, vanes, booms, terminals).",
+  "Note: literature values are quoted from the reviewer's knowledge (no live retrieval in this pass); the numerical checks are in the skeptic/*.py and *.mjs scripts."
+ ],
+ "checks": {
+  "shell_0p91_per_1pct": {
+   "IR": 3.66,
+   "back": 1.91,
+   "far_side_fronts": 1.75,
+   "share_front": 0.478,
+   "dimming": 2.38,
+   "study": {
+    "IR": 3.664,
+    "back": 1.911,
+    "front": 1.752,
+    "dimming": 2.382
+   }
+  },
+  "coorbital_kernel": {
+   "K_patch": 0.284,
+   "K_far_hemisphere": 0.292,
+   "K_lon75_174_lat60": 0.303,
+   "IR_per_1pct_design_film": 1.43,
+   "diffuse_NIR_if_textured_cell": 0.543
+  },
+  "film_T_1AU_eps_b_0p90_g0p14": {
+   "0.05": {
+    "T": 380.0,
+    "Tj_C": 116.0
+   },
+   "0.1": {
+    "T": 375.0,
+    "Tj_C": 111.0
+   },
+   "0.15": {
+    "T": 371.0,
+    "Tj_C": 107.0
+   },
+   "0.2": {
+    "T": 367.0,
+    "Tj_C": 103.0
+   },
+   "0.25": {
+    "T": 363.0,
+    "Tj_C": 98.9
+   },
+   "0.37": {
+    "T": 355.0,
+    "Tj_C": 90.7
+   },
+   "0.85": {
+    "T": 331.0,
+    "Tj_C": 67.0
+   }
+  },
+  "film_T_1AU_eps_b_0p73_g0p14": {
+   "0.05": {
+    "T": 399.0,
+    "Tj_C": 135.0
+   },
+   "0.1": {
+    "T": 393.0,
+    "Tj_C": 129.0
+   },
+   "0.15": {
+    "T": 388.0,
+    "Tj_C": 124.0
+   },
+   "0.2": {
+    "T": 383.0,
+    "Tj_C": 119.0
+   },
+   "0.25": {
+    "T": 378.0,
+    "Tj_C": 114.0
+   },
+   "0.37": {
+    "T": 368.0,
+    "Tj_C": 104.0
+   },
+   "0.85": {
+    "T": 340.0,
+    "Tj_C": 76.2
+   }
+  },
+  "mass_compute_repo": {
+   "a_shell_thermal_85C": {
+    "g_per_W": 0.899,
+    "flopsPerJ": 106000000000000.0,
+    "g_per_W_vs_shell": 0.0,
+    "flopsPerJ_vs_shell": 0.0,
+    "fleet_f": 0.144,
+    "fleet_f_shaded": 0.144
+   },
+   "b_coorbital_design_front_eps0.85": {
+    "g_per_W": 1.07,
+    "flopsPerJ": 117000000000000.0,
+    "g_per_W_vs_shell": 0.186,
+    "flopsPerJ_vs_shell": 0.1,
+    "fleet_f": 0.119,
+    "fleet_f_shaded": 0.0932
+   },
+   "b4_study_eps0.10_noPVloss": {
+    "g_per_W": 1.26,
+    "flopsPerJ": 85800000000000.0,
+    "g_per_W_vs_shell": 0.404,
+    "flopsPerJ_vs_shell": -0.193,
+    "fleet_f": 0.121,
+    "fleet_f_shaded": 0.0943
+   },
+   "b5_study_eps0.05_noPVloss": {
+    "g_per_W": 1.29,
+    "flopsPerJ": 81900000000000.0,
+    "g_per_W_vs_shell": 0.431,
+    "flopsPerJ_vs_shell": -0.23,
+    "fleet_f": 0.121,
+    "fleet_f_shaded": 0.0944
+   },
+   "b5_eps0.05_epsb0.73": {
+    "g_per_W": 1.39,
+    "flopsPerJ": 67900000000000.0,
+    "g_per_W_vs_shell": 0.551,
+    "flopsPerJ_vs_shell": -0.361,
+    "fleet_f": 0.122,
+    "fleet_f_shaded": 0.0948
+   },
+   "ITO_5ohm_(In)": {
+    "g_per_W": 1.48,
+    "flopsPerJ": 69600000000000.0,
+    "g_per_W_vs_shell": 0.649,
+    "flopsPerJ_vs_shell": -0.346,
+    "fleet_f": 0.123,
+    "fleet_f_shaded": 0.0955
+   },
+   "IOH_5ohm_(In)": {
+    "g_per_W": 1.36,
+    "flopsPerJ": 77200000000000.0,
+    "g_per_W_vs_shell": 0.516,
+    "flopsPerJ_vs_shell": -0.274,
+    "fleet_f": 0.122,
+    "fleet_f_shaded": 0.0949
+   },
+   "Al_mesh_0.6um_72nm_optimistic_(Mercury)": {
+    "g_per_W": 1.71,
+    "flopsPerJ": 61100000000000.0,
+    "g_per_W_vs_shell": 0.905,
+    "flopsPerJ_vs_shell": -0.425,
+    "fleet_f": 0.125,
+    "fleet_f_shaded": 0.0965
+   },
+   "Al_mesh_0.6um_48nm_central_(Mercury)": {
+    "g_per_W": 1.54,
+    "flopsPerJ": 69800000000000.0,
+    "g_per_W_vs_shell": 0.716,
+    "flopsPerJ_vs_shell": -0.344,
+    "fleet_f": 0.123,
+    "fleet_f_shaded": 0.0959
+   },
+   "Al_mesh_0.6um_72nm_epsb0.73": {
+    "g_per_W": 1.85,
+    "flopsPerJ": 51500000000000.0,
+    "g_per_W_vs_shell": 1.05,
+    "flopsPerJ_vs_shell": -0.516,
+    "fleet_f": 0.125,
+    "fleet_f_shaded": 0.0968
+   }
+  },
+  "thermostat": {
+   "nominal": {
+    "study comparator, consistent: |dP| only, full cancellation": 2.1152542386101647,
+    "no thermostat (all metrics)": 0.5711382225919603,
+    "full cancellation, all metrics": 1.9370460072638984,
+    "optimal partial shade, T + P": 4.1924198287171865,
+    "optimal partial shade, T + P + polar annual": 2.7434637865243694,
+    "optimal partial shade, all metrics incl. June polar": 2.0294117672662537
+   },
+   "ensemble_full": {
+    "median": 1.4315526978369908,
+    "p10": 0.7639148282580877,
+    "p90": 2.302145144069323
+   },
+   "ensemble_optimal": {
+    "median": 1.7594982033579232,
+    "p10": 1.2367094833514436,
+    "p90": 2.5921029911558517
+   },
+   "ensemble_passive": {
+    "median": 0.5555085504037605,
+    "p10": 0.4261669736405027,
+    "p90": 0.7568344450074527
+   },
+   "study_rule_at_2p5X": {
+    "dT_K": 0.0,
+    "dP_pct": -1.891025641025641,
+    "polar_Wm2": 0.5725,
+    "june_70_90N_Wm2": 1.0324999999999998,
+    "vs_CO2_like_X": {
+     "dP_pct": 1.6,
+     "polar": 0.75,
+     "june": 0.8
+    }
+   }
+  },
+  "collisions": {
+   "random_phase": [
+    {
+     "e_max": 0.005,
+     "tau": 0.3,
+     "per_sail_yr": 19.1
+    },
+    {
+     "e_max": 0.005,
+     "tau": 0.6,
+     "per_sail_yr": 38.0
+    },
+    {
+     "e_max": 0.005,
+     "tau": 0.9,
+     "per_sail_yr": 56.2
+    },
+    {
+     "e_max": 0.02,
+     "tau": 0.3,
+     "per_sail_yr": 5.46
+    },
+    {
+     "e_max": 0.02,
+     "tau": 0.6,
+     "per_sail_yr": 11.0
+    },
+    {
+     "e_max": 0.02,
+     "tau": 0.9,
+     "per_sail_yr": 16.5
+    },
+    {
+     "e_max": 0.05,
+     "tau": 0.3,
+     "per_sail_yr": 3.36
+    },
+    {
+     "e_max": 0.05,
+     "tau": 0.6,
+     "per_sail_yr": 7.0
+    },
+    {
+     "e_max": 0.05,
+     "tau": 0.9,
+     "per_sail_yr": 10.2
+    }
+   ],
+   "derelicts": [
+    {
+     "cloud": "coorbital e_max 0.02",
+     "beta_after": 0.002,
+     "tau": 0.3,
+     "per_yr": 9.13
+    },
+    {
+     "cloud": "coorbital e_max 0.02",
+     "beta_after": 0.002,
+     "tau": 0.6,
+     "per_yr": 19.0
+    },
+    {
+     "cloud": "coorbital e_max 0.02",
+     "beta_after": 0.0,
+     "tau": 0.3,
+     "per_yr": 8.54
+    },
+    {
+     "cloud": "coorbital e_max 0.02",
+     "beta_after": 0.0,
+     "tau": 0.6,
+     "per_yr": 17.1
+    },
+    {
+     "cloud": "interior shell 0.85-0.92 AU, nested rings",
+     "beta_after": 0.002,
+     "tau": 0.05,
+     "per_yr": 0.631
+    },
+    {
+     "cloud": "interior shell 0.85-0.92 AU, nested rings",
+     "beta_after": 0.002,
+     "tau": 0.14,
+     "per_yr": 1.8
+    },
+    {
+     "cloud": "interior shell 0.85-0.92 AU, nested rings",
+     "beta_after": 0.002,
+     "tau": 0.22,
+     "per_yr": 2.84
+    },
+    {
+     "cloud": "interior shell 0.85-0.92 AU, nested rings",
+     "beta_after": 0.0,
+     "tau": 0.05,
+     "per_yr": 0.616
+    },
+    {
+     "cloud": "interior shell 0.85-0.92 AU, nested rings",
+     "beta_after": 0.0,
+     "tau": 0.14,
+     "per_yr": 1.76
+    },
+    {
+     "cloud": "interior shell 0.85-0.92 AU, nested rings",
+     "beta_after": 0.0,
+     "tau": 0.22,
+     "per_yr": 2.8
+    }
+   ]
+  },
+  "link_geometry": {
+   "distance_AU": [
+    1.41,
+    2.0
+   ],
+   "one_way_min": [
+    11.8,
+    16.6
+   ],
+   "sun_sail_earth_angle_deg": [
+    3,
+    45
+   ],
+   "ten_cm_terminals_at_1p41AU_bit_s": [
+    20,
+    80
+   ],
+   "thirty_m_relays_at_1p41AU_bit_s": [
+    160000000000.0,
+    660000000000.0
+   ]
+  }
+ },
+ "files": [
+  "lowe_optics.py/.json",
+  "thermal_ir.py/.json",
+  "mass_compute.mjs/.json (repo model copy in model/)",
+  "cloud_dynamics.py/.json",
+  "thermostat_policy.py/.json",
+  "sky_check.py/.json",
+  "debris_check.py/.json",
+  "revised_limits.mjs/.json",
+  "build_result.py",
+  "log_*.txt"
+ ]
+}

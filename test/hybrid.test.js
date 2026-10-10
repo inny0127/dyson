@@ -146,3 +146,12 @@ test('Earth: a uniform interior shell adds ~1.9 W/m² per 1 % coverage; ≤ 1 W/
   near(e.forcing, 1.86, 0.15, 'forcing at 1 %');
   near(h.earthSafeCoverage(pMid, 1.0), 0.0053, 0.0007, 'Earth-safe coverage');
 });
+
+test('Earth limits: the night sky caps the swarm near 0.6 %, about where the shell meets 1 W/m²', () => {
+  const L = h.earthLimits(pMid);
+  near(L.sky, 0.0060, 0.0005, 'full-Moon sky cap at rho 0.004');
+  near(L.shell, 0.0053, 0.0007, 'shell climate cap at 1 W/m²');
+  near(h.earthLimits({ ...pMid, earthPlacement: 'farside' }).farside, 0.0379, 0.002, 'far side with a 1.5× shade');
+  assert.ok(L.cap <= Math.min(L.sky, L.climate) + 1e-12);
+  assert.ok(L.flops > 1e38 && L.flops < 5e38, `allowed FLOP/s ${L.flops}`);
+});
