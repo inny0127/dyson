@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mercury Swarm Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: full-bleed WebGL stage; a ledger of live numbers docked right; story caption and
+   timeline float over the stage bottom-left. Single dark look on purpose: it is space, and
+   physically based exposure only reads on black. */
+:root {
+  --bg: #05070b;
+  --panel: rgba(8, 11, 17, 0.84);
+  --panel-solid: #0a0e15;
+  --line: rgba(150, 163, 186, 0.18);
+  --fg: #ece6d8;
+  --muted: #9097a5;
+  --sun: #ffb547;
+  --ir: #ff6a3d;
+  --cool: #86b6ff;
+  --warn: #ff7a59;
+  --ok: #8fd3a6;
+  --font-display: 'Saira Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --ledger-w: 372px;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 14px/1.45 var(--font-body); overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+
+#app { position: fixed; inset: 0; display: grid; grid-template-columns: 1fr var(--ledger-w); }
+#stage-wrap { position: relative; min-width: 0; overflow: hidden; }
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lbl {
+  position: absolute; left: 0; top: 0; white-space: nowrap; pointer-events: none;
+  font: 500 11px/1.2 var(--font-mono); color: var(--fg); letter-spacing: 0.02em;
+  padding: 2px 5px 2px 12px; text-shadow: 0 0 4px #000, 0 0 2px #000;
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 9px); border-radius: 3px;
+}
+.lbl::before { content: ''; position: absolute; left: 0; top: 0; width: 5px; height: 5px; border: 1px solid currentColor; border-radius: 50%; transform: translate(-50%, -50%); margin-left: 2px; }
+.lbl.nodot::before { display: none; }
+.lbl.nodot { padding-left: 5px; background: rgba(0,0,0,0.55); }
+.lbl.sun { color: var(--sun); }
+.lbl.ir { color: var(--ir); }
+.lbl.cool { color: var(--cool); }
+.lbl.muted { color: var(--muted); }
+.lbl.big { font-size: 12px; }
+.lbl small { display: block; color: var(--muted); font-size: 10px; }
+
+/* Header */
+header.top {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+  display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 0;
+  pointer-events: none;
+}
+header.top > * { pointer-events: auto; }
+.brand { display: flex; flex-direction: column; gap: 2px; margin-right: 8px; }
+.brand h1 { margin: 0; font: 700 22px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.brand h1 span { color: var(--sun); }
+.brand p { margin: 0; font: 400 11px/1.3 var(--font-mono); color: var(--muted); letter-spacing: 0.04em; }
+nav.chapters { display: flex; gap: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px; backdrop-filter: blur(6px); }
+nav.chapters button {
+  display: flex; align-items: baseline; gap: 6px; border: 0; background: transparent; padding: 6px 11px; border-radius: 4px;
+  font: 600 14px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+nav.chapters button b { font: 500 10px/1 var(--font-mono); color: var(--muted); opacity: 0.7; }
+nav.chapters button[aria-pressed="true"] { background: rgba(255, 181, 71, 0.12); color: var(--fg); }
+nav.chapters button[aria-pressed="true"] b { color: var(--sun); opacity: 1; }
+.viewtoggles { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.seg { display: flex; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px; backdrop-filter: blur(6px); }
+.seg button { border: 0; background: transparent; padding: 5px 9px; border-radius: 4px; font: 500 11px/1 var(--font-mono); color: var(--muted); letter-spacing: 0.03em; }
+.seg button[aria-pressed="true"] { background: rgba(236, 230, 216, 0.1); color: var(--fg); }
+.seg button.ir[aria-pressed="true"] { background: rgba(255, 106, 61, 0.16); color: var(--ir); }
+
+/* Caption */
+.caption {
+  position: absolute; left: 18px; bottom: 96px; z-index: 4; max-width: min(460px, calc(100% - 36px));
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px 12px;
+  backdrop-filter: blur(6px);
+}
+.caption .eyebrow { font: 500 10px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sun); }
+.caption h2 { margin: 6px 0 6px; font: 600 24px/1.05 var(--font-display); letter-spacing: 0.02em; text-wrap: balance; }
+.caption p { margin: 0 0 6px; color: #cfc9bc; font-size: 13px; line-height: 1.5; }
+.caption p:last-child { margin-bottom: 0; }
+.caption .num { font-family: var(--font-mono); color: var(--fg); font-size: 12.5px; white-space: nowrap; }
+.caption .hot { color: var(--warn); }
+.caption .hint { font: 400 11px/1.4 var(--font-mono); color: var(--muted); margin-top: 8px; }
+.caption button.collapse { position: absolute; top: 8px; right: 8px; border: 0; background: transparent; color: var(--muted); font: 500 11px var(--font-mono); padding: 4px 6px; }
+.caption.collapsed p, .caption.collapsed .hint, .caption.collapsed .presets { display: none; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.presets:empty { display: none; }
+.presets button { border: 1px solid var(--line); background: rgba(236,230,216,0.04); border-radius: 4px; padding: 5px 8px; font: 500 11px/1 var(--font-mono); color: var(--fg); }
+.presets button:hover { border-color: var(--sun); color: var(--sun); }
+
+/* Timeline */
+.timeline {
+  position: absolute; left: 18px; right: 18px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 4;
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; backdrop-filter: blur(6px);
+}
+.timeline .play { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: rgba(255, 181, 71, 0.12); color: var(--sun); font-size: 13px; grid-row: span 2; }
+.timeline .readout { display: flex; gap: 6px 16px; flex-wrap: wrap; font: 400 11.5px/1.2 var(--font-mono); color: var(--muted); }
+.timeline .readout b { color: var(--fg); font-weight: 500; }
+.timeline .readout .yr b { color: var(--sun); font-size: 13px; }
+.track { position: relative; height: 22px; }
+.track input[type=range] { position: absolute; inset: 0; width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; }
+.track input[type=range]::-webkit-slider-runnable-track { height: 4px; background: linear-gradient(90deg, rgba(255,181,71,.6) var(--p, 50%), var(--line) var(--p, 50%)); border-radius: 2px; }
+.track input[type=range]::-moz-range-track { height: 4px; background: var(--line); border-radius: 2px; }
+.track input[type=range]::-moz-range-progress { height: 4px; background: rgba(255,181,71,.6); }
+.track input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--sun); margin-top: -5px; border: 2px solid var(--bg); }
+.track input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--sun); border: 2px solid var(--bg); }
+.ticks { position: absolute; left: 7px; right: 7px; top: 14px; height: 10px; pointer-events: none; }
+.ticks i { position: absolute; top: 0; width: 1px; height: 6px; background: var(--muted); }
+.ticks i span { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 400 9px/1 var(--font-mono); color: var(--muted); }
+
+/* Ledger */
+aside.ledger {
+  position: relative; z-index: 6; background: var(--panel-solid); border-left: 1px solid var(--line);
+  display: flex; flex-direction: column; min-height: 0; height: 100%;
+}
+.ledger-head { padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ledger-head h2 { margin: 0; font: 600 16px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.ledger-head .btns { display: flex; gap: 6px; }
+.btn { border: 1px solid var(--line); background: transparent; border-radius: 5px; padding: 5px 9px; font: 500 11px/1 var(--font-mono); color: var(--fg); }
+.btn:hover { border-color: var(--muted); }
+.btn.accent { border-color: rgba(255,181,71,.5); color: var(--sun); }
+.ledger-body { overflow-y: auto; padding: 4px 18px calc(24px + env(safe-area-inset-bottom, 0px)); min-height: 0; flex: 1; }
+.ledger section { padding: 14px 0 6px; border-bottom: 1px solid var(--line); }
+.ledger section:last-child { border-bottom: 0; }
+.ledger h3 { margin: 0 0 8px; font: 600 13px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+.ledger h3 span { color: var(--sun); font-family: var(--font-mono); letter-spacing: 0; font-weight: 400; font-size: 10px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 4px 0; align-items: baseline; }
+.row .k { color: #c6c0b3; font-size: 12.5px; min-width: 0; }
+.row .v { font: 500 12.5px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.row .n { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.row.shock .v { color: var(--sun); }
+.row.bad .v { color: var(--warn); }
+.row.good .v { color: var(--ok); }
+.pill { display: inline-block; font: 500 10px/1 var(--font-mono); padding: 3px 6px; border-radius: 10px; border: 1px solid currentColor; vertical-align: 1px; margin-left: 6px; }
+.pill.bad { color: var(--warn); } .pill.ok { color: var(--ok); } .pill.sun { color: var(--sun); }
+.ledger .chart { margin: 4px 0 6px; }
+.myths ol { margin: 0; padding: 0 0 6px; list-style: none; display: grid; gap: 8px; counter-reset: m; }
+.myths li { font-size: 12.5px; line-height: 1.45; color: #d2ccbf; padding-left: 22px; position: relative; counter-increment: m; }
+.myths li::before { content: counter(m); position: absolute; left: 0; top: 1px; font: 500 10px/16px var(--font-mono); color: var(--sun); width: 16px; height: 16px; text-align: center; border: 1px solid rgba(255,181,71,.4); border-radius: 50%; }
+.myths s { color: var(--muted); text-decoration-color: rgba(255,122,89,.8); text-decoration-thickness: 1.5px; }
+.myths b { color: var(--fg); font-weight: 600; }
+.ledger .chart svg { width: 100%; height: auto; display: block; touch-action: none; }
+.ledger .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 10.5px/1.3 var(--font-mono); color: var(--muted); margin-top: 4px; }
+.ledger .legend i { display: inline-block; width: 10px; height: 2px; vertical-align: 3px; margin-right: 5px; border-radius: 1px; }
+.ledger .legend .unit { margin-left: auto; }
+
+/* Assumptions drawer */
+.drawer {
+  position: absolute; top: 0; bottom: 0; right: 0; width: min(var(--ledger-w), 100%); z-index: 8; background: var(--panel-solid);
+  border-left: 1px solid var(--line); display: flex; flex-direction: column; transform: translateX(100%); transition: transform .25s ease;
+}
+.drawer.open { transform: none; }
+.param { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.param label { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: #d2ccbf; }
+.param label output { font: 500 12px var(--font-mono); color: var(--sun); white-space: nowrap; }
+.param input[type=range] { width: 100%; accent-color: var(--sun); margin: 6px 0 0; }
+.param select { width: 100%; margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px; }
+.param .help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.param-group { font: 600 12px/1 var(--font-display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); padding: 16px 0 2px; }
+
+.mobile-ledger-btn { display: none; }
+
+@media (max-width: 900px) {
+  :root { --ledger-w: 100%; }
+  #app { grid-template-columns: 1fr; }
+  aside.ledger { position: absolute; left: 0; right: 0; bottom: 0; top: auto; height: 62%; transform: translateY(100%); transition: transform .25s ease; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; }
+  aside.ledger.open { transform: none; }
+  .mobile-ledger-btn { display: inline-block; }
+  .viewtoggles { margin-left: 0; }
+  .caption { bottom: 108px; left: 16px; right: 16px; max-width: none; }
+  .caption h2 { font-size: 20px; }
+  .timeline { left: 16px; right: 16px; }
+  header.top { padding-left: 16px; padding-right: 16px; gap: 10px; }
+  .brand h1 { font-size: 18px; }
+}
+@media (max-width: 600px) {
+  .timeline .readout span:nth-child(n+4) { display: none; }
+  .timeline { padding: 8px 12px; }
+  .caption { padding: 10px 12px 10px; bottom: 92px; }
+  .caption p { font-size: 12.5px; }
+  .brand p { display: none; }
+  .lbl { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer, aside.ledger { transition: none; }
+}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app">
+  <div id="stage-wrap">
+    <canvas id="stage" aria-label="3D view of the swarm"></canvas>
+    <div id="labels"></div>
+
+    <header class="top">
+      <div class="brand">
+        <h1>Mercury <span>Swarm</span> Ledger</h1>
+        <p>A PV + AI-compute Dyson swarm, built from Mercury, at true numbers</p>
+      </div>
+      <nav class="chapters" id="chapters" aria-label="Chapters"></nav>
+      <div class="viewtoggles">
+        <div class="seg" role="group" aria-label="Light">
+          <button id="mode-visible" aria-pressed="true" title="What a camera or eye would record">Visible</button>
+          <button id="mode-thermal" class="ir" aria-pressed="false" title="Long-wave infrared, 8–14 µm, false colour">Thermal IR</button>
+        </div>
+        <div class="seg" role="group" aria-label="Scale">
+          <button id="scale-true" aria-pressed="true" title="Every size at its real value">True scale</button>
+          <button id="scale-exag" aria-pressed="false" title="Enlarge bodies and satellites so they can be seen">Enlarged</button>
+        </div>
+        <button class="btn mobile-ledger-btn" id="ledger-toggle">Numbers</button>
+      </div>
+    </header>
+
+    <div class="caption" id="caption">
+      <button class="collapse" id="caption-collapse" aria-label="Collapse caption">–</button>
+      <div class="eyebrow" id="cap-eyebrow"></div>
+      <h2 id="cap-title"></h2>
+      <div id="cap-body"></div>
+      <div class="presets" id="cap-presets"></div>
+      <div class="hint" id="cap-hint"></div>
+    </div>
+
+    <div class="timeline" id="timeline">
+      <button class="play" id="play" aria-label="Play the build-out">▶</button>
+      <div class="readout" id="tl-readout"></div>
+      <div class="track">
+        <input type="range" id="year" min="0" max="120" step="0.1" value="60" aria-label="Years since first launch from Mercury">
+        <div class="ticks" id="ticks"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="ledger" id="ledger">
+    <div class="ledger-head">
+      <h2>The Ledger</h2>
+      <div class="btns">
+        <button class="btn accent" id="open-assumptions">Assumptions</button>
+      </div>
+    </div>
+    <div class="ledger-body" id="ledger-body"></div>
+    <div class="drawer" id="drawer" aria-label="Assumptions">
+      <div class="ledger-head">
+        <h2>Assumptions</h2>
+        <div class="btns">
+          <button class="btn" id="reset-params">Reset</button>
+          <button class="btn accent" id="close-assumptions">Done</button>
+        </div>
+      </div>
+      <div class="ledger-body" id="params"></div>
+    </div>
+  </aside>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
