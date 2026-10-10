@@ -96,7 +96,28 @@ def _truss(name, start, end, width, mat, bays=None):
     return objs[0]
 
 
-def build(mats, spec=None, origin=(0, 0, 0), name='Sat'):
+def _sphere(name, r, loc, mat, half=False):
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, location=loc, segments=24, ring_count=12)
+    o = bpy.context.object
+    o.name = name
+    o.data.materials.append(mat)
+    bpy.ops.object.shade_smooth()
+    return o
+
+
+def _cone(name, r1, r2, depth, loc, rot, mat):
+    bpy.ops.mesh.primitive_cone_add(radius1=r1, radius2=r2, depth=depth, location=loc, rotation=rot, vertices=24)
+    o = bpy.context.object
+    o.name = name
+    o.data.materials.append(mat)
+    bpy.ops.object.shade_smooth()
+    return o
+
+
+def build(mats, spec=None, origin=(0, 0, 0), name='Sat', seed=3):
+    """Build the satellite. Returns (root empty, resolved spec)."""
+    import random
+    rnd = random.Random(seed)
     s = dict(DEFAULT)
     if spec:
         s.update(spec)
@@ -104,52 +125,78 @@ def build(mats, spec=None, origin=(0, 0, 0), name='Sat'):
     bpy.context.scene.collection.objects.link(root)
     parts = []
 
-    # Compute module: a box of cold-plated accelerator boards, wrapped in aluminised blanket
+    # ---- compute module: accelerator trays on cold plates inside an aluminised glass-cloth blanket
     bx, by, bz = s['bus']
-    bus = _box('ComputeModule', (bx, by, bz), (0, 0, 0), mats['blanket'])
-    parts.append(bus)
-    # pumped-loop manifolds on the module
-    for sgn in (-1, 1):
-        parts.append(_cyl('Manifold', 0.18, by * 0.9, (sgn * (bx / 2 + 0.2), 0, -bz * 0.25), (math.pi / 2, 0, 0), mats['steel']))
+    parts.append(_box('ComputeModule', (bx, by, bz), (0, 0, 0), mats['blanket']))
+    for sx in (-1, 1):                                    # edge rails of the primary structure
+        for sy in (-1, 1):
+            parts.append(_box('Rail', (0.08, 0.08, bz * 1.02), (sx * bx / 2, sy * by / 2, 0), mats['truss']))
+    parts.append(_box('AvionicsRadiator', (bx * 0.5, 0.02, bz * 0.35), (0, -by / 2 - 0.011, bz * 0.18), mats['radiator']))
+    for sgn in (-1, 1):                                   # star trackers with sun baffles
+        parts.append(_cyl('StarTracker', 0.07, 0.25, (sgn * bx * 0.3, by / 2 + 0.12, -bz * 0.3), (math.pi / 2, 0, 0), mats['black']))
+    for sgn in (-1, 1):                                   # pumped-loop manifolds and pump packages
+        parts.append(_cyl('Manifold', 0.16, by * 0.85, (sgn * (bx / 2 + 0.18), 0, -bz * 0.25), (math.pi / 2, 0, 0), mats['steel']))
+        parts.append(_box('PumpPackage', (0.35, 0.5, 0.35), (sgn * (bx / 2 + 0.2), 0, bz * 0.2), mats['steel']))
 
-    # PV wings: each wing is `wing_panels` panels with small hinge gaps, on a central spar
+    # ---- PV wings (cells face +Z), panels on a spar, each panel slightly out of plane like real arrays
     half = s['wing_span'] / 2
     root_x = s['wing_gap'] / 2
     wing_len = half - root_x
-    pw = wing_len / s['wing_panels']
+    npan = s['wing_panels']
+    pw = wing_len / npan
+    zw = bz / 2 + 0.6
+    H = s['wing_height']
     for sgn in (-1, 1):
-        for i in range(s['wing_panels']):
+        for i in range(npan):
             cx = sgn * (root_x + pw * (i + 0.5))
-            parts.append(_panel(f'PV_{sgn}_{i}', pw - 0.08, s['wing_height'], 0.03, (cx, 0, bz / 2 + 0.6), (0, 0, 0), mats['pv']))
-        parts.append(_truss(f'Spar_{sgn}', (sgn * bx / 2, 0, bz / 2 + 0.45), (sgn * half, 0, bz / 2 + 0.45), 0.35, mats['truss']))
+            rot = (math.radians(rnd.uniform(-0.25, 0.25)), math.radians(rnd.uniform(-0.25, 0.25)), 0)
+            parts.append(_panel(f'PV_{sgn}_{i}', pw - 0.10, H, 0.025, (cx, 0, zw), rot, mats['pv']))
+            for yy in (-H / 2, H / 2):                    # frame rails along the long edges
+                parts.append(_box('PVFrame', (pw - 0.06, 0.05, 0.05), (cx, yy, zw - 0.02), mats['aluminium']))
+            for xx in (cx - sgn * (pw / 2 - 0.03), cx + sgn * (pw / 2 - 0.03)):
+                parts.append(_box('PVFrameEnd', (0.04, H, 0.04), (xx, 0, zw - 0.03), mats['aluminium']))
+            if i < npan - 1:                              # hinge blocks between panels
+                hx = sgn * (root_x + pw * (i + 1))
+                for yy in (-H * 0.42, 0, H * 0.42):
+                    parts.append(_box('Hinge', (0.12, 0.18, 0.08), (hx, yy, zw - 0.04), mats['steel']))
+        parts.append(_truss(f'Spar_{sgn}', (sgn * bx / 2, 0, zw - 0.35), (sgn * half, 0, zw - 0.35), 0.4, mats['truss']))
+        parts.append(_box('Yoke', (root_x - bx / 2 + 0.2, 0.25, 0.25), (sgn * (bx / 2 + (root_x - bx / 2) / 2), 0, zw - 0.2), mats['truss']))
 
-    # Radiators: double-sided panels in the YZ plane (edge-on to the Sun), above and below the bus
+    # ---- radiator blades: double-sided, knife-edge to the Sun, segmented, with headers and MMOD lip
     n = s['radiator_panels']
     depth = s['radiator_depth']
     height = s['radiator_area'] / (n * depth)
+    nseg = max(2, int(round(height / 3.0)))
+    seg_h = height / nseg
+    zc = -depth / 2 + bz / 2 - 0.3
     for k in range(n):
         sgn = 1 if k % 2 == 0 else -1
-        cy = sgn * (by / 2 + 0.4 + height / 2)
-        rad = _panel(f'Radiator_{k}', 0.06, height, depth, (0, cy, -depth / 2 + bz / 2 - 0.3), (0, 0, 0), mats['radiator'])
-        parts.append(rad)
-        # header pipes along the radiator root and tip
-        for yy in (sgn * (by / 2 + 0.4), sgn * (by / 2 + 0.4 + height)):
-            parts.append(_cyl('Header', 0.08, depth, (0, yy, -depth / 2 + bz / 2 - 0.3), (0, 0, 0), mats['steel']))
-        parts.append(_truss(f'RadBoom_{k}', (0, sgn * by / 2, -depth - 0.2 + bz / 2), (0, sgn * (by / 2 + 0.4 + height), -depth - 0.2 + bz / 2), 0.3, mats['truss']))
+        y0 = sgn * (by / 2 + 0.5)
+        for j in range(nseg):
+            cy = y0 + sgn * (seg_h * (j + 0.5))
+            parts.append(_panel(f'Radiator_{k}_{j}', 0.05, seg_h - 0.06, depth, (0, cy, zc), (0, 0, 0), mats['radiator']))
+        for yy in (y0, y0 + sgn * height):
+            parts.append(_cyl('Header', 0.075, depth, (0, yy, zc), (0, 0, 0), mats['steel']))
+        # leading edge toward the Sun: a narrow guard rail that shades the blade edge
+        parts.append(_cyl('EdgeGuard', 0.05, height, (0, y0 + sgn * height / 2, zc + depth / 2 + 0.05), (math.pi / 2, 0, 0), mats['aluminium']))
+        parts.append(_truss(f'RadBoom_{k}', (0, sgn * by / 2, zc - depth / 2 - 0.25), (0, y0 + sgn * height, zc - depth / 2 - 0.25), 0.3, mats['truss']))
+        for sx in (-1, 1):                                # flex lines from the manifolds to the blade root
+            parts.append(_cyl('FlexLine', 0.045, 0.9, (sx * 0.12, sgn * (by / 2 + 0.25), zc + depth * 0.3), (math.pi / 2, 0, 0), mats['black']))
 
-    # Laser terminals: small gimballed telescopes on the module corners (Starlink-style)
+    # ---- laser terminals on the anti-Sun face: gimbal base, dome, telescope with dark aperture
     for k in range(s['terminals']):
         a = (k + 0.5) * 2 * math.pi / s['terminals']
-        x = math.cos(a) * bx * 0.42
-        z = -bz / 2 - 0.25
-        y = math.sin(a) * by * 0.42
-        base = _cyl('LaserBase', 0.18, 0.3, (x, y, z), (0, 0, 0), mats['black'])
-        tel = _cyl('LaserTelescope', 0.11, 0.35, (x, y, z - 0.3), (0.4 * math.cos(a), 0.4 * math.sin(a), 0), mats['aluminium'])
-        parts += [base, tel]
+        x, y = math.cos(a) * bx * 0.38, math.sin(a) * by * 0.38
+        z = -bz / 2
+        parts.append(_cyl('LaserBase', 0.2, 0.18, (x, y, z - 0.09), (0, 0, 0), mats['truss']))
+        parts.append(_sphere('LaserDome', 0.17, (x, y, z - 0.22), mats['aluminium']))
+        tilt = (0.5 * math.sin(a), -0.5 * math.cos(a), 0)
+        parts.append(_cyl('LaserTube', 0.09, 0.32, (x, y, z - 0.42), tilt, mats['aluminium']))
 
-    # Ion thrusters (circularisation, station keeping)
+    # ---- electric thrusters (circularisation and station keeping)
     for sgn in (-1, 1):
-        parts.append(_cyl('Thruster', 0.25, 0.4, (sgn * bx * 0.3, by / 2 + 0.2, -bz / 2), (math.pi / 2, 0, 0), mats['steel']))
+        parts.append(_cyl('ThrusterBody', 0.22, 0.25, (sgn * bx * 0.28, -by / 2 - 0.15, -bz * 0.3), (math.pi / 2, 0, 0), mats['steel']))
+        parts.append(_cone('ThrusterExit', 0.24, 0.30, 0.12, (sgn * bx * 0.28, -by / 2 - 0.32, -bz * 0.3), (math.pi / 2, 0, 0), mats['black']))
 
     for p in parts:
         p.parent = root

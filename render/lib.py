@@ -210,8 +210,8 @@ def pv_material(name='PV', cell=0.156, gap=0.003, busbar=0.0012, fingers=0.0025)
     noise = N.new('ShaderNodeTexNoise'); noise.inputs['Scale'].default_value = 0.35
     L.new(tc.outputs['Object'], noise.inputs['Vector'])
     ramp = N.new('ShaderNodeValToRGB')
-    ramp.color_ramp.elements[0].color = (0.012, 0.016, 0.040, 1)
-    ramp.color_ramp.elements[1].color = (0.020, 0.028, 0.065, 1)
+    ramp.color_ramp.elements[0].color = (0.014, 0.019, 0.046, 1)
+    ramp.color_ramp.elements[1].color = (0.017, 0.023, 0.054, 1)
     L.new(noise.outputs['Fac'], ramp.inputs['Fac'])
     mix1 = N.new('ShaderNodeMix'); mix1.data_type = 'RGBA'
     L.new(gapmask.outputs[0], mix1.inputs['Factor'])
@@ -262,6 +262,29 @@ def radiator_material(name='Radiator', tube_pitch=0.15):
     return m
 
 
+def blanket_material(name='AluminisedGlassCloth'):
+    """Multilayer blanket of aluminised glass cloth (no polymers on Mercury): crinkled metal."""
+    m, nt = _mat(name)
+    if nt is None:
+        return m
+    N, L = nt.nodes, nt.links
+    b = N['Principled BSDF']
+    b.inputs['Base Color'].default_value = (0.83, 0.82, 0.78, 1)
+    b.inputs['Metallic'].default_value = 1.0
+    b.inputs['Roughness'].default_value = 0.32
+    tc = N.new('ShaderNodeTexCoord')
+    vor = N.new('ShaderNodeTexVoronoi'); vor.inputs['Scale'].default_value = 7.0
+    L.new(tc.outputs['Object'], vor.inputs['Vector'])
+    noise = N.new('ShaderNodeTexNoise'); noise.inputs['Scale'].default_value = 3.0; noise.inputs['Detail'].default_value = 8
+    L.new(tc.outputs['Object'], noise.inputs['Vector'])
+    add = N.new('ShaderNodeMath'); add.operation = 'ADD'
+    L.new(vor.outputs['Distance'], add.inputs[0]); L.new(noise.outputs['Fac'], add.inputs[1])
+    bump = N.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.35; bump.inputs['Distance'].default_value = 0.01
+    L.new(add.outputs[0], bump.inputs['Height'])
+    L.new(bump.outputs['Normal'], b.inputs['Normal'])
+    return m
+
+
 def metal(name, color=(0.91, 0.92, 0.92), rough=0.3):
     return principled(name, color, rough=rough, metal=1.0)
 
@@ -273,7 +296,7 @@ def mat_library():
         'aluminium': metal('Aluminium', (0.91, 0.92, 0.92), 0.28),
         'steel': metal('FeSiNi', (0.56, 0.57, 0.58), 0.38),
         'truss': principled('TrussOxide', (0.18, 0.18, 0.19), rough=0.55, metal=0.6),
-        'blanket': metal('AluminisedGlassCloth', (0.86, 0.86, 0.84), 0.45),
+        'blanket': blanket_material(),
         'glass': principled('Glass', (0.9, 0.95, 1.0), rough=0.02, ior=1.52),
         'mirror': metal('Mirror', (0.95, 0.95, 0.95), 0.02),
         'black': principled('BlackAnodised', (0.02, 0.02, 0.022), rough=0.4),
