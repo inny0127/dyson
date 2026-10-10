@@ -227,9 +227,9 @@ export function swarmSkyEmissivity(f, epsFront) {
 }
 
 /** Sky brightness temperature (8–14 µm) at altitude alt for a swarm sky of in-band radiance Lsw. */
-export function skyBandTemp(alt, Lsw) {
+export function skyBandTemp(alt, Lsw, tAir = IR_ATM.tAirEmit) {
   const tau = IR_ATM.tauZenith ** airmass(alt);
-  return bandTemp(tau * Lsw + (1 - tau) * bandRadiance(IR_ATM.tAirEmit));
+  return bandTemp(tau * Lsw + (1 - tau) * bandRadiance(tAir));
 }
 
 /** Change in Earth's radiating temperature without catastrophic cancellation for tiny forcing. */

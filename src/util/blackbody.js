@@ -83,6 +83,15 @@ export function inferno(t) {
   return INFERNO[i].map((v, k) => srgbToLinear(v + (INFERNO[i + 1][k] - v) * f));
 }
 
+/** Inferno as display sRGB (0..1), for CSS legends: `rgb(${infernoSRGB(t).map(c => c * 255)})`. */
+export function infernoSRGB(t) {
+  return inferno(t).map(linearToSrgb);
+}
+
+export function linearToSrgb(c) {
+  return c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
+}
+
 export function srgbToLinear(c) {
   return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }

@@ -60,10 +60,10 @@ export default function create(ctx) {
     uGlintDir: { value: antiDir },
     uInvT: { value: inv.lut }, uLmax: { value: inv.Lmax },
     uTau0: { value: SP.IR_ATM.tauZenith }, uBair: { value: bAir },
-    uTmax: { value: SP.IR_ATM.tMax }, uDbg: { value: 0 },
+    uTmax: { value: SP.IR_ATM.tMax },
     uExp: { value: 100 }, uMode: { value: 0 },
     // sky
-    uMW: { value: 1.0 }, uGal: { value: galM },
+    uMW: { value: 1.5 }, uGal: { value: galM },   // Sagittarius star clouds ≈2–3× the natural sky background (≈20.5 vs 21.8 mag/arcsec²)
     uSwCol: { value: new THREE.Vector3(...swCol) }, uGlintCol: { value: new THREE.Vector3(...glCol) },
     uNatCol: { value: new THREE.Vector3(...natCol) },
     uLswIR: { value: 0 }, uInterior: { value: 0 }, uIntRad: { value: 0 }, uLswIRint: { value: 0 },
@@ -239,13 +239,16 @@ export default function create(ctx) {
     const forcing = SP.forcingOf(e);
     const dT = SP.dTRadiating(forcing);
     const tGround = SP.IR_ATM.tSurfaceNow + dT;
-    const tSkyZen = SP.skyBandTemp(Math.PI / 2, LswExt * gain);
-    const tSkyNat = SP.skyBandTemp(Math.PI / 2, 0);
-    const tSkyHemi = SP.skyBandTemp(40 * DEG, LswExt * gain);
+    const tAir = SP.IR_ATM.tAirEmit + dT;            // the lower atmosphere warms with the surface
+    const tSkyZen = SP.skyBandTemp(Math.PI / 2, LswExt * gain, tAir);
+    const tSkyNat = SP.skyBandTemp(Math.PI / 2, 0, SP.IR_ATM.tAirEmit);
+    const tSkyHemi = SP.skyBandTemp(40 * DEG, LswExt * gain, tAir);
+    U.uBair.value = SP.bandRadiance(tAir);
 
     const fin = state.d.earth;
     D = {
       ...s, f, gain, thermal, La, vis, LswExt, LswInt, forcing, dT, tGround, tSkyZen, tSkyNat, tSkyHemi, tSheet,
+      tSkyZenTrue: SP.skyBandTemp(Math.PI / 2, LswExt, tAir),
       finForcing: SP.forcingOf(fin), fin, rAU: d.rAU, events: computeEvents(state), year: p.year,
       yFull: d.growth.yearsToFull, exaggerate: view.exaggerate,
       skyMag: SP.lumToMag(s.zenithL),
@@ -303,7 +306,7 @@ export default function create(ctx) {
   // ---------------------------------------------------------------------------
   // Labels
   // ---------------------------------------------------------------------------
-  const tmpV = new THREE.Vector3();
+  const tmpV = new THREE.Vector3(), camRight = new THREE.Vector3(1, 0, 0), camUp = new THREE.Vector3(0, 1, 0);
   const dirFromAzAlt = (azDeg, altDeg) => new THREE.Vector3(
     Math.sin(azDeg * DEG) * Math.cos(altDeg * DEG), Math.sin(altDeg * DEG), -Math.cos(azDeg * DEG) * Math.cos(altDeg * DEG));
   const compass = [['N', 0], ['NE', 45], ['E', 90], ['SE', 135], ['S', 180], ['SW', 225], ['W', 270], ['NW', 315]]
@@ -327,7 +330,7 @@ export default function create(ctx) {
   }
 
   const fmtLux = E => (E < 0.01 ? sci(E, 2) : E < 100 ? String(Number(E.toPrecision(2))) : E < 1e5 ? Math.round(E).toLocaleString('en-US') : sci(E, 2));
-  const fmtYear = y => (y === null || y === undefined ? '—' : y < 0.05 ? '0' : y.toFixed(1));
+  const fmtYear = y => (y === null || y === undefined ? '—' : y < 0.05 ? '0' : y < 100 ? y.toFixed(1) : Math.round(y).toLocaleString('en-US'));
   const signed = (x, dig = 2) => `${x >= 0 ? '+' : '−'}${sci(Math.abs(x), dig)}`;
   function luxComparison(E) {
     if (E < 0.004) return 'a natural moonless night';
@@ -342,30 +345,35 @@ export default function create(ctx) {
     `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:7px"><span style="color:#c6c0b3;font-family:var(--font-body);font-size:11.5px">${k}</span><b style="font-weight:500;font-size:12.5px;color:${vColor}">${v}</b></div>`;
   const note = t => `<small style="white-space:normal;line-height:1.35;margin-top:1px">${t}</small>`;
 
+  const toSrgb = v => { const c = Math.min(1, Math.max(0, v)); return c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055; };
+  // blackbody.inferno returns linear values (the renderer encodes to sRGB); CSS needs sRGB.
   function infernoCss(t) {
-    const c = blackbody.inferno(t).map(v => Math.round(Math.min(1, Math.max(0, v)) * 255));
+    const c = blackbody.inferno(t).map(v => Math.round(toSrgb(v) * 255));
     return `rgb(${c[0]},${c[1]},${c[2]})`;
   }
   function legendHTML() {
     const Tm = SP.IR_ATM.tMax;
-    const stops = Array.from({ length: 11 }, (_, i) => `${infernoCss(i / 10)} ${i * 10}%`).join(',');
-    const mark = (T, label, up) => {
+    const stops = Array.from({ length: 21 }, (_, i) => `${infernoCss(i / 20)} ${i * 5}%`).join(',');
+    const skyT = D.ext ? D.tSkyZen : D.tSkyNat;
+    const marks = [[3, '3 K space'], [skyT, `sky ${Math.round(skyT)} K`], [D.tGround, `ground ${Math.round(D.tGround)} K`]];
+    if (D.ext && D.f > 1e-3) marks.push([D.tSheet, `panels ${Math.round(D.tSheet)} K`]);
+    marks.sort((a, b) => a[0] - b[0]);
+    const html = marks.map(([T, label], i) => {
       const x = Math.min(100, Math.max(0, (T / Tm) * 100));
-      return `<span style="position:absolute;left:${x}%;${up ? 'bottom:15px' : 'top:15px'};transform:translateX(-50%);font-size:9.5px;color:var(--fg);white-space:nowrap">${label}</span>` +
-        `<i style="position:absolute;left:${x}%;top:${up ? -3 : 2}px;width:1px;height:9px;background:#fff;opacity:.8"></i>`;
-    };
-    const skyNow = D.ext ? D.tSkyZen : D.tSkyNat;
+      const align = x < 12 ? '0' : x > 88 ? '-100%' : '-50%';
+      const row = i % 2 ? 13 : 0;
+      return `<span style="position:absolute;left:${x}%;bottom:${10 + row}px;transform:translateX(${align});font-size:9.5px;color:var(--fg);white-space:nowrap">${label}</span>` +
+        `<i style="position:absolute;left:${x}%;bottom:-2px;width:1px;height:${12 + row}px;background:rgba(255,255,255,.7)"></i>`;
+    }).join('');
     return `<div style="margin-top:12px;color:var(--muted);font-size:10px;letter-spacing:.08em">8–14 µm BRIGHTNESS TEMPERATURE</div>
-      <div style="position:relative;height:6px;margin:24px 2px 24px;border-radius:2px;background:linear-gradient(90deg,${stops})">
-        ${mark(3, '3 K space', true)}${mark(skyNow, `sky ${Math.round(skyNow)}`, false)}${mark(D.tGround, `ground ${Math.round(D.tGround)}`, true)}
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:-14px">${[0, 100, 200, 300, 400].map(v => `<span>${v} K</span>`).join('')}</div>`;
+      <div style="position:relative;height:30px;margin-top:4px">${html}<div style="position:absolute;left:0;right:0;bottom:0;height:7px;border-radius:2px;background:linear-gradient(90deg,${stops})"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:3px">${[0, 100, 200, 300, 400].map(v => `<span>${v} K</span>`).join('')}</div>`;
   }
 
   function hudHTML() {
     const t = D;
     const parts = [`<div style="width:${HUD_W}px;white-space:normal">`,
-      `<div style="font-size:10px;letter-spacing:.12em;color:var(--muted)">MIDNIGHT · 40°N · JUNE · YEAR ${t.year.toFixed(1)}</div>`];
+      `<div style="font-size:10px;letter-spacing:.12em;color:var(--muted)">MIDNIGHT · 40°N · JUNE · YEAR ${fmtYear(t.year)}</div>`];
     if (t.ext) {
       parts.push(row('Light on the ground', `${fmtLux(t.eGround)} lux`, t.eGround > 1 ? 'var(--sun)' : 'var(--fg)'));
       parts.push(note(`swarm glow ${fmtLux(t.e.nightLux)} + glint ${fmtLux(t.eGlintH)} + natural 0.002 · ${luxComparison(t.eGround)}`));
@@ -378,7 +386,7 @@ export default function create(ctx) {
     parts.push(note(`${nVis.toLocaleString('en-US')} of ${natural.n.toLocaleString('en-US')} stars above this horizon visible · sky ${t.skyMag.toFixed(1)} mag/arcsec²`));
     if (t.ext) {
       parts.push(row('Sky covered by panels', pct(t.f, 2)));
-      parts.push(note(`inner faces at ${Math.round(t.tSheet)} K · 8–14 µm zenith ${Math.round(SP.skyBandTemp(Math.PI / 2, t.LswExt))} K (clear sky ${Math.round(t.tSkyNat)} K)`));
+      parts.push(note(`inner faces at ${Math.round(t.tSheet)} K · 8–14 µm zenith ${Math.round(t.tSkyZenTrue)} K (clear sky ${Math.round(t.tSkyNat)} K)`));
     } else {
       parts.push(row('Sunlight blocked by day', pct(t.e.dimming, 2), t.e.dimming > 0.01 ? 'var(--warn)' : 'var(--fg)'));
       parts.push(note(`unless the swarm keeps the Sun–Earth line clear`));
@@ -403,7 +411,9 @@ export default function create(ctx) {
     if (t.thermal) msg = t.gain > 1.01 ? `ENLARGED · swarm infrared ×${sci(t.gain, 2)}` : 'ENLARGED · nothing to boost: the swarm already dominates the infrared sky';
     else if (!t.ext) msg = 'ENLARGED · nothing to show: the lit faces of an interior swarm point away from Earth';
     else msg = t.gain > 1.01 ? `ENLARGED · swarm light ×${sci(t.gain, 2)}` : 'ENLARGED · nothing to boost: the swarm already outshines the night';
-    return `<div style="font-size:11px;letter-spacing:.06em;color:var(--sun)">${msg}</div><small>stars and landscape shown at true brightness · switch to True scale for what the eye sees</small>`;
+    const sub = t.thermal ? 'ground and air at their true temperatures · True scale shows what an IR camera sees'
+      : 'stars and landscape at true brightness · True scale shows what the eye sees';
+    return `<div style="width:300px;white-space:normal"><div style="font-size:11px;letter-spacing:.06em;color:var(--sun)">${msg}</div><small>${sub}</small></div>`;
   }
 
   // ---------------------------------------------------------------------------
@@ -440,6 +450,8 @@ export default function create(ctx) {
       camera.up.set(0, 1, 0);
       camera.lookAt(tmpV.copy(camera.position).add(fwd));
       camera.updateMatrixWorld();
+      camRight.setFromMatrixColumn(camera.matrixWorld, 0);
+      camUp.setFromMatrixColumn(camera.matrixWorld, 1);
 
       // eye adaptation (fast, for the slider; the real eye takes minutes)
       logLa += (targetLogLa - logLa) * (1 - Math.exp(-dt / 0.25));
@@ -456,7 +468,7 @@ export default function create(ctx) {
       // --- labels ---
       const top = headerBottom() + 12;
       labels.put('earth-hud', screenPoint(18, top), hudHTML(), 'nodot');
-      if (D.exaggerate) labels.put('earth-banner', screenPoint(Math.max(18 + HUD_W + 30, stageW - 18 - 340), top), bannerHTML(), 'nodot');
+      if (D.exaggerate) labels.put('earth-banner', screenPoint(Math.max(18 + HUD_W + 30, stageW - 18 - 312), top), bannerHTML(), 'nodot');
       for (const [t, v] of compass) labels.put(`earth-c-${t}`, tmpV.copy(v).multiplyScalar(100).add(camera.position), t, 'muted nodot');
       if (D.ext && D.g && (D.glintContrast >= SP.GLINT.visibleContrast || D.exaggerate) && !D.thermal) {
         const th = D.g.theta / DEG;
@@ -467,8 +479,10 @@ export default function create(ctx) {
       if (!D.thermal) {
         for (const [i, name] of namedIdx) {
           if (!D.vis.vis.get(i)) continue;
-          const p = tmpV.set(cat.dir[3 * i], cat.dir[3 * i + 1], cat.dir[3 * i + 2]).multiplyScalar(100).add(camera.position);
-          labels.put(`earth-s-${name}`, p, name, 'muted');
+          // offset a little up and right so the label never sits on the star
+          const p = tmpV.set(cat.dir[3 * i], cat.dir[3 * i + 1], cat.dir[3 * i + 2])
+            .addScaledVector(camRight, 0.011).addScaledVector(camUp, 0.004).multiplyScalar(100).add(camera.position);
+          labels.put(`earth-s-${name}`, p, name, 'muted nodot');
         }
       }
     },
@@ -482,7 +496,7 @@ export default function create(ctx) {
     const fin = t.fin;
     const finTRad = SP.T_RADIATING_NOW + SP.dTRadiating(t.finForcing);
     const heatNow = `Earth already absorbs <span class="num${Math.abs(t.forcing) >= 1 ? ' hot' : ''}">${signed(t.forcing)} W/m²</span> extra (${sci(Math.abs(t.forcing) / EARTH.co2DoublingForcing, 2)}× a CO₂ doubling).`;
-    const heatFin = `Finished swarm (year ${t.yFull.toFixed(0)}): <span class="num hot">${signed(t.finForcing, 3)} W/m²</span>, Earth radiating at <span class="num hot">${Math.round(finTRad)} K</span> instead of ${EARTH.tEff} K and absorbing ${Math.round(fin.absorbed)} W/m²${fin.runaway ? `, past the ≈${EARTH.runawayAbsorbedLimit} W/m² at which the oceans run away (Goldblatt et al. 2013)` : ''}.`;
+    const heatFin = `Finished swarm (year ${fmtYear(t.yFull)}): <span class="num hot">${signed(t.finForcing, 3)} W/m²</span>, Earth radiating at <span class="num hot">${Math.round(finTRad)} K</span> instead of ${EARTH.tEff} K and absorbing ${Math.round(fin.absorbed)} W/m²${fin.runaway ? `, past the ≈${EARTH.runawayAbsorbedLimit} W/m² at which the oceans run away (Goldblatt et al. 2013)` : ''}.`;
 
     if (!t.ext) {
       return {
@@ -513,7 +527,7 @@ export default function create(ctx) {
       p1 = `${glintTxt} The rest of the sky is still dark: faint stars start to fade in year ${fmtYear(ev.fading)}.`;
     } else {
       title = `Nothing visible yet — but Earth already gains ${signed(t.forcing)} W/m²`;
-      p1 = `At year ${t.year.toFixed(1)} the panels cover <span class="num">${pct(t.f, 2)}</span> of the sky and add <span class="num">${fmtLux(t.e.nightLux)} lux</span> to the night (a moonless night is 0.002). Their glint at the antisolar point is ${sci(t.glintContrast, 2)}× the background; it becomes visible in year ${fmtYear(ev.glint)}, the stars start to fade in year ${fmtYear(ev.fading)}.`;
+      p1 = `At year ${fmtYear(t.year)} the panels cover <span class="num">${pct(t.f, 2)}</span> of the sky and add <span class="num">${fmtLux(t.e.nightLux)} lux</span> to the night (a moonless night is 0.002). Their glint at the antisolar point is ${sci(t.glintContrast, 2)}× the background; it becomes visible in year ${fmtYear(ev.glint)}, the stars start to fade in year ${fmtYear(ev.fading)}.`;
     }
     const p2 = (nVis > 0 && t.glintContrast >= SP.GLINT.visibleContrast && title !== 'A new glow at midnight') ? `<p>${glintTxt}</p>` : '';
     return {
