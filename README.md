@@ -1,9 +1,9 @@
 # Mercury Swarm Ledger
 
-A 3D visualizer of a Dyson swarm built the way the numbers say it has to be built: every satellite is a
-thin-film silicon PV panel with AI chips woven into it, computing locally, made from Mercury.
-Every size, temperature, brightness, count and date on screen comes from one physics model
-(`src/model/model.js`), so moving a slider moves the whole picture.
+A Dyson swarm built the way the numbers say it has to be built. Solar sails that are also computers
+are made from Mercury's rock and flown around the Sun. Every photograph, temperature, date and
+FLOP/s on the page comes from one physics model (`src/model/hybrid.js`), and every photograph is
+path traced in Blender at the Sun's true brightness for the orbit.
 
 ## Run it
 
@@ -13,49 +13,61 @@ No build step. Serve the folder and open it in a browser:
 npx serve .            # or: python3 -m http.server
 ```
 
-Then open the printed URL. Chapters: `#mercury`, `#satellite`, `#swarm`, `#earth`.
-
 ```sh
-node --test                          # pins the model to independently computed values
-node scripts/report.mjs NUMBERS.md   # regenerate the written numbers
-node scripts/shot.mjs swarm out.png  # headless screenshot (Playwright + Chromium)
+node --test                              # pins the model to the research values
+node scripts/report.mjs NUMBERS.md       # regenerate the written numbers
+node scripts/export-numbers.mjs          # model numbers for the Blender scenes (render/numbers.json)
+node scripts/shot.mjs buildout out.png   # headless screenshot of a page section
+blender -b --python render/sail_shot.py -- out.png --era mid --view overhead_glint
 ```
 
 ## What the numbers say
 
-See [NUMBERS.md](NUMBERS.md) for the full tables. The short version, with default assumptions:
+See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The short version:
 
-- **A compute swarm cannot hug the Sun.** Silicon chips cap the film near 350 K. A lone panel at
-  Mercury's orbit runs at about 536 K. A nearly closed shell can only shed heat outward and runs 21%
-  hotter than a lone panel, so the finished swarm sits at about **1.35 AU**: outside Earth's orbit,
-  just inside Mars's.
-- **The chip temperature, not the orbit, sets the mass.** Rejecting the Sun's 3.8×10²⁶ W at 350 K
-  needs at least ~5×10²³ m² of radiator wherever you put it. Mass scales as T⁻⁴.
-- **Mercury is mostly iron.** Its rocky crust and mantle are only 24% of its mass. At 0.1 kg/m² the
-  swarm uses about 22% of Mercury, nearly all of its rock; at 0.2 kg/m² you are into the iron core.
-- **The panel is the computer.** A thin film conducts heat sideways so poorly that compute has to be
-  spread out as sub-watt chiplets a few centimetres apart, not GPUs in boxes.
-- **Earth does not survive a finished swarm unchanged.** Outside Earth's orbit, Earth sits inside a
-  shell whose inner face glows at ~350 K and scatters sunlight back. At 1% coverage that is already
-  about one CO₂-doubling of extra heat; past ~25% coverage Earth crosses the runaway-greenhouse limit.
-- **It is invisible for 85% of the build.** With a one-year doubling time it takes ~50 years to reach
-  1% coverage and only ~7 more to finish.
+- **The satellite is a sheet, not a box.** Each sail is a 279 m square of photovoltaic film, 80 µm
+  thick, carrying ~10⁸ chiplets of 0.15 W. A thin film cannot carry heat sideways, so chips are
+  spread through it and the film is its own radiator. That beats concentrating chips in
+  radiator-cooled modules by about 5× per kilogram, in every hardware era
+  (`docs/architecture.md`). A few percent of chip power still goes to shielded pods.
+- **Today's hardware never flies.** Industry needs half a century to reach Mercury's heat wall, and
+  sails are refreshed every 10–20 years, so almost everything is built with post-2095 hardware.
+  HBM is gone, chiplets carry non-volatile memory, optical lanes make each sail one machine, and
+  silicon stays the only solar cell Mercury can supply. Energy per operation falls ~50×
+  (`docs/future-tech.md`).
+- **Fabs and recycling, not Mercury's mass, set the size.** Chip fabs slow the industrial doubling.
+  The standing fleet levels off where exports plus in-orbit recycling balance retirements. In the
+  central case that is about 14 % of sunlight and 6×10³⁹ FLOP/s, reached in the 2400s.
+- **Earth is the binding constraint.** Sails spread evenly inside Earth's orbit add about 1.9 W/m²
+  of heat to Earth for every 1 % of sunlight they capture. A geometry study moves them to the far
+  side of the Sun on Earth's own orbit, with infrared-dark front faces and a small L1 shade.
+  Under a 1 W/m² budget that allows roughly ten times more compute (`docs/data/earth_safe.json`).
+  The cloud's glow in Earth's night sky may limit it sooner.
 
 ## Layout
 
 | Path | What it is |
 |---|---|
-| `index.html` | page shell, styles, import map (three.js 0.160 from jsDelivr) |
-| `src/model/` | constants with sources, and the model: thermal balance, placement, mass, logistics, growth, Earth impact |
-| `src/scenes/` | the four chapters: `mercury`, `satellite`, `swarm`, `earth` |
-| `src/ui/` | the ledger (live numbers, spectrum chart) and the assumptions drawer |
-| `src/util/` | blackbody colour (CIE 1931), number formatting, labels, camera tweening |
-| `test/` | `node --test` suite pinning the model to research values |
-| `scripts/` | report generator and headless screenshot tool |
+| `index.html`, `src/app.js` | the page: a photo essay with live numbers, charts and the assumptions drawer |
+| `src/model/` | `hybrid.js` (model v4: sails, pods, eras, build-out), `model.js` (radiosity, logistics, Mercury, Earth), `sat2.js`, `constants.js` |
+| `src/ui/` | SVG charts and the assumptions drawer |
+| `test/` | `node --test` suites pinning the model |
+| `render/` | Blender scenes: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `mercury.py`, `earth_sky.py`, `lib.py` (physical sun, metering, materials), `post.py` (camera effects) |
+| `renders/` | finished photographs used by the page |
+| `docs/` | `architecture.md`, `future-tech.md`, and `data/` with every study's numbers and sources |
+| `assets/` | MESSENGER, Blue Marble, star catalogue and Milky Way data with credits |
+| `scripts/` | report, numbers export, screenshot, artifact staging |
 
 ## How the numbers were checked
 
-Each physics area (thermal placement, Mercury and logistics, satellite design, orbital architecture
-and Earth impact, optics) was computed independently in Python with sourced constants, then
-recomputed by a second, adversarial pass that tried to refute each result. The model reproduces those
-values; `test/model.test.js` pins them.
+Each question was answered by a research pass that ran its own scripts and cited sources, then
+attacked by an adversarial pass that recomputed the key numbers. The questions were:
+
+- thermal placement;
+- Mercury and logistics;
+- concentrated vs distributed compute;
+- the sail design;
+- eight studies of future hardware;
+- Earth-safe orbits.
+
+Corrections from those reviews are applied in the model, and the tests pin the results.
