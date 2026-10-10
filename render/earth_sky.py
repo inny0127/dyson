@@ -236,6 +236,7 @@ def main(argv):
     ap.add_argument('--samples', type=int, default=64)
     ap.add_argument('--ev', type=float, default=0.0)
     ap.add_argument('--no-stars', action='store_true')
+    ap.add_argument('--exposure', type=float, default=None, help='fixed exposure (stops), to compare skies')
     a = ap.parse_args(argv)
     w, h = (int(x) for x in a.res.split('x'))
     sc = lib.reset(samples=a.samples, res=(w, h))
@@ -249,7 +250,7 @@ def main(argv):
     cam = lib.camera(eye, eye + direction(a.alt, a.az), lens=a.lens)
     # eye adaptation: meter on the brightest broad source in view (the dome, or the natural night)
     L_ref = max(L_dome * 0.5, 2e-6)
-    sc.view_settings.exposure = math.log2(0.18 / L_ref) + a.ev
+    sc.view_settings.exposure = math.log2(0.18 / L_ref) + a.ev if a.exposure is None else a.exposure
     print(f'dome radiance {L_dome:.3g} W/m2/sr = {L_dome * LUM_EFF:.3g} cd/m2; stars {n}; exposure {sc.view_settings.exposure:.2f}')
     lib.save(sc, a.out)
     print('WROTE', a.out)
