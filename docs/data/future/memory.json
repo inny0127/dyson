@@ -1,0 +1,3622 @@
+{
+ "domain": "Memory after HBM, 2026-2300 (HBM4/4E/5+ and custom base dies, 3D DRAM, oxide-semiconductor DRAM, FeRAM/FeFET, MRAM, RRAM, PCM, 3D NAND/HBF, compute-in-memory, monolithic 3D on logic, far-future storage) for a Mercury-built Dyson-swarm AI system",
+ "summary": "Memory after HBM, 2026-2300. HBM is gone before the swarm launches (2045-2060): pods move to memory bonded on logic (custom HBM4E bases ~2027, zHBM/3D DRAM 2030-2040; KAIST HBM8 2038 is the last HBM-like part, 200-240 GB and 180 W per stack). The film needs no DRAM at all: radiation sets the split. A film chiplet absorbs 142-466 krad(Si) in 10 yr at 0.92 AU (ESP/SAPPHIRE 50-95 %, calibrated to NASA 4 mm Al doses), and local shields saturate near 20-100 krad, so DRAM/HBM (2-100 krad), 3D NAND (10-50 krad) and probably IGZO 2T0C stay in 5 g/cm2 pods (0.4-3.3 krad), while MRAM (>=1 Mrad), RRAM (5-20 Mrad), HZO FeRAM (10 Mrad) and SRAM live on the film. Stacked radiation-tolerant NVM lifts a 0.15 W chiplet from 16 MB (107 MB/W) to 0.13-4 GB in 2040 (mid 1 GB, 6.8 GB/W), 1-32 GB in 2070 and 4-256 GB in 2100+, against pods at 0.4 / 4 / 10 GB/W; the useful minimum (GPU bytes per FLOP/s) is 0.23 / 0.9 / 1.7 GB. SRAM shrinks to 1-2 MB, so leakage falls from 10-59 % to 1-10 % of chip power at 85 C; Tj stays 85-105 C because logic, not memory, sets it. The state for a 1e28-FLOP MoE replica stays ~1.1-1.4 PB (bytes/param 20 -> 5, sparsity 20 -> 100), so film power per replica falls 13.5 -> 0.21 -> 0.025 -> 0.008 MW; frontier patches shrink from 17-30 m to 3-12 m (compute-limited near 3-9 m); the replica-sized sail falls from 279 m to 62 m (1e29, 2040) and 22-38 m (1e30), so sail size reverts to structural optimum (150-300 m, many replicas). Memory-driven pod share drops 15 % -> 5 % (2040) -> 1 % (2070) -> ~0.3 % (2100+), cutting swarm mass per W by 30-47 %. New limits: local read energy must fall to 4-36 fJ/bit by 2070 (compute-in-memory or batch >=100), and Mercury lacks In, Pt, Ru, W, Te, so swarm-scale memory must be SiOx/TiOx RRAM, Zr- or MgZnO-ferroelectrics, Fe/MgO MTJs, In-free oxides and glass archives.",
+ "sota_2026": [
+  {
+   "item": "HBM4 (JEDEC JESD270-4; SK hynix 12-Hi)",
+   "value": "2048-bit, 8-10+ Gb/s, 2+ TB/s per stack; 36 GB 12-Hi; >40 % better power efficiency than HBM3E",
+   "evidence_class": "demonstrated (vendor)",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/"
+  },
+  {
+   "item": "HBM energy per bit",
+   "value": "HBM3E 3.44 pJ/bit; HBM2 3.9 pJ/bit",
+   "evidence_class": "demonstrated",
+   "source": "HBM3E 3.44 pJ/bit (project-cited, arXiv:2602.18568): https://arxiv.org/abs/2602.18568 ; O'Connor et al., Fine-Grained DRAM, MICRO 2017: HBM2 3.9 pJ/bit vs GDDR5 14 pJ/bit; FGDRAM ~2x more energy-efficient: https://research.nvidia.com/sites/default/files/pubs/2017-10_Fine-Grained-DRAM%3A-Energy-Efficient/oconnor_and_chatterjee.micro2017.pdf"
+  },
+  {
+   "item": "Rubin pod basis",
+   "value": "288 GB HBM4 per GPU at ~2.5 kW all-in -> 115 MB/W",
+   "evidence_class": "demonstrated (vendor spec)",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py"
+  },
+  {
+   "item": "Custom HBM base dies",
+   "value": "HBM4 base on N12 (1.1 -> 0.8 V, ~1.5x); C-HBM4E on N3P (0.75 V, ~2x target); Samsung 4 nm base die, roadmap to zHBM (XPU stacked on DRAM)",
+   "evidence_class": "roadmap claim",
+   "source": "TSMC custom HBM4E (C-HBM4E) base die on N3P at 0.75 V, ~2x power efficiency target; HBM4 base die N12 (1.1 -> 0.8 V, ~1.5x): https://www.trendforce.com/news/2025/12/01/news-tsmc-unveils-custom-c-hbm4e-details-n3p-logic-dies-reportedly-target-2x-efficiency-gain/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "item": "High Bandwidth Flash",
+   "value": "HBM-class bandwidth at 8-16x HBM capacity, samples H2 2026",
+   "evidence_class": "roadmap claim",
+   "source": "SanDisk/SK hynix High Bandwidth Flash: HBM-class bandwidth, 8-16x HBM capacity at similar cost; samples H2 2026, devices early 2027: https://www.businesswire.com/news/home/20250806259749/en/Sandisk-to-Collaborate-with-SK-hynix-to-Drive-Standardization-of-High-Bandwidth-Flash-Memory-Technology"
+  },
+  {
+   "item": "DRAM density",
+   "value": "D1b 16 Gb dies 0.43-0.45 Gb/mm2; 4F2 VCT -30 % area; 3D DRAM ~2030 (Samsung)",
+   "evidence_class": "demonstrated / roadmap claim",
+   "source": "TechInsights (FMS 2025): 16 Gb D1b dies 431-447 Mb/mm2, cell 0.00123-0.00133 um2: https://files.futurememorystorage.com/proceedings/2025/20250807_DRAM-304-1_Jeongdong-Choe_Short-version.pdf ; 4F2 VCT DRAM ~30 % smaller die than 6F2 (Samsung, SK hynix, 10 nm and below); Samsung 3D (VS) DRAM commercial ~2030; Micron reportedly skips 4F2: https://semiwiki.com/forum/threads/samsung-and-sk-hynix-advance-4f%C2%B2-dram-as-gateway-to-3d-memory.23054/latest ; https://www.computerbase.de/2024-05/3d-dram-samsung-plant-mit-16-layern-fuer-2030/"
+  },
+  {
+   "item": "3D NAND",
+   "value": "332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2; 1000 layers / 100 Gb/mm2 targeted 2027-2030",
+   "evidence_class": "demonstrated / roadmap claim",
+   "source": "Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand ; Kioxia IMW 2024: 1000 layers and 100 Gb/mm2 by 2027 (target); Samsung 1000-layer NAND by 2030: https://blocksandfiles.com/2024/06/19/kioxia-1000-layer-3d-nand/ ; https://www.techradar.com/pro/ssd-rival-to-samsung-reveals-road-to-petabyte-ssds-at-major-engineering-conference-kioxia-wants-1000-layer-nand-in-3-years-and-discusses-helc-molybdenum-100gbmm2-densities"
+  },
+  {
+   "item": "SRAM",
+   "value": "N2 ~38 Mb/mm2; 27.5 uW/Mb at 25 C (low-leakage mode)",
+   "evidence_class": "demonstrated",
+   "source": "TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; 3 nm dual-rail SRAM 27.5 uW/Mb low-leakage mode (ISSCC-class; project basis): https://sscs.ieee.org/tag/bit-density/"
+  },
+  {
+   "item": "Oxide-semiconductor 2T0C DRAM",
+   "value": "Ioff <3e-21 A/um; >4.5 h retention (RT); 7 ks at 85 C; >200 s at 95 C, >1e12 cycles, <10 ns write; OCTRAM vertical IGZO OFF <1 aA/cell; In-free ZTO 2T0C >1500 s",
+   "evidence_class": "demonstrated lab result",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234 ; Kioxia/Nanya OCTRAM (IEDM 2024): InGaZnO vertical-transistor 4F2 DRAM, OFF <1 aA/cell, ON >15 uA (trade report): https://www.kioxia.com/en-jp/about/news/2024/20241210-1.html ; https://convergedigest.com/kioxia-and-nanya-develop-octram-a-low-power-4f2-dram-tech/ ; Zinc-tin-oxide (In-free) TFT 2T0C DRAM: >1500 s retention, SS 59.9 mV/dec (Univ. Michigan thesis): https://deepblue.lib.umich.edu/items/e6ac2d99-46aa-444a-bc41-2851e63c965c"
+  },
+  {
+   "item": "Ferroelectric DRAM-class NVM",
+   "value": "Micron NVDRAM 32 Gb, 2-layer 1T1C, 5.7 nm HZO, ~1e15 cycles (reported)",
+   "evidence_class": "demonstrated lab result",
+   "source": "Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/"
+  },
+  {
+   "item": "MRAM",
+   "value": "64 Gb cross-point 1S1MTJ cell 0.001681 um2 (20.5 nm hp); 16 nm eMRAM 20 yr at 150 C, 1e6 cycles; SOT <100 fJ, >1e15 cycles",
+   "evidence_class": "demonstrated lab result",
+   "source": "Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips ; TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram ; imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html"
+  },
+  {
+   "item": "RRAM / PCM",
+   "value": "TSMC 22 nm RRAM 10 yr at 125 C, 1e4 cycles (automotive); ST ePCM Grade 0 165 C; 3D XPoint 0.62-1.31 Gb/mm2 (2-4 BEOL decks)",
+   "evidence_class": "demonstrated",
+   "source": "TSMC 22 nm eRRAM: 10-yr retention at 125 C, 1e4 cycles (Infineon AURIX TC4x); Weebit 150 C / 100k cycles: https://www.eenewseurope.com/en/tsmc-offers-22nm-rram-taking-mram-on-to-16nm ; https://www.weebit-nano.com/wp-content/uploads/2024/08/Weebit-FMS-2024-Presentation-ReRAM-embedded-RRAM-IP-NVM-for-semiconductors.pdf ; ST 18 nm FD-SOI embedded PCM: AEC-Q100 Grade 0 up to 165 C, 2.5x NVM density vs 40 nm: https://newsroom.st.com/media-center/press-item.html/c3244.html ; https://www.st.com/content/st_com/en/about/innovation-and-technology/pcm.html ; 3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454"
+  },
+  {
+   "item": "Compute-in-memory",
+   "value": "MRAM crossbar CIM (Nature 2022); PCM CIM 9.76 TOPS/W (Study 1)",
+   "evidence_class": "demonstrated lab result",
+   "source": "Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing ; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "item": "Glass archive",
+   "value": "1.59 Gbit/mm3, 4.8 TB per 120 mm plate, 10.1 nJ/bit write, >10,000 yr",
+   "evidence_class": "demonstrated lab result",
+   "source": "Project Silica, Nature 650, 606 (2026): 1.59 Gbit/mm3 in fused silica, 4.8 TB per 120 mm x 2 mm plate, 10.1 nJ/bit write, 25.6 Mbit/s per beam, >10,000-yr lifetime (accelerated ageing): https://pmc.ncbi.nlm.nih.gov/articles/PMC12916313/ ; https://www.microsoft.com/en-us/research/blog/project-silicas-advances-in-glass-storage-technology/"
+  },
+  {
+   "item": "Radiation tolerance",
+   "value": "HBM irregularities ~2 krad; 3D NAND BER rise at 10 krad; MRAM >=1 Mrad; HfOx RRAM 10-20 Mrad; HZO 10 Mrad (Pr -5 %); IGZO TFT Vth shift at 50 krad",
+   "evidence_class": "demonstrated lab result",
+   "source": "Google Suncatcher (arXiv:2511.19468): HBM irregularities from ~2 krad(Si), no hard fails to 15 krad: https://arxiv.org/abs/2511.19468 ; Ray et al., Towards Improving Ionizing Radiation Tolerance of 3-D NAND Flash Memory (IMW 2023): BER rises significantly after 10 krad(Si); periphery failure concern >50 krad: https://par.nsf.gov/servlets/purl/10440107 ; Avalanche STT-MRAM, NASA testing: no notable change to >=1 Mrad(Si); 16 Mb STT-MRAM: MTJ tolerant, periphery soft errors: https://avalanche-technology.com/mrams-immunity-to-radiation-makes-it-a-natural-for-space ; https://research.buaa.edu.cn/en/publications/total-dose-and-single-event-effects-on-16-mbit-standalone-spin-tr/ ; Montoya et al. Sci. Rep. 2020: https://impact.ornl.gov/en/publications/immunity-of-nanoscale-magnetic-tunnel-junctions-with-perpendicula/ ; HfOx RRAM TID: radiation hard to 10 Mrad(Si) (Southampton NSREC), >=20 Mrad (Sandia), proton 1e5-1e9 rad no degradation (MRS 2012): https://eprints.soton.ac.uk/417112 ; https://www.sandia.gov/research/publications/details/resistive-memory-for-radiation-resistant-non-volatile-memory-nstrf-final-re-2018-11-26/ ; https://resolve.cambridge.org/core/journals/mrs-online-proceedings-library-archive/article/high-totaldose-proton-radiation-tolerance-in-tinhfo2tin-reram-devices/3EBCEC3FBBC0B83C014BB77FEF6D042C ; 12 nm HZO capacitors, 10 Mrad(Si) Co-60: Pr -5 %, leakage/endurance/retention unchanged (J Mater Sci: Mater Electron 2019): https://link.springer.com/10.1007/s10854-019-02724-9 ; a-IGZO TFT gamma: negative Vth shift + hysteresis at 500 Gy (50 krad); O-vacancy deep donors raise subthreshold leakage (Adv. Electron. Mater. 2024); Vanderbilt 2025 dissertation: https://pure.jbnu.ac.kr/en/publications/rapid-thermal-annealing-under-osub2sub-ambient-to-recover-the-det/ ; https://doaj.org/article/1eabcbe2b2df4a7f963d06ee90c48fc3 ; https://ir.vanderbilt.edu/items/27f94e89-b617-4bcd-b7a4-e6b20d5b5c98"
+  }
+ ],
+ "trajectory": [
+  {
+   "metric": "film chiplet memory, radiation-tolerant, stacked on the 0.15 W chiplet",
+   "year": 2026,
+   "low": 8,
+   "mid": 16,
+   "high": 24,
+   "unit": "MB per chiplet",
+   "evidence_class": "demonstrated lab result",
+   "source": "Project decision record (85/15 film/pod split, 16 MB/chiplet, HBM 115 MB/W, pods 5 g/cm2): /home/user/dyson/docs/architecture.md ; TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram ; Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips ; 3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454 ; Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/ ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf ; Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand ; eras.py",
+   "how": "SRAM 4-8 MB (N2 38 Mb/mm2) + embedded MRAM/RRAM 4-16 MB in the logic die (~2 MB/mm2 at 16-22 nm class)"
+  },
+  {
+   "metric": "film memory per W of chip power",
+   "year": 2026,
+   "low": 53.3,
+   "mid": 106.7,
+   "high": 160.0,
+   "unit": "MB/W",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py (MB per chiplet / 0.15 W)"
+  },
+  {
+   "metric": "film memory per kg of compute sail (0.92 g/W)",
+   "year": 2026,
+   "low": 57.7,
+   "mid": 115.4,
+   "high": 173.2,
+   "unit": "GB/kg",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "pod memory per W of pod chip power",
+   "year": 2026,
+   "low": 90,
+   "mid": 115,
+   "high": 140,
+   "unit": "MB/W",
+   "evidence_class": "demonstrated",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/ ; SanDisk/SK hynix High Bandwidth Flash: HBM-class bandwidth, 8-16x HBM capacity at similar cost; samples H2 2026, devices early 2027: https://www.businesswire.com/news/home/20250806259749/en/Sandisk-to-Collaborate-with-SK-hynix-to-Drive-Standardization-of-High-Bandwidth-Flash-Memory-Technology",
+   "how": "HBM3E/HBM4 (36-48 GB/stack, 2 TB/s); Rubin 288 GB per ~2.5 kW all-in; DDR5 CPU nodes; QLC NAND 37 Gb/mm2"
+  },
+  {
+   "metric": "pod memory per kg of pod (best-credible 3.9 g/W)",
+   "year": 2026,
+   "low": 23.0,
+   "mid": 29.4,
+   "high": 35.8,
+   "unit": "GB/kg",
+   "evidence_class": "demonstrated",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "film memory footprint density",
+   "year": 2026,
+   "low": 1.6,
+   "mid": 3.2,
+   "high": 4.8,
+   "unit": "MB per mm2 of chiplet footprint",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py (MEM_AREA 5.0 mm2)"
+  },
+  {
+   "metric": "film chiplet memory, radiation-tolerant, stacked on the 0.15 W chiplet",
+   "year": 2040,
+   "low": 128,
+   "mid": 1024,
+   "high": 4096,
+   "unit": "MB per chiplet",
+   "evidence_class": "roadmap claim (cells demonstrated; stacking on a 0.15 W logic die is speculation)",
+   "source": "Project decision record (85/15 film/pod split, 16 MB/chiplet, HBM 115 MB/W, pods 5 g/cm2): /home/user/dyson/docs/architecture.md ; TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram ; Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips ; 3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454 ; Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/ ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf ; Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand ; eras.py",
+   "how": "SRAM 1-2 MB + 4-8 BEOL cross-point decks of MRAM/FeRAM/RRAM (0.3-0.45 Gb/mm2 per deck at F=20 nm, MLC weights) or a hybrid-bonded 3D ferroelectric/RRAM die of 2-10 Gb/mm2 under a 3-5 mm2 chiplet"
+  },
+  {
+   "metric": "film memory per W of chip power",
+   "year": 2040,
+   "low": 853.3,
+   "mid": 6826.7,
+   "high": 27306.7,
+   "unit": "MB/W",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py (MB per chiplet / 0.15 W)"
+  },
+  {
+   "metric": "film memory per kg of compute sail (0.92 g/W)",
+   "year": 2040,
+   "low": 923.5,
+   "mid": 7388.2,
+   "high": 29552.7,
+   "unit": "GB/kg",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "pod memory per W of pod chip power",
+   "year": 2040,
+   "low": 200,
+   "mid": 400,
+   "high": 2000,
+   "unit": "MB/W",
+   "evidence_class": "roadmap claim",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/ ; SanDisk/SK hynix High Bandwidth Flash: HBM-class bandwidth, 8-16x HBM capacity at similar cost; samples H2 2026, devices early 2027: https://www.businesswire.com/news/home/20250806259749/en/Sandisk-to-Collaborate-with-SK-hynix-to-Drive-Standardization-of-High-Bandwidth-Flash-Memory-Technology",
+   "how": "HBM7/HBM8-class or 3D DRAM stacked directly on logic (zHBM): KAIST ~6 TB per 15.4 kW package -> ~390 MB/W; high end = 3D DRAM/NVDRAM-class dies bonded on logic + HBF (NAND) tier for read-mostly weights"
+  },
+  {
+   "metric": "pod memory per kg of pod (best-credible 3.9 g/W)",
+   "year": 2040,
+   "low": 51.2,
+   "mid": 102.3,
+   "high": 511.5,
+   "unit": "GB/kg",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "film memory footprint density",
+   "year": 2040,
+   "low": 32.0,
+   "mid": 256.0,
+   "high": 1024.0,
+   "unit": "MB per mm2 of chiplet footprint",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py (MEM_AREA 4.0 mm2)"
+  },
+  {
+   "metric": "film chiplet memory, radiation-tolerant, stacked on the 0.15 W chiplet",
+   "year": 2070,
+   "low": 1024,
+   "mid": 8192,
+   "high": 32768,
+   "unit": "MB per chiplet",
+   "evidence_class": "speculation",
+   "source": "Project decision record (85/15 film/pod split, 16 MB/chiplet, HBM 115 MB/W, pods 5 g/cm2): /home/user/dyson/docs/architecture.md ; TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram ; Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips ; 3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454 ; Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/ ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf ; Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand ; eras.py",
+   "how": "vertical 3D rad-tolerant NVM (FeFET/ferroelectric NAND-like or vertical RRAM, 64-256 layers, 10-60 Gb/mm2) bonded to a 4-8 mm2 chiplet"
+  },
+  {
+   "metric": "film memory per W of chip power",
+   "year": 2070,
+   "low": 6826.7,
+   "mid": 54613.3,
+   "high": 218453.3,
+   "unit": "MB/W",
+   "evidence_class": "speculation",
+   "source": "eras.py (MB per chiplet / 0.15 W)"
+  },
+  {
+   "metric": "film memory per kg of compute sail (0.92 g/W)",
+   "year": 2070,
+   "low": 7388.2,
+   "mid": 59105.3,
+   "high": 236421.4,
+   "unit": "GB/kg",
+   "evidence_class": "speculation",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "pod memory per W of pod chip power",
+   "year": 2070,
+   "low": 1000,
+   "mid": 4000,
+   "high": 20000,
+   "unit": "MB/W",
+   "evidence_class": "speculation",
+   "source": "speculation (eras.py): 3D DRAM / 3D FeRAM monolithically on logic",
+   "how": "monolithic 3D DRAM (100+ layers) and 3D FeRAM on logic; HBM as a product line gone"
+  },
+  {
+   "metric": "pod memory per kg of pod (best-credible 3.9 g/W)",
+   "year": 2070,
+   "low": 255.8,
+   "mid": 1023.0,
+   "high": 5115.1,
+   "unit": "GB/kg",
+   "evidence_class": "speculation",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "film memory footprint density",
+   "year": 2070,
+   "low": 170.67,
+   "mid": 1365.33,
+   "high": 5461.33,
+   "unit": "MB per mm2 of chiplet footprint",
+   "evidence_class": "speculation",
+   "source": "eras.py (MEM_AREA 6.0 mm2)"
+  },
+  {
+   "metric": "film chiplet memory, radiation-tolerant, stacked on the 0.15 W chiplet",
+   "year": "2100+",
+   "low": 4096,
+   "mid": 32768,
+   "high": 262144,
+   "unit": "MB per chiplet",
+   "evidence_class": "speculation",
+   "source": "Project decision record (85/15 film/pod split, 16 MB/chiplet, HBM 115 MB/W, pods 5 g/cm2): /home/user/dyson/docs/architecture.md ; TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram ; Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips ; 3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454 ; Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/ ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf ; Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand ; eras.py",
+   "how": "1000+-layer vertical NVM at 100-400 Gb/mm2 on 5-10 mm2; physics floor ~(7 nm)^3 per bit allows >1 Tb/mm2"
+  },
+  {
+   "metric": "film memory per W of chip power",
+   "year": "2100+",
+   "low": 27306.7,
+   "mid": 218453.3,
+   "high": 1747626.7,
+   "unit": "MB/W",
+   "evidence_class": "speculation",
+   "source": "eras.py (MB per chiplet / 0.15 W)"
+  },
+  {
+   "metric": "film memory per kg of compute sail (0.92 g/W)",
+   "year": "2100+",
+   "low": 29552.7,
+   "mid": 236421.4,
+   "high": 1891370.9,
+   "unit": "GB/kg",
+   "evidence_class": "speculation",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "pod memory per W of pod chip power",
+   "year": "2100+",
+   "low": 2000,
+   "mid": 10000,
+   "high": 50000,
+   "unit": "MB/W",
+   "evidence_class": "speculation",
+   "source": "speculation (eras.py): 3D DRAM / 3D FeRAM monolithically on logic",
+   "how": "dense charge-based 3D memory where shielding is cheap; archives in glass"
+  },
+  {
+   "metric": "pod memory per kg of pod (best-credible 3.9 g/W)",
+   "year": "2100+",
+   "low": 511.5,
+   "mid": 2557.5,
+   "high": 12787.7,
+   "unit": "GB/kg",
+   "evidence_class": "speculation",
+   "source": "eras.py; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "metric": "film memory footprint density",
+   "year": "2100+",
+   "low": 512.0,
+   "mid": 4096.0,
+   "high": 32768.0,
+   "unit": "MB per mm2 of chiplet footprint",
+   "evidence_class": "speculation",
+   "source": "eras.py (MEM_AREA 8.0 mm2)"
+  },
+  {
+   "metric": "HBM per-stack capacity",
+   "year": 2026,
+   "low": 24,
+   "mid": 36,
+   "high": 48,
+   "unit": "GB/stack",
+   "evidence_class": "demonstrated lab result",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "metric": "HBM per-stack bandwidth",
+   "year": 2026,
+   "low": 2.0,
+   "mid": 2.0,
+   "high": 2.6,
+   "unit": "TB/s per stack",
+   "evidence_class": "demonstrated lab result",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack power",
+   "year": 2026,
+   "low": 60,
+   "mid": 75,
+   "high": 75,
+   "unit": "W per stack",
+   "evidence_class": "roadmap claim",
+   "source": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack capacity",
+   "year": 2029,
+   "low": 48,
+   "mid": 64,
+   "high": 80,
+   "unit": "GB/stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "metric": "HBM per-stack bandwidth",
+   "year": 2029,
+   "low": 4,
+   "mid": 5,
+   "high": 6,
+   "unit": "TB/s per stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack power",
+   "year": 2029,
+   "low": 90,
+   "mid": 100,
+   "high": 110,
+   "unit": "W per stack",
+   "evidence_class": "roadmap claim",
+   "source": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack capacity",
+   "year": 2032,
+   "low": 96,
+   "mid": 108,
+   "high": 120,
+   "unit": "GB/stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "metric": "HBM per-stack bandwidth",
+   "year": 2032,
+   "low": 8,
+   "mid": 8,
+   "high": 8,
+   "unit": "TB/s per stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack power",
+   "year": 2032,
+   "low": 100,
+   "mid": 120,
+   "high": 130,
+   "unit": "W per stack",
+   "evidence_class": "roadmap claim",
+   "source": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack capacity",
+   "year": 2035,
+   "low": 160,
+   "mid": 176,
+   "high": 192,
+   "unit": "GB/stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "metric": "HBM per-stack bandwidth",
+   "year": 2035,
+   "low": 24,
+   "mid": 24,
+   "high": 24,
+   "unit": "TB/s per stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack power",
+   "year": 2035,
+   "low": 150,
+   "mid": 160,
+   "high": 170,
+   "unit": "W per stack",
+   "evidence_class": "roadmap claim",
+   "source": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack capacity",
+   "year": 2038,
+   "low": 200,
+   "mid": 220,
+   "high": 240,
+   "unit": "GB/stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "metric": "HBM per-stack bandwidth",
+   "year": 2038,
+   "low": 64,
+   "mid": 64,
+   "high": 64,
+   "unit": "TB/s per stack",
+   "evidence_class": "roadmap claim",
+   "source": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/ ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/ ; KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM per-stack power",
+   "year": 2038,
+   "low": 170,
+   "mid": 180,
+   "high": 190,
+   "unit": "W per stack",
+   "evidence_class": "roadmap claim",
+   "source": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "HBM-attached accelerator module memory per W",
+   "year": 2035,
+   "low": 300,
+   "mid": 390,
+   "high": 450,
+   "unit": "MB/W (~6 TB per 15.36 kW module)",
+   "evidence_class": "roadmap claim",
+   "source": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "metric": "pod main-memory access energy (DRAM-class, incl. IO)",
+   "year": 2026,
+   "low": 2.0,
+   "mid": 2.5,
+   "high": 3.9,
+   "unit": "pJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "HBM3E 3.44 pJ/bit (project-cited, arXiv:2602.18568): https://arxiv.org/abs/2602.18568 ; O'Connor et al., Fine-Grained DRAM, MICRO 2017: HBM2 3.9 pJ/bit vs GDDR5 14 pJ/bit; FGDRAM ~2x more energy-efficient: https://research.nvidia.com/sites/default/files/pubs/2017-10_Fine-Grained-DRAM%3A-Energy-Efficient/oconnor_and_chatterjee.micro2017.pdf ; SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/"
+  },
+  {
+   "metric": "pod main-memory access energy (DRAM-class, incl. IO)",
+   "year": 2030,
+   "low": 1.2,
+   "mid": 1.7,
+   "high": 2.2,
+   "unit": "pJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "TSMC custom HBM4E (C-HBM4E) base die on N3P at 0.75 V, ~2x power efficiency target; HBM4 base die N12 (1.1 -> 0.8 V, ~1.5x): https://www.trendforce.com/news/2025/12/01/news-tsmc-unveils-custom-c-hbm4e-details-n3p-logic-dies-reportedly-target-2x-efficiency-gain/ ; Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "metric": "pod main-memory access energy (DRAM-class, incl. IO)",
+   "year": 2040,
+   "low": 0.3,
+   "mid": 0.6,
+   "high": 1.0,
+   "unit": "pJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/ ; O'Connor et al., Fine-Grained DRAM, MICRO 2017: HBM2 3.9 pJ/bit vs GDDR5 14 pJ/bit; FGDRAM ~2x more energy-efficient: https://research.nvidia.com/sites/default/files/pubs/2017-10_Fine-Grained-DRAM%3A-Energy-Efficient/oconnor_and_chatterjee.micro2017.pdf ; Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html (zHBM: DRAM stacked on logic, no PHY)"
+  },
+  {
+   "metric": "pod main-memory access energy (DRAM-class, incl. IO)",
+   "year": 2070,
+   "low": 0.1,
+   "mid": 0.25,
+   "high": 0.5,
+   "unit": "pJ/bit",
+   "evidence_class": "speculation",
+   "source": "eras/cells.py: array + hybrid-bond IO (<0.05 pJ/bit) only"
+  },
+  {
+   "metric": "pod main-memory access energy (DRAM-class, incl. IO)",
+   "year": "2100+",
+   "low": 0.05,
+   "mid": 0.15,
+   "high": 0.3,
+   "unit": "pJ/bit",
+   "evidence_class": "speculation",
+   "source": "cells.py; bitline CV^2 floor ~0.01-0.05 pJ/bit"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 16",
+   "year": 2026,
+   "low": null,
+   "mid": 62.4,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 128",
+   "year": 2026,
+   "low": null,
+   "mid": 499.2,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 1024",
+   "year": 2026,
+   "low": null,
+   "mid": 3993.6,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 16",
+   "year": 2040,
+   "low": null,
+   "mid": 16.32,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 128",
+   "year": 2040,
+   "low": null,
+   "mid": 130.56,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 1024",
+   "year": 2040,
+   "low": null,
+   "mid": 1044.48,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 16",
+   "year": 2070,
+   "low": null,
+   "mid": 4.096,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 128",
+   "year": 2070,
+   "low": null,
+   "mid": 32.768,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 1024",
+   "year": 2070,
+   "low": null,
+   "mid": 262.144,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 16",
+   "year": "2100+",
+   "low": null,
+   "mid": 4.448,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 128",
+   "year": "2100+",
+   "low": null,
+   "mid": 35.584,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "maximum local weight-read energy for memory <= 20 % of chiplet energy, batch reuse 1024",
+   "year": "2100+",
+   "low": null,
+   "mid": 284.672,
+   "high": null,
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (derived from Study 1 J/op)",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "film local NVM / stacked-memory read energy incl. sense amp (or analog CIM per-MAC equivalent)",
+   "year": 2026,
+   "low": 50,
+   "mid": 200,
+   "high": 500,
+   "unit": "fJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html ; imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html ; Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing ; cells.py estimate"
+  },
+  {
+   "metric": "film local NVM / stacked-memory read energy incl. sense amp (or analog CIM per-MAC equivalent)",
+   "year": 2040,
+   "low": 20,
+   "mid": 80,
+   "high": 200,
+   "unit": "fJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html ; imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html ; Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing ; cells.py estimate"
+  },
+  {
+   "metric": "film local NVM / stacked-memory read energy incl. sense amp (or analog CIM per-MAC equivalent)",
+   "year": 2070,
+   "low": 10,
+   "mid": 30,
+   "high": 100,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html ; imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html ; Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing ; cells.py estimate"
+  },
+  {
+   "metric": "film local NVM / stacked-memory read energy incl. sense amp (or analog CIM per-MAC equivalent)",
+   "year": "2100+",
+   "low": 5,
+   "mid": 15,
+   "high": 50,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html ; imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html ; Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing ; cells.py estimate"
+  },
+  {
+   "metric": "3D NAND (and successor) areal density",
+   "year": 2026,
+   "low": 29,
+   "mid": 33,
+   "high": 37,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "demonstrated lab result",
+   "source": "Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand"
+  },
+  {
+   "metric": "3D NAND (and successor) areal density",
+   "year": 2030,
+   "low": 50,
+   "mid": 80,
+   "high": 100,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "roadmap claim",
+   "source": "Kioxia IMW 2024: 1000 layers and 100 Gb/mm2 by 2027 (target); Samsung 1000-layer NAND by 2030: https://blocksandfiles.com/2024/06/19/kioxia-1000-layer-3d-nand/ ; https://www.techradar.com/pro/ssd-rival-to-samsung-reveals-road-to-petabyte-ssds-at-major-engineering-conference-kioxia-wants-1000-layer-nand-in-3-years-and-discusses-helc-molybdenum-100gbmm2-densities ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "metric": "3D NAND (and successor) areal density",
+   "year": 2040,
+   "low": 100,
+   "mid": 200,
+   "high": 300,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "speculation",
+   "source": "IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "metric": "3D NAND (and successor) areal density",
+   "year": 2070,
+   "low": 200,
+   "mid": 500,
+   "high": 1000,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "speculation",
+   "source": "speculation"
+  },
+  {
+   "metric": "3D NAND (and successor) areal density",
+   "year": "2100+",
+   "low": 300,
+   "mid": 1000,
+   "high": 3000,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "speculation",
+   "source": "physics floor ~5 Tb/mm2 for (10 nm x 10 nm x 20 nm) cells in a 10 um stack"
+  },
+  {
+   "metric": "DRAM areal density (planar -> 4F2 VCT -> 3D DRAM)",
+   "year": 2026,
+   "low": 0.43,
+   "mid": 0.44,
+   "high": 0.45,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "demonstrated lab result",
+   "source": "TechInsights (FMS 2025): 16 Gb D1b dies 431-447 Mb/mm2, cell 0.00123-0.00133 um2: https://files.futurememorystorage.com/proceedings/2025/20250807_DRAM-304-1_Jeongdong-Choe_Short-version.pdf"
+  },
+  {
+   "metric": "DRAM areal density (planar -> 4F2 VCT -> 3D DRAM)",
+   "year": 2030,
+   "low": 0.55,
+   "mid": 0.65,
+   "high": 0.8,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "roadmap claim",
+   "source": "4F2 VCT DRAM ~30 % smaller die than 6F2 (Samsung, SK hynix, 10 nm and below); Samsung 3D (VS) DRAM commercial ~2030; Micron reportedly skips 4F2: https://semiwiki.com/forum/threads/samsung-and-sk-hynix-advance-4f%C2%B2-dram-as-gateway-to-3d-memory.23054/latest ; https://www.computerbase.de/2024-05/3d-dram-samsung-plant-mit-16-layern-fuer-2030/"
+  },
+  {
+   "metric": "DRAM areal density (planar -> 4F2 VCT -> 3D DRAM)",
+   "year": 2040,
+   "low": 1,
+   "mid": 3,
+   "high": 8,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "roadmap claim",
+   "source": "4F2 VCT DRAM ~30 % smaller die than 6F2 (Samsung, SK hynix, 10 nm and below); Samsung 3D (VS) DRAM commercial ~2030; Micron reportedly skips 4F2: https://semiwiki.com/forum/threads/samsung-and-sk-hynix-advance-4f%C2%B2-dram-as-gateway-to-3d-memory.23054/latest ; https://www.computerbase.de/2024-05/3d-dram-samsung-plant-mit-16-layern-fuer-2030/ ; imec/Ghent: 120 Si0.8Ge0.2/Si bilayers epitaxially grown on 300 mm for 3D DRAM, J. Appl. Phys. 138, 055702 (2025): https://xenospectrum.com/the-future-opened-up-by-120-layer-si-sige-stacks/ ; https://technews.tw/2025/08/25/3d-dram-120-layers/ ; NEO Semiconductor 3D X-DRAM 1T1C/3T0C IGZO variants: up to 512 Gb (10x DRAM), PoC chips 2026, 450 s retention (TCAD) - company claims: https://blocksandfiles.com/2025/05/12/neo-3d-dram-variants/ ; https://www.storagenewsletter.com/2025/05/08/neo-semiconductor-unveils-1t1c-and-3t0c-igzo-based-3d-x-dram-technology/ ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "metric": "DRAM areal density (planar -> 4F2 VCT -> 3D DRAM)",
+   "year": 2070,
+   "low": 5,
+   "mid": 15,
+   "high": 40,
+   "unit": "Gb/mm2 of die",
+   "evidence_class": "speculation",
+   "source": "speculation (100-1000-layer 3D DRAM)"
+  },
+  {
+   "metric": "SRAM macro density",
+   "year": 2026,
+   "low": 32,
+   "mid": 38,
+   "high": 38,
+   "unit": "Mb/mm2",
+   "evidence_class": "demonstrated lab result",
+   "source": "TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "metric": "SRAM macro density",
+   "year": 2040,
+   "low": 45,
+   "mid": 60,
+   "high": 80,
+   "unit": "Mb/mm2",
+   "evidence_class": "roadmap claim",
+   "source": "TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "metric": "SRAM macro density",
+   "year": 2070,
+   "low": 50,
+   "mid": 75,
+   "high": 100,
+   "unit": "Mb/mm2",
+   "evidence_class": "speculation",
+   "source": "TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs ; IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "metric": "cross-point NVM cell density per deck (4F2, F = 20.5 nm)",
+   "year": 2024,
+   "low": 0.36,
+   "mid": 0.45,
+   "high": 0.6,
+   "unit": "Gb/mm2 per deck (array efficiency 0.6-1.0)",
+   "evidence_class": "demonstrated lab result",
+   "source": "Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips"
+  },
+  {
+   "metric": "BEOL cross-point PCM/OTS (3D XPoint), 2 and 4 decks",
+   "year": 2019,
+   "low": 0.62,
+   "mid": 0.97,
+   "high": 1.31,
+   "unit": "Gb/mm2",
+   "evidence_class": "demonstrated lab result",
+   "source": "3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454"
+  },
+  {
+   "metric": "SRAM retention leakage at 85 C",
+   "year": 2026,
+   "low": 1.218,
+   "mid": 1.845,
+   "high": 7.382,
+   "unit": "mW per MB",
+   "evidence_class": "physics floor + engineering estimate",
+   "source": "3 nm dual-rail SRAM 27.5 uW/Mb low-leakage mode (ISSCC-class; project basis): https://sscs.ieee.org/tag/bit-density/ ; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json ; cells.py (doubling every 25/20/12 K)"
+  },
+  {
+   "metric": "DRAM 1T1C refresh power at 85 C",
+   "year": 2026,
+   "low": 13.42,
+   "mid": 26.84,
+   "high": 53.69,
+   "unit": "mW per GB",
+   "evidence_class": "physics floor + engineering estimate",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613 ; cells.py (0.05-0.2 pJ/bit per refresh)"
+  },
+  {
+   "metric": "oxide-semiconductor (IGZO/ZTO) 2T0C refresh power at 85 C",
+   "year": 2026,
+   "low": 0.0061,
+   "mid": null,
+   "high": 2.15,
+   "unit": "uW per GB",
+   "evidence_class": "demonstrated lab result (retention) + estimate (energy)",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234 ; Zinc-tin-oxide (In-free) TFT 2T0C DRAM: >1500 s retention, SS 59.9 mV/dec (Univ. Michigan thesis): https://deepblue.lib.umich.edu/items/e6ac2d99-46aa-444a-bc41-2851e63c965c ; cells.py"
+  },
+  {
+   "metric": "oxide-semiconductor 2T0C retention at 85 C",
+   "year": 2026,
+   "low": 200.0,
+   "mid": null,
+   "high": 7000.0,
+   "unit": "s",
+   "evidence_class": "demonstrated lab result",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234"
+  },
+  {
+   "metric": "DRAM retention window at 85 C",
+   "year": 2026,
+   "low": null,
+   "mid": 32.0,
+   "high": null,
+   "unit": "ms",
+   "evidence_class": "demonstrated (JEDEC) / extrapolated above 105 C",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613"
+  },
+  {
+   "metric": "SRAM retention leakage at 105 C",
+   "year": 2026,
+   "low": 2.12,
+   "mid": 3.691,
+   "high": 23.436,
+   "unit": "mW per MB",
+   "evidence_class": "physics floor + engineering estimate",
+   "source": "3 nm dual-rail SRAM 27.5 uW/Mb low-leakage mode (ISSCC-class; project basis): https://sscs.ieee.org/tag/bit-density/ ; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json ; cells.py (doubling every 25/20/12 K)"
+  },
+  {
+   "metric": "DRAM 1T1C refresh power at 105 C",
+   "year": 2026,
+   "low": 53.69,
+   "mid": 107.37,
+   "high": 214.75,
+   "unit": "mW per GB",
+   "evidence_class": "physics floor + engineering estimate",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613 ; cells.py (0.05-0.2 pJ/bit per refresh)"
+  },
+  {
+   "metric": "oxide-semiconductor (IGZO/ZTO) 2T0C refresh power at 105 C",
+   "year": 2026,
+   "low": 0.0068,
+   "mid": null,
+   "high": 6.0,
+   "unit": "uW per GB",
+   "evidence_class": "demonstrated lab result (retention) + estimate (energy)",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234 ; Zinc-tin-oxide (In-free) TFT 2T0C DRAM: >1500 s retention, SS 59.9 mV/dec (Univ. Michigan thesis): https://deepblue.lib.umich.edu/items/e6ac2d99-46aa-444a-bc41-2851e63c965c ; cells.py"
+  },
+  {
+   "metric": "oxide-semiconductor 2T0C retention at 105 C",
+   "year": 2026,
+   "low": 71.5,
+   "mid": null,
+   "high": 6316.0,
+   "unit": "s",
+   "evidence_class": "speculation (Arrhenius 0.06-0.6 eV)",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234"
+  },
+  {
+   "metric": "DRAM retention window at 105 C",
+   "year": 2026,
+   "low": null,
+   "mid": 8.0,
+   "high": null,
+   "unit": "ms",
+   "evidence_class": "demonstrated (JEDEC) / extrapolated above 105 C",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613"
+  },
+  {
+   "metric": "SRAM retention leakage at 125 C",
+   "year": 2026,
+   "low": 3.691,
+   "mid": 7.382,
+   "high": 74.406,
+   "unit": "mW per MB",
+   "evidence_class": "physics floor + engineering estimate",
+   "source": "3 nm dual-rail SRAM 27.5 uW/Mb low-leakage mode (ISSCC-class; project basis): https://sscs.ieee.org/tag/bit-density/ ; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json ; cells.py (doubling every 25/20/12 K)"
+  },
+  {
+   "metric": "DRAM 1T1C refresh power at 125 C",
+   "year": 2026,
+   "low": 214.75,
+   "mid": 429.5,
+   "high": 858.99,
+   "unit": "mW per GB",
+   "evidence_class": "physics floor + engineering estimate",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613 ; cells.py (0.05-0.2 pJ/bit per refresh)"
+  },
+  {
+   "metric": "oxide-semiconductor (IGZO/ZTO) 2T0C refresh power at 125 C",
+   "year": 2026,
+   "low": 0.0075,
+   "mid": null,
+   "high": 15.14,
+   "unit": "uW per GB",
+   "evidence_class": "demonstrated lab result (retention) + estimate (energy)",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234 ; Zinc-tin-oxide (In-free) TFT 2T0C DRAM: >1500 s retention, SS 59.9 mV/dec (Univ. Michigan thesis): https://deepblue.lib.umich.edu/items/e6ac2d99-46aa-444a-bc41-2851e63c965c ; cells.py"
+  },
+  {
+   "metric": "oxide-semiconductor 2T0C retention at 125 C",
+   "year": 2026,
+   "low": 28.4,
+   "mid": null,
+   "high": 5758.1,
+   "unit": "s",
+   "evidence_class": "speculation (Arrhenius 0.06-0.6 eV)",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234"
+  },
+  {
+   "metric": "DRAM retention window at 125 C",
+   "year": 2026,
+   "low": null,
+   "mid": 2.0,
+   "high": null,
+   "unit": "ms",
+   "evidence_class": "demonstrated (JEDEC) / extrapolated above 105 C",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613"
+  },
+  {
+   "metric": "STT-MRAM retention at 150 C",
+   "year": 2026,
+   "low": 10,
+   "mid": 20,
+   "high": 20,
+   "unit": "years",
+   "evidence_class": "demonstrated lab result",
+   "source": "TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram"
+  },
+  {
+   "metric": "RRAM retention at 125 C",
+   "year": 2026,
+   "low": 10,
+   "mid": 10,
+   "high": 10,
+   "unit": "years",
+   "evidence_class": "demonstrated lab result",
+   "source": "TSMC 22 nm eRRAM: 10-yr retention at 125 C, 1e4 cycles (Infineon AURIX TC4x); Weebit 150 C / 100k cycles: https://www.eenewseurope.com/en/tsmc-offers-22nm-rram-taking-mram-on-to-16nm ; https://www.weebit-nano.com/wp-content/uploads/2024/08/Weebit-FMS-2024-Presentation-ReRAM-embedded-RRAM-IP-NVM-for-semiconductors.pdf"
+  },
+  {
+   "metric": "PCM maximum operating temperature (Grade 0)",
+   "year": 2026,
+   "low": 150,
+   "mid": 165,
+   "high": 165,
+   "unit": "C",
+   "evidence_class": "demonstrated lab result",
+   "source": "ST 18 nm FD-SOI embedded PCM: AEC-Q100 Grade 0 up to 165 C, 2.5x NVM density vs 40 nm: https://newsroom.st.com/media-center/press-item.html/c3244.html ; https://www.st.com/content/st_com/en/about/innovation-and-technology/pcm.html"
+  },
+  {
+   "metric": "HZO FeRAM (NVDRAM) retention",
+   "year": 2026,
+   "low": 10,
+   "mid": 10,
+   "high": 10,
+   "unit": "years (temperature not public)",
+   "evidence_class": "demonstrated lab result (secondary report)",
+   "source": "Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/"
+  },
+  {
+   "metric": "endurance: SRAM, DRAM, oxide 2T0C",
+   "year": 2026,
+   "low": 1000000000000.0,
+   "mid": 1000000000000000.0,
+   "high": 1e+16,
+   "unit": "write cycles per cell",
+   "evidence_class": "demonstrated lab result",
+   "source": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234"
+  },
+  {
+   "metric": "endurance: STT-MRAM (eFlash-like 1e6; RAM-like >=1e10) / SOT-MRAM",
+   "year": 2026,
+   "low": 1000000.0,
+   "mid": 10000000000.0,
+   "high": 1000000000000000.0,
+   "unit": "write cycles per cell",
+   "evidence_class": "demonstrated lab result",
+   "source": "TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram ; imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html"
+  },
+  {
+   "metric": "endurance: HZO FeRAM / NVDRAM",
+   "year": 2026,
+   "low": 100000000000.0,
+   "mid": 1000000000000.0,
+   "high": 1000000000000000.0,
+   "unit": "write cycles per cell",
+   "evidence_class": "demonstrated lab result",
+   "source": "Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/"
+  },
+  {
+   "metric": "endurance: RRAM (embedded)",
+   "year": 2026,
+   "low": 10000.0,
+   "mid": 100000.0,
+   "high": 1000000.0,
+   "unit": "write cycles per cell",
+   "evidence_class": "demonstrated lab result",
+   "source": "TSMC 22 nm eRRAM: 10-yr retention at 125 C, 1e4 cycles (Infineon AURIX TC4x); Weebit 150 C / 100k cycles: https://www.eenewseurope.com/en/tsmc-offers-22nm-rram-taking-mram-on-to-16nm ; https://www.weebit-nano.com/wp-content/uploads/2024/08/Weebit-FMS-2024-Presentation-ReRAM-embedded-RRAM-IP-NVM-for-semiconductors.pdf"
+  },
+  {
+   "metric": "endurance: PCM",
+   "year": 2026,
+   "low": 1000000.0,
+   "mid": 100000000.0,
+   "high": 1000000000.0,
+   "unit": "write cycles per cell",
+   "evidence_class": "demonstrated lab result",
+   "source": "3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454 ; ST 18 nm FD-SOI embedded PCM: AEC-Q100 Grade 0 up to 165 C, 2.5x NVM density vs 40 nm: https://newsroom.st.com/media-center/press-item.html/c3244.html ; https://www.st.com/content/st_com/en/about/innovation-and-technology/pcm.html"
+  },
+  {
+   "metric": "endurance: 3D NAND (QLC-SLC)",
+   "year": 2026,
+   "low": 1000.0,
+   "mid": 3000.0,
+   "high": 100000.0,
+   "unit": "write cycles per cell",
+   "evidence_class": "demonstrated lab result",
+   "source": "Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand"
+  },
+  {
+   "metric": "10-yr TID at a film chiplet, 0.92 AU (flip-chip 50 um die, ~16 mg/cm2 each side)",
+   "year": "any",
+   "low": 142.0,
+   "mid": 169.7,
+   "high": 465.7,
+   "unit": "krad(Si)",
+   "evidence_class": "physics floor (transport) + model environment",
+   "source": "Henderson (NASA/Jacobs), Solar Particle Event Modeling Compared To Satellite Data (NSREC 2024): ESP/SAPPHIRE/JPL 7-yr solar-max spectra; Si dose behind 4 mm Al 2.05-2.23 krad (50 %), 5.2-17.6 krad (95 %); observed 0.73-4.03 krad: https://ntrs.nasa.gov/api/citations/20240000718/downloads/HendersonNSREC2024SummaryFinal.pdf ; SEP radial dependence inside 1 AU: modelled fluence R^-1.5..R^-0.7 (A&A 2025); 2023-07-17 event H fluence ~r^-4 (0.65-1 AU): https://www.aanda.org/10.1051/0004-6361/202452591 ; https://cosmos.esa.int/web/solar-orbiter/-/science-nugget-radial-dependence-of-solar-energetic-particle-peak-fluxes-and-fluences ; NIST PSTAR proton ranges (check: Si 10 MeV 0.17 g/cm2; Al 100 MeV ~10 g/cm2): https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html ; radiation.py (r^-2; r^-1..r^-3 changes it by -8/+9 %)"
+  },
+  {
+   "metric": "10-yr TID at a film chiplet with 0.1 mm local Si pads (+2.7 % film mass)",
+   "year": "any",
+   "low": 60.6,
+   "mid": 66.2,
+   "high": 238.2,
+   "unit": "krad(Si)",
+   "evidence_class": "physics floor + model environment",
+   "source": "radiation.py"
+  },
+  {
+   "metric": "10-yr TID at a film chiplet with 0.25 mm local Si pads (+10 % film mass)",
+   "year": "any",
+   "low": 34.4,
+   "mid": 36.7,
+   "high": 154.4,
+   "unit": "krad(Si)",
+   "evidence_class": "physics floor + model environment",
+   "source": "radiation.py"
+  },
+  {
+   "metric": "10-yr TID inside a 5 g/cm2 pod shield",
+   "year": "any",
+   "low": 0.36,
+   "mid": 0.46,
+   "high": 3.31,
+   "unit": "krad(Si)",
+   "evidence_class": "physics floor + model environment",
+   "source": "radiation.py; Henderson (NASA/Jacobs), Solar Particle Event Modeling Compared To Satellite Data (NSREC 2024): ESP/SAPPHIRE/JPL 7-yr solar-max spectra; Si dose behind 4 mm Al 2.05-2.23 krad (50 %), 5.2-17.6 krad (95 %); observed 0.73-4.03 krad: https://ntrs.nasa.gov/api/citations/20240000718/downloads/HendersonNSREC2024SummaryFinal.pdf"
+  },
+  {
+   "metric": "SEP low-energy-proton upsets in 16 MB of SRAM on the film over 10 yr",
+   "year": "any",
+   "low": 19565,
+   "mid": 256610,
+   "high": 5352383,
+   "unit": "upsets (mostly in a few event-days)",
+   "evidence_class": "physics floor + demonstrated cross-sections",
+   "source": "Glorieux et al., Methods for Proton Direct Ionization SEU Characterization, IEEE TNS 71, 1707 (2024): PDI cross-section >1000x high-energy; peaks ~1-4e-13 cm2/bit (16 nm FinFET), 3e-11-1e-10 (65-28 nm) at 0.5-0.8 MeV: https://jyx.jyu.fi/handle/123456789/100368 ; radiation.py"
+  },
+  {
+   "metric": "training state per replica, 1e+26 FLOP MoE",
+   "year": 2026,
+   "low": 92.4,
+   "mid": 115.5,
+   "high": 144.0,
+   "unit": "TB",
+   "evidence_class": "engineering estimate (research3 basis)",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 5770000000000.0,
+   "bytes_per_param": 20.0,
+   "sparsity": 20
+  },
+  {
+   "metric": "film power holding one 1e+26 FLOP MoE replica",
+   "year": 2026,
+   "low": 0.9021,
+   "mid": 1.3532,
+   "high": 2.7063,
+   "unit": "MW of film",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+26 FLOP MoE replica",
+   "year": 2026,
+   "low": 0.825,
+   "mid": 1.004,
+   "high": 1.283,
+   "unit": "MW of pods",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+27 FLOP MoE",
+   "year": 2026,
+   "low": 292.0,
+   "mid": 365.1,
+   "high": 456.0,
+   "unit": "TB",
+   "evidence_class": "engineering estimate (research3 basis)",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 18300000000000.0,
+   "bytes_per_param": 20.0,
+   "sparsity": 20
+  },
+  {
+   "metric": "film power holding one 1e+27 FLOP MoE replica",
+   "year": 2026,
+   "low": 2.8527,
+   "mid": 4.2791,
+   "high": 8.5582,
+   "unit": "MW of film",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+27 FLOP MoE replica",
+   "year": 2026,
+   "low": 2.608,
+   "mid": 3.175,
+   "high": 4.057,
+   "unit": "MW of pods",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+28 FLOP MoE",
+   "year": 2026,
+   "low": 924.0,
+   "mid": 1154.7,
+   "high": 1440.0,
+   "unit": "TB",
+   "evidence_class": "engineering estimate (research3 basis)",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 57700000000000.0,
+   "bytes_per_param": 20.0,
+   "sparsity": 20
+  },
+  {
+   "metric": "film power holding one 1e+28 FLOP MoE replica",
+   "year": 2026,
+   "low": 9.0211,
+   "mid": 13.5316,
+   "high": 27.0633,
+   "unit": "MW of film",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+28 FLOP MoE replica",
+   "year": 2026,
+   "low": 8.248,
+   "mid": 10.041,
+   "high": 12.83,
+   "unit": "MW of pods",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+29 FLOP MoE",
+   "year": 2026,
+   "low": 2920.0,
+   "mid": 3651.5,
+   "high": 4560.0,
+   "unit": "TB",
+   "evidence_class": "engineering estimate (research3 basis)",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 183000000000000.0,
+   "bytes_per_param": 20.0,
+   "sparsity": 20
+  },
+  {
+   "metric": "film power holding one 1e+29 FLOP MoE replica",
+   "year": 2026,
+   "low": 28.5272,
+   "mid": 42.7908,
+   "high": 85.5816,
+   "unit": "MW of film",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+29 FLOP MoE replica",
+   "year": 2026,
+   "low": 26.082,
+   "mid": 31.752,
+   "high": 40.572,
+   "unit": "MW of pods",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "frontier inference patch side (<=2k concurrent sequences)",
+   "year": 2026,
+   "low": 14.7,
+   "mid": 18.0,
+   "high": 40.2,
+   "unit": "m",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py (memory- or compute-limited; frontier weights [4, 10] TB)",
+   "limited_by": {
+    "small model, high mem": "memory",
+    "mid": "memory",
+    "big model, mid mem": "memory",
+    "big model, low mem": "memory"
+   }
+  },
+  {
+   "metric": "replica-sized sail side (largest film replica: 1e+28 FLOP MoE)",
+   "year": 2026,
+   "low": 199.9,
+   "mid": 279.1,
+   "high": 346.3,
+   "unit": "m",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py; Sail design spec (279 m sail, 1.06e8 sites, 1e28 MoE replica, sensitivity k^-1/2): research4/design/result.json, sensitivity.json",
+   "state_TB": 1154.7
+  },
+  {
+   "metric": "minimum pod share of chip power from memory reasons alone",
+   "year": 2026,
+   "low": 0.1,
+   "mid": 0.15,
+   "high": 0.2,
+   "unit": "fraction of chip power",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json",
+   "why": "CPU+DRAM sandboxes/RL envs 3-8 %, storage+weight stores 0.5-1 %, HBM training/capacity islands 5-10 % (architecture.md, research3 skeptic)"
+  },
+  {
+   "metric": "film memory matched to a 2026 HBM GPU bytes per FLOP/s (1.65e-5 B per FLOP/s)",
+   "year": 2026,
+   "low": null,
+   "mid": 29.5,
+   "high": null,
+   "unit": "MB per chiplet",
+   "evidence_class": "engineering estimate",
+   "source": "eras.py; research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "4 GB agent sandbox footprint on the film",
+   "year": 2026,
+   "low": null,
+   "mid": 320.0,
+   "high": null,
+   "unit": "chiplets (0.15 W each)",
+   "evidence_class": "demonstrated lab result",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+26 FLOP MoE",
+   "year": 2040,
+   "low": 86.6,
+   "mid": 115.5,
+   "high": 173.0,
+   "unit": "TB",
+   "evidence_class": "roadmap claim",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 11500000000000.0,
+   "bytes_per_param": 10.0,
+   "sparsity": 40
+  },
+  {
+   "metric": "film power holding one 1e+26 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.0053,
+   "mid": 0.0211,
+   "high": 0.1691,
+   "unit": "MW of film",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+26 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.058,
+   "mid": 0.289,
+   "high": 0.577,
+   "unit": "MW of pods",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+27 FLOP MoE",
+   "year": 2040,
+   "low": 274.0,
+   "mid": 365.1,
+   "high": 548.0,
+   "unit": "TB",
+   "evidence_class": "roadmap claim",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 36500000000000.0,
+   "bytes_per_param": 10.0,
+   "sparsity": 40
+  },
+  {
+   "metric": "film power holding one 1e+27 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.0167,
+   "mid": 0.0669,
+   "high": 0.5349,
+   "unit": "MW of film",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+27 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.183,
+   "mid": 0.913,
+   "high": 1.826,
+   "unit": "MW of pods",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+28 FLOP MoE",
+   "year": 2040,
+   "low": 866.0,
+   "mid": 1154.7,
+   "high": 1730.0,
+   "unit": "TB",
+   "evidence_class": "roadmap claim",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 115000000000000.0,
+   "bytes_per_param": 10.0,
+   "sparsity": 40
+  },
+  {
+   "metric": "film power holding one 1e+28 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.0529,
+   "mid": 0.2114,
+   "high": 1.6915,
+   "unit": "MW of film",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+28 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.577,
+   "mid": 2.887,
+   "high": 5.774,
+   "unit": "MW of pods",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+29 FLOP MoE",
+   "year": 2040,
+   "low": 2740.0,
+   "mid": 3651.5,
+   "high": 5480.0,
+   "unit": "TB",
+   "evidence_class": "roadmap claim",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 365000000000000.0,
+   "bytes_per_param": 10.0,
+   "sparsity": 40
+  },
+  {
+   "metric": "film power holding one 1e+29 FLOP MoE replica",
+   "year": 2040,
+   "low": 0.1672,
+   "mid": 0.6686,
+   "high": 5.3489,
+   "unit": "MW of film",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+29 FLOP MoE replica",
+   "year": 2040,
+   "low": 1.826,
+   "mid": 9.129,
+   "high": 18.257,
+   "unit": "MW of pods",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "frontier inference patch side (<=2k concurrent sequences)",
+   "year": 2040,
+   "low": 3.1,
+   "mid": 3.5,
+   "high": 31.8,
+   "unit": "m",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py (memory- or compute-limited; frontier weights [10, 100] TB)",
+   "limited_by": {
+    "small model, high mem": "compute",
+    "mid": "memory",
+    "big model, mid mem": "memory",
+    "big model, low mem": "memory"
+   }
+  },
+  {
+   "metric": "replica-sized sail side (largest film replica: 1e+29 FLOP MoE)",
+   "year": 2040,
+   "low": 27.2,
+   "mid": 62.0,
+   "high": 153.9,
+   "unit": "m",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py; Sail design spec (279 m sail, 1.06e8 sites, 1e28 MoE replica, sensitivity k^-1/2): research4/design/result.json, sensitivity.json",
+   "state_TB": 3651.5
+  },
+  {
+   "metric": "minimum pod share of chip power from memory reasons alone",
+   "year": 2040,
+   "low": 0.02,
+   "mid": 0.05,
+   "high": 0.1,
+   "unit": "fraction of chip power",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json",
+   "why": "training state fits on film (>=128 MB/chiplet); CPU+DRAM sandboxes still in pods unless MRAM/FeRAM main memory on film matures; storage <=1 %"
+  },
+  {
+   "metric": "film memory matched to a 2026 HBM GPU bytes per FLOP/s (1.65e-5 B per FLOP/s)",
+   "year": 2040,
+   "low": null,
+   "mid": 225.2,
+   "high": null,
+   "unit": "MB per chiplet",
+   "evidence_class": "engineering estimate",
+   "source": "eras.py; research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "4 GB agent sandbox footprint on the film",
+   "year": 2040,
+   "low": null,
+   "mid": 5.0,
+   "high": null,
+   "unit": "chiplets (0.15 W each)",
+   "evidence_class": "roadmap claim",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+26 FLOP MoE",
+   "year": 2070,
+   "low": 74.3,
+   "mid": 110.9,
+   "high": 185.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 18500000000000.0,
+   "bytes_per_param": 6.0,
+   "sparsity": 64
+  },
+  {
+   "metric": "film power holding one 1e+26 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.0006,
+   "mid": 0.0025,
+   "high": 0.0203,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+26 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.006,
+   "mid": 0.028,
+   "high": 0.111,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+27 FLOP MoE",
+   "year": 2070,
+   "low": 235.0,
+   "mid": 350.5,
+   "high": 585.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 58400000000000.0,
+   "bytes_per_param": 6.0,
+   "sparsity": 64
+  },
+  {
+   "metric": "film power holding one 1e+27 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.002,
+   "mid": 0.008,
+   "high": 0.0642,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+27 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.018,
+   "mid": 0.088,
+   "high": 0.351,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+28 FLOP MoE",
+   "year": 2070,
+   "low": 743.0,
+   "mid": 1108.5,
+   "high": 1850.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 185000000000000.0,
+   "bytes_per_param": 6.0,
+   "sparsity": 64
+  },
+  {
+   "metric": "film power holding one 1e+28 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.0063,
+   "mid": 0.0254,
+   "high": 0.203,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+28 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.055,
+   "mid": 0.277,
+   "high": 1.109,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+29 FLOP MoE",
+   "year": 2070,
+   "low": 2350.0,
+   "mid": 3505.4,
+   "high": 5850.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 584000000000000.0,
+   "bytes_per_param": 6.0,
+   "sparsity": 64
+  },
+  {
+   "metric": "film power holding one 1e+29 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.0201,
+   "mid": 0.0802,
+   "high": 0.6419,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+29 FLOP MoE replica",
+   "year": 2070,
+   "low": 0.175,
+   "mid": 0.876,
+   "high": 3.505,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "frontier inference patch side (<=2k concurrent sequences)",
+   "year": 2070,
+   "low": 2.8,
+   "mid": 2.8,
+   "high": 35.5,
+   "unit": "m",
+   "evidence_class": "speculation",
+   "source": "eras.py (memory- or compute-limited; frontier weights [30, 1000] TB)",
+   "limited_by": {
+    "small model, high mem": "compute",
+    "mid": "compute",
+    "big model, mid mem": "memory",
+    "big model, low mem": "memory"
+   }
+  },
+  {
+   "metric": "replica-sized sail side (largest film replica: 1e+30 FLOP MoE)",
+   "year": 2070,
+   "low": 16.8,
+   "mid": 38.2,
+   "high": 94.8,
+   "unit": "m",
+   "evidence_class": "speculation",
+   "source": "eras.py; Sail design spec (279 m sail, 1.06e8 sites, 1e28 MoE replica, sensitivity k^-1/2): research4/design/result.json, sensitivity.json",
+   "state_TB": 11085.1
+  },
+  {
+   "metric": "minimum pod share of chip power from memory reasons alone",
+   "year": 2070,
+   "low": 0.003,
+   "mid": 0.01,
+   "high": 0.03,
+   "unit": "fraction of chip power",
+   "evidence_class": "speculation",
+   "source": "eras.py; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json",
+   "why": "sandboxes run on film chiplets with GB of SEU-immune MRAM/FeRAM; pods keep archives, DRAM-only legacy work, and >10 krad-sensitive dense storage"
+  },
+  {
+   "metric": "film memory matched to a 2026 HBM GPU bytes per FLOP/s (1.65e-5 B per FLOP/s)",
+   "year": 2070,
+   "low": null,
+   "mid": 897.4,
+   "high": null,
+   "unit": "MB per chiplet",
+   "evidence_class": "engineering estimate",
+   "source": "eras.py; research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "4 GB agent sandbox footprint on the film",
+   "year": 2070,
+   "low": null,
+   "mid": 0.6,
+   "high": null,
+   "unit": "chiplets (0.15 W each)",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+26 FLOP MoE",
+   "year": "2100+",
+   "low": 86.6,
+   "mid": 144.3,
+   "high": 231.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 28900000000000.0,
+   "bytes_per_param": 5.0,
+   "sparsity": 100
+  },
+  {
+   "metric": "film power holding one 1e+26 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.0001,
+   "mid": 0.0008,
+   "high": 0.0066,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+26 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.003,
+   "mid": 0.014,
+   "high": 0.072,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+27 FLOP MoE",
+   "year": "2100+",
+   "low": 274.0,
+   "mid": 456.4,
+   "high": 730.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 91300000000000.0,
+   "bytes_per_param": 5.0,
+   "sparsity": 100
+  },
+  {
+   "metric": "film power holding one 1e+27 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.0003,
+   "mid": 0.0026,
+   "high": 0.0209,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+27 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.009,
+   "mid": 0.046,
+   "high": 0.228,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+28 FLOP MoE",
+   "year": "2100+",
+   "low": 866.0,
+   "mid": 1443.4,
+   "high": 2310.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 289000000000000.0,
+   "bytes_per_param": 5.0,
+   "sparsity": 100
+  },
+  {
+   "metric": "film power holding one 1e+28 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.001,
+   "mid": 0.0083,
+   "high": 0.0661,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+28 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.029,
+   "mid": 0.144,
+   "high": 0.722,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "training state per replica, 1e+29 FLOP MoE",
+   "year": "2100+",
+   "low": 2740.0,
+   "mid": 4564.4,
+   "high": 7300.0,
+   "unit": "TB",
+   "evidence_class": "speculation",
+   "source": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861 ; Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507 ; DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437 ; NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149 ; Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2",
+   "N_total_params": 913000000000000.0,
+   "bytes_per_param": 5.0,
+   "sparsity": 100
+  },
+  {
+   "metric": "film power holding one 1e+29 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.0033,
+   "mid": 0.0261,
+   "high": 0.2089,
+   "unit": "MW of film",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "pod power holding one 1e+29 FLOP MoE replica",
+   "year": "2100+",
+   "low": 0.091,
+   "mid": 0.456,
+   "high": 2.282,
+   "unit": "MW of pods",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  },
+  {
+   "metric": "frontier inference patch side (<=2k concurrent sequences)",
+   "year": "2100+",
+   "low": 3.0,
+   "mid": 3.0,
+   "high": 56.1,
+   "unit": "m",
+   "evidence_class": "speculation",
+   "source": "eras.py (memory- or compute-limited; frontier weights [100, 10000] TB)",
+   "limited_by": {
+    "small model, high mem": "compute",
+    "mid": "compute",
+    "big model, mid mem": "memory",
+    "big model, low mem": "memory"
+   }
+  },
+  {
+   "metric": "replica-sized sail side (largest film replica: 1e+30 FLOP MoE)",
+   "year": "2100+",
+   "low": 6.8,
+   "mid": 21.8,
+   "high": 54.1,
+   "unit": "m",
+   "evidence_class": "speculation",
+   "source": "eras.py; Sail design spec (279 m sail, 1.06e8 sites, 1e28 MoE replica, sensitivity k^-1/2): research4/design/result.json, sensitivity.json",
+   "state_TB": 14433.8
+  },
+  {
+   "metric": "minimum pod share of chip power from memory reasons alone",
+   "year": "2100+",
+   "low": 0.0,
+   "mid": 0.003,
+   "high": 0.01,
+   "unit": "fraction of chip power",
+   "evidence_class": "speculation",
+   "source": "eras.py; research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json",
+   "why": "memory gives no reason for pods; pods only for switching/gateways (non-memory) and archives"
+  },
+  {
+   "metric": "film memory matched to a 2026 HBM GPU bytes per FLOP/s (1.65e-5 B per FLOP/s)",
+   "year": "2100+",
+   "low": null,
+   "mid": 1652.8,
+   "high": null,
+   "unit": "MB per chiplet",
+   "evidence_class": "engineering estimate",
+   "source": "eras.py; research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py ; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "metric": "4 GB agent sandbox footprint on the film",
+   "year": "2100+",
+   "low": null,
+   "mid": 0.2,
+   "high": null,
+   "unit": "chiplets (0.15 W each)",
+   "evidence_class": "speculation",
+   "source": "eras.py"
+  }
+ ],
+ "physical_floors": [
+  {
+   "floor": "Non-volatility barrier for 10-yr retention at p_bit <= 1e-9 (attempt 1e9/s)",
+   "value": {
+    "300K": {
+     "Delta_kT": 61.0,
+     "E_b_eV": 1.577
+    },
+    "358K": {
+     "Delta_kT": 61.0,
+     "E_b_eV": 1.883
+    },
+    "398K": {
+     "Delta_kT": 61.0,
+     "E_b_eV": 2.093
+    }
+   },
+   "unit": "kT, eV",
+   "evidence_class": "physics floor",
+   "source": "cells.py (Neel-Arrhenius)"
+  },
+  {
+   "floor": "Smallest thermally stable magnetic bit at that barrier",
+   "value": {
+    "300K": {
+     "cube_nm_Ku_1e6": 6.32,
+     "cube_nm_FePt": 3.37
+    },
+    "358K": {
+     "cube_nm_Ku_1e6": 6.71,
+     "cube_nm_FePt": 3.58
+    },
+    "398K": {
+     "cube_nm_Ku_1e6": 6.95,
+     "cube_nm_FePt": 3.7
+    }
+   },
+   "unit": "nm (cube side)",
+   "evidence_class": "physics floor",
+   "source": "cells.py; Ku 1e6 J/m3 (CoFeB/MgO-class), 6.6e6 (L1_0 FePt)"
+  },
+  {
+   "floor": "Landauer erase energy kT ln2",
+   "value": {
+    "300K": 2.870978885078724e-21,
+    "358K": 3.42747029230315e-21,
+    "398K": 3.8102674769803126e-21
+   },
+   "unit": "J/bit",
+   "evidence_class": "physics floor (not binding: real writes are 1e4-1e7x higher)",
+   "source": "cells.py"
+  },
+  {
+   "floor": "Charge retention t = C dV / I_off",
+   "value": [
+    {
+     "cell": "DRAM 1T1C (10-20 fF, 0.3 V margin, Si access FET 1e-16..1e-15 A at 85 C)",
+     "t_ret_s": [
+      4.499999999999999,
+      45.0
+     ]
+    },
+    {
+     "cell": "IGZO 2T0C (0.5 fF SN, 0.2 V, 3e-21 A/um x 0.05 um .. 3e-19 x 0.05)",
+     "t_ret_s": [
+      6666.666666666667,
+      666666.6666666667
+     ]
+    },
+    {
+     "cell": "Si 2T0C/gain cell (0.5 fF, 0.2 V, Si FET 1e-17..1e-15 A)",
+     "t_ret_s": [
+      0.1,
+      10.0
+     ]
+    }
+   ],
+   "unit": "s",
+   "evidence_class": "physics floor + demonstrated I_off",
+   "source": "cells.py; imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology ; Kioxia/Nanya OCTRAM (IEDM 2024): InGaZnO vertical-transistor 4F2 DRAM, OFF <1 aA/cell, ON >15 uA (trade report): https://www.kioxia.com/en-jp/about/news/2024/20241210-1.html ; https://convergedigest.com/kioxia-and-nanya-develop-octram-a-low-power-4f2-dram-tech/"
+  },
+  {
+   "floor": "Thermal minority-carrier generation ~ exp(-Eg/2kT): wide-gap oxides vs Si",
+   "value": {
+    "Si": {
+     "85C": 1.3178002607882526e-08,
+     "125C": 8.156918710260049e-08
+    },
+    "IGZO/ZnO/TiO2-class": {
+     "85C": 3.056923287957372e-23,
+     "125C": 5.587499875510386e-21
+    },
+    "SnO2/ZTO-class": {
+     "85C": 4.687541309300093e-26,
+     "125C": 1.6429324867229943e-23
+    }
+   },
+   "unit": "relative n_i",
+   "evidence_class": "physics floor",
+   "source": "cells.py (why oxide channels leak 1e3-1e5x less than Si and stay low when hot)"
+  },
+  {
+   "floor": "DRAM retention halves every ~10 K above 85 C (Arrhenius ~0.6-0.8 eV); SRAM leakage doubles every 12-25 K",
+   "value": "refresh x16 at 125 C vs 85 C; SRAM leakage x3-27 at 125 C vs 85 C",
+   "unit": "",
+   "evidence_class": "physics floor (thermally activated leakage) + JEDEC",
+   "source": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613 ; cells.py"
+  },
+  {
+   "floor": "Read-energy budget: E_bit <= f_mem x J/FLOP x 2b / (8 x bytes per param)",
+   "value": {
+    "2026 b=1": 3.9,
+    "2026 b=16": 62.4,
+    "2026 b=128": 499.2,
+    "2026 b=1024": 3993.6,
+    "2040 b=1": 1.02,
+    "2040 b=16": 16.32,
+    "2040 b=128": 130.56,
+    "2040 b=1024": 1044.48,
+    "2070 b=1": 0.256,
+    "2070 b=16": 4.096,
+    "2070 b=128": 32.768,
+    "2070 b=1024": 262.144,
+    "2100+ b=1": 0.278,
+    "2100+ b=16": 4.448,
+    "2100+ b=128": 35.584,
+    "2100+ b=1024": 284.672
+   },
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor (energy accounting) using Study 1 J/op",
+   "source": "cells.py; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "floor": "Film radiation floor: thin film + die give ~16 mg/cm2 each side; local pads saturate because oblique paths bypass them",
+   "value": {
+    "bare_krad": [
+     142.0,
+     465.7
+    ],
+    "pads_0p1mm_krad": [
+     60.6,
+     238.2
+    ],
+    "pads_1mm_krad": [
+     21.3,
+     100.2
+    ],
+    "pads_1mm_g_per_W": 1.292,
+    "pod_5gcm2_krad": [
+     0.36,
+     3.31
+    ]
+   },
+   "unit": "krad(Si) per 10 yr at 0.92 AU",
+   "evidence_class": "physics floor (CSDA transport, calibrated to Henderson 4 mm Al within 2-7 %)",
+   "source": "radiation.py; Henderson (NASA/Jacobs), Solar Particle Event Modeling Compared To Satellite Data (NSREC 2024): ESP/SAPPHIRE/JPL 7-yr solar-max spectra; Si dose behind 4 mm Al 2.05-2.23 krad (50 %), 5.2-17.6 krad (95 %); observed 0.73-4.03 krad: https://ntrs.nasa.gov/api/citations/20240000718/downloads/HendersonNSREC2024SummaryFinal.pdf"
+  },
+  {
+   "floor": "Physical density ceiling for 3D non-volatile memory",
+   "value": "~(7 nm)^3 per bit -> ~1e18 bit/cm3; a 10 um stack at 10x10x20 nm cells ~5 Tb/mm2; H-on-Si atomic memory 1.7 Tb/mm2 (2D)",
+   "unit": "",
+   "evidence_class": "physics floor + demonstrated lab result",
+   "source": "cells.py; Achal et al., Lithography for robust and editable atomic-scale silicon devices and memories, Nat. Commun. 9, 2778 (2018): 1.1 Pb/in2, room-temperature stable: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6056515/"
+  },
+  {
+   "floor": "Wire/bond energy floor for stacked memory",
+   "value": "C ~0.5-2 fF per bond+via at 0.1-0.5 V: 0.005-0.5 fJ/bit (hybrid bonds today <50 fJ/bit incl. PHY)",
+   "unit": "fJ/bit",
+   "evidence_class": "physics floor + demonstrated",
+   "source": "Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html"
+  }
+ ],
+ "model_parameters": [
+  {
+   "param": "filmMemPerChiplet (new)",
+   "unit": "MB per 0.15 W chiplet (radiation-tolerant NVM + SRAM)",
+   "y2026": 16,
+   "y2040": 1024,
+   "y2070": 8192,
+   "y2100plus": 32768,
+   "notes": "Ranges 8-24 / 128-4096 / 1024-32768 / 4096-262144. 2026 = 4-8 MB SRAM + eMRAM/eRRAM; 2040 = BEOL cross-point MRAM/FeRAM/RRAM decks or a bonded 3D ferroelectric die; later vertical 3D NVM. Useful minimum = 2026-GPU bytes per FLOP/s: 30/225/900/1650 MB."
+  },
+  {
+   "param": "filmMemMBperW",
+   "unit": "MB/W",
+   "y2026": 107,
+   "y2040": 6830,
+   "y2070": 54600,
+   "y2100plus": 218000,
+   "notes": "x0.8 usable fill for replicas/patches. Was the 107 MB/W basis."
+  },
+  {
+   "param": "podMemMBperW",
+   "unit": "MB per W of pod chip power",
+   "y2026": 115,
+   "y2040": 400,
+   "y2070": 4000,
+   "y2100plus": 10000,
+   "notes": "2026 Rubin HBM4; 2040 HBM8-class/zHBM (KAIST ~6 TB per 15.4 kW); then 3D DRAM/FeRAM on logic. Film MB/W overtakes pods by ~2035-2040 because the film can stack NVM on every chiplet with no concentration penalty."
+  },
+  {
+   "param": "sramPerChiplet",
+   "unit": "MB",
+   "y2026": "4-8",
+   "y2040": "1-2",
+   "y2070": "0.5-2",
+   "y2100plus": "0.5-2",
+   "notes": "Only buffers/registers once weights, KV and optimizer state move to NVM/oxide memory."
+  },
+  {
+   "param": "sramLeakShareAt85C",
+   "unit": "fraction of 0.15 W",
+   "y2026": "0.10-0.59",
+   "y2040": "0.01-0.10",
+   "y2070": "0.005-0.10",
+   "y2100plus": "0.005-0.10",
+   "notes": "1 MB: 0.8-4.9 % at 85 C, 1.4-16 % at 105 C, 2.5-50 % at 125 C (cells.py). The leakage cap on Tj goes away up to ~105 C."
+  },
+  {
+   "param": "tjFilmC",
+   "unit": "C",
+   "y2026": 85,
+   "y2040": "85-95",
+   "y2070": "85-105",
+   "y2100plus": "85-105",
+   "notes": "Memory no longer sets the limit; logic does. FLOP/s/kg vs 85 C: 105 C 0.93x (2026 slope) / 1.00x (2100 slope); 125 C 0.85x / 0.97x (swarm.json). Hotter only pays for staying inside Earth orbit at high coverage."
+  },
+  {
+   "param": "podFrac (memory-driven minimum)",
+   "unit": "fraction of chip power",
+   "y2026": 0.15,
+   "y2040": 0.05,
+   "y2070": 0.01,
+   "y2100plus": 0.003,
+   "notes": "Ranges 0.10-0.20 / 0.02-0.10 / 0.003-0.03 / 0-0.01. Swarm g/W at f=0.01 (best pods): 1.37 (15 %) -> 1.07 (5 %) -> 0.95 (1 %) -> 0.93 (0.3 %); heavier pods 1.88 -> 1.24 -> 0.99 -> 0.94."
+  },
+  {
+   "param": "podShield",
+   "unit": "g/cm2",
+   "y2026": 5,
+   "y2040": 5,
+   "y2070": "1-5",
+   "y2100plus": "1-5",
+   "notes": "5 g/cm2 gives 0.4-3.3 krad per 10 yr: still at the HBM/DRAM 2 krad onset in the 95 % environment; NAND fine. Pods that keep only archives and rad-tolerant NVM can drop to ~1 g/cm2 (3.7-27 krad)."
+  },
+  {
+   "param": "trainingBytesPerParam",
+   "unit": "B/param incl. optimizer and activations",
+   "y2026": 20,
+   "y2040": 10,
+   "y2070": 6,
+   "y2100plus": 5,
+   "notes": "BF16+FP32 Adam -> FP8 + 8-bit states -> FP4/FP8 + 4-bit states."
+  },
+  {
+   "param": "moeSparsity",
+   "unit": "total/active params",
+   "y2026": 20,
+   "y2040": 40,
+   "y2070": 64,
+   "y2100plus": 100,
+   "notes": "DeepSeek-V3 18, Kimi K2 32 (2025)."
+  },
+  {
+   "param": "replicaState1e28",
+   "unit": "TB",
+   "y2026": 1155,
+   "y2040": 1155,
+   "y2070": 1109,
+   "y2100plus": 1443,
+   "notes": "Nearly constant: bytes/param fall 4x while sparsity rises 5x, so total params for 1e28 FLOP grow 58T -> 115T -> 185T -> 289T."
+  },
+  {
+   "param": "filmMWper1e28Replica",
+   "unit": "MW",
+   "y2026": 13.5,
+   "y2040": 0.21,
+   "y2070": 0.025,
+   "y2100plus": 0.008,
+   "notes": "Pods: 10 / 2.9 / 0.28 / 0.14 MW."
+  },
+  {
+   "param": "replicaSailSide",
+   "unit": "m",
+   "y2026": 279,
+   "y2040": 62,
+   "y2070": 38,
+   "y2100plus": 22,
+   "notes": "Design-consistent scaling for the largest film replica (1e28, 1e29, 1e30, 1e30 FLOP). Below ~150 m the replica rule stops sizing sails: keep ~150-300 m for hub/vane fixed mass (2.4 % at 279 m, 19 % at 82 m) and pack 10-1000 replicas per sail."
+  },
+  {
+   "param": "frontierPatchSide",
+   "unit": "m (<=2k concurrency)",
+   "y2026": "18 (15-40)",
+   "y2040": "3.6-11 (3-32)",
+   "y2070": "2.8-12.5 (2.8-36)",
+   "y2100plus": "3-20 (3-56)",
+   "notes": "Becomes compute-limited (2.8-9 m) for models whose weights fit in a few hundred thousand chiplets."
+  },
+  {
+   "param": "filmLocalReadEnergyMax",
+   "unit": "fJ/bit at batch reuse 128",
+   "y2026": 500,
+   "y2040": 131,
+   "y2070": 33,
+   "y2100plus": 36,
+   "notes": "At batch 16 the budget is 62/16/4/4 fJ/bit: weight reads must become analog compute-in-memory or high-reuse batches by 2070."
+  },
+  {
+   "param": "podMemAccessEnergy",
+   "unit": "pJ/bit",
+   "y2026": 2.5,
+   "y2040": 0.6,
+   "y2070": 0.25,
+   "y2100plus": 0.15,
+   "notes": "HBM3E 3.44, HBM2 3.9; custom HBM4E ~1.7; DRAM on logic without PHY."
+  },
+  {
+   "param": "weightBackingStoreNeeded",
+   "unit": "bool",
+   "y2026": true,
+   "y2040": false,
+   "y2070": false,
+   "y2100plus": false,
+   "notes": "NVM weights survive brownouts and shadows; only KV/activations are volatile."
+  },
+  {
+   "param": "memoryWafersPerMW (new)",
+   "unit": "300 mm memory-process wafers per MW (one memory die per chiplet)",
+   "y2026": 524,
+   "y2040": 419,
+   "y2070": 629,
+   "y2100plus": 838,
+   "notes": "2026 value is logic-die SRAM/eNVM area; later values are cheaper memory wafers but with tens to hundreds of layers. Capacity beyond the useful minimum costs fab output, not mass."
+  }
+ ],
+ "obsolete_by_era": [
+  {
+   "param": "HBM (TSV DRAM stacks beside the accelerator on an interposer)",
+   "obsolete_by": "2035-2045",
+   "replacement": "DRAM (later 3D DRAM/3D FeRAM) bonded directly on logic (Samsung zHBM phase 3, custom logic base dies from HBM4E), plus HBF NAND tiers for read-mostly weights",
+   "why": "HBM8-class modules spend >13 kW of 15.4 kW on memory (KAIST); bonding memory on logic removes the PHY (pJ -> sub-pJ/bit). The swarm launches from 2045-2060, so pods never fly HBM as such."
+  },
+  {
+   "param": "HBM training islands in pods (5-10 % of power)",
+   "obsolete_by": "2035-2045",
+   "replacement": "training replicas on the film: 1e28 MoE state (1.15 PB) fits in 0.05-1.7 MW of film at 0.13-4 GB/chiplet",
+   "why": "film MB/W (0.85-27 GB/W in 2040) exceeds pod MB/W (0.2-2 GB/W); needs MRAM/FeRAM (endurance >=1e10) for optimizer state written every step"
+  },
+  {
+   "param": "16 MB per chiplet; 4-8 MB SRAM; 107 MB/W",
+   "obsolete_by": "2035-2040",
+   "replacement": "0.13-4 GB radiation-tolerant NVM per chiplet (mid 1 GB, 6.8 GB/W); 1-2 MB SRAM",
+   "why": "BEOL/bonded NVM roadmaps (IRDS ~2029 for BEOL oxide/FeFET), 64 Gb cross-point MRAM cell (2024)"
+  },
+  {
+   "param": "SRAM leakage 10-59 % of chip power at 85 C; Tj cap 85 C from SRAM",
+   "obsolete_by": "2035-2040",
+   "replacement": "leakage 1-10 % (1-2 MB SRAM); Tj set by logic at 85-105 C",
+   "why": "weights/KV/optimizer state leave SRAM"
+  },
+  {
+   "param": "weight backing store and reload path after brownouts",
+   "obsolete_by": "2035-2040",
+   "replacement": "weights persist in on-chiplet NVM; KV re-prefill only",
+   "why": "MRAM/RRAM/FeRAM are non-volatile and SEU-immune at the cell"
+  },
+  {
+   "param": "replica-sized sail rule (279 m for a 1e28 replica)",
+   "obsolete_by": "~2040",
+   "replacement": "sail size set by structure, fixed mass and launch package (150-300 m); 10-1000 replicas per sail",
+   "why": "replica side falls to 27-154 m (1e29, 2040) and 7-95 m later"
+  },
+  {
+   "param": "frontier patches of 17-30 m (<=2k seq)",
+   "obsolete_by": "2040-2050",
+   "replacement": "3-12 m mid (up to ~30-55 m only for 100 TB-10 PB models with low memory per chiplet)",
+   "why": "GB-class chiplets; patches become compute-limited"
+  },
+  {
+   "param": "DRAM-capacity CPU work as a pod-only job (4 GB sandbox = 312 chiplets)",
+   "obsolete_by": "2045-2070",
+   "replacement": "sandboxes on 1-5 film chiplets with MRAM/FeRAM main memory",
+   "why": "needs >=1e10-1e15 write endurance (MRAM/FeRAM, not RRAM/PCM/NAND) and SEU-immune cells"
+  },
+  {
+   "param": "5 g/cm2 shielding sized for HBM",
+   "obsolete_by": "2050-2070 (for most pods)",
+   "replacement": "5 g/cm2 only for DRAM/NAND storage vaults; ~1 g/cm2 for pods holding rad-tolerant NVM or glass archives",
+   "why": "HBM/DRAM leave the swarm; NVM tolerates >=1 Mrad"
+  },
+  {
+   "param": "IGZO (indium) oxide channels at swarm scale",
+   "obsolete_by": "from first launch (In-limited above f ~ 0.003-0.03 at 1 GB/chiplet)",
+   "replacement": "In-free oxides (ZTO to f ~0.03-0.3; TiO2/MgZnO-class speculative)",
+   "why": "Mercury rock shell holds ~1e14-1e15 kg In; 1 GB/chiplet needs 0.67 g In per MW"
+  },
+  {
+   "param": "Pt/Ru/W/Ta MTJ stacks; GST PCM; W word-line 3D NAND",
+   "obsolete_by": "from first launch at swarm scale",
+   "replacement": "Fe/MgO MTJs with VCMA or light-metal writes; SiOx/TiOx/AlOx RRAM; ZrO2/MgZnO ferroelectrics; poly-Si/TiSi word lines",
+   "why": "element budgets cap these at f ~1e-6-1e-3 (cells.py)"
+  }
+ ],
+ "replaces_hbm": {
+  "answer": "HBM is replaced in two steps. (1) 2027-2035, in pods: custom logic base dies (HBM4E on N3P, ~2x efficiency), then memory bonded directly on the accelerator (Samsung zHBM, no interposer) with HBF/3D-NAND tiers for read-mostly weights; KAIST-roadmap HBM8 (2038, 200-240 GB, 64 TB/s, 180 W per stack) is the last HBM-like form. (2) 2035-2045, on the film: radiation-tolerant NVM (cross-point MRAM/FeRAM/RRAM decks in the logic BEOL or a bonded 3D ferroelectric die) on every 0.15 W chiplet, 0.13-4 GB per chiplet (mid 1 GB, 6.8 GB/W vs HBM 0.115 GB/W). Volatile DRAM (incl. 3D DRAM) survives only in shielded pods: it tolerates 2-100 krad, while a film chiplet receives 140-470 krad per 10 yr.",
+  "pod_memory_2040": "3D DRAM stacked on logic (zHBM-class, 0.3-1 pJ/bit) + 3D FeRAM/NVDRAM; HBF/1000-layer NAND for weights and datasets (100-300 Gb/mm2); 0.2-2 GB/W; 5 g/cm2 shield",
+  "pod_memory_2070": "monolithic 3D DRAM/FeRAM on logic for the residual DRAM-only CPU work; storage vaults of dense 3D charge-trap NVM and fused-silica optical archives (1.6 Gbit/mm3, Mercury SiO2); 1-20 GB/W",
+  "pod_memory_2100plus": "no memory-driven pods; archives (glass) and switch/gateway pods only; any DRAM is a niche",
+  "first_launch_note": "First launch is 2045-2060, so no HBM ever flies: the first pods already use memory-on-logic, and the first film chiplets should carry NVM, not SRAM-only weights."
+ },
+ "architecture_implications": [
+  {
+   "question": "1. What replaces HBM, and when? What is the memory of a pod in 2040, 2070, 2100+?",
+   "answer": "HBM is replaced in two steps. (1) 2027-2035, in pods: custom logic base dies (HBM4E on N3P, ~2x efficiency), then memory bonded directly on the accelerator (Samsung zHBM, no interposer) with HBF/3D-NAND tiers for read-mostly weights; KAIST-roadmap HBM8 (2038, 200-240 GB, 64 TB/s, 180 W per stack) is the last HBM-like form. (2) 2035-2045, on the film: radiation-tolerant NVM (cross-point MRAM/FeRAM/RRAM decks in the logic BEOL or a bonded 3D ferroelectric die) on every 0.15 W chiplet, 0.13-4 GB per chiplet (mid 1 GB, 6.8 GB/W vs HBM 0.115 GB/W). Volatile DRAM (incl. 3D DRAM) survives only in shielded pods: it tolerates 2-100 krad, while a film chiplet receives 140-470 krad per 10 yr.",
+   "numbers": "pod MB/W: 115 (2026) -> 400 (2040; 200-2000) -> 4000 (2070) -> 10000 (2100+); access 2.5-3.4 -> 0.3-1 -> 0.1-0.5 -> 0.05-0.3 pJ/bit. HBM per stack 36-48 GB/2 TB/s/75 W (2026) -> 200-240 GB/64 TB/s/180 W (2038, roadmap).",
+   "evidence_class": "demonstrated (2026) / roadmap claim (to 2038) / speculation"
+  },
+  {
+   "question": "2. Capacity per 0.15 W chiplet once weights and KV sit in stacked NVM / near-zero-leakage memory; does the SRAM-leakage problem go away?",
+   "answer": "2040: 128 MB-4 GB (mid 1 GB = 6.8 GB/W); 2070: 1-32 GB (mid 8 GB = 55 GB/W); 2100+: 4-256 GB (mid 32 GB = 218 GB/W). The useful minimum (2026-GPU bytes per FLOP/s) is 0.23 / 0.9 / 1.7 GB. Yes: with 1-2 MB of SRAM left, leakage is 0.8-10 % of chip power at 85 C and 1.4-31 % at 105 C (vs 10-59 % for 16 MB), NVM standby is zero and oxide 2T0C refresh is <=15 uW/GB even at 125 C. But the film optimum stays 85-105 C because logic J/op rises with T (FLOP/s/kg at 105 C = 0.93-1.00x of 85 C), so the gain is chip power returned to compute (+10-50 %), not a hotter film.",
+   "numbers": "SRAM 1 MB: 1.2-7.4 mW at 85 C, 2.1-23 mW at 105 C, 3.7-74 mW at 125 C; DRAM refresh 13-54 mW/GB at 85 C, 215-860 mW/GB at 125 C; IGZO/ZTO 2T0C 0.006-2 uW/GB at 85 C (retention 200-7000 s).",
+   "evidence_class": "demonstrated cells / roadmap claim (2040) / speculation (2070+)"
+  },
+  {
+   "question": "3. Per era: state per replica, MW per replica, frontier patches, replica-sized sail",
+   "answer": "State for a fixed C stays ~1-1.5 PB at 1e28 FLOP across eras (bytes/param 20 -> 10 -> 6 -> 5 while MoE sparsity 20 -> 40 -> 64 -> 100; total params 58T -> 115T -> 185T -> 289T). Film MW per 1e28 replica: 13.5 -> 0.21 -> 0.025 -> 0.008 (pods 10 -> 2.9 -> 0.28 -> 0.14). Frontier patches (<=2k seq): 18-28 m (2026) -> 3.6-11 m (2040) -> 2.8-12.5 m (2070) -> 3-20 m (2100+), compute-limited at ~3-9 m. Replica-sized sail: 279 m (1e28, 2026) -> 62 m (1e29, 2040; 27-154) -> 38 m (1e30, 2070) -> 22 m (1e30, 2100+).",
+   "numbers": "{\"2026\": {\"1e+26\": {\"state_TB\": 115.5, \"film_MW\": 1.3532, \"pod_MW\": 1.004, \"side_m\": 88.3}, \"1e+27\": {\"state_TB\": 365.1, \"film_MW\": 4.2791, \"pod_MW\": 3.175, \"side_m\": 156.9}, \"1e+28\": {\"state_TB\": 1154.7, \"film_MW\": 13.5316, \"pod_MW\": 10.041, \"side_m\": 279.1}, \"1e+29\": {\"state_TB\": 3651.5, \"film_MW\": 42.7908, \"pod_MW\": 31.752, \"side_m\": 496.3}}, \"2040\": {\"1e+26\": {\"state_TB\": 115.5, \"film_MW\": 0.0211, \"pod_MW\": 0.289, \"side_m\": 11.0}, \"1e+27\": {\"state_TB\": 365.1, \"film_MW\": 0.0669, \"pod_MW\": 0.913, \"side_m\": 19.6}, \"1e+28\": {\"state_TB\": 1154.7, \"film_MW\": 0.2114, \"pod_MW\": 2.887, \"side_m\": 34.9}, \"1e+29\": {\"state_TB\": 3651.5, \"film_MW\": 0.6686, \"pod_MW\": 9.129, \"side_m\": 62.0}}, \"2070\": {\"1e+26\": {\"state_TB\": 110.9, \"film_MW\": 0.0025, \"pod_MW\": 0.028, \"side_m\": 3.8}, \"1e+27\": {\"state_TB\": 350.5, \"film_MW\": 0.008, \"pod_MW\": 0.088, \"side_m\": 6.8}, \"1e+28\": {\"state_TB\": 1108.5, \"film_MW\": 0.0254, \"pod_MW\": 0.277, \"side_m\": 12.1}, \"1e+29\": {\"state_TB\": 3505.4, \"film_MW\": 0.0802, \"pod_MW\": 0.876, \"side_m\": 21.5}}, \"2100+\": {\"1e+26\": {\"state_TB\": 144.3, \"film_MW\": 0.0008, \"pod_MW\": 0.014, \"side_m\": 2.2}, \"1e+27\": {\"state_TB\": 456.4, \"film_MW\": 0.0026, \"pod_MW\": 0.046, \"side_m\": 3.9}, \"1e+28\": {\"state_TB\": 1443.4, \"film_MW\": 0.0083, \"pod_MW\": 0.144, \"side_m\": 6.9}, \"1e+29\": {\"state_TB\": 4564.4, \"film_MW\": 0.0261, \"pod_MW\": 0.456, \"side_m\": 12.3}}}",
+   "evidence_class": "engineering estimate (2026) / speculation"
+  },
+  {
+   "question": "4. Does the film need pods for memory reasons (CPU/DRAM work, storage, training state)?",
+   "answer": "Training state: no from ~2040 (film holds ~17x more per W than pods at mid values; 0.4-140x across the ranges). CPU/DRAM sandboxes: move onto 1-5 chiplets once MRAM/FeRAM main memory (>=1e10-1e15 writes, SEU-immune) is on the film (2045-2070). Storage: a 279 m sail at 8 GB/chiplet holds ~850 PB, and storage power is tiny, so only archives remain (glass, Mercury SiO2). Minimum pod share from memory: 10-20 % (2026) -> 2-10 % (2040) -> 0.3-3 % (2070) -> 0-1 % (2100+).",
+   "numbers": "swarm g/W (f = 0.01, project model): 15 % pods 1.37 (best pods) / 1.88 (heavier) -> 1 % pods 0.95 / 0.99: 30-47 % less mass per W.",
+   "evidence_class": "speculation (timing) + project model"
+  },
+  {
+   "question": "5. Radiation: which memories can live unshielded on the film at 0.92 AU?",
+   "answer": "Film chiplet 10-yr TID: 142-466 krad(Si) (SAPPHIRE 50 % to ESP 95 %, r^-2). Local Si pads cut it to 61-238 krad (0.1 mm, +2.7 % mass) or 34-154 krad (0.25 mm, +10 %) and saturate near 20-100 krad. On the film: SRAM (TID fine; SEU 2e4-5e6 upsets per 16 MB per 10 yr, ECC+scrub), STT/SOT-MRAM (>=1 Mrad), HfOx/SiOx RRAM (5-20 Mrad), HZO FeRAM/FeFET (10 Mrad: Pr -5 %), PCM. Pods only: DRAM/HBM (2-15 krad irregularities; space DDR4 100 krad), 3D NAND (BER rises at 10 krad), and oxide-semiconductor 2T0C (Vth shift at 50 krad: open question). A 5 g/cm2 pod gives 0.4-3.3 krad per 10 yr.",
+   "numbers": "{\"HBM / DRAM (commodity)\": \"none on film -> pod (>=1-5 g/cm2)\", \"3D NAND (charge trap / floating gate, TLC)\": \"none on film -> pod (>=1-5 g/cm2)\", \"IGZO / oxide-semiconductor 2T0C (retention set by Ioff)\": \"none on film -> pod (>=1-5 g/cm2)\", \"SRAM (FinFET/GAA, TID)\": \"film, flip-chip die (baseline 50 um die)\", \"STT/SOT-MRAM (MTJ + CMOS periphery)\": \"film, flip-chip die (baseline 50 um die)\", \"HfO2 / TaOx RRAM\": \"film, flip-chip die (baseline 50 um die)\", \"HZO FeRAM / FeFET\": \"film, flip-chip die (baseline 50 um die)\", \"PCM (GST / Ge-rich)\": \"film, flip-chip die (baseline 50 um die)\", \"Fused-silica optical archive (Project Silica class)\": \"film, flip-chip die (baseline 50 um die)\"}",
+   "evidence_class": "physics floor (transport) + demonstrated tolerances"
+  },
+  {
+   "question": "Bandwidth energy: does capacity help if the weights must be read?",
+   "answer": "Only with reuse or compute-in-memory. With memory reads capped at 20 % of chip energy, the allowed local read energy at batch reuse 128 falls from 500 fJ/bit (2026) to 130 (2040) and 33-36 fJ/bit (2070-2100+); at reuse 16 it is 4 fJ/bit by 2070. Stacked NVM reads cost ~50-500 fJ/bit today, so by ~2060 weight memory must be analog/digital compute-in-memory arrays (Study 1 analog CIM) or serve batches of >=100-1000.",
+   "numbers": "{\"2026_b1\": 3.9, \"2026_b16\": 62.4, \"2026_b128\": 499.2, \"2026_b1024\": 3993.6, \"2040_b1\": 1.02, \"2040_b16\": 16.32, \"2040_b128\": 130.56, \"2040_b1024\": 1044.48, \"2070_b1\": 0.256, \"2070_b16\": 4.096, \"2070_b128\": 32.768, \"2070_b1024\": 262.144, \"2100+_b1\": 0.278, \"2100+_b16\": 4.448, \"2100+_b128\": 35.584, \"2100+_b1024\": 284.672}",
+   "evidence_class": "physics floor (energy accounting)"
+  },
+  {
+   "question": "Manufacturability from Mercury materials",
+   "answer": "At GB/chiplet the active layers need 0.5-300 g of scarce element per MW. Mercury rock shell (8e22 kg) caps: In (IGZO) at f ~0.003-0.03 (1 GB/chiplet) and 0.00005-0.0005 (32 GB); Sn (ZTO) at f ~0.03-0.3 (1 GB); Hf (HZO, HfO2 RRAM) at f ~0.2-0.4 (1 GB) and ~0.003-0.007 (32 GB); Pt/Ru/W MTJ layers and Te (GST) at f ~1e-6-1e-2; W word-line NAND at f <1e-3. Zr (10.8 ppm) and Co carry to f ~0.1-1. So swarm-scale memory must be built from Si, O, Mg, Al, Ti, Fe, Zr (+ trace Zn, Sn): SiOx/TiOx/AlOx RRAM, ZrO2-rich or Mg-ZnO ferroelectrics, Fe/MgO MTJs without Pt/Ru/W/B, In-free oxide channels, poly-Si/TiSi word lines, fused-silica archives.",
+   "numbers": "see manufacturability key and cells.json element_budget",
+   "evidence_class": "physics/geochemistry estimate (BSE proxies; Mercury trace abundances unmeasured)"
+  }
+ ],
+ "wildcards": [
+  {
+   "wildcard": "Oxide-semiconductor 2T0C proves Mrad-tolerant (e.g. H-free gate stacks, negative hold bias)",
+   "effect": "KV cache and optimizer state in near-zero-standby, unlimited-endurance DRAM on the film from ~2040; SRAM shrinks to <0.5 MB",
+   "probability_by_2070": "0.3-0.5 (speculation)",
+   "source": "a-IGZO TFT gamma: negative Vth shift + hysteresis at 500 Gy (50 krad); O-vacancy deep donors raise subthreshold leakage (Adv. Electron. Mater. 2024); Vanderbilt 2025 dissertation: https://pure.jbnu.ac.kr/en/publications/rapid-thermal-annealing-under-osub2sub-ambient-to-recover-the-det/ ; https://doaj.org/article/1eabcbe2b2df4a7f963d06ee90c48fc3 ; https://ir.vanderbilt.edu/items/27f94e89-b617-4bcd-b7a4-e6b20d5b5c98 ; Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234"
+  },
+  {
+   "wildcard": "Analog compute-in-memory in NVM becomes the default weight memory",
+   "effect": "weights never leave the array: removes the 4-35 fJ/bit read limit; favours <=85 C (PCM drift, kT/C)",
+   "probability_by_2070": "0.3-0.5",
+   "source": "Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing ; Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "wildcard": "Fused-silica optical archives built from Mercury SiO2",
+   "effect": "datasets/checkpoint history in write-once glass (1.6 Gbit/mm3, >10,000 yr, radiation tolerant); storage pods become libraries of glass at ~1 g/cm2",
+   "probability_by_2070": "0.5",
+   "source": "Project Silica, Nature 650, 606 (2026): 1.59 Gbit/mm3 in fused silica, 4.8 TB per 120 mm x 2 mm plate, 10.1 nJ/bit write, 25.6 Mbit/s per beam, >10,000-yr lifetime (accelerated ageing): https://pmc.ncbi.nlm.nih.gov/articles/PMC12916313/ ; https://www.microsoft.com/en-us/research/blog/project-silicas-advances-in-glass-storage-technology/"
+  },
+  {
+   "wildcard": "Atomic-scale memory (H-on-Si lithography, 1.7 Tb/mm2; Cl-vacancy 0.8 Tb/mm2 at 77 K)",
+   "effect": "archival density x1e3; needs H (scarce on Mercury) and STM-speed writes",
+   "probability_by_2100": "0.1 (speculation)",
+   "source": "Achal et al., Lithography for robust and editable atomic-scale silicon devices and memories, Nat. Commun. 9, 2778 (2018): 1.1 Pb/in2, room-temperature stable: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6056515/ ; Kalff et al., A kilobyte rewritable atomic memory, Nature Nanotech. 11, 926 (2016): 502 Tb/in2, stable to 77 K: https://rua.ua.es/dspace/bitstream/10045/58073/1/2016_Kalff_etal_NatureNanotech_preprint.pdf"
+  },
+  {
+   "wildcard": "Models stop growing (distillation, algorithmic efficiency)",
+   "effect": "memory demand saturates near today's 1-10 TB per frontier model; the extra GB per chiplet then buys only replica packing and storage",
+   "probability_by_2070": "0.3",
+   "source": "Villalobos et al. (Epoch, 2024): ~300T-token effective stock of public human text (100T-1000T), used up 2026-2032: https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data"
+  },
+  {
+   "wildcard": "Carrington/1-in-1000-year SEP (10-100x the 95 % fluence)",
+   "effect": "film NVM keeps data; volatile SRAM/KV lost; any film DRAM would fail; pods at 5 g/cm2 receive ~10-300 krad (HBM/NAND at risk)",
+   "probability_per_century": "~0.1",
+   "source": "Henderson (NASA/Jacobs), Solar Particle Event Modeling Compared To Satellite Data (NSREC 2024): ESP/SAPPHIRE/JPL 7-yr solar-max spectra; Si dose behind 4 mm Al 2.05-2.23 krad (50 %), 5.2-17.6 krad (95 %); observed 0.73-4.03 krad: https://ntrs.nasa.gov/api/citations/20240000718/downloads/HendersonNSREC2024SummaryFinal.pdf"
+  },
+  {
+   "wildcard": "DNA / molecular storage",
+   "effect": "not viable on Mercury (C, N, P, H scarce) and slow; excluded",
+   "probability_by_2100": "<0.05",
+   "source": "speculation"
+  },
+  {
+   "wildcard": "Superconducting/cryogenic memory",
+   "effect": "only inside Study-1 cryostats; no film role",
+   "probability_by_2100": "<0.1",
+   "source": "Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  }
+ ],
+ "technology_table": [
+  {
+   "tech": "SRAM (FinFET/GAA)",
+   "MB_per_mm2": 4.75,
+   "standby": "1.2-7.4 mW/MB at 85 C",
+   "read_fJ_bit": "~20 (small macro)",
+   "endurance": "unlimited",
+   "max_T_C": "125 (leakage-limited)",
+   "TID": ">1 Mrad",
+   "SEU": "LEP 1e-14..1e-12 cm2/bit",
+   "film": "yes (small)",
+   "materials": "Si, metals"
+  },
+  {
+   "tech": "HBM / DRAM 1T1C",
+   "MB_per_mm2": "55 per die; ~300 per HBM4 footprint",
+   "standby": "13-54 mW/GB at 85 C, x16 at 125 C",
+   "read_fJ_bit": "2000-3900 (HBM incl. PHY)",
+   "endurance": "unlimited",
+   "max_T_C": "85-95 (refresh x2 per 10 K)",
+   "TID": "2-100 krad",
+   "SEU": "SEFI-prone",
+   "film": "no",
+   "materials": "Zr (ZrO2 caps), TiN, W"
+  },
+  {
+   "tech": "3D DRAM / zHBM on logic",
+   "MB_per_mm2": "125-1000 (2040)",
+   "standby": "as DRAM",
+   "read_fJ_bit": "300-1000",
+   "endurance": "unlimited",
+   "max_T_C": "85-95",
+   "TID": "~DRAM",
+   "SEU": "~DRAM",
+   "film": "no",
+   "materials": "Si/SiGe (Ge scarce), Zr"
+  },
+  {
+   "tech": "Oxide 2T0C (IGZO, ZTO)",
+   "MB_per_mm2": "~20-60 per layer (est.)",
+   "standby": "0.006-15 uW/GB to 125 C",
+   "read_fJ_bit": "~10-50 (est.)",
+   "endurance": ">1e12",
+   "max_T_C": "125+ (retention 30-6000 s)",
+   "TID": "Vth shift at 50 krad (open)",
+   "SEU": "low (thin wide-gap channel, est.)",
+   "film": "only if rad-hardened",
+   "materials": "In (scarce) -> ZTO, TiO2"
+  },
+  {
+   "tech": "STT/SOT/VCMA-MRAM",
+   "MB_per_mm2": "45-75 per deck (cross-point)",
+   "standby": "0",
+   "read_fJ_bit": "~50-200",
+   "endurance": "1e6-1e15",
+   "max_T_C": "150 (20-yr retention)",
+   "TID": ">=1 Mrad",
+   "SEU": "cell immune; periphery not",
+   "film": "yes",
+   "materials": "Co, Fe, B, MgO, Pt/Ru/W/Ta (scarce) -> Fe/MgO"
+  },
+  {
+   "tech": "FeRAM/FeFET (HZO)",
+   "MB_per_mm2": "NVDRAM 32 Gb 2-layer; ~DRAM-class",
+   "standby": "0",
+   "read_fJ_bit": "~50-300 (destructive read for 1T1C)",
+   "endurance": "1e11-1e15",
+   "max_T_C": "85-125",
+   "TID": "10 Mrad (cap)",
+   "SEU": "cell immune",
+   "film": "yes",
+   "materials": "Hf, Zr -> ZrO2, Mg-ZnO"
+  },
+  {
+   "tech": "RRAM (HfOx, TaOx, SiOx, TiOx)",
+   "MB_per_mm2": "~1-2 embedded; 45-75 per cross-point deck",
+   "standby": "0",
+   "read_fJ_bit": "~50-500",
+   "endurance": "1e4-1e6",
+   "max_T_C": "125-150",
+   "TID": "5-20 Mrad",
+   "SEU": "cell immune",
+   "film": "yes (weights only)",
+   "materials": "Hf/Ta -> SiOx/TiOx/AlOx (Mercury-native)"
+  },
+  {
+   "tech": "PCM (GST)",
+   "MB_per_mm2": "77-164 (3D XPoint 2-4 decks)",
+   "standby": "0",
+   "read_fJ_bit": "~100-1000",
+   "endurance": "1e6-1e9",
+   "max_T_C": "165 (Ge-rich)",
+   "TID": ">1 Mrad",
+   "SEU": "cell immune",
+   "film": "possible but Te-limited",
+   "materials": "Ge, Sb, Te (scarce)"
+  },
+  {
+   "tech": "3D NAND / HBF",
+   "MB_per_mm2": "3600-4600 (29-37 Gb/mm2)",
+   "standby": "0",
+   "read_fJ_bit": "~1e4-1e5 (page read)",
+   "endurance": "1e3-1e5",
+   "max_T_C": "85 (retention)",
+   "TID": "10-50 krad",
+   "SEU": "low",
+   "film": "no",
+   "materials": "W/Mo word lines (scarce) -> poly-Si/TiSi"
+  },
+  {
+   "tech": "Fused-silica optical (Project Silica)",
+   "MB_per_mm2": "199 per mm3",
+   "standby": "0",
+   "read_fJ_bit": "optical read",
+   "endurance": "write once",
+   "max_T_C": ">290 (ageing test)",
+   "TID": "high (read optics limit)",
+   "SEU": "none",
+   "film": "archives only",
+   "materials": "SiO2 (Mercury-native)"
+  }
+ ],
+ "manufacturability": {
+  "inventory_kg": {
+   "In": [
+    104585000000000.0,
+    1045849999999999.9
+   ],
+   "Ga": [
+    1.06194e+17,
+    3.5398e+17
+   ],
+   "Hf": [
+    2.4135e+16,
+    4.827e+16
+   ],
+   "Zr": [
+    8.6886e+17,
+    1.73772e+18
+   ],
+   "Ta": [
+    3218000000000000.0,
+    6436000000000000.0
+   ],
+   "Co": [
+    4.1029500000000006e+17,
+    4.1029500000000005e+18
+   ],
+   "Ru": [
+    5631500000000.0,
+    168945000000000.0
+   ],
+   "Pt": [
+    6114200000000.0,
+    183426000000000.0
+   ],
+   "W": [
+    64360000000000.0,
+    1287200000000000.0
+   ],
+   "Mo": [
+    156877500000000.0,
+    3137550000000000.0
+   ],
+   "Sn": [
+    1110210000000000.2,
+    1.1102100000000002e+16
+   ],
+   "Zn": [
+    4.304075e+17,
+    4.304075e+18
+   ],
+   "Ge": [
+    4827000000000000.0,
+    4.827e+16
+   ],
+   "Sb": [
+    96540000000000.0,
+    965400000000000.0
+   ],
+   "Te": [
+    64360000000000.0,
+    643600000000000.0
+   ],
+   "La": [
+    5.518870000000001e+16,
+    1.1037740000000002e+17
+   ],
+   "B": [
+    6275100000000000.0,
+    2.0917e+16
+   ],
+   "Ti": [
+    1.031369e+20,
+    3.094107e+20
+   ]
+  },
+  "element_budget": [
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "IGZO 2T0C channel (InGaZnO4)",
+    "element": "In",
+    "g_per_MW": 0.667,
+    "need_kg_at_f0p01": 335000000000000.0,
+    "max_coverage": [
+     0.00312,
+     0.0312
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "IGZO 2T0C channel (InGaZnO4)",
+    "element": "Ga",
+    "g_per_MW": 0.404,
+    "need_kg_at_f0p01": 203000000000000.0,
+    "max_coverage": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "ZTO 2T0C channel (Zn2SnO4)",
+    "element": "Sn",
+    "g_per_MW": 0.658,
+    "need_kg_at_f0p01": 330000000000000.0,
+    "max_coverage": [
+     0.0336,
+     0.336
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "HZO ferroelectric Hf0.5Zr0.5O2",
+    "element": "Hf",
+    "g_per_MW": 2.33,
+    "need_kg_at_f0p01": 1170000000000000.0,
+    "max_coverage": [
+     0.206,
+     0.413
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "HZO ferroelectric Hf0.5Zr0.5O2",
+    "element": "Zr",
+    "g_per_MW": 1.19,
+    "need_kg_at_f0p01": 596000000000000.0,
+    "max_coverage": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "ZrO2-only ferroelectric/antiferroelectric",
+    "element": "Zr",
+    "g_per_MW": 2.16,
+    "need_kg_at_f0p01": 1080000000000000.0,
+    "max_coverage": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "HfO2 RRAM switching layer",
+    "element": "Hf",
+    "g_per_MW": 2.19,
+    "need_kg_at_f0p01": 1100000000000000.0,
+    "max_coverage": [
+     0.219,
+     0.438
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "MTJ CoFeB free+reference (Co ~40 % at.)",
+    "element": "Co",
+    "g_per_MW": 0.768,
+    "need_kg_at_f0p01": 386000000000000.0,
+    "max_coverage": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "MTJ Ru SAF spacer",
+    "element": "Ru",
+    "g_per_MW": 0.529,
+    "need_kg_at_f0p01": 266000000000000.0,
+    "max_coverage": [
+     0.000212,
+     0.00636
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "MTJ [Co/Pt]n reference multilayer",
+    "element": "Pt",
+    "g_per_MW": 4.57,
+    "need_kg_at_f0p01": 2290000000000000.0,
+    "max_coverage": [
+     2.67e-05,
+     0.0008
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "MTJ W/Ta cap / SOT track",
+    "element": "W",
+    "g_per_MW": 4.12,
+    "need_kg_at_f0p01": 2070000000000000.0,
+    "max_coverage": [
+     0.000311,
+     0.00623
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "PCM GeSbTe (Ge2Sb2Te5)",
+    "element": "Te",
+    "g_per_MW": 1.48,
+    "need_kg_at_f0p01": 744000000000000.0,
+    "max_coverage": [
+     0.000865,
+     0.00865
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "3D NAND tungsten word lines (per layer ~25 nm, full plane)",
+    "element": "W",
+    "g_per_MW": 51.5,
+    "need_kg_at_f0p01": 2.58e+16,
+    "max_coverage": [
+     2.49e-05,
+     0.000498
+    ]
+   },
+   {
+    "scenario": "2040 (1 GB/chiplet: 4 mm2 x 8 BEOL decks)",
+    "tech": "3D NAND molybdenum word lines",
+    "element": "Mo",
+    "g_per_MW": 27.2,
+    "need_kg_at_f0p01": 1.37e+16,
+    "max_coverage": [
+     0.000115,
+     0.0023
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "IGZO 2T0C channel (InGaZnO4)",
+    "element": "In",
+    "g_per_MW": 8.0,
+    "need_kg_at_f0p01": 4020000000000000.0,
+    "max_coverage": [
+     0.00026,
+     0.0026
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "IGZO 2T0C channel (InGaZnO4)",
+    "element": "Ga",
+    "g_per_MW": 4.85,
+    "need_kg_at_f0p01": 2440000000000000.0,
+    "max_coverage": [
+     0.436,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "ZTO 2T0C channel (Zn2SnO4)",
+    "element": "Sn",
+    "g_per_MW": 7.89,
+    "need_kg_at_f0p01": 3960000000000000.0,
+    "max_coverage": [
+     0.0028,
+     0.028
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "HZO ferroelectric Hf0.5Zr0.5O2",
+    "element": "Hf",
+    "g_per_MW": 27.9,
+    "need_kg_at_f0p01": 1.4e+16,
+    "max_coverage": [
+     0.0172,
+     0.0344
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "HZO ferroelectric Hf0.5Zr0.5O2",
+    "element": "Zr",
+    "g_per_MW": 14.3,
+    "need_kg_at_f0p01": 7160000000000000.0,
+    "max_coverage": [
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "ZrO2-only ferroelectric/antiferroelectric",
+    "element": "Zr",
+    "g_per_MW": 25.9,
+    "need_kg_at_f0p01": 1.3e+16,
+    "max_coverage": [
+     0.668,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "HfO2 RRAM switching layer",
+    "element": "Hf",
+    "g_per_MW": 26.3,
+    "need_kg_at_f0p01": 1.32e+16,
+    "max_coverage": [
+     0.0183,
+     0.0365
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "MTJ CoFeB free+reference (Co ~40 % at.)",
+    "element": "Co",
+    "g_per_MW": 9.22,
+    "need_kg_at_f0p01": 4630000000000000.0,
+    "max_coverage": [
+     0.887,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "MTJ Ru SAF spacer",
+    "element": "Ru",
+    "g_per_MW": 6.35,
+    "need_kg_at_f0p01": 3190000000000000.0,
+    "max_coverage": [
+     1.77e-05,
+     0.00053
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "MTJ [Co/Pt]n reference multilayer",
+    "element": "Pt",
+    "g_per_MW": 54.8,
+    "need_kg_at_f0p01": 2.75e+16,
+    "max_coverage": [
+     2.22e-06,
+     6.67e-05
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "MTJ W/Ta cap / SOT track",
+    "element": "W",
+    "g_per_MW": 49.4,
+    "need_kg_at_f0p01": 2.48e+16,
+    "max_coverage": [
+     2.59e-05,
+     0.000519
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "PCM GeSbTe (Ge2Sb2Te5)",
+    "element": "Te",
+    "g_per_MW": 17.8,
+    "need_kg_at_f0p01": 8920000000000000.0,
+    "max_coverage": [
+     7.21e-05,
+     0.000721
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "3D NAND tungsten word lines (per layer ~25 nm, full plane)",
+    "element": "W",
+    "g_per_MW": 618.0,
+    "need_kg_at_f0p01": 3.1e+17,
+    "max_coverage": [
+     2.08e-06,
+     4.15e-05
+    ]
+   },
+   {
+    "scenario": "2070 (8 GB: 6 mm2 x 64 layers)",
+    "tech": "3D NAND molybdenum word lines",
+    "element": "Mo",
+    "g_per_MW": 326.0,
+    "need_kg_at_f0p01": 1.64e+17,
+    "max_coverage": [
+     9.57e-06,
+     0.000191
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "IGZO 2T0C channel (InGaZnO4)",
+    "element": "In",
+    "g_per_MW": 42.7,
+    "need_kg_at_f0p01": 2.14e+16,
+    "max_coverage": [
+     4.88e-05,
+     0.000488
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "IGZO 2T0C channel (InGaZnO4)",
+    "element": "Ga",
+    "g_per_MW": 25.9,
+    "need_kg_at_f0p01": 1.3e+16,
+    "max_coverage": [
+     0.0817,
+     0.272
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "ZTO 2T0C channel (Zn2SnO4)",
+    "element": "Sn",
+    "g_per_MW": 42.1,
+    "need_kg_at_f0p01": 2.11e+16,
+    "max_coverage": [
+     0.000526,
+     0.00526
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "HZO ferroelectric Hf0.5Zr0.5O2",
+    "element": "Hf",
+    "g_per_MW": 149.0,
+    "need_kg_at_f0p01": 7.48e+16,
+    "max_coverage": [
+     0.00323,
+     0.00645
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "HZO ferroelectric Hf0.5Zr0.5O2",
+    "element": "Zr",
+    "g_per_MW": 76.0,
+    "need_kg_at_f0p01": 3.82e+16,
+    "max_coverage": [
+     0.228,
+     0.455
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "ZrO2-only ferroelectric/antiferroelectric",
+    "element": "Zr",
+    "g_per_MW": 138.0,
+    "need_kg_at_f0p01": 6.94e+16,
+    "max_coverage": [
+     0.125,
+     0.25
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "HfO2 RRAM switching layer",
+    "element": "Hf",
+    "g_per_MW": 140.0,
+    "need_kg_at_f0p01": 7.05e+16,
+    "max_coverage": [
+     0.00342,
+     0.00685
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "MTJ CoFeB free+reference (Co ~40 % at.)",
+    "element": "Co",
+    "g_per_MW": 49.2,
+    "need_kg_at_f0p01": 2.47e+16,
+    "max_coverage": [
+     0.166,
+     1.0
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "MTJ Ru SAF spacer",
+    "element": "Ru",
+    "g_per_MW": 33.9,
+    "need_kg_at_f0p01": 1.7e+16,
+    "max_coverage": [
+     3.31e-06,
+     9.94e-05
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "MTJ [Co/Pt]n reference multilayer",
+    "element": "Pt",
+    "g_per_MW": 292.0,
+    "need_kg_at_f0p01": 1.47e+17,
+    "max_coverage": [
+     4.17e-07,
+     1.25e-05
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "MTJ W/Ta cap / SOT track",
+    "element": "W",
+    "g_per_MW": 264.0,
+    "need_kg_at_f0p01": 1.32e+17,
+    "max_coverage": [
+     4.87e-06,
+     9.73e-05
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "PCM GeSbTe (Ge2Sb2Te5)",
+    "element": "Te",
+    "g_per_MW": 94.8,
+    "need_kg_at_f0p01": 4.76e+16,
+    "max_coverage": [
+     1.35e-05,
+     0.000135
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "3D NAND tungsten word lines (per layer ~25 nm, full plane)",
+    "element": "W",
+    "g_per_MW": 3290.0,
+    "need_kg_at_f0p01": 1.65e+18,
+    "max_coverage": [
+     3.89e-07,
+     7.78e-06
+    ]
+   },
+   {
+    "scenario": "2100+ (32 GB: 8 mm2 x 256 layers)",
+    "tech": "3D NAND molybdenum word lines",
+    "element": "Mo",
+    "g_per_MW": 1740.0,
+    "need_kg_at_f0p01": 8.74e+17,
+    "max_coverage": [
+     1.8e-06,
+     3.59e-05
+    ]
+   }
+  ],
+  "notes": "Inventory = rock shell 8.0e22 kg x primitive-mantle abundance x Mercury factor (0.1-1 for chalcophile/siderophile In, Ga, Sn, Zn, W, Mo, Co, PGE; 1-2 for refractory lithophile Zr, Hf, Ta, REE). Chip power 5e23 W at f = 0.01.",
+  "sources": "Primitive-mantle abundances (Palme & O'Neill 2004; McDonough & Sun 1995) via GERM: In 13 ppb, Ga 4.4 ppm, Hf 0.30 ppm, Zr 10.8 ppm, Ta 40 ppb, Co 102 ppm, W 16-29 ppb, Mo ~39 ppb, Sn 138 ppb, Zn 53.5 ppm, Ge 1.2 ppm, Sb 12 ppb, Te 8-12 ppb, B 0.26-0.3 ppm, Sc 16.5 ppm, Ti 1282 ppm, Ir 3.2 ppb: https://earthref.org/GERMRD/30/ ; Mercury crust+mantle 8.0e22 kg (project constants.js: core 2024 km, crust 35 km): /home/user/dyson/src/model/constants.js ; Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+ },
+ "radiation": {
+  "geometries": [
+   {
+    "geometry": "film, flip-chip die (baseline 50 um die)",
+    "t_front_mg_cm2": 16.1,
+    "t_back_mg_cm2": 15.7,
+    "pad_mm": 0.0,
+    "pad_mass_g_per_chiplet": 0.0,
+    "pad_g_per_W": 0.0,
+    "pad_share_of_film_mass": 0.0,
+    "TID_10yr_krad_ESP_p50_r^-2": 169.7,
+    "TID_10yr_krad_ESP_p95_r^-2": 465.7,
+    "TID_10yr_krad_SAPPHIRE_p50_r^-2": 142.0,
+    "TID_10yr_krad_SAPPHIRE_p95_r^-2": 288.3
+   },
+   {
+    "geometry": "film, die face-up (~5 um glass over the device; research3 thermal_mass worst case)",
+    "t_front_mg_cm2": 16.1,
+    "t_back_mg_cm2": 1.2,
+    "pad_mm": 0.0,
+    "pad_mass_g_per_chiplet": 0.0,
+    "pad_g_per_W": 0.0,
+    "pad_share_of_film_mass": 0.0,
+    "TID_10yr_krad_ESP_p50_r^-2": 836.1,
+    "TID_10yr_krad_ESP_p95_r^-2": 1473.6,
+    "TID_10yr_krad_SAPPHIRE_p50_r^-2": 562.7,
+    "TID_10yr_krad_SAPPHIRE_p95_r^-2": 1035.6
+   },
+   {
+    "geometry": "film + 0.1 mm local Si pads both sides",
+    "t_front_mg_cm2": 16.1,
+    "t_back_mg_cm2": 15.7,
+    "pad_mm": 0.1,
+    "pad_mass_g_per_chiplet": 0.0038,
+    "pad_g_per_W": 0.025,
+    "pad_share_of_film_mass": 0.027,
+    "TID_10yr_krad_ESP_p50_r^-2": 66.2,
+    "TID_10yr_krad_ESP_p95_r^-2": 238.2,
+    "TID_10yr_krad_SAPPHIRE_p50_r^-2": 60.6,
+    "TID_10yr_krad_SAPPHIRE_p95_r^-2": 128.4
+   },
+   {
+    "geometry": "film + 0.25 mm local Si pads both sides",
+    "t_front_mg_cm2": 16.1,
+    "t_back_mg_cm2": 15.7,
+    "pad_mm": 0.25,
+    "pad_mass_g_per_chiplet": 0.0139,
+    "pad_g_per_W": 0.092,
+    "pad_share_of_film_mass": 0.1,
+    "TID_10yr_krad_ESP_p50_r^-2": 36.7,
+    "TID_10yr_krad_ESP_p95_r^-2": 154.4,
+    "TID_10yr_krad_SAPPHIRE_p50_r^-2": 34.4,
+    "TID_10yr_krad_SAPPHIRE_p95_r^-2": 73.9
+   },
+   {
+    "geometry": "film + 0.5 mm local Si pads both sides",
+    "t_front_mg_cm2": 16.1,
+    "t_back_mg_cm2": 15.7,
+    "pad_mm": 0.5,
+    "pad_mass_g_per_chiplet": 0.0461,
+    "pad_g_per_W": 0.308,
+    "pad_share_of_film_mass": 0.334,
+    "TID_10yr_krad_ESP_p50_r^-2": 24.8,
+    "TID_10yr_krad_ESP_p95_r^-2": 113.8,
+    "TID_10yr_krad_SAPPHIRE_p50_r^-2": 23.7,
+    "TID_10yr_krad_SAPPHIRE_p95_r^-2": 51.1
+   },
+   {
+    "geometry": "film + 1 mm local Si pads both sides",
+    "t_front_mg_cm2": 16.1,
+    "t_back_mg_cm2": 15.7,
+    "pad_mm": 1.0,
+    "pad_mass_g_per_chiplet": 0.1939,
+    "pad_g_per_W": 1.292,
+    "pad_share_of_film_mass": 1.405,
+    "TID_10yr_krad_ESP_p50_r^-2": 22.4,
+    "TID_10yr_krad_ESP_p95_r^-2": 100.2,
+    "TID_10yr_krad_SAPPHIRE_p50_r^-2": 21.3,
+    "TID_10yr_krad_SAPPHIRE_p95_r^-2": 45.9
+   }
+  ],
+  "pod": {
+   "1.0 g/cm2 sphere": {
+    "ESP_p50": 3.69,
+    "ESP_p95": 27.12,
+    "SAPPHIRE_p50": 3.66,
+    "SAPPHIRE_p95": 8.2
+   },
+   "5.0 g/cm2 sphere": {
+    "ESP_p50": 0.46,
+    "ESP_p95": 3.31,
+    "SAPPHIRE_p50": 0.36,
+    "SAPPHIRE_p95": 0.51
+   },
+   "20.0 g/cm2 sphere": {
+    "ESP_p50": 0.07,
+    "ESP_p95": 0.37,
+    "SAPPHIRE_p50": 0.04,
+    "SAPPHIRE_p95": 0.03
+   }
+  },
+  "tolerance": [
+   {
+    "memory": "HBM / DRAM (commodity)",
+    "tid_onset_rad": 2000.0,
+    "tid_fail_rad": 100000.0,
+    "source": "Suncatcher: HBM irregularities from ~2 krad, no hard fails to 15 krad; space-grade DDR4 100 krad (Teledyne e2v)",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": false,
+    "ok_at_median_env": false,
+    "thinnest_film_option_that_works": "none on film -> pod (>=1-5 g/cm2)"
+   },
+   {
+    "memory": "3D NAND (charge trap / floating gate, TLC)",
+    "tid_onset_rad": 10000.0,
+    "tid_fail_rad": 50000.0,
+    "source": "Ray et al. IMW 2023: BER rises significantly after 10 krad(Si); peripheral failure concern >50 krad",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": false,
+    "ok_at_median_env": false,
+    "thinnest_film_option_that_works": "none on film -> pod (>=1-5 g/cm2)"
+   },
+   {
+    "memory": "IGZO / oxide-semiconductor 2T0C (retention set by Ioff)",
+    "tid_onset_rad": 50000.0,
+    "tid_fail_rad": 1000000.0,
+    "source": "a-IGZO TFT: negative Vth shift + hysteresis at 500 Gy (50 krad); oxygen-vacancy donors raise leakage (AEM 2024); no 2T0C retention-vs-dose data found -> speculative",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": false,
+    "ok_at_median_env": false,
+    "thinnest_film_option_that_works": "none on film -> pod (>=1-5 g/cm2)"
+   },
+   {
+    "memory": "SRAM (FinFET/GAA, TID)",
+    "tid_onset_rad": 1000000.0,
+    "tid_fail_rad": 100000000.0,
+    "source": "FinFET logic ~100 Mrad (research3 thermal_mass); SEU, not TID, is the SRAM problem",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": true,
+    "ok_at_median_env": true,
+    "thinnest_film_option_that_works": "film, flip-chip die (baseline 50 um die)"
+   },
+   {
+    "memory": "STT/SOT-MRAM (MTJ + CMOS periphery)",
+    "tid_onset_rad": 1000000.0,
+    "tid_fail_rad": 10000000.0,
+    "source": "NASA test of Avalanche STT-MRAM: no notable change to >=1 Mrad(Si); MTJ robust to high gamma/neutron doses (Montoya 2020)",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": true,
+    "ok_at_median_env": true,
+    "thinnest_film_option_that_works": "film, flip-chip die (baseline 50 um die)"
+   },
+   {
+    "memory": "HfO2 / TaOx RRAM",
+    "tid_onset_rad": 5000000.0,
+    "tid_fail_rad": 20000000.0,
+    "source": "TiN/HfOx/TiN hard to 10 Mrad (Southampton), 20 Mrad (Sandia, IEEE TNANO 2017); proton 1e5-1e9 rad no degradation (MRS 2012)",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": true,
+    "ok_at_median_env": true,
+    "thinnest_film_option_that_works": "film, flip-chip die (baseline 50 um die)"
+   },
+   {
+    "memory": "HZO FeRAM / FeFET",
+    "tid_onset_rad": 1000000.0,
+    "tid_fail_rad": 10000000.0,
+    "source": "12 nm HZO capacitors: 10 Mrad(Si) Co-60 -> Pr -5 %, endurance and retention unchanged (J Mater Sci 2019); FeFET data scarce",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": true,
+    "ok_at_median_env": true,
+    "thinnest_film_option_that_works": "film, flip-chip die (baseline 50 um die)"
+   },
+   {
+    "memory": "PCM (GST / Ge-rich)",
+    "tid_onset_rad": 1000000.0,
+    "tid_fail_rad": 10000000.0,
+    "source": "chalcogenide cell hard; periphery-limited (literature class; not re-checked here)",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": true,
+    "ok_at_median_env": true,
+    "thinnest_film_option_that_works": "film, flip-chip die (baseline 50 um die)"
+   },
+   {
+    "memory": "Fused-silica optical archive (Project Silica class)",
+    "tid_onset_rad": 10000000.0,
+    "tid_fail_rad": 1000000000.0,
+    "source": "voxels are nanostructures in SiO2; radiation darkening affects read optics (speculation)",
+    "film_baseline_10yr_krad": [
+     142.0,
+     465.7
+    ],
+    "unshielded_film_ok": true,
+    "ok_at_median_env": true,
+    "thinnest_film_option_that_works": "film, flip-chip die (baseline 50 um die)"
+   }
+  ],
+  "calibration": {
+   "model": {
+    "ESP_p50": 2.3647334865909615,
+    "ESP_p95": 17.927611069494837,
+    "SAPPHIRE_p50": 2.3306846146845577,
+    "SAPPHIRE_p95": 5.198133784410698
+   },
+   "henderson_table1": {
+    "ESP_p50": 2.21,
+    "ESP_p95": 17.6,
+    "SAPPHIRE_p50": 2.23,
+    "SAPPHIRE_p95": 5.2
+   }
+  },
+  "lep_fluence_10yr_cm2": {
+   "ESP_p50": 19118959616.088627,
+   "ESP_p95": 39878363358.68536,
+   "SAPPHIRE_p50": 14577108661.376406,
+   "SAPPHIRE_p95": 27993703744.560837
+  },
+  "seu_16MB_10yr": {
+   "ESP_p50": [
+    25661,
+    256610,
+    2566103
+   ],
+   "ESP_p95": [
+    53524,
+    535238,
+    5352383
+   ],
+   "SAPPHIRE_p50": [
+    19565,
+    195651,
+    1956506
+   ],
+   "SAPPHIRE_p95": [
+    37573,
+    375725,
+    3757251
+   ]
+  }
+ },
+ "sources": [
+  {
+   "key": "arch",
+   "ref": "Project decision record (85/15 film/pod split, 16 MB/chiplet, HBM 115 MB/W, pods 5 g/cm2): /home/user/dyson/docs/architecture.md"
+  },
+  {
+   "key": "design",
+   "ref": "Sail design spec (279 m sail, 1.06e8 sites, 1e28 MoE replica, sensitivity k^-1/2): research4/design/result.json, sensitivity.json"
+  },
+  {
+   "key": "skeptic",
+   "ref": "research3 skeptic checks (SRAM leakage 10-59 %, pod capacity, SEU, 16 B/param x1.25 state): research3/skeptic/checks.json"
+  },
+  {
+   "key": "workloads",
+   "ref": "research3 workloads (MoE scaling Na=sqrt(C/1200), total 20 Na, state 16 B/param x1.25; Rubin 288 GB, 2.5 kW all-in): research3/workloads/common.py, training.py"
+  },
+  {
+   "key": "study1",
+   "ref": "Study 1 (logic): J/op 7.8e-14 (2026), 1.0e-14 (2040), 2.6e-15 (2070), 1.4e-15 (2100+); slope 0.9 -> 0.56 %/K: research5/future/logic/result.json"
+  },
+  {
+   "key": "swarm",
+   "ref": "Project model run (src/model/hybrid.js via swarm.mjs): chip power 5.0e23 W (f=0.01), 5.0e24 (f=0.1), 5.0e25 (f=1); g/W vs pod share and Tj: research5/future/memory/swarm.json"
+  },
+  {
+   "key": "jedec_hbm4",
+   "ref": "JEDEC JESD270-4 HBM4 (Apr 2025): 2048-bit, up to 8 Gb/s, 2 TB/s, 32 channels: https://www.businesswire.com/news/home/20250416843598/en ; https://www.hpcwire.com/off-the-wire/jedec-releases-hbm4-standard-to-advance-ai-and-hpc-memory/"
+  },
+  {
+   "key": "skh_hbm4",
+   "ref": "SK hynix HBM4: 12-Hi 36 GB, >2 TB/s, >10 Gb/s, >40 % better power efficiency, 1b DRAM + MR-MUF: https://www.trendforce.com/news/2025/09/12/news-sk-hynix-finalizes-worlds-first-hbm4-mass-production-ready-eyes-nvidia-approval/ ; https://www.yolegroup.com/industry-news/sk-hynix-ships-worlds-first-12-layer-hbm4-samples-to-customers-2/"
+  },
+  {
+   "key": "tsmc_chbm",
+   "ref": "TSMC custom HBM4E (C-HBM4E) base die on N3P at 0.75 V, ~2x power efficiency target; HBM4 base die N12 (1.1 -> 0.8 V, ~1.5x): https://www.trendforce.com/news/2025/12/01/news-tsmc-unveils-custom-c-hbm4e-details-n3p-logic-dies-reportedly-target-2x-efficiency-gain/"
+  },
+  {
+   "key": "samsung_hc26",
+   "ref": "Samsung, evolving HBM base die (Hot Chips 2026): 4 nm base die from HBM4; HBM5 >60 GB, 6 TB/s; power density 0.5 -> >2 W/mm2; phases: controller on base die -> processing elements (aHBM) -> zHBM (XPU stacked on DRAM, no interposer): https://www.servethehome.com/samsung-evolving-hbm-base-die-at-hot-chips-2026/"
+  },
+  {
+   "key": "kaist",
+   "ref": "KAIST TERA HBM roadmap (2025, projection): HBM5 2029 (4 TB/s, 100 W), HBM6 2032 (96-120 GB, 20-Hi), HBM7 2035 (160-192 GB, 24 TB/s, 160 W), HBM8 2038 (200-240 GB, 64 TB/s, 180 W, 16,384-bit); ~6 TB HBM per 15,360 W GPU module by 2035: https://blocksandfiles.com/2025/06/26/four-more-hbm-generations/ ; https://www.koreatimes.co.kr/business/tech-science/20250611/ai-memory-chip-guru-presents-road-map-for-next-generation-hbms ; https://www.networkworld.com/article/4008275/next-gen-ai-chips-will-draw-15000w-each-redefining-power-cooling-and-data-center-design.html ; http://www.design-reuse.com/news/202528901-hbm-development-roadmap-revealed-hbm8-with-a-16-384-bit-interface-and-embedded-nand-in-2038/"
+  },
+  {
+   "key": "hbf",
+   "ref": "SanDisk/SK hynix High Bandwidth Flash: HBM-class bandwidth, 8-16x HBM capacity at similar cost; samples H2 2026, devices early 2027: https://www.businesswire.com/news/home/20250806259749/en/Sandisk-to-Collaborate-with-SK-hynix-to-Drive-Standardization-of-High-Bandwidth-Flash-Memory-Technology"
+  },
+  {
+   "key": "hbm3e_pj",
+   "ref": "HBM3E 3.44 pJ/bit (project-cited, arXiv:2602.18568): https://arxiv.org/abs/2602.18568"
+  },
+  {
+   "key": "fgdram",
+   "ref": "O'Connor et al., Fine-Grained DRAM, MICRO 2017: HBM2 3.9 pJ/bit vs GDDR5 14 pJ/bit; FGDRAM ~2x more energy-efficient: https://research.nvidia.com/sites/default/files/pubs/2017-10_Fine-Grained-DRAM%3A-Energy-Efficient/oconnor_and_chatterjee.micro2017.pdf"
+  },
+  {
+   "key": "synopsys_3dio",
+   "ref": "Synopsys 3DIO hybrid-bond die-to-die PHY: <0.05 pJ/bit at 4-6 Gb/s per lane: https://www.synopsys.com/designware-ip/memories-logic-libraries/3dio.html"
+  },
+  {
+   "key": "dram_density",
+   "ref": "TechInsights (FMS 2025): 16 Gb D1b dies 431-447 Mb/mm2, cell 0.00123-0.00133 um2: https://files.futurememorystorage.com/proceedings/2025/20250807_DRAM-304-1_Jeongdong-Choe_Short-version.pdf"
+  },
+  {
+   "key": "vct_3ddram",
+   "ref": "4F2 VCT DRAM ~30 % smaller die than 6F2 (Samsung, SK hynix, 10 nm and below); Samsung 3D (VS) DRAM commercial ~2030; Micron reportedly skips 4F2: https://semiwiki.com/forum/threads/samsung-and-sk-hynix-advance-4f%C2%B2-dram-as-gateway-to-3d-memory.23054/latest ; https://www.computerbase.de/2024-05/3d-dram-samsung-plant-mit-16-layern-fuer-2030/"
+  },
+  {
+   "key": "imec_sige",
+   "ref": "imec/Ghent: 120 Si0.8Ge0.2/Si bilayers epitaxially grown on 300 mm for 3D DRAM, J. Appl. Phys. 138, 055702 (2025): https://xenospectrum.com/the-future-opened-up-by-120-layer-si-sige-stacks/ ; https://technews.tw/2025/08/25/3d-dram-120-layers/"
+  },
+  {
+   "key": "neo",
+   "ref": "NEO Semiconductor 3D X-DRAM 1T1C/3T0C IGZO variants: up to 512 Gb (10x DRAM), PoC chips 2026, 450 s retention (TCAD) - company claims: https://blocksandfiles.com/2025/05/12/neo-3d-dram-variants/ ; https://www.storagenewsletter.com/2025/05/08/neo-semiconductor-unveils-1t1c-and-3t0c-igzo-based-3d-x-dram-technology/"
+  },
+  {
+   "key": "imec_igzo",
+   "ref": "imec IGZO 2T0C: >400 s (IEDM 2020, Ioff 3e-19 A/um), >1e3 s and >1e11 cycles (IEDM 2021), >4.5 h and Ioff <3e-21 A/um (VLSI 2023); IMECAS 10 ks RT / 7 ks at 85 C: https://www.imec-int.com/en/articles/disrupting-dram-roadmap-capacitor-less-igzo-dram-technology"
+  },
+  {
+   "key": "imec_igzo_95C",
+   "ref": "Izukashi et al. (imec), IEEE EDL 2025: 40 nm 2T0C IGZO, >200 s retention at 95 C, >1e12 cycles, <10 ns write: https://imec-publications.be/entities/publication/948b2190-065d-48d2-a9b9-4f4ecd22c234"
+  },
+  {
+   "key": "octram",
+   "ref": "Kioxia/Nanya OCTRAM (IEDM 2024): InGaZnO vertical-transistor 4F2 DRAM, OFF <1 aA/cell, ON >15 uA (trade report): https://www.kioxia.com/en-jp/about/news/2024/20241210-1.html ; https://convergedigest.com/kioxia-and-nanya-develop-octram-a-low-power-4f2-dram-tech/"
+  },
+  {
+   "key": "zto",
+   "ref": "Zinc-tin-oxide (In-free) TFT 2T0C DRAM: >1500 s retention, SS 59.9 mV/dec (Univ. Michigan thesis): https://deepblue.lib.umich.edu/items/e6ac2d99-46aa-444a-bc41-2851e63c965c"
+  },
+  {
+   "key": "tio2_tft",
+   "ref": "TiO2 TFTs: ALD TiO2 on/off 2.5e6, 0.67 cm2/Vs (SPIE 2013); 1e7 on/off, 3.9 cm2/Vs (RSC Adv. 2024): https://repository.bilkent.edu.tr/items/e53930fa-b476-4a35-9401-303bbb93291c ; https://pubs.rsc.org/en/content/articlehtml/2024/ra/d3ra08447g"
+  },
+  {
+   "key": "nvdram",
+   "ref": "Micron NVDRAM (IEDM 2023): 32 Gb dual-layer 1T1C ferroelectric (5.7 nm HZO), 48 nm pitch, ~1e15 cycles and >10 yr retention (secondary reports): https://blocksandfiles.com/2024/01/05/ferroelectric-ram-update-and-micron/ ; https://www.eenewseurope.com/en/iedm-micron-to-present-dram-like-non-volatile-memory-for-ai/"
+  },
+  {
+   "key": "xp_mram",
+   "ref": "Kioxia/SK hynix 64 Gb cross-point STT-MRAM (IEDM 2024): 20.5 nm half-pitch, 0.001681 um2 1S1MTJ cell, read disturb <1e-6: https://www.kioxia.com/en-jp/rd/technology/topics/topics-80.html ; https://mram-info.com/kioxia-and-hynix-co-develop-worlds-smallest-1selector-1mtj-cell-can-enable-64gb-mram-chips"
+  },
+  {
+   "key": "tsmc_mram16",
+   "ref": "TSMC 16 nm FinFET eMRAM (ISSCC 2023 / NXP): 32 Mb, 1M cycles, 20-yr retention at 150 C: https://www.mram-info.com/nxp-and-tsmc-offer-16-nm-finfet-automotive-embedded-mram"
+  },
+  {
+   "key": "imec_sot",
+   "ref": "imec SOT-MRAM (IEDM 2023): <100 fJ/bit switching, >1e15 cycles: https://www.design-reuse.com/news/55400/imec-sot-mram.html"
+  },
+  {
+   "key": "tsmc_rram",
+   "ref": "TSMC 22 nm eRRAM: 10-yr retention at 125 C, 1e4 cycles (Infineon AURIX TC4x); Weebit 150 C / 100k cycles: https://www.eenewseurope.com/en/tsmc-offers-22nm-rram-taking-mram-on-to-16nm ; https://www.weebit-nano.com/wp-content/uploads/2024/08/Weebit-FMS-2024-Presentation-ReRAM-embedded-RRAM-IP-NVM-for-semiconductors.pdf"
+  },
+  {
+   "key": "st_pcm",
+   "ref": "ST 18 nm FD-SOI embedded PCM: AEC-Q100 Grade 0 up to 165 C, 2.5x NVM density vs 40 nm: https://newsroom.st.com/media-center/press-item.html/c3244.html ; https://www.st.com/content/st_com/en/about/innovation-and-technology/pcm.html"
+  },
+  {
+   "key": "xpoint",
+   "ref": "3D XPoint (TechInsights): gen-1 128 Gb, 206.5 mm2, 0.62 Gb/mm2 (2 decks); gen-2 256 Gb, 1.31 Gb/mm2 (4 decks), BEOL between M4 and M5: https://www.techinsights.com/blog/memoryselector-elements-intel-optanetm-xpoint-memory ; https://anandtech.com/show/11454"
+  },
+  {
+   "key": "nand_bics10",
+   "ref": "Kioxia/SanDisk BiCS10 332 layers: QLC >37 Gb/mm2, TLC >29 Gb/mm2: https://www.tomshardware.com/pc-components/ssds/kioxia-and-sandisk-sample-worlds-densest-3d-nand-new-332-layer-beats-samsungs-400-layer-nand"
+  },
+  {
+   "key": "nand_1000",
+   "ref": "Kioxia IMW 2024: 1000 layers and 100 Gb/mm2 by 2027 (target); Samsung 1000-layer NAND by 2030: https://blocksandfiles.com/2024/06/19/kioxia-1000-layer-3d-nand/ ; https://www.techradar.com/pro/ssd-rival-to-samsung-reveals-road-to-petabyte-ssds-at-major-engineering-conference-kioxia-wants-1000-layer-nand-in-3-years-and-discusses-helc-molybdenum-100gbmm2-densities"
+  },
+  {
+   "key": "n2_sram",
+   "ref": "TSMC N2 HD SRAM macro ~38 Mb/mm2 (IEDM 2024): https://www.ieee.org/ns/periodicals/EDS/EDS-APRIL-2025-HTML/InnerFiles/LandPage.html ; https://marklapedus.substack.com/p/intel-tsmc-tout-sram-breakthroughs"
+  },
+  {
+   "key": "sram_leak",
+   "ref": "3 nm dual-rail SRAM 27.5 uW/Mb low-leakage mode (ISSCC-class; project basis): https://sscs.ieee.org/tag/bit-density/"
+  },
+  {
+   "key": "irds",
+   "ref": "IRDS 2024 More Moore: BEOL oxide transistors/IGZO/FeFET adoption ~2029; DRAM to 4F2 then 3D; 3D NAND 500+ layers achievable, 1000 possible; CIM in BEOL NVM: https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "key": "dram_refresh",
+   "ref": "DRAM refresh windows: DDR5 32 ms up to 85 C, 16 ms 85-95 C (arXiv:2303.07445); 64/32/16 ms at 85/95/105 C (US 11798613): https://arxiv.org/pdf/2303.07445 ; https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11798613"
+  },
+  {
+   "key": "mram_cim",
+   "ref": "Jung et al. (Samsung), A crossbar array of magnetoresistive memory devices for in-memory computing, Nature 601, 211 (2022): https://news.samsung.com/global/samsung-demonstrates-the-worlds-first-mram-based-in-memory-computing"
+  },
+  {
+   "key": "silica",
+   "ref": "Project Silica, Nature 650, 606 (2026): 1.59 Gbit/mm3 in fused silica, 4.8 TB per 120 mm x 2 mm plate, 10.1 nJ/bit write, 25.6 Mbit/s per beam, >10,000-yr lifetime (accelerated ageing): https://pmc.ncbi.nlm.nih.gov/articles/PMC12916313/ ; https://www.microsoft.com/en-us/research/blog/project-silicas-advances-in-glass-storage-technology/"
+  },
+  {
+   "key": "kalff",
+   "ref": "Kalff et al., A kilobyte rewritable atomic memory, Nature Nanotech. 11, 926 (2016): 502 Tb/in2, stable to 77 K: https://rua.ua.es/dspace/bitstream/10045/58073/1/2016_Kalff_etal_NatureNanotech_preprint.pdf"
+  },
+  {
+   "key": "achal",
+   "ref": "Achal et al., Lithography for robust and editable atomic-scale silicon devices and memories, Nat. Commun. 9, 2778 (2018): 1.1 Pb/in2, room-temperature stable: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6056515/"
+  },
+  {
+   "key": "henderson",
+   "ref": "Henderson (NASA/Jacobs), Solar Particle Event Modeling Compared To Satellite Data (NSREC 2024): ESP/SAPPHIRE/JPL 7-yr solar-max spectra; Si dose behind 4 mm Al 2.05-2.23 krad (50 %), 5.2-17.6 krad (95 %); observed 0.73-4.03 krad: https://ntrs.nasa.gov/api/citations/20240000718/downloads/HendersonNSREC2024SummaryFinal.pdf"
+  },
+  {
+   "key": "sep_radial",
+   "ref": "SEP radial dependence inside 1 AU: modelled fluence R^-1.5..R^-0.7 (A&A 2025); 2023-07-17 event H fluence ~r^-4 (0.65-1 AU): https://www.aanda.org/10.1051/0004-6361/202452591 ; https://cosmos.esa.int/web/solar-orbiter/-/science-nugget-radial-dependence-of-solar-energetic-particle-peak-fluxes-and-fluences"
+  },
+  {
+   "key": "pstar",
+   "ref": "NIST PSTAR proton ranges (check: Si 10 MeV 0.17 g/cm2; Al 100 MeV ~10 g/cm2): https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html"
+  },
+  {
+   "key": "suncatcher",
+   "ref": "Google Suncatcher (arXiv:2511.19468): HBM irregularities from ~2 krad(Si), no hard fails to 15 krad: https://arxiv.org/abs/2511.19468"
+  },
+  {
+   "key": "nand_tid",
+   "ref": "Ray et al., Towards Improving Ionizing Radiation Tolerance of 3-D NAND Flash Memory (IMW 2023): BER rises significantly after 10 krad(Si); periphery failure concern >50 krad: https://par.nsf.gov/servlets/purl/10440107"
+  },
+  {
+   "key": "ddr4_space",
+   "ref": "Teledyne e2v space DDR4: TID up to 100 krad(Si), SEL immune >60 MeV cm2/mg: https://www.design-reuse.com/news/202529169"
+  },
+  {
+   "key": "mram_tid",
+   "ref": "Avalanche STT-MRAM, NASA testing: no notable change to >=1 Mrad(Si); 16 Mb STT-MRAM: MTJ tolerant, periphery soft errors: https://avalanche-technology.com/mrams-immunity-to-radiation-makes-it-a-natural-for-space ; https://research.buaa.edu.cn/en/publications/total-dose-and-single-event-effects-on-16-mbit-standalone-spin-tr/ ; Montoya et al. Sci. Rep. 2020: https://impact.ornl.gov/en/publications/immunity-of-nanoscale-magnetic-tunnel-junctions-with-perpendicula/"
+  },
+  {
+   "key": "rram_tid",
+   "ref": "HfOx RRAM TID: radiation hard to 10 Mrad(Si) (Southampton NSREC), >=20 Mrad (Sandia), proton 1e5-1e9 rad no degradation (MRS 2012): https://eprints.soton.ac.uk/417112 ; https://www.sandia.gov/research/publications/details/resistive-memory-for-radiation-resistant-non-volatile-memory-nstrf-final-re-2018-11-26/ ; https://resolve.cambridge.org/core/journals/mrs-online-proceedings-library-archive/article/high-totaldose-proton-radiation-tolerance-in-tinhfo2tin-reram-devices/3EBCEC3FBBC0B83C014BB77FEF6D042C"
+  },
+  {
+   "key": "hzo_tid",
+   "ref": "12 nm HZO capacitors, 10 Mrad(Si) Co-60: Pr -5 %, leakage/endurance/retention unchanged (J Mater Sci: Mater Electron 2019): https://link.springer.com/10.1007/s10854-019-02724-9"
+  },
+  {
+   "key": "igzo_tid",
+   "ref": "a-IGZO TFT gamma: negative Vth shift + hysteresis at 500 Gy (50 krad); O-vacancy deep donors raise subthreshold leakage (Adv. Electron. Mater. 2024); Vanderbilt 2025 dissertation: https://pure.jbnu.ac.kr/en/publications/rapid-thermal-annealing-under-osub2sub-ambient-to-recover-the-det/ ; https://doaj.org/article/1eabcbe2b2df4a7f963d06ee90c48fc3 ; https://ir.vanderbilt.edu/items/27f94e89-b617-4bcd-b7a4-e6b20d5b5c98"
+  },
+  {
+   "key": "lep",
+   "ref": "Glorieux et al., Methods for Proton Direct Ionization SEU Characterization, IEEE TNS 71, 1707 (2024): PDI cross-section >1000x high-energy; peaks ~1-4e-13 cm2/bit (16 nm FinFET), 3e-11-1e-10 (65-28 nm) at 0.5-0.8 MeV: https://jyx.jyu.fi/handle/123456789/100368"
+  },
+  {
+   "key": "germ",
+   "ref": "Primitive-mantle abundances (Palme & O'Neill 2004; McDonough & Sun 1995) via GERM: In 13 ppb, Ga 4.4 ppm, Hf 0.30 ppm, Zr 10.8 ppm, Ta 40 ppb, Co 102 ppm, W 16-29 ppb, Mo ~39 ppb, Sn 138 ppb, Zn 53.5 ppm, Ge 1.2 ppm, Sb 12 ppb, Te 8-12 ppb, B 0.26-0.3 ppm, Sc 16.5 ppm, Ti 1282 ppm, Ir 3.2 ppb: https://earthref.org/GERMRD/30/"
+  },
+  {
+   "key": "mercury_shell",
+   "ref": "Mercury crust+mantle 8.0e22 kg (project constants.js: core 2024 km, crust 35 km): /home/user/dyson/src/model/constants.js"
+  },
+  {
+   "key": "zno_fe",
+   "ref": "Ferri et al., Ferroelectrics everywhere: ferroelectricity in Mg-substituted ZnO thin films, J. Appl. Phys. 130, 044101 (2021): Pr >100 uC/cm2, grown at <=200 C: https://pure.psu.edu/en/publications/ferroelectrics-everywhere-ferroelectricity-in-magnesium-substitut/"
+  },
+  {
+   "key": "femgo",
+   "ref": "Yuasa et al., Giant room-temperature magnetoresistance in single-crystal Fe/MgO/Fe MTJs, Nat. Mater. 3, 868 (2004): 180 % TMR without Co/B/Pt: https://doi.org/10.1038/nmat1257"
+  },
+  {
+   "key": "siox_rram",
+   "ref": "Yao, Tour et al., Resistive switches and memories from silicon oxide, Nano Lett. 10, 4105 (2010); intrinsic SiOx switching, Appl. Phys. A (2011): https://link.springer.com/doi/10.1007/s00339-011-6267-6"
+  },
+  {
+   "key": "epoch_2030",
+   "ref": "Epoch AI, Can AI scaling continue through 2030? (training compute ~4x/yr; 2e29 FLOP runs likely feasible by 2030): https://epoch.ai/blog/can-ai-scaling-continue-through-2030"
+  },
+  {
+   "key": "epoch_data",
+   "ref": "Villalobos et al. (Epoch, 2024): ~300T-token effective stock of public human text (100T-1000T), used up 2026-2032: https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data"
+  },
+  {
+   "key": "opt8bit",
+   "ref": "Dettmers et al., 8-bit Optimizers via Block-wise Quantization (ICLR 2022): https://arxiv.org/abs/2110.02861"
+  },
+  {
+   "key": "opt4bit",
+   "ref": "Li et al., Memory Efficient Optimizers with 4-bit States (NeurIPS 2023): https://arxiv.org/abs/2309.01507"
+  },
+  {
+   "key": "dsv3",
+   "ref": "DeepSeek-V3 technical report (FP8 mixed-precision training; 671B total / 37B active): https://arxiv.org/abs/2412.19437"
+  },
+  {
+   "key": "nvfp4",
+   "ref": "NVIDIA, Pretraining LLMs with NVFP4 (12B, 10T tokens matches FP8): https://arxiv.org/abs/2509.25149"
+  },
+  {
+   "key": "kimi",
+   "ref": "Moonshot Kimi K2 (1.04T total, 32B active): https://github.com/MoonshotAI/Kimi-K2"
+  }
+ ],
+ "files": [
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/result.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/build_result.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/sources.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/radiation.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/radiation.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/digitize_sep.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/sep_spectra.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/cells.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/cells.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/eras.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/eras.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/swarm.mjs",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/swarm.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/dl (NASA SEP model comparison, 3D NAND TID, LEP SEU paper, GERM abundances, Jiggens 2018 SAPPHIRE)"
+ ]
+}

@@ -4,6 +4,13 @@
 fed by PV wings and cooled by pumped loops to radiators), or should the chips be spread through the
 PV film itself as sub-watt chiplets, so the panel is the radiator?
 
+> **Update (future technology).** This decision was made with 2026 hardware. The swarm is built
+> mostly after 2095 and refreshed every 10–20 years, so `docs/future-tech.md` re-examines it. The
+> split survives and tilts further toward sails. HBM never flies: pods become memory-on-logic
+> modules for the work the film cannot host, at 1–6 % of chip power (15 % only if chiplets cannot
+> run agent sandboxes). Each sail becomes one tightly coupled machine through optical lanes in the
+> film.
+
 **Decision.** Use both, sized by what each can physically do. About **85 % of the power** goes into
 **compute sails**: thin c-Si film with 0.15 W chiplets every 2.5 cm. About **15 %** goes into
 **concentrated pods**: shielded HBM/DRAM/flash modules with pumped two-phase loops feeding knife-edge

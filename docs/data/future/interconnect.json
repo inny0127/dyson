@@ -1,0 +1,1457 @@
+{
+ "domain": "Interconnect and communication (on-die wires to AU-scale laser links), 2026-2300",
+ "summary": "Interconnect from die to AU, 2026-2300. Invariants: 2 pF/cm wires (1/4CV^2), 3.336 us/km light (4.9 in glass), lambda/D diffraction, ~10 photons/bit uncoded. Wire energy only falls with V^2 (42 -> 9 fJ/bit/mm on-die); 3D bonding cuts die-to-die to ~2-30 fJ/bit; optical I/O falls 5.6 pJ (2026 product; 0.12 pJ lab) -> 0.4 (2040) -> 0.1 (2070) -> 0.03 pJ (2100+). Q1: photonic express lanes in the film (laid drawn-silica fibre or <=0.1 dB/m waveguides, continuous across 171 hinge folds) make a 279 m sail one tightly coupled 14.8 MW machine: mean global bit 2.2 pJ (2040) -> 0.11 (2070) -> 0.03 pJ (2100+) vs 440-1,465 pJ on the electrical mesh; sail-wide all-to-all 6e-5 / 3.3e-4 / 6.4e-4 B/FLOP at 10 % energy (NVLink-class), per-chiplet bandwidth flat in distance, MoE all-to-all 2-5 % of energy (2070-2100+) instead of 60-78 %; latency 0.9 us mean, 2.7 us worst (vs 11-94 us electrical); fabric 0.2-4 % of sail mass. Plausible ~2050-2070. Q2: light binds per-layer collectives beyond one sail (0.15-1.06 ms to neighbours; decode floor 38-271 ms), and inside a sail only costs batch (5e6-4e7 tokens for <=10 %). A 2070 sail runs a 1e28-class step at critical batch in ~0.6 s (1e28 FLOP in ~20 days); cross-sail DP is laser-bandwidth-bound (~100 Pbps per sail needed vs ~6), so the sail is the synchronous unit. Q3: a terminal carries ~50 / 200 / 400 Tbps (2040/2070/2100+) for 3.4 / 0.75 / 0.21 pJ/bit, spectrum-limited not photon-limited: 10 cm suffices to 330-360 km (all sail-sail neighbours), 30 cm to ~3,000-5,000 km (sail-pod); ~12 per sail (6-30) = 0.2-2.7 % of sail mass, <0.05 % of power; 2026-style 10 cm terminals would be 17-524 % of mass. Pod-pod km links are multi-beam (Pbps). Q4: interconnect-driven pod share 4 % -> 1.5 % -> 0.2 % -> 0; switching moves into the film (chiplet forwarding 0.75-7.5 Tb/s/site, non-volatile optical circuit switches), gateways are terminals with 0.1-0.3 m2 radiators, trunks are small relay craft (<1e-7 of swarm mass). Q5: hierarchical network, ~60-70 hops, 15-35 min light time (chords through the hollow interior 36 % shorter than along the shell); relays 1.6e-8 -> 1.4e-9 J/bit/AU, a byte across 1 AU stays ~1e7 FLOPs in every era. Synchronous cooperation: one sail (~3e-17 of the swarm); DiLoCo-class islands 1e2-1e5 sails; only hour-scale asynchronous syncs reach 97-99 % of the swarm (0.5-2.6 Tbps bisection).",
+ "sota_2026": [
+  {
+   "item": "On-die global wire, repeated, 0.75 V",
+   "value": "~42 fJ/bit/mm (25-150); 40-120 ps/mm",
+   "evidence_class": "demonstrated lab result",
+   "source": "research3; miller2017"
+  },
+  {
+   "item": "Die-to-die UCIe-A / UCIe-3D hybrid bonding",
+   "value": "0.25-0.3 pJ/bit (<2 mm) / 0.01-0.05 pJ/bit, <1-9 um pitch, up to ~300 TB/s/mm2 claimed",
+   "evidence_class": "demonstrated lab result",
+   "source": "ucie"
+  },
+  {
+   "item": "Hybrid-bond pitch",
+   "value": "400 nm wafer-to-wafer (imec, IEDM 2023); ~1 um industrial; 2 um die-to-wafer",
+   "evidence_class": "demonstrated lab result",
+   "source": "imec_hb"
+  },
+  {
+   "item": "Co-packaged optics / optical I/O (product)",
+   "value": "5.6 pJ/bit (NVIDIA CPO switch, 9 W per 1.6T); ~5 pJ/bit TeraPHY, 8 Tbps per chiplet; <7 pJ/bit typical 2026",
+   "evidence_class": "demonstrated lab result",
+   "source": "cpo_nvidia; ayar; cpo_7pj"
+  },
+  {
+   "item": "Chip optical link (lab)",
+   "value": "120 fJ/bit total, 80 x 10 Gb/s, 5.3 Tb/s/mm2 (3D-integrated, Columbia 2025)",
+   "evidence_class": "demonstrated lab result",
+   "source": "daudlin2025"
+  },
+  {
+   "item": "Modulators / O-E-O (lab)",
+   "value": "0.9 fJ/bit Si microdisk at 25 Gb/s (+0.24 fJ athermal); 42 aJ/bit photonic-crystal modulator at 40 Gb/s; 1.6 fJ/bit O-E-O at 10 Gb/s, 2 fF",
+   "evidence_class": "demonstrated lab result",
+   "source": "timurdogan2014; nozaki2019"
+  },
+  {
+   "item": "Low-loss guided optics",
+   "value": "0.034 dB/m ULL Si3N4 on 200 mm wafers (11.8 mm bends, 21 um of cladding); silica PLC 0.035 dB/cm at 5 mm bends; Al2O3 0.05-0.1 dB/cm; SMF 0.16-0.2 dB/km; hollow-core 0.08-0.09 dB/km",
+   "evidence_class": "demonstrated lab result",
+   "source": "liu2022_sin; plc_silica; al2o3; hcf"
+  },
+  {
+   "item": "Film mesh (project baseline)",
+   "value": "0.46 pJ/bit/hop, 4.3 ns/hop at 2.54 cm; 2.4e-6 B/FLOP global at 100 m; 29 us worst latency at 100 m",
+   "evidence_class": "demonstrated lab result",
+   "source": "research3"
+  },
+  {
+   "item": "Space laser links in service",
+   "value": "Starlink ~100 Gbps sustained, 200 Gbps max per link, ~5,400 km, >9,000 lasers; mini laser 25 Gbps to 4,000 km; SCOT80 10 Gbps, 11.9 kg, 60-80 W",
+   "evidence_class": "demonstrated lab result",
+   "source": "starlink; scot80"
+  },
+  {
+   "item": "Highest-rate space/FSO demos",
+   "value": "TBIRD 200 Gbps LEO-ground; Suncatcher bench 1.6 Tbps bidirectional and 9.6 Tbps design per 10 cm to ~300 km; terrestrial 13.16 Tbps over 10.45 km",
+   "evidence_class": "demonstrated lab result",
+   "source": "tbird; suncatcher; fso_records"
+  },
+  {
+   "item": "Deep-space optical",
+   "value": "DSOC 267 Mbps at 0.21 AU, 25 Mbps at 1.5 AU (22 cm, 4 W, ~28 kg)",
+   "evidence_class": "demonstrated lab result",
+   "source": "dsoc"
+  },
+  {
+   "item": "Detectors and photon efficiency",
+   "value": "SNSPD 98 % system efficiency (cryogenic); 14.5 bits per incident photon (lab)",
+   "evidence_class": "demonstrated lab result",
+   "source": "snspd; pie_record"
+  },
+  {
+   "item": "Lasers at 1550 nm",
+   "value": "45 % wall-plug watt-class tapered lasers for FSO; 40 % broad-area; 71 % single device; EDFA transmitters ~20 %",
+   "evidence_class": "demonstrated lab result",
+   "source": "laser_1550_wpe; suncatcher"
+  },
+  {
+   "item": "WDM capacity per spatial mode",
+   "value": "402 Tb/s in one SMF over 37.6 THz (NICT 2024); 44 Tb/s from one microcomb chip",
+   "evidence_class": "demonstrated lab result",
+   "source": "nict402; corcoran2020"
+  },
+  {
+   "item": "Acquisition",
+   "value": "22-34 s spatial+frequency acquisition LEO-LEO (TerraSAR-X/NFIRE)",
+   "evidence_class": "demonstrated lab result",
+   "source": "nfire"
+  },
+  {
+   "item": "Optical circuit switching",
+   "value": "3D-MEMS OCS in TPU v4: <3 % of system power, <5 % of cost; non-volatile Sb2Se3 photonic switches zero static power (lab)",
+   "evidence_class": "demonstrated lab result",
+   "source": "tpu_ocs; pcm_switch"
+  }
+ ],
+ "trajectory": [
+  {
+   "metric": "on-die global wire, full swing, repeated (energy per bit per mm)",
+   "year": "2026",
+   "low": 31.7,
+   "mid": 42.2,
+   "high": 54.2,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "demonstrated lab result",
+   "source": "miller2017 (2 pF/cm, 1/4CV^2) x Vdd by era (IRDS-class 0.75 -> 0.55 -> 0.4 -> 0.35 V)"
+  },
+  {
+   "metric": "on-die global wire, full swing, repeated (energy per bit per mm)",
+   "year": "2040",
+   "low": 15.2,
+   "mid": 22.7,
+   "high": 36.7,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "roadmap claim",
+   "source": "miller2017 (2 pF/cm, 1/4CV^2) x Vdd by era (IRDS-class 0.75 -> 0.55 -> 0.4 -> 0.35 V)"
+  },
+  {
+   "metric": "on-die global wire, full swing, repeated (energy per bit per mm)",
+   "year": "2070",
+   "low": 6.75,
+   "mid": 12.0,
+   "high": 22.7,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "speculation",
+   "source": "miller2017 (2 pF/cm, 1/4CV^2) x Vdd by era (IRDS-class 0.75 -> 0.55 -> 0.4 -> 0.35 V)"
+  },
+  {
+   "metric": "on-die global wire, full swing, repeated (energy per bit per mm)",
+   "year": "2100+",
+   "low": 4.69,
+   "mid": 9.19,
+   "high": 18.8,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "speculation",
+   "source": "miller2017 (2 pF/cm, 1/4CV^2) x Vdd by era (IRDS-class 0.75 -> 0.55 -> 0.4 -> 0.35 V)"
+  },
+  {
+   "metric": "on-die low-swing link (per mm, excl. fixed receiver overhead)",
+   "year": "2026",
+   "low": 3.75,
+   "mid": 5.62,
+   "high": 7.5,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "demonstrated lab result",
+   "source": "miller2017; research3 film_wires.py (0.1 V swing from 0.75 V); RX overhead 20 fJ/bit"
+  },
+  {
+   "metric": "on-die low-swing link (per mm, excl. fixed receiver overhead)",
+   "year": "2040",
+   "low": 1.93,
+   "mid": 2.75,
+   "high": 4.12,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "speculation",
+   "source": "miller2017; research3 film_wires.py (0.1 V swing from 0.75 V); RX overhead 10 fJ/bit"
+  },
+  {
+   "metric": "on-die low-swing link (per mm, excl. fixed receiver overhead)",
+   "year": "2070",
+   "low": 1.0,
+   "mid": 1.4,
+   "high": 2.0,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "speculation",
+   "source": "miller2017; research3 film_wires.py (0.1 V swing from 0.75 V); RX overhead 5 fJ/bit"
+  },
+  {
+   "metric": "on-die low-swing link (per mm, excl. fixed receiver overhead)",
+   "year": "2100+",
+   "low": 0.525,
+   "mid": 0.875,
+   "high": 1.4,
+   "unit": "fJ/bit/mm",
+   "evidence_class": "speculation",
+   "source": "miller2017; research3 film_wires.py (0.1 V swing from 0.75 V); RX overhead 3 fJ/bit"
+  },
+  {
+   "metric": "on-die repeated wire delay",
+   "year": "2026",
+   "low": 40.0,
+   "mid": 70.0,
+   "high": 120.0,
+   "unit": "ps/mm",
+   "evidence_class": "demonstrated lab result",
+   "source": "RC-limited repeated wires (Miller 2017 aspect-ratio limit B ~ 1e16 A/L^2); speed-of-light floor 3.3-5 ps/mm"
+  },
+  {
+   "metric": "on-die repeated wire delay",
+   "year": "2040",
+   "low": 40.0,
+   "mid": 70.0,
+   "high": 120.0,
+   "unit": "ps/mm",
+   "evidence_class": "physics floor",
+   "source": "RC-limited repeated wires (Miller 2017 aspect-ratio limit B ~ 1e16 A/L^2); speed-of-light floor 3.3-5 ps/mm"
+  },
+  {
+   "metric": "on-die repeated wire delay",
+   "year": "2070",
+   "low": 40.0,
+   "mid": 70.0,
+   "high": 120.0,
+   "unit": "ps/mm",
+   "evidence_class": "physics floor",
+   "source": "RC-limited repeated wires (Miller 2017 aspect-ratio limit B ~ 1e16 A/L^2); speed-of-light floor 3.3-5 ps/mm"
+  },
+  {
+   "metric": "on-die repeated wire delay",
+   "year": "2100+",
+   "low": 40.0,
+   "mid": 70.0,
+   "high": 120.0,
+   "unit": "ps/mm",
+   "evidence_class": "physics floor",
+   "source": "RC-limited repeated wires (Miller 2017 aspect-ratio limit B ~ 1e16 A/L^2); speed-of-light floor 3.3-5 ps/mm"
+  },
+  {
+   "metric": "die-to-die energy: UCIe-Advanced (2.5D, <2 mm)",
+   "year": "2026",
+   "low": 250.0,
+   "mid": 280.0,
+   "high": 300.0,
+   "unit": "fJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: UCIe-Advanced (2.5D, <2 mm)",
+   "year": "2040",
+   "low": 80.0,
+   "mid": 120.0,
+   "high": 200.0,
+   "unit": "fJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: UCIe-Advanced (2.5D, <2 mm)",
+   "year": "2070",
+   "low": 50.0,
+   "mid": 80.0,
+   "high": 120.0,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: UCIe-Advanced (2.5D, <2 mm)",
+   "year": "2100+",
+   "low": 40.0,
+   "mid": 60.0,
+   "high": 100.0,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: 3D hybrid bonding (face-to-face)",
+   "year": "2026",
+   "low": 10.0,
+   "mid": 30.0,
+   "high": 50.0,
+   "unit": "fJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: 3D hybrid bonding (face-to-face)",
+   "year": "2040",
+   "low": 4.0,
+   "mid": 10.0,
+   "high": 20.0,
+   "unit": "fJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: 3D hybrid bonding (face-to-face)",
+   "year": "2070",
+   "low": 2.0,
+   "mid": 4.0,
+   "high": 10.0,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "die-to-die energy: 3D hybrid bonding (face-to-face)",
+   "year": "2100+",
+   "low": 1.0,
+   "mid": 2.0,
+   "high": 5.0,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "ucie ; imec_hb ; scaled by Vdd^2 and bond capacitance (C_bond ~ 1-5 fF -> 1/4CV^2 = 0.06-0.7 fJ at 0.5-0.75 V)"
+  },
+  {
+   "metric": "3D hybrid-bond bandwidth density (pitch 9.0-3.0 um, 6 Gb/s per pad, 50 % signal pads)",
+   "year": "2026",
+   "low": 37.0,
+   "mid": 111.0,
+   "high": 333.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "demonstrated lab result",
+   "source": "imec_hb (400 nm W2W demonstrated 2023); ucie (UCIe-3D <1-9 um, ~300 TB/s/mm2 claim)"
+  },
+  {
+   "metric": "3D hybrid-bond bandwidth density (pitch 1.0-0.5 um, 10 Gb/s per pad, 50 % signal pads)",
+   "year": "2040",
+   "low": 5000.0,
+   "mid": 10000.0,
+   "high": 20000.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "roadmap claim",
+   "source": "imec_hb (400 nm W2W demonstrated 2023); ucie (UCIe-3D <1-9 um, ~300 TB/s/mm2 claim)"
+  },
+  {
+   "metric": "3D hybrid-bond bandwidth density (pitch 0.4-0.3 um, 16 Gb/s per pad, 50 % signal pads)",
+   "year": "2070",
+   "low": 50000.0,
+   "mid": 66700.0,
+   "high": 88900.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "speculation",
+   "source": "imec_hb (400 nm W2W demonstrated 2023); ucie (UCIe-3D <1-9 um, ~300 TB/s/mm2 claim)"
+  },
+  {
+   "metric": "3D hybrid-bond bandwidth density (pitch 0.3-0.2 um, 20 Gb/s per pad, 50 % signal pads)",
+   "year": "2100+",
+   "low": 111000.0,
+   "mid": 167000.0,
+   "high": 250000.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "speculation",
+   "source": "imec_hb (400 nm W2W demonstrated 2023); ucie (UCIe-3D <1-9 um, ~300 TB/s/mm2 claim)"
+  },
+  {
+   "metric": "co-packaged / chip optical I/O, full link incl. laser",
+   "year": "2026",
+   "low": 1000.0,
+   "mid": 5600.0,
+   "high": 7000.0,
+   "unit": "fJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "cpo_nvidia (5.6 pJ/b product 2026); cpo_7pj; ayar (~5 pJ/b); daudlin2025 (0.12 pJ/b lab, 2025); pipes (<1 pJ/b target); miller2017 (<10 fJ/b system target)"
+  },
+  {
+   "metric": "co-packaged / chip optical I/O, full link incl. laser",
+   "year": "2040",
+   "low": 150.0,
+   "mid": 400.0,
+   "high": 1000.0,
+   "unit": "fJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "cpo_nvidia (5.6 pJ/b product 2026); cpo_7pj; ayar (~5 pJ/b); daudlin2025 (0.12 pJ/b lab, 2025); pipes (<1 pJ/b target); miller2017 (<10 fJ/b system target)"
+  },
+  {
+   "metric": "co-packaged / chip optical I/O, full link incl. laser",
+   "year": "2070",
+   "low": 30.0,
+   "mid": 100.0,
+   "high": 300.0,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "cpo_nvidia (5.6 pJ/b product 2026); cpo_7pj; ayar (~5 pJ/b); daudlin2025 (0.12 pJ/b lab, 2025); pipes (<1 pJ/b target); miller2017 (<10 fJ/b system target)"
+  },
+  {
+   "metric": "co-packaged / chip optical I/O, full link incl. laser",
+   "year": "2100+",
+   "low": 10.0,
+   "mid": 30.0,
+   "high": 100.0,
+   "unit": "fJ/bit",
+   "evidence_class": "speculation",
+   "source": "cpo_nvidia (5.6 pJ/b product 2026); cpo_7pj; ayar (~5 pJ/b); daudlin2025 (0.12 pJ/b lab, 2025); pipes (<1 pJ/b target); miller2017 (<10 fJ/b system target)"
+  },
+  {
+   "metric": "optical I/O bandwidth density (chip area)",
+   "year": "2026",
+   "low": 1.0,
+   "mid": 2.0,
+   "high": 5.3,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "demonstrated lab result",
+   "source": "daudlin2025 (5.3 Tb/s/mm2 lab); ayar"
+  },
+  {
+   "metric": "optical I/O bandwidth density (chip area)",
+   "year": "2040",
+   "low": 5.0,
+   "mid": 10.0,
+   "high": 30.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "speculation",
+   "source": "daudlin2025 (5.3 Tb/s/mm2 lab); ayar"
+  },
+  {
+   "metric": "optical I/O bandwidth density (chip area)",
+   "year": "2070",
+   "low": 20.0,
+   "mid": 50.0,
+   "high": 100.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "speculation",
+   "source": "daudlin2025 (5.3 Tb/s/mm2 lab); ayar"
+  },
+  {
+   "metric": "optical I/O bandwidth density (chip area)",
+   "year": "2100+",
+   "low": 50.0,
+   "mid": 100.0,
+   "high": 300.0,
+   "unit": "Tb/s per mm2",
+   "evidence_class": "speculation",
+   "source": "daudlin2025 (5.3 Tb/s/mm2 lab); ayar"
+  },
+  {
+   "metric": "film electrical mesh hop (2.54 cm, low-swing + router)",
+   "year": "2026",
+   "low": 310.0,
+   "mid": 459.99999999999994,
+   "high": 710.0,
+   "unit": "fJ/bit/hop",
+   "evidence_class": "demonstrated lab result",
+   "source": "research3 (2026); study1 (later eras)"
+  },
+  {
+   "metric": "film electrical mesh hop (2.54 cm, low-swing + router)",
+   "year": "2040",
+   "low": 100.0,
+   "mid": 200.0,
+   "high": 400.0,
+   "unit": "fJ/bit/hop",
+   "evidence_class": "roadmap claim",
+   "source": "research3 (2026); study1 (later eras)"
+  },
+  {
+   "metric": "film electrical mesh hop (2.54 cm, low-swing + router)",
+   "year": "2070",
+   "low": 20.0,
+   "mid": 60.0,
+   "high": 200.0,
+   "unit": "fJ/bit/hop",
+   "evidence_class": "speculation",
+   "source": "research3 (2026); study1 (later eras)"
+  },
+  {
+   "metric": "film electrical mesh hop (2.54 cm, low-swing + router)",
+   "year": "2100+",
+   "low": 10.0,
+   "mid": 30.0,
+   "high": 100.0,
+   "unit": "fJ/bit/hop",
+   "evidence_class": "speculation",
+   "source": "research3 (2026); study1 (later eras)"
+  },
+  {
+   "metric": "sail-wide mean global bit, uniform all-to-all, 279 m sail",
+   "year": "2026",
+   "low": 2260.0,
+   "mid": 3370.0,
+   "high": 5190.0,
+   "unit": "pJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "film_photonics.py (electrical mesh only; 2n/3 = 7,300 mean hops x 0.31/0.46/0.71 pJ)"
+  },
+  {
+   "metric": "sail-wide mean global bit, uniform all-to-all, 279 m sail (photonic express lanes, laid-fibre)",
+   "year": "2040",
+   "low": 1.29,
+   "mid": 2.23,
+   "high": 4.63,
+   "unit": "pJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "film_photonics.py; daudlin2025; pipes; miller2017; nozaki2019; timurdogan2014"
+  },
+  {
+   "metric": "sail-wide mean global bit, uniform all-to-all, 279 m sail (photonic express lanes, laid-fibre)",
+   "year": "2070",
+   "low": 0.0808,
+   "mid": 0.111,
+   "high": 0.272,
+   "unit": "pJ/bit",
+   "evidence_class": "speculation",
+   "source": "film_photonics.py; daudlin2025; pipes; miller2017; nozaki2019; timurdogan2014"
+  },
+  {
+   "metric": "sail-wide mean global bit, uniform all-to-all, 279 m sail (photonic express lanes, laid-fibre)",
+   "year": "2100+",
+   "low": 0.0184,
+   "mid": 0.0304,
+   "high": 0.0945,
+   "unit": "pJ/bit",
+   "evidence_class": "speculation",
+   "source": "film_photonics.py; daudlin2025; pipes; miller2017; nozaki2019; timurdogan2014"
+  },
+  {
+   "metric": "sail-wide all-to-all bytes per FLOP at 10 % of chip energy",
+   "year": "2026",
+   "low": 2.1e-07,
+   "mid": 3.2e-07,
+   "high": 4.8e-07,
+   "unit": "B/FLOP",
+   "evidence_class": "demonstrated lab result",
+   "source": "film_photonics.py (electrical mesh; low/high from hop energy 0.71/0.31 pJ)"
+  },
+  {
+   "metric": "sail-wide all-to-all bytes per FLOP at 10 % of chip energy",
+   "year": "2040",
+   "low": 3e-05,
+   "mid": 6.2e-05,
+   "high": 0.00011,
+   "unit": "B/FLOP",
+   "evidence_class": "roadmap claim",
+   "source": "film_photonics.py (photonic lanes; electrical mesh alone gives 9.5e-08)"
+  },
+  {
+   "metric": "sail-wide all-to-all bytes per FLOP at 10 % of chip energy",
+   "year": "2070",
+   "low": 0.00013,
+   "mid": 0.00033,
+   "high": 0.00045,
+   "unit": "B/FLOP",
+   "evidence_class": "speculation",
+   "source": "film_photonics.py (photonic lanes; electrical mesh alone gives 8.2e-08)"
+  },
+  {
+   "metric": "sail-wide all-to-all bytes per FLOP at 10 % of chip energy",
+   "year": "2100+",
+   "low": 0.00021,
+   "mid": 0.00064,
+   "high": 0.0011,
+   "unit": "B/FLOP",
+   "evidence_class": "speculation",
+   "source": "film_photonics.py (photonic lanes; electrical mesh alone gives 8.8e-08)"
+  },
+  {
+   "metric": "one-way collective latency across a 279 m sail (low = mean path, mid = worst path, high = electrical-mesh worst / slow hops)",
+   "year": "2026",
+   "low": 31.5,
+   "mid": 94.5,
+   "high": 179.0,
+   "unit": "us",
+   "evidence_class": "demonstrated lab result",
+   "source": "research3 (4.3 ns/hop, 2(n-1) hops)"
+  },
+  {
+   "metric": "one-way collective latency across a 279 m sail (low = mean path, mid = worst path, high = electrical-mesh worst / slow hops)",
+   "year": "2040",
+   "low": 0.941,
+   "mid": 2.76,
+   "high": 65.9,
+   "unit": "us",
+   "evidence_class": "physics floor",
+   "source": "film_photonics.py: low = photonic mean, mid = photonic Manhattan worst (n_g 1.468), high = electrical mesh worst"
+  },
+  {
+   "metric": "one-way collective latency across a 279 m sail (low = mean path, mid = worst path, high = electrical-mesh worst / slow hops)",
+   "year": "2070",
+   "low": 0.926,
+   "mid": 2.75,
+   "high": 43.9,
+   "unit": "us",
+   "evidence_class": "physics floor",
+   "source": "film_photonics.py: low = photonic mean, mid = photonic Manhattan worst (n_g 1.468), high = electrical mesh worst"
+  },
+  {
+   "metric": "one-way collective latency across a 279 m sail (low = mean path, mid = worst path, high = electrical-mesh worst / slow hops)",
+   "year": "2100+",
+   "low": 0.92,
+   "mid": 2.74,
+   "high": 32.9,
+   "unit": "us",
+   "evidence_class": "physics floor",
+   "source": "film_photonics.py: low = photonic mean, mid = photonic Manhattan worst (n_g 1.468), high = electrical mesh worst"
+  },
+  {
+   "metric": "laser terminal throughput, sail-sail 139 km (10 cm / era terminal / 1 m)",
+   "year": "2026",
+   "low": 9.6,
+   "mid": 9.6,
+   "high": 128.0,
+   "unit": "Tbps",
+   "evidence_class": "demonstrated lab result",
+   "source": "fso_eras.py; suncatcher; starlink; tbird; scot80"
+  },
+  {
+   "metric": "laser terminal throughput, sail-sail 139 km (10 cm / era terminal / 1 m)",
+   "year": "2040",
+   "low": 50.0,
+   "mid": 50.0,
+   "high": 664.0,
+   "unit": "Tbps",
+   "evidence_class": "roadmap claim",
+   "source": "fso_eras.py; suncatcher (12.8 Tbps at 75 GHz grid); corcoran2020 (44 Tb/s one comb, C-band); pipes"
+  },
+  {
+   "metric": "laser terminal throughput, sail-sail 139 km (10 cm / era terminal / 1 m)",
+   "year": "2070",
+   "low": 200.0,
+   "mid": 200.0,
+   "high": 2660.0,
+   "unit": "Tbps",
+   "evidence_class": "speculation",
+   "source": "fso_eras.py; nict402 (402 Tb/s, 37.6 THz in one SMF mode, 2024); laser_1550_wpe"
+  },
+  {
+   "metric": "laser terminal throughput, sail-sail 139 km (10 cm / era terminal / 1 m)",
+   "year": "2100+",
+   "low": 400.0,
+   "mid": 400.0,
+   "high": 5320.0,
+   "unit": "Tbps",
+   "evidence_class": "speculation",
+   "source": "fso_eras.py; nict402; floors.json (heterodyne 10.5 PPB at 6 b/mode)"
+  },
+  {
+   "metric": "laser terminal throughput, sail-pod 3,000 km (10 cm / era terminal / 1 m)",
+   "year": "2026",
+   "low": 0.182,
+   "mid": 0.182,
+   "high": 9.6,
+   "unit": "Tbps",
+   "evidence_class": "demonstrated lab result",
+   "source": "fso_eras.py; design (0.1-0.4 Tbps at <=3,000 km in 2026)"
+  },
+  {
+   "metric": "laser terminal throughput, sail-pod 3,000 km (10 cm / era terminal / 1 m)",
+   "year": "2040",
+   "low": 0.712,
+   "mid": 50.0,
+   "high": 50.0,
+   "unit": "Tbps",
+   "evidence_class": "roadmap claim",
+   "source": "fso_eras.py; design (0.1-0.4 Tbps at <=3,000 km in 2026)"
+  },
+  {
+   "metric": "laser terminal throughput, sail-pod 3,000 km (10 cm / era terminal / 1 m)",
+   "year": "2070",
+   "low": 2.85,
+   "mid": 200.0,
+   "high": 200.0,
+   "unit": "Tbps",
+   "evidence_class": "speculation",
+   "source": "fso_eras.py; design (0.1-0.4 Tbps at <=3,000 km in 2026)"
+  },
+  {
+   "metric": "laser terminal throughput, sail-pod 3,000 km (10 cm / era terminal / 1 m)",
+   "year": "2100+",
+   "low": 4.75,
+   "mid": 385.0,
+   "high": 400.0,
+   "unit": "Tbps",
+   "evidence_class": "speculation",
+   "source": "fso_eras.py; design (0.1-0.4 Tbps at <=3,000 km in 2026)"
+  },
+  {
+   "metric": "laser link energy per bit, sail-sail 139 km (electronics + PAT + photons)",
+   "year": "2026",
+   "low": 19.7,
+   "mid": 39.4,
+   "high": 78.8,
+   "unit": "pJ/bit",
+   "evidence_class": "demonstrated lab result",
+   "source": "fso_eras.py (mid computed; low/high = x0.5/x2 on terminal electronics, assumed); suncatcher; tbird; scot80"
+  },
+  {
+   "metric": "laser link energy per bit, sail-sail 139 km (electronics + PAT + photons)",
+   "year": "2040",
+   "low": 1.7,
+   "mid": 3.4,
+   "high": 6.8,
+   "unit": "pJ/bit",
+   "evidence_class": "roadmap claim",
+   "source": "fso_eras.py (mid computed; low/high = x0.5/x2 on terminal electronics, assumed); suncatcher; tbird; scot80"
+  },
+  {
+   "metric": "laser link energy per bit, sail-sail 139 km (electronics + PAT + photons)",
+   "year": "2070",
+   "low": 0.375,
+   "mid": 0.751,
+   "high": 1.5,
+   "unit": "pJ/bit",
+   "evidence_class": "speculation",
+   "source": "fso_eras.py (mid computed; low/high = x0.5/x2 on terminal electronics, assumed); suncatcher; tbird; scot80"
+  },
+  {
+   "metric": "laser link energy per bit, sail-sail 139 km (electronics + PAT + photons)",
+   "year": "2100+",
+   "low": 0.106,
+   "mid": 0.213,
+   "high": 0.425,
+   "unit": "pJ/bit",
+   "evidence_class": "speculation",
+   "source": "fso_eras.py (mid computed; low/high = x0.5/x2 on terminal electronics, assumed); suncatcher; tbird; scot80"
+  },
+  {
+   "metric": "swarm relay chain energy per bit per AU (3 m / 1 m / 0.3 m relays at optimum hop)",
+   "year": "2026",
+   "low": 1.3e-08,
+   "mid": 1.1e-07,
+   "high": 1.3e-06,
+   "unit": "J/bit/AU",
+   "evidence_class": "demonstrated lab result",
+   "source": "swarm_net.py (l* = sqrt(E0/K)); research3"
+  },
+  {
+   "metric": "swarm relay chain energy per bit per AU (3 m / 1 m / 0.3 m relays at optimum hop)",
+   "year": "2040",
+   "low": 1.7e-09,
+   "mid": 1.6e-08,
+   "high": 1.7e-07,
+   "unit": "J/bit/AU",
+   "evidence_class": "roadmap claim",
+   "source": "swarm_net.py (l* = sqrt(E0/K)); research3"
+  },
+  {
+   "metric": "swarm relay chain energy per bit per AU (3 m / 1 m / 0.3 m relays at optimum hop)",
+   "year": "2070",
+   "low": 4.3e-10,
+   "mid": 3.9e-09,
+   "high": 4.3e-08,
+   "unit": "J/bit/AU",
+   "evidence_class": "speculation",
+   "source": "swarm_net.py (l* = sqrt(E0/K)); research3"
+  },
+  {
+   "metric": "swarm relay chain energy per bit per AU (3 m / 1 m / 0.3 m relays at optimum hop)",
+   "year": "2100+",
+   "low": 1.5e-10,
+   "mid": 1.4e-09,
+   "high": 1.5e-08,
+   "unit": "J/bit/AU",
+   "evidence_class": "speculation",
+   "source": "swarm_net.py (l* = sqrt(E0/K)); research3"
+  },
+  {
+   "metric": "pod share of chip power justified by interconnect alone (switching, shuffles, gateways)",
+   "year": "2026",
+   "low": 0.02,
+   "mid": 0.04,
+   "high": 0.06,
+   "unit": "fraction",
+   "evidence_class": "demonstrated lab result",
+   "source": "pods_switching.py: film mesh cannot switch (<=48 Gb/s/site) or do global traffic (2.4e-6 B/FLOP at 100 m); switched fabric and gateways in pods"
+  },
+  {
+   "metric": "pod share of chip power justified by interconnect alone (switching, shuffles, gateways)",
+   "year": "2040",
+   "low": 0.0,
+   "mid": 0.015,
+   "high": 0.03,
+   "unit": "fraction",
+   "evidence_class": "speculation",
+   "source": "pods_switching.py: film photonic express lanes (E_global ~2 pJ, gateway-limited) vs pod fabric ~1.7 pJ: parity; keep a hedge until film photonics is proven"
+  },
+  {
+   "metric": "pod share of chip power justified by interconnect alone (switching, shuffles, gateways)",
+   "year": "2070",
+   "low": 0.0,
+   "mid": 0.002,
+   "high": 0.005,
+   "unit": "fraction",
+   "evidence_class": "speculation",
+   "source": "pods_switching.py: film global bit 0.11 pJ vs pod 0.65 pJ; chiplet sites switch 0.75-3 Tb/s each; OCS non-volatile in film"
+  },
+  {
+   "metric": "pod share of chip power justified by interconnect alone (switching, shuffles, gateways)",
+   "year": "2100+",
+   "low": 0.0,
+   "mid": 0.0,
+   "high": 0.002,
+   "unit": "fraction",
+   "evidence_class": "speculation",
+   "source": "pods_switching.py: no interconnect reason for concentration; trunk relays are separate kW craft at <1e-7 of swarm mass"
+  }
+ ],
+ "physical_floors": [
+  {
+   "floor": "Line capacitance of any electrical wire",
+   "value": 2.0,
+   "unit": "pF/cm (1-3.5)",
+   "evidence_class": "physics floor",
+   "source": "miller2017",
+   "note": "Depends on log of geometry only; energy per bit = 1/4 C' L V^2 scales with length at any lithography."
+  },
+  {
+   "floor": "Full-swing wire energy at 0.75 / 0.5 / 0.3 / 0.1 V",
+   "value": [
+    28.1,
+    12.5,
+    4.5,
+    0.5
+   ],
+   "unit": "fJ/bit/mm (before repeater overhead)",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Thermal-noise (kT/C) floor for a 1 mm or 2.54 cm wire at 358 K, BER 1e-12",
+   "value": 2.4e-19,
+   "unit": "J/bit",
+   "evidence_class": "physics floor",
+   "source": "floors.py",
+   "note": "~1e5 below practical wires: the practical floor is device offset/variation, not physics."
+  },
+  {
+   "floor": "Speed of light",
+   "value": 3.336,
+   "unit": "us/km in vacuum; 4.90 us/km in silica (n_g 1.468); hollow-core ~3.35",
+   "evidence_class": "physics floor",
+   "source": "floors.py",
+   "note": "279 m sail: 0.93 us side, 1.32 us diagonal (vacuum); 2.73 us Manhattan in fibre. 44/139/317 km: 0.15/0.46/1.06 ms."
+  },
+  {
+   "floor": "Light time across the swarm shell",
+   "value": [
+    918.0,
+    1347.0,
+    1442.0,
+    2116.0
+   ],
+   "unit": "s (chord through interior 0.92 / 1.35 AU; half great circle 0.92 / 1.35 AU)",
+   "evidence_class": "physics floor",
+   "source": "swarm_net.py",
+   "note": "Chords through the empty interior are 36 % shorter than paths along the shell; a 5 deg Sun-avoidance detour adds 0.4 %."
+  },
+  {
+   "floor": "Diffraction: beam divergence lambda/D at 1550 nm",
+   "value": {
+    "1 cm": 155.0,
+    "10 cm": 15.5,
+    "30 cm": 5.17,
+    "100 cm": 1.55,
+    "300 cm": 0.517
+   },
+   "unit": "urad",
+   "evidence_class": "physics floor",
+   "source": "floors.py",
+   "note": "Pointing jitter must be ~0.1 lambda/D: 1.6 / 0.52 / 0.16 / 0.05 urad for 10 cm / 30 cm / 1 m / 3 m."
+  },
+  {
+   "floor": "Near-field (Fresnel) distance D^2/lambda",
+   "value": {
+    "1 cm": 0.0645,
+    "10 cm": 6.45,
+    "30 cm": 58.1,
+    "100 cm": 645.0,
+    "300 cm": 5810.0
+   },
+   "unit": "km",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Independent spatial channels between two apertures N ~ (pi Dt Dr / 4 lambda L)^2",
+   "value": {
+    "30 cm at 1 km": 2080,
+    "30 cm at 44 km": 1.07,
+    "30 cm at 139 km": 0.11,
+    "1 m at 139 km": 13.3
+   },
+   "unit": "modes",
+   "evidence_class": "physics floor",
+   "source": "floors.py; suncatcher (2x2 at 1.25 km, 4x4 at 0.32 km)",
+   "note": "Pod-pod links inside km-scale islands can carry thousands of parallel beams; sail-sail links (>=44 km, 30 cm) are single-mode, so capacity per terminal = optical bandwidth x spectral efficiency."
+  },
+  {
+   "floor": "Photons per bit, ideal photon-counting OOK (BER 1e-9 / 1e-12)",
+   "value": [
+    10.0,
+    13.5
+   ],
+   "unit": "photons/bit",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Photons per bit, shot-noise BPSK homodyne (BER 1e-9 / 1e-12)",
+   "value": [
+    8.99,
+    12.4
+   ],
+   "unit": "photons/bit",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Shannon limit, heterodyne, at 1 / 4 / 6 / 8 bits per mode",
+   "value": [
+    1.0,
+    3.75,
+    10.5,
+    31.875
+   ],
+   "unit": "photons/bit",
+   "evidence_class": "physics floor",
+   "source": "floors.py; suncatcher (196 PPB PM-16QAM, 71 PPB OOK in practice)",
+   "note": "Wideband limits: heterodyne ln2 = 0.69, homodyne 0.35; Holevo -> 0 as photons per mode -> 0 (lab record 14.5 bits per photon = 0.069 PPB, pie_record). High Tbps per aperture forces high spectral efficiency, i.e. >=4-30 PPB."
+  },
+  {
+   "floor": "Receiverless detector charge N = C V / e",
+   "value": {
+    "1 fF, 0.4 V": 2497,
+    "0.3 fF, 0.3 V": 562
+   },
+   "unit": "photons/bit (0.32 fJ / 0.072 fJ optical at 1550 nm)",
+   "evidence_class": "physics floor",
+   "source": "miller2017; floors.py",
+   "note": "With 10-19 dB system loss and 30 % lasers, the laser share is ~3-30 fJ/bit: Miller's <10 fJ/bit link."
+  },
+  {
+   "floor": "Landauer kT ln2 at 358 K",
+   "value": 3.4e-21,
+   "unit": "J/bit",
+   "evidence_class": "physics floor",
+   "source": "floors.py",
+   "note": "Irrelevant for links: transmission is not erasure; practical floors are 1e3-1e6x higher."
+  }
+ ],
+ "model_parameters": [
+  {
+   "param": "filmHopEnergy",
+   "unit": "J/bit per 2.54 cm electrical hop",
+   "y2026": 4.6e-13,
+   "y2040": 2e-13,
+   "y2070": 6e-14,
+   "y2100plus": 3e-14,
+   "notes": "Unchanged from study 1. Used only for <~1-2 hop neighbour traffic once photonic lanes exist (electrical/optical break-even 1-2 hops after 2040).",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "filmPhotonicEndpointEnergy (new)",
+   "unit": "J/bit per E-O-E traversal (modulator+driver+receiver+tuning, excl. laser)",
+   "y2026": "n/a on film (chip optical I/O 2e-12 mid; lab 1.2e-13)",
+   "y2040": 1e-13,
+   "y2070": 2e-14,
+   "y2100plus": 8e-15,
+   "notes": "Ranges 3e-14-5e-13 / 5e-15-1e-13 / 2e-15-4e-14. Laser share added by loss: N_rx h nu 10^(dB/10)/eta_wp with N_rx 6000/2500/600 photons.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "filmGlobalBitEnergy (new)",
+   "unit": "J/bit, mean over uniform traffic across a 279 m sail",
+   "y2026": 3.4e-09,
+   "y2040": 2.2e-12,
+   "y2070": 1.1e-13,
+   "y2100plus": 3e-14,
+   "notes": "2026 = electrical mesh (7,300 mean hops). Later = photonic express lanes (laid fibre or <=0.1 dB/m ULL waveguides), 2 E-O-E segments + turn; 2040 includes 4+4 electrical access hops to a gateway (dominant). Electrical-only stays 1.5e-9 / 4.4e-10 / 2.2e-10.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "filmGlobalBytesPerFLOP10 (new)",
+   "unit": "B/FLOP sail-wide all-to-all at 10 % of chip energy",
+   "y2026": 3.2e-07,
+   "y2040": 6.2e-05,
+   "y2070": 0.00033,
+   "y2100plus": 0.00064,
+   "notes": "NVLink-class all-to-all is ~5e-5-1e-4 B/FLOP: the whole 14.8 MW sail reaches it ~2040-2070. Electrical mesh alone: 9.5e-8 / 8.2e-8 / 8.9e-8.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "sailCollectiveLatency (new)",
+   "unit": "s, worst-case one-way across a 279 m sail",
+   "y2026": 9.4e-05,
+   "y2040": 2.8e-06,
+   "y2070": 2.7e-06,
+   "y2100plus": 2.7e-06,
+   "notes": "Photonic mean 0.92-0.97 us; hollow-core diagonal 1.33 us; vacuum diagonal 1.32 us is the floor. Electrical worst falls only to 33 us by 2100+.",
+   "evidence_class": "physics floor (light time in glass) + speculation (O-E-O delays)"
+  },
+  {
+   "param": "filmWaveguideLossMax (new)",
+   "unit": "dB/m needed for sail-span lanes without regeneration",
+   "y2026": "n/a",
+   "y2040": 0.1,
+   "y2070": 0.1,
+   "y2100plus": 0.1,
+   "notes": "0.034 dB/m demonstrated (ULL SiN) but needs 21 um of thermal-quality oxide and cracks at hinge folds; laid drawn-silica fibre (0.0002-0.001 dB/m, survives 8 mm folds) is the robust choice. Deposited doped silica (~2 dB/m) needs O-E-O every ~4-10 m (6-60x worse).",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "filmPhotonicFabricMass (new)",
+   "unit": "kg/m2 of fibre/waveguide lanes",
+   "y2026": 0.0,
+   "y2040": 0.0018,
+   "y2070": 0.00086,
+   "y2100plus": 0.00051,
+   "notes": "Sized for 1e-5 B/FLOP sail-wide (+ local traffic on short lanes); 1e-4 B/FLOP costs 0.018 (2040), 0.0086 (2070), 0.0051 (2100+) kg/m2 with 7-core fibre, or 2.2/1.2 % of sail mass with ULL SiN strips.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "laserAperture (sail terminals)",
+   "unit": "m",
+   "y2026": 0.1,
+   "y2040": "0.10 neighbour / 0.30 long-range",
+   "y2070": "0.10 / 0.30",
+   "y2100plus": "0.10 / 0.30",
+   "notes": "From 2040 a 10 cm terminal reaches the per-mode spectral cap (50/200/400 Tbps) out to 330-360 km, i.e. every sail-sail neighbour (44-317 km); 30 cm is needed only for sail-pod and regional links (>=1,000 km: 30 cm gives 50-385 Tbps at 3,000 km vs 0.7-4.7 for 10 cm). 1 m terminals live on trunk relay craft.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "laserTerminalRate (new)",
+   "unit": "bit/s per terminal at 139 km",
+   "y2026": 9600000000000.0,
+   "y2040": 50000000000000.0,
+   "y2070": 200000000000000.0,
+   "y2100plus": 400000000000000.0,
+   "notes": "Spectrum/electronics-limited, not photon-limited, at 44-317 km. At 3,000 km: 0.18 Tbps (10 cm, 2026), 50, 200, 385 Tbps (30 cm).",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "laserTerminalEnergy (new)",
+   "unit": "J/bit at 139 km (DSP + PAT + photons)",
+   "y2026": 3.9e-11,
+   "y2040": 3.4e-12,
+   "y2070": 7.5e-13,
+   "y2100plus": 2.1e-13,
+   "notes": "Coherent DSP 36 pJ/bit today dominates; photons are <=3 fJ/bit at 139 km with 30 cm.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "laserTerminalMass (new)",
+   "unit": "kg per terminal (Mercury-built)",
+   "y2026": 5.0,
+   "y2040": 12.8,
+   "y2070": 11.0,
+   "y2100plus": 9.15,
+   "notes": "30 cm terminal. Heritage fit m = 11.9 kg (D/0.08)^0.85 (SCOT80, DSOC) x 0.25-0.35 Mercury lightweighting; 10 cm 3.6-5.0 kg, 1 m 26-36 kg.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "terminalsPerSail (new)",
+   "unit": "count",
+   "y2026": 64,
+   "y2040": "12 (8 x 10 cm + 4 x 30 cm)",
+   "y2070": "12 (8 + 4)",
+   "y2100plus": "12 (8 + 4)",
+   "notes": "Range 6 (service traffic 1e-8 B/FLOP; set by mesh degree and redundancy) to ~30 (low-comm training 1e-7 B/FLOP). 2026 = 60 patch + 4 corner terminals of 10 cm.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "laserKgPerW (FIXED.film)",
+   "unit": "kg/W",
+   "y2026": 2.2e-05,
+   "y2040": 6.2e-06,
+   "y2070": 5.3e-06,
+   "y2100plus": 4.4e-06,
+   "notes": "Model currently 2e-5. Upper bound with 6-30 terminals all 30 cm: 2040 0.5-2.6e-5, 2070 0.45-2.2e-5, 2100+ 0.37-1.7e-5. Terminal power <=0.04 % of sail power.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "sailPodRange1Tbps (new)",
+   "unit": "km at which one terminal still carries 1 Tbps",
+   "y2026": 1280.0,
+   "y2040": 22800.0,
+   "y2070": 45600.0,
+   "y2100plus": 58800.0,
+   "notes": "100 Tbps closes to 4,560 km (2070) and 5,880 km (2100+) with 30 cm; 1 m gives 51,000-65,000 km. Pod lanes can thin out or vanish.",
+   "evidence_class": "2026 demonstrated lab result; 2040 roadmap claim; 2070 and 2100+ speculation"
+  },
+  {
+   "param": "relayEnergyPerBitPerAU (new)",
+   "unit": "J/bit/AU, 1 m relays at the optimum hop",
+   "y2026": 1.1e-07,
+   "y2040": 1.6e-08,
+   "y2070": 3.9e-09,
+   "y2100plus": 1.4e-09,
+   "notes": "Optimum hop 160,000 / 81,000 / 62,000 / 48,000 km. One byte across 1 AU stays ~1e7 FLOP-equivalents in every era (link and logic energy fall together).",
+   "evidence_class": "physics floor (Friis/diffraction) + speculation (terminal electronics by era)"
+  },
+  {
+   "param": "podFracInterconnect (new)",
+   "unit": "fraction of chip power in pods for interconnect reasons",
+   "y2026": 0.04,
+   "y2040": 0.015,
+   "y2070": 0.002,
+   "y2100plus": 0.0,
+   "notes": "Ranges 0.02-0.06 / 0-0.03 / 0-0.005 / 0-0.002. Add to study 2's memory-driven podFrac (0.15/0.05/0.01/0.003) only where roles do not overlap; the combined floor is ~max, not sum.",
+   "evidence_class": "speculation (judgement from pods_switching.py numbers)"
+  },
+  {
+   "param": "syncUnit (new)",
+   "unit": "largest group running per-layer (TP/MoE) and fully synchronous DP collectives",
+   "y2026": "patch (~18 m) or pod",
+   "y2040": "sail (279 m) if photonic lanes",
+   "y2070": "sail",
+   "y2100plus": "sail",
+   "notes": "Neighbour sails 44-317 km are 0.15-1.06 ms away: per-layer collectives never cross sails; synchronous DP across sails is laser-bandwidth-bound (needs ~1e2-1e5x less traffic: DiLoCo/SparseLoCo).",
+   "evidence_class": "physics floor (light time) + speculation (algorithms)"
+  }
+ ],
+ "obsolete_by_era": [
+  {
+   "param": "Electrical nearest-neighbour mesh as the only on-film fabric (0.46 pJ/bit/hop, 2.4e-6 B/FLOP at 100 m)",
+   "obsolete_by": "2045-2060",
+   "replacement": "Two-level film fabric: electrical mesh for 1-2 hops + photonic express lanes (laid fibre / ULL waveguides) at 2 pJ (2040) -> 0.11 pJ (2070) -> 0.03 pJ (2100+) per global bit",
+   "why": "Wire energy is fixed by 2 pF/cm; FLOPs per film-hop byte rise 47 -> 160-640 (study 1). Optics is flat in distance."
+  },
+  {
+   "param": "Film all-to-all domain <= 0.9 m (~200 W) at NVLink energy parity",
+   "obsolete_by": "2050-2070",
+   "replacement": "Whole 279 m, 14.8 MW sail as one all-to-all domain at 3e-4-6e-4 B/FLOP for 10 % of energy",
+   "why": "film_photonics.py sail-wide Monte Carlo"
+  },
+  {
+   "param": "60 x 10 cm patch handover terminals (one per 32.5 m patch), 0.1-0.4 Tbps each",
+   "obsolete_by": "2035-2045",
+   "replacement": "6-30 x 30 cm terminals at boom tips/hub/service plates, 50-400 Tbps each; in-sail photonics aggregates patches",
+   "why": "10 cm terminals at FLOP/s x8-250 would be 17-520 % of sail mass (fso_eras.py)."
+  },
+  {
+   "param": "Coherent-DSP laser link energy 36-39 pJ/bit",
+   "obsolete_by": "2035-2040",
+   "replacement": "3.4 pJ (2040), 0.75 pJ (2070), 0.21 pJ (2100+) per bit at 139 km",
+   "why": "Short (<=3,000 km) high-SNR links do not need full long-haul DSP; PIC transceivers follow CPO energy."
+  },
+  {
+   "param": "'Sail-pod links close only within ~3,000 km at 0.1-0.4 Tbps'",
+   "obsolete_by": "2040",
+   "replacement": "30 cm: 50 Tbps at 3,000 km and 1 Tbps to 22,800 km (2040); 1 Tbps to 46,000-59,000 km (2070-2100+)",
+   "why": "Rate x81 from 30 cm apertures (D^4) plus wider WDM; photon budget is not binding at <=3,000 km."
+  },
+  {
+   "param": "Pods as the switched fabric / global-shuffle / gateway hosts (part of the 5-10 % pod floor)",
+   "obsolete_by": "2050-2070",
+   "replacement": "Switching in the film (chiplets forward 0.3-5 Tb/s each at <=0.15 W; non-volatile PCM optical circuit switches; passive wavelength routing); gateways on 0.1-0.3 m2 radiator plates; separate relay craft for trunks",
+   "why": "Film global bit 0.11 pJ vs 0.5-0.8 pJ for a pod fabric in 2070 (pods_switching.py)."
+  },
+  {
+   "param": "Relay-chain energy 0.1-11 uJ/bit per AU",
+   "obsolete_by": "2040-2070",
+   "replacement": "1.6e-8 (2040), 3.9e-9 (2070), 1.4e-9 (2100+) J/bit/AU with 1 m relays",
+   "why": "E/AU = 2 sqrt(E0 K): falls with sqrt of terminal electronics energy."
+  },
+  {
+   "param": "'Tensor parallel max distance 90-900 m' as a separate constraint",
+   "obsolete_by": "never (physics)",
+   "replacement": "Keep; it now coincides with the sail size, so the sail is the synchronous unit",
+   "why": "Light time is invariant: 1 us per 300 m (vacuum), 1 us per 204 m in glass."
+  }
+ ],
+ "architecture_implications": [
+  {
+   "question": "1. With on-film optical waveguides at ~10-100 fJ/bit, does a 50-300 m sail behave like one tightly coupled machine? Does that remove the global-bandwidth penalty that made pods useful? When?",
+   "answer": "Yes for bandwidth and energy, from ~2050-2070; latency stays light-limited at ~1-3 us across the sail. Per-chiplet bandwidth becomes flat in distance instead of falling as 1/L.",
+   "numbers": "Per chiplet at 10 % of 0.14 W: electrical mesh 233 Gb/s at 2.5 cm but 0.2 Gb/s at 30 m and 0.021 Gb/s at 279 m (2070); photonic 197 Gb/s flat to 279 m (4.6e-04 B/FLOP), port-capped. Sail-wide uniform all-to-all at 10 % energy: electrical 8.2e-08 B/FLOP vs photonic 6.2e-05 (2040, gateway-access limited), 3.3e-04 (2070), 6.4e-04 (2100+) - above NVLink's 5e-5-1e-4. Mean global bit 2.2 / 0.11 / 0.03 pJ vs electrical 1,465 / 440 / 220 pJ (x658-7225). Layer-local MoE all-to-all: electrical 60-78 % of chip energy vs photonic 20 % (2040), 4.5 % (2070), 2.4 % (2100+). Latency: photonic 0.93 us mean, 2.75 us worst vs electrical 15-44 us mean/worst (2070). Needs loss <=0.1 dB/m (ULL SiN 0.034 demonstrated) or laid drawn-silica fibre (0.0003 dB/m), continuous across 171 hinge folds (jumper pairs would add 34-171 dB). Fabric mass for 1e-5 B/FLOP sail-wide: 0.2-1.2 % of sail; 1e-4: 2-4 % with ULL strips or 7-core fibre, 12 % with single-core fibre (2070). Plausible: express lanes ~2040-2050, chiplet-native receiverless ports (<=20 fJ) ~2060-2070.",
+   "evidence_class": "physics floor (light time, 2 pF/cm) + demonstrated lab (0.034 dB/m, 120 fJ/bit link, 0.9 fJ modulators) + speculation (film integration, era energies)"
+  },
+  {
+   "question": "2. Does the speed of light become the binding constraint for synchronous work?",
+   "answer": "Inside a sail: only for per-layer collectives at small batch (it costs concurrency, not feasibility). Across sails: yes for every per-layer collective (TP, MoE); data- and pipeline-parallel across sails are laser-bandwidth-bound before they are latency-bound.",
+   "numbers": "Per-layer compute at batch 1 falls to ~3 ns in an 8 m patch (2070) and 0.003 ns for a whole sail. Batch for latency <=10 %: patch 90-440 tokens (photonic) vs 2,200-8,400 (electrical mesh); whole sail 5e6-4e7 tokens; neighbour sails 44-317 km 2e9-3e10 (impossible). Decode token floor from 2 collectives x 128 layers: patch 12-42 us, sail 0.70 ms, neighbour sails 38-271 ms. Training step at critical batch on ONE sail: 0.71 s (2040), 0.61 s (2070); a 1e28-FLOP run takes 20 days on one 2070 sail. DP all-reduce latency across 44-317 km is <=0.7 % of a step, but fully synchronous DP across 10 sails needs ~97 Pbps per sail (2070) vs ~6 Pbps of terminals. Pipeline across sails: 6e-8 B/FLOP per boundary = 2.7 Pbps per sail (2070), 4-28 micro-batches in flight hide 0.15-1 ms. Pod island (2 km): 6.7 us.",
+   "evidence_class": "physics floor (light time) + speculation (model shapes, critical batch 2e8 tokens in 2070)"
+  },
+  {
+   "question": "3. Laser-link bandwidth by era for sail-sail, sail-pod, pod-pod; power and mass fraction; scaling with FLOP/s x8-250",
+   "answer": "Per terminal: ~50 Tbps (2040), ~200 Tbps (2070), ~400 Tbps (2100+), set by optical bandwidth x spectral efficiency, not photons: 10 cm suffices for every sail-sail neighbour (<=330-360 km), 30 cm for sail-pod/regional links to ~3,000-5,000 km; pod-pod inside km islands is unbounded in practice (hundreds to thousands of spatial modes). Terminals stay <3 % of sail mass and <0.05 % of sail power because 30 cm apertures and WDM grow faster than FLOP/s.",
+   "numbers": "Sail-sail 139 km: 9.6 / 50 / 200 / 400 Tbps per terminal at 39 / 3.4 / 0.75 / 0.21 pJ/bit. Sail-pod 3,000 km: 0.18 (10 cm, 2026) / 50 / 200 / 385 Tbps. Pod-pod 0.5-2 km: 0.06-0.15 Pbps (2026, 10 cm SDM) -> 3.2 / 51 / 410 Pbps aggregate with 64-1024 parallel beams. Need per sail = beta_ext x 8 x FLOP/s: service traffic (1e-8 B/FLOP, the 2026 design rule) 15 -> 118 -> 455 -> 845 Tbps; low-comm training (1e-7) 0.15 -> 1.2 -> 4.5 -> 8.4 Pbps. Terminals: 6 (service) to 27-30 (training) x 9-13 kg = 0.4-2.7 % of sail mass, 0.2-4.8 kW = 0.001-0.03 % of power. Keeping 2026 tech (10 cm, 9.6 Tbps cap) at FLOP/s x8/30/56/250 would need 480-15,000 terminals = 17-524 % of sail mass; 30 cm: 9-284 terminals = 0.8-25 %.",
+   "evidence_class": "physics floor (diffraction, Friis) + demonstrated (9.6 Tbps design, 402 Tb/s per mode in fibre) + speculation (era DSP energy)"
+  },
+  {
+   "question": "4. What pod share is still justified by interconnect (switching, global shuffles, gateways)? Should switching become a film function?",
+   "answer": "~4 % today -> ~1.5 % (2040, hedge) -> ~0.2 % (2070) -> 0 (2100+). Yes: switching moves into the film (distributed electrical forwarding in chiplets, non-volatile optical circuit switches and passive wavelength routing on the lanes); gateways are just laser terminals with 0.1-0.3 m2 radiators; trunk relays are separate small craft.",
+   "numbers": "A 0.15 W site switches 30-75 Gb/s (2026) -> 150-500 Gb/s (2040) -> 0.75-3 Tb/s (2070) -> 3-7.5 Tb/s (2100+); 1 % of a sail's sites = 2e+18 b/s of switching (2070). Film photonic global bit vs 3-tier pod fabric: 2.2 vs 3.5 pJ (2040), 0.11 vs 0.8 pJ (2070), 0.03 vs 0.24 pJ (2100+). Gateway heat per 30 cm terminal 85-170 W -> 0.07-0.14 m2 at 330 K. Trunk relay craft (6 x 1 m terminals, ~0.5 t) on a 48,000-160,000 km lattice: 4e8-6e10 craft = 2e-12-5e-8 of swarm mass. Combined with study 2: pods fall to ~5 % (2040), ~1 % (2070), ~0.3 % (2100+), all memory/archive/cryogenic driven.",
+   "evidence_class": "speculation (switch energy by era) + demonstrated (OCS <3 % of TPU v4 power; PCM zero static power)"
+  },
+  {
+   "question": "5. Swarm-scale networking: topology, hops, latency; what fraction can cooperate synchronously?",
+   "answer": "Hierarchical laser network: in-sail photonic fabric; 6-12 persistent links per sail to co-moving ring neighbours (44-317 km); 30 cm long-range links (1e3-1e4 km); 1-3 m trunk relays (5e4-1.6e5 km hops); 3 m photon-counting chords through the empty interior. ~60-70 hops end to end, <1 ms processing on top of 15-35 min light time. Synchronous cooperation is capped at one sail (~3e-17 of the swarm at f=0.01); low-communication training reaches ~1e2-1e5 sails; only asynchronous, hour-scale outer syncs span the swarm.",
+   "numbers": "Light time: chord 918 s (0.92 AU) to 1,347 s (1.35 AU); along the shell 1,442-2,116 s. Neighbour-mesh-only routing: 2e6-1.5e7 hops, 1-150 s of processing and 0.4-590 uJ/bit - unusable; hierarchy: 60-70 hops. Energy per bit per AU (1 m relays): 1.1e-7 -> 1.6e-8 -> 3.9e-9 -> 1.4e-9 J; direct 3 m photon-counting chord at 1 AU: 77-230 Gbps at 1.4-4.3 nJ/bit (100 W). A byte across 1 AU stays ~1e6-1e8 FLOP-equivalents in every era. Self-occultation: sun-facing sails give each shell crossing tau = -ln(1-f): 1 / 10 / 50 % of radial lines blocked at f = 0.01 / 0.1 / 0.5; tangential links see sails edge-on. Link lifetimes: co-moving ring neighbours 0.01-0.1 m/s -> 770-1,300 h; crossing rings 1 km/s -> 0.7-5 min (acquisition 22-34 s costs 10-70 %). Sails within latency radius: 3 us -> 1 sail; 1 ms -> 1 (f=0.01) to 228 (f=0.5); 50 ms -> 7.5e4-2.9e7; 900 s -> 97-99 %. Bandwidth caps fully synchronous DP at 1 sail; DiLoCo-class (1e3x less traffic) 230-1,070 sails; 1e5x less 2e4-1e5 sails. Swarm-wide hourly reduce of a 1e28-class model needs only 0.5-2.6 Tbps of bisection.",
+   "evidence_class": "physics floor (light time, occultation geometry) + speculation (algorithms, orbit plan)"
+  },
+  {
+   "question": "On-film photonics engineering: layers, coupling, bends, hinges, mass and Mercury manufacturability",
+   "answer": "Pattern lanes, do not blanket the film; use two lane layers (x and y) that cross vertically; carry long lanes in drawn Mercury-silica fibre that survives the hinge folds; keep deposited waveguides for <=1-10 m local lanes.",
+   "numbers": "Blanket waveguide layers would cost 0.018 (8 um SiN/Al2O3 stack), 0.046 (ULL SiN, 21 um) or 0.066 kg/m2 (PLC, 30 um) each = 8-32 % of the 0.207 kg/m2 sail; lanes need only 0.1-18 % of area per axis at 1e-5-1e-4 B/FLOP (0.1-4 % with 7-core fibre or ULL strips), so 2 lane layers suffice and 2-4 is the practical maximum before the laminate-moment (<=3 K-equivalent) and IR-emitter stack are disturbed. A y-lane crosses 93-279 x-lanes (1-3 m spacing): in-plane crossings at 0.12-0.17 dB would add 11-47 dB, interlayer crossings at 0.001 dB add 0.1-0.3 dB. Taps: evanescent/interlayer couplers 0.1-0.4 dB at the tapping chiplet, ~0.005-0.01 dB per pass-by, so each waveguide serves <=~200 taps; splitters 0.1-0.3 dB. Bends: ULL SiN ~12 mm, PLC 2-5 mm, fibre 5-10 mm - direction changes happen by O-E-O at a chiplet or by interlayer couplers, not in-plane bends. Hinges: 171 fold lines per side at ~8 mm fold radius; fibre strain 0.5 % (80 um) - 0.8 % (125 um) is below the ~1 % proof test, a 21 um deposited stack at 0.13 % is at thin-film flaw strength (~100 MPa) and would crack; jumper pairs would add 34-171 dB. Materials: SiO2 (abundant) purified by chlorination (Cl detected by MESSENGER), Ti (1e20-3e20 kg) or Ge (5e15-5e16 kg) core dopant, no hydrogen so no OH absorption; Al2O3 (Al abundant); Si3N4 needs ~1e-7 kg N per m2 (Mercury N unmeasured; ppm suffices); 1550 nm lasers need In (1e14-1e15 kg inventory) at mg per sail, or switch to 9xx nm GaAs sources with Si/Ge detectors (+0.8 dB/km Rayleigh is irrelevant at 300 m). ULL SiN needs ~1000 C thermal oxide: make it (and fibre) off-film as ribbons and laminate.",
+   "evidence_class": "demonstrated lab result (losses, crossings, fibre bend specs) + speculation (film integration)"
+  },
+  {
+   "question": "Placement rule that follows",
+   "answer": "Make the sail the unit of synchronous work and the unit of networking: one sail = one ~15 MW scale-up domain (1-3 us), sails group into DiLoCo islands of 1e2-1e5 within ~1,000-30,000 km, the swarm cooperates only asynchronously. Pods lose their interconnect role; the remaining pod fraction is set by memory (study 2) and any cryogenic logic (study 1).",
+   "numbers": "Sail synchronous unit 14.8 MW; island 1.5-1,500 GW; swarm 5e23-3.4e25 W.",
+   "evidence_class": "synthesis"
+  }
+ ],
+ "render_implications": [
+  {
+   "era": "2026-2040",
+   "element": "patch handover terminals",
+   "change": "60 small 10 cm terminals on 0.6 m masts over 1 x 1 m service plates (one per 32.5 m patch) + 4 corner relays, as in the design spec.",
+   "numbers": "0.3 x 0.3 x 0.75 m each, 5 kg; 295-315 K."
+  },
+  {
+   "era": "2040-2060",
+   "element": "sail terminals",
+   "change": "Consolidate to ~12 terminals (6-30): ~8 small 10 cm neighbour terminals (as today's, but no longer one per patch) at boom tips and hub, plus ~4 larger 30 cm long-range terminals on the hub/service plates; no per-patch masts.",
+   "numbers": "10 cm: 0.3 x 0.3 x 0.75 m, 3.6-5 kg; 30 cm: ~0.45 x 0.45 x 1.0 m, 9-13 kg with ~0.4 m sunshade tube; radiator plate 0.07-0.3 m2 at 300-330 K (visible in LWIR)."
+  },
+  {
+   "era": "2050+",
+   "element": "film back face",
+   "change": "An orthogonal grid of express lanes (bundles of 80-125 um drawn-silica fibre under the back enamel), spaced ~1-3 m, crossing hinge strips as continuous fibre loops.",
+   "numbers": "Lanes are 2-20 mm wide, 0.2-4 % of area; invisible beyond ~50 m except as a faint grazing-angle sheen; no change from the front."
+  },
+  {
+   "era": "2050+",
+   "element": "trunk / relay craft",
+   "change": "Small dedicated relay craft with 4-6 one-metre telescopes (and a few with 3 m photon-counting apertures for interior chords) replace pod-hosted gateways.",
+   "numbers": "~0.5 t, 0.3-0.4 kW each, one per 5e4-1.6e5 km lattice cell (1 per ~1e5-1e7 sails): never two in one frame."
+  },
+  {
+   "era": "2060+",
+   "element": "pods",
+   "change": "No switch/gateway pods; pod count follows memory only (study 2: ~1 % then ~0.3 % of power); pod-pod links inside islands become multi-beam (arrays of small apertures).",
+   "numbers": "Pod-pod islands 0.5-2 km: 520-8,300 spatial modes per 30 cm pair."
+  },
+  {
+   "era": "all",
+   "element": "laser beams",
+   "change": "Invisible: 1550 nm, no scattering medium. Show only as an optional overlay (sail-sail 44-317 km lines; trunk lines 5e4-1.6e5 km).",
+   "numbers": "Beam footprint at 139 km from 30 cm: ~1.8 m diameter (2.44 lambda L / D)."
+  }
+ ],
+ "wildcards": [
+  {
+   "wildcard": "Low-staleness training at 1e6+ islands (asynchronous methods that tolerate 15-35 min of light time)",
+   "effect": "Turns the swarm's 97-99 % asynchronous reach into one useful training job; bisection need is only Tbps; the binding limit is algorithmic.",
+   "probability_by_2100": "unknown (speculation)",
+   "source": "cbs; architecture.md (Covenant-72B/SparseLoCo largest public)"
+  },
+  {
+   "wildcard": "Film-wide optical phased arrays (the sail's own back face as a conformal 1-10 m aperture)",
+   "effect": "10-100x range or rate at sail spacing with no discrete terminals; needs closed-loop phase control over a membrane flat only to ~mm.",
+   "probability_by_2100": "0.1-0.2 (speculation)",
+   "source": "opa (10 Gbps over 50 m with passive OPAs; 512-element 2D OPA <1.8 W)"
+  },
+  {
+   "wildcard": "Hollow-core fibre lanes",
+   "effect": "n_g 1.003: sail-scale collectives 32 % faster (1.33 us diagonal), lower nonlinearity; heavier (~200 um OD).",
+   "probability_by_2100": "0.5 (demonstrated fibre)",
+   "source": "hcf"
+  },
+  {
+   "wildcard": "Free-space optics across the back of the sail (mast-to-mast micro-terminals)",
+   "effect": "Vacuum light speed and no hinge crossings; limited by membrane flatness, shadowing and pointing.",
+   "probability_by_2100": "0.2-0.3",
+   "source": "floors.json (1 cm aperture near field 65 m)"
+  },
+  {
+   "wildcard": "Quantum-limited receivers (Holevo, >10 bits/photon) on relay craft",
+   "effect": "AU-scale direct chords 10-100x faster at fixed power; matters only for Earth/long-haul since those bits are already <1e-4 of swarm energy.",
+   "probability_by_2100": "0.3-0.5",
+   "source": "pie_record; snspd"
+  },
+  {
+   "wildcard": "On-film optical amplification without erbium (semiconductor or Raman)",
+   "effect": "Lets lossy deposited glass (1-10 dB/m) span the sail; removes the ULL/fibre requirement.",
+   "probability_by_2100": "0.3",
+   "source": "al2o3 (Er:Al2O3 amplifiers exist; Mercury Er unknown)"
+  },
+  {
+   "wildcard": "Fully passive wavelength-routed all-to-all (AWGR-like) at sail scale with thousands of wavelengths",
+   "effect": "No O-E-O turn: one optical hop any-to-any, ~2x lower energy and <1 us mean latency.",
+   "probability_by_2100": "0.2",
+   "source": "nict402 (1,505 channels); corcoran2020"
+  }
+ ],
+ "sources": [
+  {
+   "key": "miller2017",
+   "ref": "D.A.B. Miller, 'Attojoule optoelectronics for low-energy information processing and communications', J. Lightwave Tech. 35(3) 2017: https://arxiv.org/abs/1609.05510 (2 pF/cm; 1/4CV^2; receiverless ~1 fJ/bit; system target <10 fJ/bit = 30 aJ received x 19 dB loss / 30 % wall-plug + <1 fJ modulator)"
+  },
+  {
+   "key": "research3",
+   "ref": "Project 2026 interconnect baseline: research3/interconnect_final.json and research3/interconnect/{fso,film_wires,ladder}.py (0.46 pJ/bit/hop, 4.3 ns/hop, FSO Friis model validated vs Suncatcher and DSOC)"
+  },
+  {
+   "key": "design",
+   "ref": "Project sail design spec: research4/design/result.json (279 m, 14.8 MW, 1.06e8 chiplets, 60 x 10 cm terminals, 5 kg each; spacing 317/139/44 km; sail-pod handover <=3000 km)"
+  },
+  {
+   "key": "study1",
+   "ref": "Study 1 (logic): research5/future/logic/result.json (J/op 7.8e-14 -> 1.0e-14 -> 2.6e-15 -> 1.4e-15; hop 0.46 -> 0.2 -> 0.06 -> 0.03 pJ)"
+  },
+  {
+   "key": "study2",
+   "ref": "Study 2 (memory): research5/future/memory/result.json (patches 3-12 m, 1e28 replica 0.21/0.025/0.008 MW, pod share 15/5/1/0.3 %)"
+  },
+  {
+   "key": "suncatcher",
+   "ref": "Google, 'Towards a future space-based, highly scalable AI infrastructure system design' (Suncatcher) arXiv:2511.19468: https://arxiv.org/abs/2511.19468 (24 x 400G DWDM = 9.6 Tbps per 10 cm aperture to ~300 km; -20 dBm/channel; 196 PPB PM-16QAM, 71 PPB OOK; 2x2 SDM at 1.25 km, 4x4 at 0.32 km; ~1 urad pointing; 1.6 Tbps bidirectional bench demo)"
+  },
+  {
+   "key": "nozaki2019",
+   "ref": "Nozaki et al., 'Femtofarad optoelectronic integration demonstrating energy-saving signal conversion and nonlinear functions', Nature Photonics 13, 454 (2019): https://www.nature.com/articles/s41566-019-0397-3 ; NTT release (42 aJ/bit modulator at 40 Gb/s; 1.6 fJ/bit O-E-O at 10 Gb/s; 2 fF integration): https://group.ntt/en/newsrelease/2019/04/16/190416a.html"
+  },
+  {
+   "key": "timurdogan2014",
+   "ref": "Timurdogan et al., 'An ultralow power athermal silicon modulator', Nature Communications 5, 4008 (2014): 0.9 fJ/bit at 25 Gb/s, 0.5 Vpp; athermal over 7.5 C for +0.24 fJ/bit: https://dspace.mit.edu/handle/1721.1/91011"
+  },
+  {
+   "key": "daudlin2025",
+   "ref": "Daudlin et al. (Bergman group), '3D photonics for ultra-low energy, high bandwidth-density chip data links' (Nature Photonics 2025; preprint arXiv:2310.01615): 120 fJ/bit total, 80 ch x 10 Gb/s = 800 Gb/s, 5.3 Tb/s/mm2: https://arxiv.org/abs/2310.01615 ; https://www.engineering.columbia.edu/about/news/new-study-showcases-3d-photonics-record-performance-ai"
+  },
+  {
+   "key": "ayar",
+   "ref": "Ayar Labs TeraPHY optical I/O chiplet: ~5 pJ/bit, 16 wavelengths/port, up to 8 Tbps bidirectional; 'few pJ/bit' 100+ Tbps/package (IMS 2024): https://ims-ieee.org/paper_abstract/890 ; https://www.businesswire.com/news/home/20230301005515/en"
+  },
+  {
+   "key": "pipes",
+   "ref": "DARPA PIPES targets >100 Tbps per package at <1 pJ/bit: https://www.darpa.mil/news/2020/pipes-optical-interconnects ; https://blogs.intel.com/psg/ayar-labs-and-intel-demo-fpga-with-optical-transceivers-in-darpa-pipes-project-2-tbps-now-100-tbps-is-the-goal/"
+  },
+  {
+   "key": "cpo_nvidia",
+   "ref": "NVIDIA Spectrum-X/Quantum-X Photonics CPO ~9 W per 1.6T port (5.6 pJ/bit) vs ~30 W pluggable: https://nand-research.com/nvidia-is-rewiring-the-data-center-with-light/"
+  },
+  {
+   "key": "cpo_7pj",
+   "ref": "Production CPO below ~7 pJ/bit as of 2026 (secondary): https://yieldwerx.com/?p=12123"
+  },
+  {
+   "key": "ucie",
+   "ref": "UCIe Consortium metrics: UCIe-A 0.25-0.3 pJ/b; UCIe-3D (hybrid bonding <1-9 um) 0.01-0.05 pJ/b, up to ~300 TB/s/mm2 (HOTI 2025 summary): https://convergedigest.com/hoti25-ucie-brings-on-package-memory-to-the-forefront/ ; https://snia.org/sites/default/files/2025-05/SNIA-SDC2024-DasSharma-Updates-on-UCIe-Technology.pdf"
+  },
+  {
+   "key": "imec_hb",
+   "ref": "imec 400 nm pitch wafer-to-wafer hybrid bonding (IEDM 2023), industry ~1 um; die-to-wafer 2 um: https://www.imec-int.com/en/articles/wafer-wafer-hybrid-bonding-pushing-boundaries-400nm-interconnect-pitch"
+  },
+  {
+   "key": "liu2022_sin",
+   "ref": "Liu et al., 'Ultralow 0.034 dB/m loss wafer-scale integrated photonics realizing 720 million Q and 380 uW threshold Brillouin lasing', Opt. Lett. 47, 1855 (2022): 11 um x 80 nm LPCVD Si3N4 TM core, 15 um thermal-oxide under-clad + 6 um upper clad, 11.787 mm radius (bend loss <0.01 dB/m): https://ocaqpi.ece.ucsb.edu/sites/default/files/2025-05/ol-47-7-1855.pdf"
+  },
+  {
+   "key": "plc_silica",
+   "ref": "Doped-silica PLC: 1.5 % contrast, 2 mm min bend, 0.1 dB/cm (Horikawa, via review); 0.75 % contrast 0.035 dB/cm over 1.6 m at 5 mm radius; wafer-bonded thermal silica 0.045 dB/m record: https://arxiv.org/pdf/1211.4114 ; https://ocaqpi.ece.ucsb.edu/sites/default/files/2022-03/24.%20OL%20Planar%20Waveguides%200.1dB_m.pdf"
+  },
+  {
+   "key": "al2o3",
+   "ref": "Al2O3 waveguides: 0.05 dB/cm at 1550 nm (deep-UV Al2O3 platform, arXiv:2302.11492); reactive sputtered 0.11 dB/cm; Er:Al2O3 background <0.1 dB/cm: https://arxiv.org/pdf/2302.11492 ; https://research.utwente.nl/en/publications/optimization-of-low-loss-alsub2subosub3sub-waveguide-fabrication-/"
+  },
+  {
+   "key": "sin_3d_interposer",
+   "ref": "Scalable 3D SiN photonic interposer (preprint 2026): intralayer crossing 0.12-0.17 dB, interlayer crossing 0.001 dB, interlayer taper 0.36 dB, 0.038 dB/cm: https://arxiv.org/pdf/2604.12566"
+  },
+  {
+   "key": "flex_glass",
+   "ref": "Flexible chalcogenide-glass photonics bendable to sub-mm radii (Li, Hu et al., Nature Photonics 2014): https://arxiv.org/pdf/1307.5937"
+  },
+  {
+   "key": "g657",
+   "ref": "ITU-T G.657.B3 bend-insensitive fibre: <=0.15 dB per turn at 5 mm radius, 1550 nm: https://hfcl.com/blog/macrobending ; https://stl.tech/wp-content/uploads/2023/07/STL-HD-B3-Optical-Fibre.pdf"
+  },
+  {
+   "key": "hcf",
+   "ref": "Hollow-core DNANF fibre 0.08 +/- 0.03 dB/km (OFC 2024) / 0.091 dB/km (Nature Photonics 2025), light guided in air: https://www.orc.soton.ac.uk/news/7210 ; https://optics.org/news/southampton-achieves-record-low-signal-loss-with-hollow-fiber"
+  },
+  {
+   "key": "nict402",
+   "ref": "NICT 402 Tb/s over one standard SMF, 37.6 THz (O-U bands), 1,505 channels (2024): https://www.nict.go.jp/en/press/2024/06/26-1.html"
+  },
+  {
+   "key": "corcoran2020",
+   "ref": "Corcoran et al., 44.2 Tb/s from a single microcomb chip source, 10.4 b/s/Hz, Nat. Commun. 11, 2568 (2020): https://arxiv.org/abs/2003.11893"
+  },
+  {
+   "key": "pcm_switch",
+   "ref": "Non-volatile Sb2Se3 phase-change photonic switches (zero static power; SOI phase shifter 0.3 dB/pi; Sb2Se3 on Si3N4 with ITO heaters): https://arxiv.org/pdf/2604.11649 ; https://pmc.ncbi.nlm.nih.gov/articles/PMC10261021/"
+  },
+  {
+   "key": "tpu_ocs",
+   "ref": "Google TPU v4 (ISCA 2023): 3D-MEMS optical circuit switches <5 % of cost, <3 % of system power: https://arxiv.org/abs/2304.01433"
+  },
+  {
+   "key": "starlink",
+   "ref": "Starlink optical ISLs: ~100 Gbps sustained, up to 200 Gbps per link, 3 per V2 Mini; 9,000 lasers carried >42 PB/day (Jan 2024); ~5,400 km max range: https://www.advanced-television.com/2024/02/02/spacex-reveals-starlink-laser-capacity/ ; mini laser 25 Gbps to 4,000 km: https://www.satellitetoday.com/technology/2025/10/21/muon-space-to-adopt-starlink-laser-terminals-on-its-satellites"
+  },
+  {
+   "key": "tbird",
+   "ref": "NASA/MIT-LL TBIRD 200 Gbps space-to-ground from a 6U CubeSat (Apr 2023), commercial coherent transceivers + ARQ: https://ntrs.nasa.gov/citations/20230007959 ; https://spectrum.ieee.org/laser-communications-2660616147"
+  },
+  {
+   "key": "fso_records",
+   "ref": "Terrestrial FSO: DLR/ADVA 13.16 Tbps over 10.45 km; TU/e-Aircision 5.7 Tbps over 4.6 km (2025): https://www.lightwaveonline.com/network-design/article/16676217/adva-and-german-aerospace-center-transmit-1316-tbps-of-data-across-1045-km-and-set-free-space-optics-record ; https://arxiv.org/pdf/2603.17121"
+  },
+  {
+   "key": "scot80",
+   "ref": "Tesat SCOT80: 80 mm aperture, 11.9 kg per optical channel, 60-80 W, 10 Gbps (up to 100 Gbps), 5,000-8,000 km: https://www.tesat.de/products ; https://satnow.com/products/laser-communication-terminals/tesat-spacecom-gmbh-co-kg/155-1423-scot80"
+  },
+  {
+   "key": "condor",
+   "ref": "Mynaric CONDOR Mk3: 80 mm aperture, 4 W optical EOL, >6,500-7,500 km: https://mynaric.com/products/space/condor-mk3/"
+  },
+  {
+   "key": "dsoc",
+   "ref": "NASA DSOC flight laser transceiver: 22 cm aperture, 4 W at 1550 nm, ~28-29 kg, ~76-100 W; 267 Mbps at 0.21 AU, 25 Mbps at ~1.5 AU: https://en.wikipedia.org/wiki/Deep_Space_Optical_Communications ; https://www.kiss.caltech.edu/workshops/optcomm/presentations/fields.pdf"
+  },
+  {
+   "key": "nfire",
+   "ref": "TerraSAR-X/NFIRE LEO-LEO coherent BPSK 5.625 Gbps; spatial+frequency acquisition 22 s (NFIRE) / 34 s (TerraSAR-X): https://ebooks.spiedigitallibrary.org/conference-proceedings-of-spie/7199/719906/56-Gbps-optical-intersatellite-communication-link/10.1117/12.812209.full"
+  },
+  {
+   "key": "snspd",
+   "ref": "Reddy et al., SNSPDs with 98.0 +/- 0.5 % system detection efficiency at 1550 nm, Optica 7, 1649 (2020): https://www.nist.gov/people/dileep-reddy ; https://www.arxiv.org/pdf/2009.14690"
+  },
+  {
+   "key": "pie_record",
+   "ref": "Photon information efficiency records: 14.5 bits per incident photon (0.069 photons/bit, 87.5 dB loss; Bell Labs, arXiv:2501.13356); 12.5 b/photon (arXiv:2310.02191): https://arxiv.org/abs/2501.13356v1 ; https://arxiv.org/abs/2310.02191v1"
+  },
+  {
+   "key": "laser_1550_wpe",
+   "ref": "1550 nm diode lasers: watt-class tapered lasers with 45 % wall-plug for FSO; broad-area 40 %; single-device 70.8 % (0.74 W): https://scholar.rose-hulman.edu/physics_fac/461 ; https://spiedigitallibrary.org/conference-proceedings-of-spie/12867/3001390/1550-nm-broad-area-large-optical-cavity-laser-with-49/10.1117/12.3001390.full ; https://doaj.org/article/1c9633376e844421bed548a4c2132045"
+  },
+  {
+   "key": "opa",
+   "ref": "Integrated optical phased arrays: 10 Gbps over 50 m with passive OPAs (DARPA MOABB, 10 cm2 aperture goal); 512-element OPA <1.8 W: https://eri-summit.darpa.mil/docs/ERIsummit2019/posters/poster8.pdf ; https://www.cnf.cornell.edu/sites/default/files/2019-RA/2018cnfRA_pg160.pdf"
+  },
+  {
+   "key": "cbs",
+   "ref": "Critical batch size grows mainly with data size (Zhang et al. 2024, arXiv:2410.21676); OLMo CBS plateaus during training (Merrill et al. 2025, arXiv:2505.23971); Llama 3 405B trained at up to 16M-token batches (arXiv:2407.21783): https://arxiv.org/abs/2410.21676 ; https://arxiv.org/abs/2505.23971 ; https://arxiv.org/abs/2407.21783"
+  },
+  {
+   "key": "messenger_volatiles",
+   "ref": "MESSENGER found high surface S, K, Na, Cl and some C on Mercury; no nitrogen abundance was measured: https://www.jsg.utexas.edu/news/2015/11/sean-solomon-messenger-finds-ingredients-for-life-on-mercury/ ; https://resolve.cambridge.org/core/books/mercury/chemical-composition-of-mercury/556EB8C4C9E327754AFF88EA46373A4B"
+  },
+  {
+   "key": "sun_sep",
+   "ref": "Optical deep-space link availability is limited near the Sun (background, solar damage); relays assume ~10 % availability loss criteria: https://arxiv.org/pdf/2205.14234 ; https://neurophotonics.spiedigitallibrary.org/conference-proceedings-of-spie/11272/112720K/Minimizing-effect-of-Sun-Earth-probe-angle-for-RF/10.1117/12.2551066.full"
+  }
+ ],
+ "files": [
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/build_result.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/common.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/film_photonics.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/film_photonics.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/floors.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/floors.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/fso_eras.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/fso_eras.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/onchip.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/onchip.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/pods_switching.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/pods_switching.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/result.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/swarm_net.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/swarm_net.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/sync_latency.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/sync_latency.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/dl/ol2022/liu2022_ol.pdf (+ .txt)"
+ ]
+}

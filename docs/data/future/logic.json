@@ -1,0 +1,1425 @@
+{
+ "domain": "Logic energy per operation, 2026-2300 (CMOS end-scaling, steep slope, NTV, number formats, analog/in-memory, photonic, adiabatic/reversible, superconducting incl. cryo), for a Mercury-built Dyson-swarm AI system",
+ "summary": "System-level energy per FP8-equivalent op on the compute sail (85 C, x0.6 clock): 2026 7.8e-14 J (4e-14-1.6e-13); 2040 1.0e-14 (2.8e-15-8.2e-14; IRDS x3.5 device, FP4, 3D/NVM locality); 2070 2.6e-15 (3.1e-16-3.9e-14); 2100+ 1.4e-15 irreversible, approaching the practical irreversible floor ~7e-16 J at 358 K. Adiabatic/reversible logic adds 1.5-4.1x by 2070 and 2.1-10x by 2100+ (memory and links reversible too) -> 2100+ mid 2.3e-16, low 1e-17. Its energy-area law (gain g costs ~2.4 g^2 more silicon per W) caps it at ~6x for 10 % and ~20x for 100 % film coverage, and multiplies leading-edge wafers per MW 9-110x (5,500-70,000 vs 640). Superconducting logic (AQFP/RQFP at 4.2 K) incl. 200-375 W/W cryocooling reaches 3e-15 J/FLOP electric in 2070 (parity with CMOS) but weighs 6-38 g/W (cryocooler 3-30 kg/kW), so its FLOP/s/kg is ~20-30x below the film's; it demands kW-class cryostats (pods) and gains nothing from a colder orbit (best reject 250-340 K). Falling J/op does not change film vs pod (heat transport sets that); it raises per-sail FLOP/s 8-250x, forcing 30 cm laser terminals and on-film photonic links, because wire energy (2 pF/cm) does not scale. Landauer kT ln2 = 3.4 zJ at 358 K; gate-level Landauer ~1.7e-18 J/FLOP; algorithmic ~3e-23 J/FLOP; refrigeration cannot lower the floor below kT_reject ln2.",
+ "sota_2026": [
+  {
+   "item": "NVIDIA Vera Rubin (2026)",
+   "value": "~2.3 kW; 35 PF dense NVFP4 -> 6.6e-14 J per FP4 op; ~17.5 PF dense FP8 -> 1.3e-13 J/FLOP (chip TDP basis)",
+   "evidence_class": "demonstrated (vendor spec, third-party compiled)",
+   "source": "NVIDIA Vera Rubin (third-party compilations of GTC 2026 specs): ~2.3 kW, 35 PF dense NVFP4, 50 PF with sparsity, ~17.5 PF dense FP8: https://www.cudocompute.com/products/nvidia-vera-rubin ; https://blog.barrack.ai/nvidia-rubin-specs-architecture-2026/"
+  },
+  {
+   "item": "NVIDIA B200",
+   "value": "4.5 PF dense FP8 at ~1 kW -> 2.2e-13 J/FLOP",
+   "evidence_class": "demonstrated (vendor spec)",
+   "source": "NVIDIA B200: ~1000 W, 4.5 PF dense FP8 (project constants.js REFS)"
+  },
+  {
+   "item": "Google Ironwood TPU",
+   "value": "4614 TFLOPS FP8 per chip; ~2x perf/W over Trillium (TDP not published)",
+   "evidence_class": "demonstrated (vendor spec)",
+   "source": "Google Ironwood TPU: 4614 TFLOPS FP8 per chip, ~2x perf/W over Trillium: https://blog.google/products/google-cloud/ironwood-tpu-age-of-inference/"
+  },
+  {
+   "item": "Project basis",
+   "value": "1.3e-13 J/FLOP system FP8 at 85 C full clock; x0.6 under-clock -> 7.8e-14; +0.9 %/K above 85 C",
+   "evidence_class": "engineering estimate",
+   "source": "/home/user/dyson/docs/architecture.md (project decision record; 1.3e-13 J/FLOP basis x0.6)"
+  },
+  {
+   "item": "4-bit pretraining",
+   "value": "NVFP4 12B model, 10T tokens, matches FP8 (MMLU-pro 62.58 vs 62.62 %)",
+   "evidence_class": "demonstrated lab result",
+   "source": "NVIDIA, 'Pretraining Large Language Models with NVFP4' (12B model, 10T tokens, matches FP8 loss/accuracy, ~16 % of layers kept in BF16): https://arxiv.org/abs/2509.25149"
+  },
+  {
+   "item": "Ternary LLMs",
+   "value": "BitNet b1.58: 71.4x lower matmul arithmetic energy (estimate, 7 nm) vs FP16",
+   "evidence_class": "demonstrated lab result (model) / estimate (energy)",
+   "source": "Ma et al., 'The Era of 1-bit LLMs' (BitNet b1.58; 71.4x lower matmul arithmetic energy at 7 nm vs FP16, an estimate): https://arxiv.org/abs/2402.17764"
+  },
+  {
+   "item": "IRDS 2024 roadmap",
+   "value": "Vdd 0.70 V (2024) -> 0.60 V (2027-2039); SS 82->70 mV/dec; CV^2 0.65->0.33 fJ; MAC TOPS/W only x3.5 by 2039; 'no solutions left to reduce the supply voltage'",
+   "evidence_class": "roadmap claim",
+   "source": "IRDS 2024 More Moore, Tables MM-9 and MM-11 (Vdd 0.70 V 2024 -> 0.60 V 2027-2039; SS 82->70 mV/dec HP; CV^2 0.65 -> 0.33 fJ/switch; MAC TOPS/W x3.5 by 2039; MAC power density x4.8 with 6 tiers): https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "item": "Analog in-memory (IBM HERMES, 14 nm PCM)",
+   "value": "9.76 TOPS/W 8-bit MVM (1.0e-13 J/op), 2.48 TOPS/W high-precision",
+   "evidence_class": "demonstrated lab result",
+   "source": "Le Gallo et al., Nature Electronics 2023, 64-core PCM in-memory chip, 14 nm: 63.1 TOPS at 9.76 TOPS/W (8-bit MVM, low-precision read) or 16.1 TOPS at 2.48 TOPS/W: https://arxiv.org/abs/2212.02872 ; https://www.hpcwire.com/off-the-wire/ibm-develops-a-new-64-core-mixed-signal-in-memory-computing-chip/"
+  },
+  {
+   "item": "Analog in-memory (EnCharge EN100, 16 nm)",
+   "value": "40 TOPS/W 8-bit cores (vendor); 200+ TOPS at ~8.25 W card (~24 TOPS/W)",
+   "evidence_class": "vendor claim",
+   "source": "EnCharge AI EN100 (16 nm analog in-memory): vendor 40 TOPS/W 8-bit NPU cores; 200+ TOPS at ~8.25 W card: https://www.eejournal.com/article/encharge-me-up-200-ai-tops-at-only-8-watts/ ; https://en100.enchargeai.com/llms.txt"
+  },
+  {
+   "item": "Photonic (Lightmatter, Nature 2025)",
+   "value": "65.5 TOPS (16-bit ABFP) at 78 W + 1.6 W optical -> 1.2e-12 J/op (worse than GPUs)",
+   "evidence_class": "demonstrated lab result",
+   "source": "Ahmed et al. (Lightmatter), 'Universal photonic artificial intelligence acceleration', Nature 640, 368 (2025): 65.5 TOPS (16-bit ABFP) at 78 W electrical + 1.6 W optical, six chips, 4x 128x128 photonic tensor cores: https://www.nature.com/articles/s41586-025-08854-x ; https://www.hackster.io/news/the-bright-side-of-ai-ad44886a24cd"
+  },
+  {
+   "item": "Photonic floor demo",
+   "value": "0.66 photons (2.5e-19 J optical) per MAC at ~90 % MNIST",
+   "evidence_class": "demonstrated lab result",
+   "source": "Wang et al. (McMahon group), 'An optical neural network using less than 1 photon per multiplication', Nat. Commun. 2022 (0.66 photons = 2.5e-19 J optical per MAC at ~90 % MNIST): https://arxiv.org/abs/2104.13467"
+  },
+  {
+   "item": "Reversible/adiabatic CMOS (Vaire Ice River, 22 nm)",
+   "value": "1.77x energy-recovery factor at 500 MHz on a capacitor-array test structure; ~30 % less energy than conventional",
+   "evidence_class": "demonstrated lab result",
+   "source": "Vaire Ice River (22 nm): ~30 % less energy than conventional (Science News) and 1.77x energy-recovery factor at 500 MHz (EE Times Japan 2025-10-31): https://www.sciencenews.org/article/computer-chip-reuses-energy ; https://eetimes.itmedia.co.jp/ee/spv/2510/31/news001_2.html"
+  },
+  {
+   "item": "Superconducting AQFP",
+   "value": "1.4 zJ/JJ at 5 GHz (MANA, 20k JJ); 8-bit adder 1.5 aJ/op at 1 GHz (24 kT per JJ at 4.2 K)",
+   "evidence_class": "demonstrated lab result",
+   "source": "Ayala et al., MANA AQFP 4-bit microprocessor, IEEE JSSC 2021: 1.4 zJ per JJ at 5 GHz 4-phase AC clock, 4.2 K, >20,000 JJ: https://www.eenewseurope.com/en/researchers-develop-4bit-processor-using-superconducting-junctions/ ; Takeuchi et al., 'An adiabatic superconductor 8-bit adder with 24 kBT energy dissipation per junction', APL 114, 042602 (2019), ~1.5 aJ per add at 1 GHz: https://doi.org/10.1063/1.5080753"
+  },
+  {
+   "item": "Superconducting RSFQ FP units",
+   "value": "32-bit FP adder/multiplier 2.2-2.4 GFLOPS at 4.9-5.8 mW cold (2.2e-12 J/FLOP at 4.2 K; 0.1-1.3 GFLOP/J at 300 K)",
+   "evidence_class": "demonstrated lab result",
+   "source": "Tolpygo, 'Superconductor Digital Electronics: Scalability and Energy Efficiency Issues' (RSFQ <Esw> 2.5e-19 J/JJ; 32-bit FP ~2000 SBOPs ~5e-15 J at 4.2 K; cryocooler 1/eps 352-3520; RSFQ FP adder/multiplier 4.9-5.8 mW for 2.2-2.4 GFLOPS): https://arxiv.org/abs/1602.03546"
+  },
+  {
+   "item": "Superconducting AI system (imec)",
+   "value": "~20 EFLOPS BF16 dense for ~1 kW cold (~500 kW wall) -> ~2.5e-14 J/FLOP incl. cooling",
+   "evidence_class": "roadmap claim",
+   "source": "imec, superconducting digital technology for AI (100-board stack ~20 EFLOPS BF16, ~1 kW cold ~ 500 kW wall; 2e-20 J per JJ switch; projected): https://www.imec-int.com/en/articles/superconducting-digital-technology-revolutionize-ai-and-machine-learning-roadmap"
+  },
+  {
+   "item": "4 K cryogenics",
+   "value": "LHC 18 kW plants: 220-230 W/W (~30 % Carnot); small (<2 W) coolers <1-3 % Carnot; space 4.5 K JT 0.1 W for 250 W",
+   "evidence_class": "demonstrated",
+   "source": "CERN CAS 2021 cryogenics lecture: LHC 18 kW @ 4.5 K plants at 220-230 W_el/W (~30 % Carnot), 4 MW each: https://cas.web.cern.ch/sites/cas.web.cern.ch/files/lectures/Indico-04%20May%202021/CAS_2021_Introduction_to_Cryogenics_TKoettig.pdf ; NIST/Radebaugh 2020 review of refrigeration methods (4 K: <1 % Carnot for <2 W to ~35 % for very large plants): https://trc.nist.gov/cryogenics/Papers/Review/2020-Review_of_Refrigeration_Methods.pdf ; PICO probe study: NGAS 4.5 K JT cooler, 100 mW lift for 250 W input (projection): https://arxiv.org/abs/1902.10541"
+  },
+  {
+   "item": "Cryocooler specific mass",
+   "value": "best high-efficiency coolers 10-30 kg/kW input; goal 3 kg/kW; 20 kW industrial Stirling 49 kg/kW",
+   "evidence_class": "demonstrated",
+   "source": "Radebaugh, 'Cryocoolers for aircraft superconducting generators and motors' (NIST 2012): specific-mass goal 3 kg/kW input; current high-efficiency coolers 10-30 kg/kW; 20 kW Stirling at 41 % Carnot but 49 kg/kW: https://trc.nist.gov/cryogenics/Papers/Review/2012-Cryocoolers_for_Aircraft_Superconducting_Generators_and_Motors.pdf"
+  }
+ ],
+ "trajectory": [
+  {
+   "metric": "J per FP8-equivalent op: irreversible digital CMOS (GAA -> CFET -> 2D/3D), film chiplet, system level",
+   "year": 2026,
+   "low": 4e-14,
+   "mid": 7.8e-14,
+   "high": 1.6e-13,
+   "unit": "J/op (system level)",
+   "evidence_class": "demonstrated lab result",
+   "source": "architecture_md;rubin;irds2024_mm9_mm11;ho2023",
+   "junction_temperature": "85 C (optimum flat 85-105 C)",
+   "logic_power_density_W_per_mm2": "0.025-0.1 (film chiplet); 0.6-1.3 (GPU die)",
+   "silicon_area_mm2_per_W": "10-40 film (logic ~5); 0.75-1.6 GPU"
+  },
+  {
+   "metric": "J per FP8-equivalent op: irreversible digital CMOS (GAA -> CFET -> 2D/3D), film chiplet, system level",
+   "year": 2040,
+   "low": 2.8112941176470587e-15,
+   "mid": 1.0195878151260504e-14,
+   "high": 8.187999999999999e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "roadmap claim",
+   "source": "architecture_md;rubin;irds2024_mm9_mm11;ho2023",
+   "junction_temperature": "85 C (optimum flat 85-105 C)",
+   "logic_power_density_W_per_mm2": "0.025-0.2 film; ~1 per tier, 3-5 per footprint with 6 tiers",
+   "silicon_area_mm2_per_W": "5-40 film"
+  },
+  {
+   "metric": "J per FP8-equivalent op: irreversible digital CMOS (GAA -> CFET -> 2D/3D), film chiplet, system level",
+   "year": 2070,
+   "low": 3.0657647058823522e-16,
+   "mid": 2.564823529411765e-15,
+   "high": 3.896470588235294e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "architecture_md;rubin;irds2024_mm9_mm11;ho2023",
+   "junction_temperature": "85 C (optimum flat 85-105 C)",
+   "logic_power_density_W_per_mm2": "0.02-0.2 film",
+   "silicon_area_mm2_per_W": "5-60 film"
+  },
+  {
+   "metric": "J per FP8-equivalent op: irreversible digital CMOS (GAA -> CFET -> 2D/3D), film chiplet, system level",
+   "year": "2100+",
+   "low": 1.2481176470588236e-16,
+   "mid": 1.3909235294117648e-15,
+   "high": 3.247058823529412e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "architecture_md;rubin;irds2024_mm9_mm11;ho2023",
+   "junction_temperature": "85 C (optimum flat 85-105 C)",
+   "logic_power_density_W_per_mm2": "0.02-0.2 film",
+   "silicon_area_mm2_per_W": "5-60 film"
+  },
+  {
+   "metric": "J per FP8-equivalent op: near-threshold CMOS (Vdd 0.35-0.45 V, 5-20x slower)",
+   "year": 2026,
+   "low": 2e-14,
+   "mid": 5.2e-14,
+   "high": 1.3333333333333334e-13,
+   "unit": "J/op (system level)",
+   "evidence_class": "demonstrated lab result",
+   "source": "hotsi",
+   "junction_temperature": "<= 60-85 C (leakage share grows when hot)",
+   "logic_power_density_W_per_mm2": "0.007-0.01",
+   "silicon_area_mm2_per_W": "100-150 (logic 75-130)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: near-threshold CMOS (Vdd 0.35-0.45 V, 5-20x slower)",
+   "year": 2040,
+   "low": 1.4056470588235293e-15,
+   "mid": 6.797252100840336e-15,
+   "high": 6.823333333333333e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "roadmap claim",
+   "source": "hotsi",
+   "junction_temperature": "<= 60-85 C (leakage share grows when hot)",
+   "logic_power_density_W_per_mm2": "0.007-0.01",
+   "silicon_area_mm2_per_W": "100-150 (logic 75-130)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: near-threshold CMOS (Vdd 0.35-0.45 V, 5-20x slower)",
+   "year": 2070,
+   "low": 1.5328823529411761e-16,
+   "mid": 1.7098823529411766e-15,
+   "high": 3.247058823529412e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "hotsi",
+   "junction_temperature": "<= 60-85 C (leakage share grows when hot)",
+   "logic_power_density_W_per_mm2": "0.007-0.01",
+   "silicon_area_mm2_per_W": "100-150 (logic 75-130)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: near-threshold CMOS (Vdd 0.35-0.45 V, 5-20x slower)",
+   "year": "2100+",
+   "low": 6.240588235294118e-17,
+   "mid": 9.272823529411765e-16,
+   "high": 2.7058823529411764e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "hotsi",
+   "junction_temperature": "<= 60-85 C (leakage share grows when hot)",
+   "logic_power_density_W_per_mm2": "0.007-0.01",
+   "silicon_area_mm2_per_W": "100-150 (logic 75-130)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: adiabatic / reversible CMOS (resonant power clock), film",
+   "year": 2026,
+   "low": 4e-14,
+   "mid": 7.8e-14,
+   "high": 1.6e-13,
+   "unit": "J/op (system level)",
+   "evidence_class": "demonstrated lab result",
+   "source": "iceriver;s2lal2020;spectrum2025;frank2017",
+   "junction_temperature": "85 C (area-limited regime is temperature-insensitive)",
+   "logic_power_density_W_per_mm2": "n/a (test chips)",
+   "silicon_area_mm2_per_W": "n/a"
+  },
+  {
+   "metric": "J per FP8-equivalent op: adiabatic / reversible CMOS (resonant power clock), film",
+   "year": 2040,
+   "low": 8.905690629367049e-16,
+   "mid": 6.797252100840336e-15,
+   "high": 8.187999999999999e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "roadmap claim",
+   "source": "iceriver;s2lal2020;spectrum2025;frank2017",
+   "junction_temperature": "85 C (area-limited regime is temperature-insensitive)",
+   "logic_power_density_W_per_mm2": "0.001-0.003",
+   "silicon_area_mm2_per_W": "300-900"
+  },
+  {
+   "metric": "J per FP8-equivalent op: adiabatic / reversible CMOS (resonant power clock), film",
+   "year": 2070,
+   "low": 7.38840212447653e-17,
+   "mid": 1.1965948852556798e-15,
+   "high": 2.527279908455532e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "iceriver;s2lal2020;spectrum2025;frank2017",
+   "junction_temperature": "85 C (area-limited regime is temperature-insensitive)",
+   "logic_power_density_W_per_mm2": "0.0003-0.003",
+   "silicon_area_mm2_per_W": "350-3700"
+  },
+  {
+   "metric": "J per FP8-equivalent op: adiabatic / reversible CMOS (resonant power clock), film",
+   "year": "2100+",
+   "low": 1.2237093542895555e-17,
+   "mid": 2.3047493044756815e-16,
+   "high": 1.513862871818002e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "iceriver;s2lal2020;spectrum2025;frank2017",
+   "junction_temperature": "85 C (area-limited regime is temperature-insensitive)",
+   "logic_power_density_W_per_mm2": "0.0003-0.003",
+   "silicon_area_mm2_per_W": "350-3800 (bounded by 4800 mm2/W of film)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: analog in-memory compute (PCM/RRAM/SRAM-charge), <= 8-bit inference",
+   "year": 2026,
+   "low": 2.5e-14,
+   "mid": 1.02e-13,
+   "high": 4e-13,
+   "unit": "J/op (system level)",
+   "evidence_class": "demonstrated lab result",
+   "source": "ibm_hermes;encharge;murmann2021",
+   "junction_temperature": "<= 85 C (kT/C noise ~T, PCM drift)",
+   "logic_power_density_W_per_mm2": "0.02-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-50 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: analog in-memory compute (PCM/RRAM/SRAM-charge), <= 8-bit inference",
+   "year": 2040,
+   "low": 3e-15,
+   "mid": 1e-14,
+   "high": 3e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "roadmap claim",
+   "source": "ibm_hermes;encharge;murmann2021",
+   "junction_temperature": "<= 85 C (kT/C noise ~T, PCM drift)",
+   "logic_power_density_W_per_mm2": "0.02-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-50 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: analog in-memory compute (PCM/RRAM/SRAM-charge), <= 8-bit inference",
+   "year": 2070,
+   "low": 5e-16,
+   "mid": 2e-15,
+   "high": 1e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "ibm_hermes;encharge;murmann2021",
+   "junction_temperature": "<= 85 C (kT/C noise ~T, PCM drift)",
+   "logic_power_density_W_per_mm2": "0.02-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-50 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: analog in-memory compute (PCM/RRAM/SRAM-charge), <= 8-bit inference",
+   "year": "2100+",
+   "low": 3e-16,
+   "mid": 1e-15,
+   "high": 5e-15,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "ibm_hermes;encharge;murmann2021",
+   "junction_temperature": "<= 85 C (kT/C noise ~T, PCM drift)",
+   "logic_power_density_W_per_mm2": "0.02-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-50 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: photonic matrix multiply (MZI/ring meshes + DAC/ADC)",
+   "year": 2026,
+   "low": 1.2e-12,
+   "mid": 1.2e-12,
+   "high": 1.2e-12,
+   "unit": "J/op (system level)",
+   "evidence_class": "demonstrated lab result",
+   "source": "lightmatter2025;mcmahon2022",
+   "junction_temperature": "<= 60-85 C (laser efficiency, ring tuning)",
+   "logic_power_density_W_per_mm2": "0.01-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-100 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: photonic matrix multiply (MZI/ring meshes + DAC/ADC)",
+   "year": 2040,
+   "low": 1e-14,
+   "mid": 5e-14,
+   "high": 3e-13,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "lightmatter2025;mcmahon2022",
+   "junction_temperature": "<= 60-85 C (laser efficiency, ring tuning)",
+   "logic_power_density_W_per_mm2": "0.01-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-100 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: photonic matrix multiply (MZI/ring meshes + DAC/ADC)",
+   "year": 2070,
+   "low": 1e-15,
+   "mid": 5e-15,
+   "high": 5e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "lightmatter2025;mcmahon2022",
+   "junction_temperature": "<= 60-85 C (laser efficiency, ring tuning)",
+   "logic_power_density_W_per_mm2": "0.01-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-100 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: photonic matrix multiply (MZI/ring meshes + DAC/ADC)",
+   "year": "2100+",
+   "low": 3e-16,
+   "mid": 2e-15,
+   "high": 2e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "lightmatter2025;mcmahon2022",
+   "junction_temperature": "<= 60-85 C (laser efficiency, ring tuning)",
+   "logic_power_density_W_per_mm2": "0.01-0.1 (speculation)",
+   "silicon_area_mm2_per_W": "10-100 (speculation)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: superconducting AQFP/RQFP incl. cryocooler (electric J per FLOP)",
+   "year": 2026,
+   "low": 6.192003503742635e-10,
+   "mid": 6.192003503742635e-10,
+   "high": 6.192003503742635e-10,
+   "unit": "J/op (system level)",
+   "evidence_class": "demonstrated lab result",
+   "source": "tolpygo2016;mana2020;aqfp_adder2019;imec_scd;lhc_cryo;nist2012",
+   "junction_temperature": "4.2 K logic (Nb); cryocooler rejects at 250-340 K",
+   "logic_power_density_W_per_mm2": "n/a",
+   "silicon_area_mm2_per_W": "n/a"
+  },
+  {
+   "metric": "J per FP8-equivalent op: superconducting AQFP/RQFP incl. cryocooler (electric J per FLOP)",
+   "year": 2040,
+   "low": 3.441391941391942e-15,
+   "mid": 1.692673992673993e-14,
+   "high": 1.2254578754578754e-13,
+   "unit": "J/op (system level)",
+   "evidence_class": "roadmap claim",
+   "source": "tolpygo2016;mana2020;aqfp_adder2019;imec_scd;lhc_cryo;nist2012",
+   "junction_temperature": "4.2 K logic (Nb); cryocooler rejects at 250-340 K",
+   "logic_power_density_W_per_mm2": "cold side 1e-6-1e-4",
+   "silicon_area_mm2_per_W": "40-4000 per W_elec (inside cryostat)"
+  },
+  {
+   "metric": "J per FP8-equivalent op: superconducting AQFP/RQFP incl. cryocooler (electric J per FLOP)",
+   "year": 2070,
+   "low": 8.730004777830865e-16,
+   "mid": 3.028113553113553e-15,
+   "high": 2.9136446886446885e-14,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "tolpygo2016;mana2020;aqfp_adder2019;imec_scd;lhc_cryo;nist2012",
+   "junction_temperature": "4.2 K logic (Nb); cryocooler rejects at 250-340 K",
+   "logic_power_density_W_per_mm2": "cold side 1e-6-1e-4",
+   "silicon_area_mm2_per_W": "40-4000"
+  },
+  {
+   "metric": "J per FP8-equivalent op: superconducting AQFP/RQFP incl. cryocooler (electric J per FLOP)",
+   "year": "2100+",
+   "low": 2.9100015926102887e-17,
+   "mid": 3.128113553113553e-16,
+   "high": 5.927289377289377e-15,
+   "unit": "J/op (system level)",
+   "evidence_class": "speculation",
+   "source": "tolpygo2016;mana2020;aqfp_adder2019;imec_scd;lhc_cryo;nist2012",
+   "junction_temperature": "4.2 K logic (Nb); cryocooler rejects at 250-340 K",
+   "logic_power_density_W_per_mm2": "cold side 1e-7-1e-5",
+   "silicon_area_mm2_per_W": "400-40000"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (irreversible CMOS)",
+   "year": 2026,
+   "low": 6766498059946479.0,
+   "mid": 1.3879996020403034e+16,
+   "high": 2.7065992239785916e+16,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "demonstrated lab result",
+   "source": "swarm_node.mjs (project model) x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (adiabatic CMOS; die mass and Amdahl share included)",
+   "year": 2026,
+   "low": 6766498059946479.0,
+   "mid": 1.3879996020403034e+16,
+   "high": 2.7065992239785916e+16,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "demonstrated lab result",
+   "source": "adiabatic.py film optimum x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (adiabatic CMOS)",
+   "year": 2026,
+   "low": 811994625000.0001,
+   "mid": 1665630000000.0002,
+   "high": 3247978500000.0005,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "demonstrated lab result",
+   "source": "adiabatic.py x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (irreversible CMOS)",
+   "year": 2026,
+   "low": 811994625000.0001,
+   "mid": 1665630000000.0002,
+   "high": 3247978500000.0005,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "demonstrated lab result",
+   "source": "swarm_node.mjs x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (irreversible CMOS)",
+   "year": 2040,
+   "low": 1.3222272711180224e+16,
+   "mid": 1.061840553143126e+17,
+   "high": 3.851036726450959e+17,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "roadmap claim",
+   "source": "swarm_node.mjs (project model) x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (adiabatic CMOS; die mass and Amdahl share included)",
+   "year": 2040,
+   "low": 1.3222272711180224e+16,
+   "mid": 1.4865767744003763e+17,
+   "high": 1.0885540735771476e+18,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "roadmap claim",
+   "source": "adiabatic.py film optimum x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (adiabatic CMOS)",
+   "year": 2040,
+   "low": 1586701758671.2266,
+   "mid": 19113479693351.12,
+   "high": 145883284527742.16,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "roadmap claim",
+   "source": "adiabatic.py x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (irreversible CMOS)",
+   "year": 2040,
+   "low": 1586701758671.2266,
+   "mid": 12742319795567.414,
+   "high": 46213286324070.984,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "roadmap claim",
+   "source": "swarm_node.mjs x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, superconducting pod (incl. cryocooler 3-30 kg/kW, PV, radiator)",
+   "year": 2040,
+   "low": 213147939725763.53,
+   "mid": 3600086616017923.0,
+   "high": 4.686820795612826e+16,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "roadmap claim",
+   "source": "sc.py"
+  },
+  {
+   "metric": "FLOP per J of sunlight, superconducting pod",
+   "year": 2040,
+   "low": 1261761468384.1904,
+   "mid": 9134869059682.553,
+   "high": 44930526795947.93,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "roadmap claim",
+   "source": "sc.py"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (irreversible CMOS)",
+   "year": 2070,
+   "low": 2.778513696113288e+16,
+   "mid": 4.2211079131816026e+17,
+   "high": 3.5313854566664924e+18,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "speculation",
+   "source": "swarm_node.mjs (project model) x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (adiabatic CMOS; die mass and Amdahl share included)",
+   "year": 2070,
+   "low": 4.102767475124039e+16,
+   "mid": 8.400232126447635e+17,
+   "high": 1.3390066542624266e+19,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py film optimum x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (adiabatic CMOS)",
+   "year": 2070,
+   "low": 5140670788594.843,
+   "mid": 108574039218160.14,
+   "high": 1758419991375399.2,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (irreversible CMOS)",
+   "year": 2070,
+   "low": 3334277445652.1743,
+   "mid": 50654221824686.945,
+   "high": 423774008979623.3,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "speculation",
+   "source": "swarm_node.mjs x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, superconducting pod (incl. cryocooler 3-30 kg/kW, PV, radiator)",
+   "year": 2070,
+   "low": 896484812964819.9,
+   "mid": 1.977098895265784e+16,
+   "high": 1.7718187395005757e+17,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "speculation",
+   "source": "sc.py"
+  },
+  {
+   "metric": "FLOP per J of sunlight, superconducting pod",
+   "year": 2070,
+   "low": 5306877445993.411,
+   "mid": 51062666616013.66,
+   "high": 177117374816018.22,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "speculation",
+   "source": "sc.py"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (irreversible CMOS)",
+   "year": "2100+",
+   "low": 3.3342164353359464e+16,
+   "mid": 7.783603244164655e+17,
+   "high": 8.67417981103517e+18,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "speculation",
+   "source": "swarm_node.mjs (project model) x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, compute sail (adiabatic CMOS; die mass and Amdahl share included)",
+   "year": "2100+",
+   "low": 6.6375750261664216e+16,
+   "mid": 3.731506312774999e+18,
+   "high": 7.946188068520985e+19,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py film optimum x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (adiabatic CMOS)",
+   "year": "2100+",
+   "low": 8581962238361.773,
+   "mid": 563701829729181.5,
+   "high": 1.0616829849717598e+16,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py x swarm_node.mjs"
+  },
+  {
+   "metric": "FLOP per J of sunlight, compute sail (irreversible CMOS)",
+   "year": "2100+",
+   "low": 4001132934782.6094,
+   "mid": 93404948045522.02,
+   "high": 1040920623998491.9,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "speculation",
+   "source": "swarm_node.mjs x cmos.json"
+  },
+  {
+   "metric": "FLOP/s per kg, superconducting pod (incl. cryocooler 3-30 kg/kW, PV, radiator)",
+   "year": "2100+",
+   "low": 4406800558369384.0,
+   "mid": 1.9138947032920662e+17,
+   "high": 5.315456218501726e+18,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "speculation",
+   "source": "sc.py"
+  },
+  {
+   "metric": "FLOP per J of sunlight, superconducting pod",
+   "year": "2100+",
+   "low": 26086722445257.293,
+   "mid": 494302876838234.0,
+   "high": 5313521244480546.0,
+   "unit": "FLOP/J_sun",
+   "evidence_class": "speculation",
+   "source": "sc.py"
+  },
+  {
+   "metric": "silicon area per W of chip power on the film, irreversible logic (logic + SRAM/NVM)",
+   "year": 2026,
+   "low": 10,
+   "mid": 25,
+   "high": 40,
+   "unit": "mm2/W",
+   "evidence_class": "demonstrated lab result",
+   "source": "cmos.py area table"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW of film chips",
+   "year": 2026,
+   "low": 157.19006725125465,
+   "mid": 392.9751681281366,
+   "high": 628.7602690050186,
+   "unit": "wafers/MW",
+   "evidence_class": "demonstrated lab result",
+   "source": "area / 63,617 mm2 usable per wafer"
+  },
+  {
+   "metric": "silicon area per W of chip power on the film, irreversible logic (logic + SRAM/NVM)",
+   "year": 2040,
+   "low": 5,
+   "mid": 20,
+   "high": 40,
+   "unit": "mm2/W",
+   "evidence_class": "roadmap claim",
+   "source": "cmos.py area table"
+  },
+  {
+   "metric": "silicon area per W on the film, adiabatic logic at the FLOP/s/kg optimum",
+   "year": 2040,
+   "low": 292.2075147763802,
+   "mid": 514.6839054588304,
+   "high": 926.1943587528312,
+   "unit": "mm2/W (film offers 4776)",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW, adiabatic film logic",
+   "year": 2040,
+   "low": 4593.211889902119,
+   "mid": 8090.319771221194,
+   "high": 14558.85535400902,
+   "unit": "wafers/MW",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW of film chips",
+   "year": 2040,
+   "low": 78.59503362562732,
+   "mid": 314.3801345025093,
+   "high": 628.7602690050186,
+   "unit": "wafers/MW",
+   "evidence_class": "roadmap claim",
+   "source": "area / 63,617 mm2 usable per wafer"
+  },
+  {
+   "metric": "silicon area per W of chip power on the film, irreversible logic (logic + SRAM/NVM)",
+   "year": 2070,
+   "low": 5,
+   "mid": 20,
+   "high": 60,
+   "unit": "mm2/W",
+   "evidence_class": "speculation",
+   "source": "cmos.py area table"
+  },
+  {
+   "metric": "silicon area per W on the film, adiabatic logic at the FLOP/s/kg optimum",
+   "year": 2070,
+   "low": 349.99286041845215,
+   "mid": 611.2988243879294,
+   "high": 3741.0497784430827,
+   "unit": "mm2/W (film offers 4776)",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW, adiabatic film logic",
+   "year": 2070,
+   "low": 5501.540126663547,
+   "mid": 9609.01033161515,
+   "high": 58805.586626375945,
+   "unit": "wafers/MW",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW of film chips",
+   "year": 2070,
+   "low": 78.59503362562732,
+   "mid": 314.3801345025093,
+   "high": 943.1404035075278,
+   "unit": "wafers/MW",
+   "evidence_class": "speculation",
+   "source": "area / 63,617 mm2 usable per wafer"
+  },
+  {
+   "metric": "silicon area per W of chip power on the film, irreversible logic (logic + SRAM/NVM)",
+   "year": "2100+",
+   "low": 5,
+   "mid": 20,
+   "high": 60,
+   "unit": "mm2/W",
+   "evidence_class": "speculation",
+   "source": "cmos.py area table"
+  },
+  {
+   "metric": "silicon area per W on the film, adiabatic logic at the FLOP/s/kg optimum",
+   "year": "2100+",
+   "low": 614.1012644632763,
+   "mid": 2053.0728678398473,
+   "high": 4496.617836290636,
+   "unit": "mm2/W (film offers 4776)",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW, adiabatic film logic",
+   "year": "2100+",
+   "low": 9653.06190600629,
+   "mid": 32272.266216747183,
+   "high": 70682.36600897161,
+   "unit": "wafers/MW",
+   "evidence_class": "speculation",
+   "source": "adiabatic.py"
+  },
+  {
+   "metric": "leading-edge 300 mm wafers per MW of film chips",
+   "year": "2100+",
+   "low": 78.59503362562732,
+   "mid": 314.3801345025093,
+   "high": 943.1404035075278,
+   "unit": "wafers/MW",
+   "evidence_class": "speculation",
+   "source": "area / 63,617 mm2 usable per wafer"
+  },
+  {
+   "metric": "MAC TOPS/W scaling vs 2024 (technology only, iso-architecture)",
+   "year": 2039,
+   "low": 3.5,
+   "mid": 3.5,
+   "high": 3.5,
+   "unit": "x",
+   "evidence_class": "roadmap claim",
+   "source": "irds2024_mm9_mm11"
+  },
+  {
+   "metric": "energy per switching, FO3 load, HP logic",
+   "year": "2024->2039",
+   "low": 3.3e-16,
+   "mid": 3.3e-16,
+   "high": 6.5e-16,
+   "unit": "J/switch",
+   "evidence_class": "roadmap claim",
+   "source": "irds2024_mm9_mm11"
+  },
+  {
+   "metric": "supply voltage Vdd (IRDS logic core)",
+   "year": "2024->2039",
+   "low": 0.6,
+   "mid": 0.6,
+   "high": 0.7,
+   "unit": "V",
+   "evidence_class": "roadmap claim",
+   "source": "irds2024_mm9_mm11"
+  },
+  {
+   "metric": "film mesh energy share, layer-local expert all-to-all (at constant bytes/FLOP)",
+   "year": "2040",
+   "low": 0.5166019074531968,
+   "mid": 0.60374531835206,
+   "high": 0.2709334767555212,
+   "unit": "fraction of chip energy",
+   "evidence_class": "speculation",
+   "source": "comm.py (2026: 0.15-0.31, architecture.md)"
+  },
+  {
+   "metric": "film mesh energy share, layer-local expert all-to-all (at constant bytes/FLOP)",
+   "year": "2070",
+   "low": 0.6587652374651616,
+   "mid": 0.6374228923920493,
+   "high": 0.2809243316719529,
+   "unit": "fraction of chip energy",
+   "evidence_class": "speculation",
+   "source": "comm.py (2026: 0.15-0.31, architecture.md)"
+  },
+  {
+   "metric": "film mesh energy share, layer-local expert all-to-all (at constant bytes/FLOP)",
+   "year": "2100+",
+   "low": 0.7053504144687265,
+   "mid": 0.620127205580632,
+   "high": 0.1922893405859338,
+   "unit": "fraction of chip energy",
+   "evidence_class": "speculation",
+   "source": "comm.py (2026: 0.15-0.31, architecture.md)"
+  }
+ ],
+ "physical_floors": [
+  {
+   "floor": "Landauer kT ln2 per irreversible bit erasure",
+   "value": {
+    "4.2 K": 4.019370439110214e-23,
+    "77 K": 7.368845805035391e-22,
+    "300 K": 2.870978885078724e-21,
+    "358 K": 3.42747029230315e-21
+   },
+   "unit": "J/bit",
+   "evidence_class": "physics floor (verified: Berut 2012)",
+   "source": "Berut et al., 'Experimental verification of Landauer's principle', Nature 483, 187 (2012): https://pubmed.ncbi.nlm.nih.gov/22398556/"
+  },
+  {
+   "floor": "Landauer referred to the heat sink",
+   "value": "refrigeration cannot lower it: kTc ln2 at Tc + Carnot work = kTh ln2 at the radiator (330-400 K near 1 AU)",
+   "unit": "",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Thermionic subthreshold swing (kT/q) ln10",
+   "value": {
+    "300 K": 59.5,
+    "358 K": 71.1
+   },
+   "unit": "mV/decade",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Practical Vdd for 1e4-1e6 on/off with n=1.1 plus 0.1-0.15 V variation margin",
+   "value": {
+    "300.0": [
+     0.362,
+     0.543
+    ],
+    "358.15": [
+     0.413,
+     0.619
+    ]
+   },
+   "unit": "V",
+   "evidence_class": "physics floor + engineering margin",
+   "source": "floors.py; irds2024_mm6"
+  },
+  {
+   "floor": "Thermal-noise reliability",
+   "value": "E >= kT ln(1/p): 46 kT for p=1e-20 (7.6e-20 J at 358 K); practical logic 100-1000 kT per switch incl. wire",
+   "unit": "J/switch",
+   "evidence_class": "physics floor",
+   "source": "floors.py; ho2023"
+  },
+  {
+   "floor": "Algorithmic Landauer per FLOP (reversible MAC dataflow, erase only outputs)",
+   "value": {
+    "low": 2.74197623384252e-24,
+    "mid": 2.74197623384252e-23,
+    "high": 2.7419762338425202e-22
+   },
+   "unit": "J/FLOP at 358 K",
+   "evidence_class": "physics floor",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Gate-level Landauer per FLOP (irreversible gates, 500-3000 switches per FP8 MAC)",
+   "value": {
+    "low": 8.568675730757875e-19,
+    "mid": 1.713735146151575e-18,
+    "high": 5.141205438454725e-18
+   },
+   "unit": "J/FLOP at 358 K",
+   "evidence_class": "physics floor x engineering count",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Reliable irreversible switching per FLOP (46-1000 kT x switches)",
+   "value": {
+    "low": 5.686513552525e-17,
+    "mid": 4.9447943935e-16,
+    "high": 7.41719159025e-15
+   },
+   "unit": "J/FLOP at 358 K",
+   "evidence_class": "physics floor x engineering count",
+   "source": "floors.py"
+  },
+  {
+   "floor": "Practical irreversible CMOS limit, system FP8-equivalent at 358 K",
+   "value": {
+    "low": 1.0890856825604307e-16,
+    "mid": 7.277811205673758e-16,
+    "high": 5.47131909754979e-15
+   },
+   "unit": "J/FLOP",
+   "evidence_class": "physics-based estimate (Ho 2023 4.7e15 FP4/J, x1.2 format, x(358/300)^2, x1.5-3 memory/mesh)",
+   "source": "Ho, Erdil, Besiroglu, 'Limits to the Energy Efficiency of CMOS Microprocessors', ICRC 2023 (4.7e15 FP4/J, +-0.7 OOM; 3e-20..1e-18 J/switch; 30-3000 switches/op): https://arxiv.org/abs/2312.08595"
+  },
+  {
+   "floor": "Wire energy: ~2 pF/cm, 1/4 C V^2 per bit",
+   "value": {
+    "2.54 cm hop at 0.1 V (x2 driver)": 2.54e-14,
+    "2.54 cm hop at 0.2 V": 1.016e-13,
+    "today": 4.6e-13
+   },
+   "unit": "J/bit",
+   "evidence_class": "physics floor (capacitance) + engineering swing",
+   "source": "D. A. B. Miller, 'Attojoule optoelectronics for low-energy information processing and communications', JLT 2017 (2 pF/cm, ~10 fJ/bit target): https://arxiv.org/abs/1609.05510"
+  },
+  {
+   "floor": "Adiabatic charging: E >= 2 (RC/T) C V^2 per cycle; leakage adds V I_off T",
+   "value": "E x t = const -> energy gain g costs ~2.4 g^2 more silicon per W (8-tick S2LAL, 2x energy and 3x area overhead): ~6x at 10 % of film area, ~20x if logic covers the whole film; leakage-limited maximum 120x at 358 K vs 460x at 300 K (needs >80x the film's area)",
+   "unit": "",
+   "evidence_class": "physics floor (RC law) + engineering overheads",
+   "source": "adiabatic.py; s2lal2020"
+  },
+  {
+   "floor": "Photonic shot-noise floor (8-bit output, fan-in 1024, laser wall-plug 0.3)",
+   "value": 2.734033007688848e-17,
+   "unit": "J/MAC",
+   "evidence_class": "physics floor",
+   "source": "floors.py; mcmahon2022"
+  },
+  {
+   "floor": "Analog kT/C floor (8-bit readout, fan-in 256) vs ADC (1-5 fJ/step)",
+   "value": {
+    "kTC_J_per_MAC": 1.5190408376832e-17,
+    "ADC_J_per_MAC": [
+     1e-15,
+     5.000000000000001e-15
+    ]
+   },
+   "unit": "J/MAC",
+   "evidence_class": "physics floor (kT/C) + demonstrated ADC class",
+   "source": "floors.py; murmann2021"
+  },
+  {
+   "floor": "Carnot work to lift 1 W from 4.2 K",
+   "value": {
+    "to 300 K": 70.4,
+    "to 350 K": 82.3,
+    "at 30 % Carnot, 350 K": 274,
+    "at 2 % Carnot (small cooler)": 4100
+   },
+   "unit": "W/W",
+   "evidence_class": "physics floor; real fractions demonstrated",
+   "source": "floors.py; lhc_cryo; nist2020"
+  },
+  {
+   "floor": "Radiative rejection sigma T^4, 2 faces eps 0.9, fin 0.72, inside the shell (cavity)",
+   "value": {
+    "150": 0,
+    "200": 61.1,
+    "250": 230.6,
+    "300": 538.7,
+    "330": 815.0,
+    "353": 1084.6,
+    "380": 1475.8,
+    "420": 2230.2,
+    "500": 4536.5
+   },
+   "unit": "W/m^2 at f = 0.1 (radiator at 150 K rejects nothing)",
+   "evidence_class": "physics floor",
+   "source": "swarm_node.mjs (sat2.js radiatorFlux)"
+  }
+ ],
+ "model_parameters": [
+  {
+   "param": "jPerFlop85",
+   "unit": "J per FP8-equivalent FLOP, system, 85 C, full clock (model multiplies by clockFactor)",
+   "y2026": 1.3e-13,
+   "y2040": 1.7e-14,
+   "y2070": 4.27e-15,
+   "y2100plus": 2.32e-15,
+   "notes": "Irreversible CMOS mid. Ranges (x0.6 applied): 2040 2.8e-15-8.2e-14, 2070 3.1e-16-3.9e-14, 2100+ 1.2e-16-3.2e-14. Floor ~7.3e-16 (1.1e-16..5.5e-15)."
+  },
+  {
+   "param": "adiabaticGain (new)",
+   "unit": "system energy divisor from adiabatic/reversible logic on the film",
+   "y2026": 1.0,
+   "y2040": 1.5,
+   "y2070": 2.14,
+   "y2100plus": 6.04,
+   "notes": "Optimistic/pessimistic: 2040 3.2/1.0, 2070 4.1/1.5, 2100+ 10.2/2.1 (2100+ assumes memory and links also reversible). Amdahl-limited by the non-adiabatic share; couples to siliconAreaPerW. FLOP/s/kg gain is smaller (x2.0 in 2070, x4.8 in 2100+) because thicker silicon adds mass."
+  },
+  {
+   "param": "clockFactor",
+   "unit": "energy factor from under-clocking",
+   "y2026": 0.6,
+   "y2040": 0.6,
+   "y2070": 0.6,
+   "y2100plus": 0.6,
+   "notes": "Keep for irreversible logic. Adiabatic logic runs its gates 5-20x slower than a conventional pipeline (clock_rel 0.06-0.2 at the film optimum); represent that through adiabaticGain and area, not this factor."
+  },
+  {
+   "param": "energySlopeAbove85",
+   "unit": "%/K of J/op above 85 C (hot-designed logic)",
+   "y2026": 0.9,
+   "y2040": 0.8,
+   "y2070": 0.6,
+   "y2100plus": 0.56,
+   "notes": "Near the Boltzmann floor E ~ T^2 (2/T = 0.56 %/K at 358 K). Below 85 C keep -0.45 %/K. A TFET-class device (wildcard) would flatten it."
+  },
+  {
+   "param": "tjFilmC",
+   "unit": "C",
+   "y2026": 85,
+   "y2040": 85,
+   "y2070": 85,
+   "y2100plus": 85,
+   "notes": "FLOP/s/kg optimum stays flat 85-105 C for irreversible and adiabatic logic (adiabatic.py: Tj 60/85/105 -> 1.77/1.89/1.81x). Analog and photonic prefer <= 85 C."
+  },
+  {
+   "param": "siliconAreaPerW (new)",
+   "unit": "mm2 of die per W on the film",
+   "y2026": 25,
+   "y2040": 20,
+   "y2070": 611.0,
+   "y2100plus": 2050.0,
+   "notes": "2026-2040 irreversible (5-40; 3D NVM shrinks SRAM area). 2070 and 2100+ are the adiabatic film optima (adiabatic.py; range 350-3741 and 614-4497); keep 20 mm2/W if adiabatic logic is not adopted. The film offers 4776 mm2/W. Die mass at 50 um: 0.12 g per 1000 mm2."
+  },
+  {
+   "param": "wafersPerMW",
+   "unit": "300 mm leading-edge wafers per MW",
+   "y2026": 640,
+   "y2040": 314.0,
+   "y2070": 9610.0,
+   "y2100plus": 32300.0,
+   "notes": "2070/2100+ values assume adiabatic film logic (5,500-70,000 wafers/MW); irreversible logic stays at 80-950. Either way the fab, not Mercury mass, sets the build rate once adiabatic logic is used."
+  },
+  {
+   "param": "sail FLOP/s per kg (output)",
+   "unit": "FLOP/s/kg",
+   "y2026": 1.39e+16,
+   "y2040": 1.06e+17,
+   "y2070": 4.22e+17,
+   "y2100plus": 3.73e+18,
+   "notes": "Film kg/W 0.924 g/W; 2070 irreversible (adiabatic x2.0 -> 8.40e+17); 2100+ includes the adiabatic optimum with die mass (irreversible only: 7.78e+17)."
+  },
+  {
+   "param": "sail FLOP per J of sunlight (output)",
+   "unit": "FLOP/J_sun",
+   "y2026": 1670000000000.0,
+   "y2040": 12700000000000.0,
+   "y2070": 50700000000000.0,
+   "y2100plus": 564000000000000.0,
+   "notes": "0.13 W of chip power per W of sunlight at 0.92 AU."
+  },
+  {
+   "param": "filmHopEnergy",
+   "unit": "J/bit per 2.54 cm hop",
+   "y2026": 4.6e-13,
+   "y2040": 2e-13,
+   "y2070": 6e-14,
+   "y2100plus": 3e-14,
+   "notes": "Needs on-film photonics or 0.1-0.2 V low-swing links (floor 2.5e-14-1e-13 J/bit electrical). Even so, FLOPs per hop-byte rise 47 -> 160-640."
+  },
+  {
+   "param": "sailLaserAperture",
+   "unit": "m",
+   "y2026": 0.1,
+   "y2040": 0.3,
+   "y2070": 0.3,
+   "y2100plus": 0.3,
+   "notes": "Per-sail FLOP/s x8-250; at constant bytes/FLOP 10 cm terminals would weigh 0.05-0.46 kg/m2; 30 cm terminals 0.002-0.017 kg/m2 (design spec sensitivity)."
+  },
+  {
+   "param": "superconducting option (not in base model)",
+   "unit": "J/FLOP electric incl. cryo; g/W",
+   "y2026": "n/a",
+   "y2040": "1.7e-14; 16 g/W",
+   "y2070": "3.0e-15; 17 g/W",
+   "y2100plus": "3.1e-16; 17 g/W",
+   "notes": "Pod-only (>= 1-10 kW cold per cryostat); cryocooler 3-30 kg/kW input dominates mass; FLOP/s/kg ~20-30x below the film."
+  }
+ ],
+ "obsolete_by_era": [
+  {
+   "param": "J/FLOP basis 1.3e-13 (x0.6)",
+   "obsolete_by": "2030-2032",
+   "replacement": "era curve: 1.7e-14 (2040), 4.3e-15 (2070), 2.3e-15 (2100+) full-clock equivalents, x0.6; adiabatic divisor 1.5-4 later",
+   "why": "Rubin (2026) already gives 6.6e-14 per FP4 op at full clock; IRDS + format + architecture give ~8x by 2040."
+  },
+  {
+   "param": "FP8 as the unit of work",
+   "obsolete_by": "2028-2035",
+   "replacement": "'FP8-equivalent useful op': NVFP4 training (demonstrated 2025), ternary/2-bit inference; count FLOPs at the quality of FP8",
+   "why": "4-bit training matches FP8 at 12B/10T tokens; quoting raw FP4 FLOPs would double-count."
+  },
+  {
+   "param": "energyPenalty table (+0.9 %/K)",
+   "obsolete_by": "2040-2060",
+   "replacement": "slope -> 0.56 %/K (E ~ T^2 Boltzmann floor) for irreversible logic; weaker for adiabatic logic in the area-limited regime",
+   "why": "Mobility and BTI terms shrink relative to the Boltzmann term as designs approach the floor."
+  },
+  {
+   "param": "SRAM leakage 10-59 % of a 0.15 W chiplet at 85 C",
+   "obsolete_by": "2035-2045",
+   "replacement": "5-20 % (NVM-resident weights, power-gated SRAM for KV/activations); leakage returns as the floor-setter for adiabatic logic (I_off/I_on <= 1e-7..1e-9 needed)",
+   "why": "Weights move to MRAM/RRAM (already the design rule); GAA/CFET HD devices reach Ion/Ioff ~6e6 at 0.6 V (IRDS)."
+  },
+  {
+   "param": "~640 leading-edge wafers per MW",
+   "obsolete_by": "2040 (falls) / 2060+ (rises if adiabatic)",
+   "replacement": "80-950 wafers/MW for irreversible logic with 3D NVM (5-60 mm2/W); 5,500-70,000 wafers/MW for adiabatic film logic",
+   "why": "Adiabatic energy gain g costs ~2.4 g^2 more silicon per W."
+  },
+  {
+   "param": "Film mesh hop 0.46 pJ/bit",
+   "obsolete_by": "~2040-2050",
+   "replacement": "<= 50 fJ/bit (on-film photonics) or 0.1-0.2 V low-swing (2.5e-14-1e-13 J/bit floor)",
+   "why": "Compute energy falls 8-50x while wire capacitance (2 pF/cm) stays; expert all-to-all would grow from 15-31 % to 37-64 % of chip energy."
+  },
+  {
+   "param": "10 cm sail laser terminals (60 per sail)",
+   "obsolete_by": "~2040",
+   "replacement": "30 cm terminals or lower external bytes/FLOP",
+   "why": "Per-sail FLOP/s scales with 1/J; terminal mass at 10 cm would reach 0.05-0.46 kg/m2."
+  },
+  {
+   "param": "HBM 115 MB/W, wafer SRAM 1.8 MB/W, pod HBM <= 95 C limit",
+   "obsolete_by": "2035-2050 (memory study)",
+   "replacement": "3D DRAM/NVM stacked on logic (outside this study; logic numbers here assume off-die energy falls x5-50)",
+   "why": "IRDS: memory bandwidth/capacity near logic is the main architecture lever once Vdd stops scaling."
+  },
+  {
+   "param": "Cryogenic computing",
+   "obsolete_by": "never adopted in the mass-limited build",
+   "replacement": "possible pod niche only in a sunlight-limited end state (>2100) if cold reversible logic + memory reach <= 1e-18 J/FLOP",
+   "why": "Cryocooler mass (3-30 kg/kW) puts superconducting pods ~20-30x below the film in FLOP/s/kg."
+  }
+ ],
+ "architecture_implications": [
+  {
+   "question": "(a) Does falling J/op or rising area per watt change thin film vs concentration?",
+   "answer": "No for J/op; mildly pro-film for area per W.",
+   "numbers": "J/op multiplies film and pod FLOP/s/kg equally (film/pod ratio stays ~5.1x at 2026 basis); the split is set by heat-transport mass, which depends on sunlight, not on J/op. Film FLOP/s/kg: 1.4e+16 (2026) -> 1.1e+17 (2040) -> 4.2e+17 (2070) -> 3.7e+18 (2100+, adiabatic incl. die mass). Rising silicon area per W (NTV 100-150 mm2/W, adiabatic 350-4500 mm2/W at the FLOP/s/kg optimum) fits inside the film's 4776 mm2/W and lets each die spread its own heat; a pod would have to stack 0.35-4.5 m2 of die per kW. The real cost of area is fab output: 5,500-70,000 wafers/MW.",
+   "evidence_class": "physics floor (heat transport) + speculation (future J/op)"
+  },
+  {
+   "question": "(b) Does any technology demand concentration or a different orbit?",
+   "answer": "Superconducting logic demands concentration (kW-class cryostats in pods) but not a colder orbit. Nothing else does.",
+   "numbers": "Cryocooler efficiency rises from 4 % Carnot at 1 W to 26 % at 10 kW cold: FLOP/s/kg improves 6.1x from 1 W to 10 kW cryostats, so the unit is ~1-10 kW cold = 0.4-2.3 MW electric (pod scale). Best reject temperature 250-340 K; inside a dense shell the radiator must stay >= 330 K or fly outside. FLOP/s/kg is flat 0.5-2 AU (2.0e+16 at 0.5 AU vs 1.8e+16 at 2 AU) and falls beyond (wing mass); a far orbit raises FLOP per J of sunlight only through cooler PV and reject (4.4e+13 at 0.88 AU -> 1.0e+14 at 5 AU, at 1.5x lower FLOP/s/kg), which holds for any technology. 2070 mid: 3.0e-15 J/FLOP electric, 17 g/W, 2.0e+16 FLOP/s/kg vs film 4.2e+17; FLOP per J of sunlight 5.1e+13 vs film 5.1e+13. In 2100+ the optimistic superconducting case (5.3e+15 FLOP/J_sun) beats the film's mid case (5.6e+14) but not its optimistic adiabatic case (1.1e+16). Cryo-CMOS at 77 K loses 3-14x. 4 K cooling needs helium, which Mercury lacks (exosphere source ~2.5e23 He/s ~ 50 t/yr).",
+   "evidence_class": "physics floor (Carnot, sigma T^4) + demonstrated (cryocooler efficiency/mass) + speculation (cold J/op)"
+  },
+  {
+   "question": "(c) Which current parameters go obsolete, and what replaces them?",
+   "answer": "See obsolete_by_era: the J/FLOP basis (by ~2030), FP8 as the unit, the +0.9 %/K slope, SRAM leakage share, wafers/MW, mesh hop energy, 10 cm terminals.",
+   "numbers": "jPerFlop85: 1.3e-13 -> 1.7e-14 (2040) -> 4.3e-15 (2070) -> 2.3e-15 (2100+), x0.6; adiabaticGain 1 -> 1.5 -> 2.1 -> 6.0; siliconAreaPerW 25 -> 20 (irreversible) or 611-2053 (adiabatic).",
+   "evidence_class": "roadmap claim to 2040; speculation after"
+  },
+  {
+   "question": "Communication becomes the limiter",
+   "answer": "Wire energy is invariant (2 pF/cm), so FLOPs per film-hop byte rise from 47 to ~160 (mid) and up to 640.",
+   "numbers": "At constant bytes/FLOP: TP-inference mesh share 1.4-3.5 % -> 5-12 %; TP training 3.6-13 % -> 11-37 %; layer-local expert all-to-all 15-31 % -> 37-64 %. On-film photonic links (<= 50 fJ/bit) are needed by ~2050, or the film concentrates on weight-stationary, locality-friendly work. Pods do not escape this (switched fabric 9-39 pJ/bit).",
+   "evidence_class": "physics floor (wire capacitance) + speculation"
+  },
+  {
+   "question": "How close to the floors does the build era get?",
+   "answer": "Irreversible logic reaches within ~2x of its practical floor (~7e-16 J/FLOP at 358 K) by 2070-2100; that is ~400x the gate-level Landauer energy and ~3e7x the algorithmic Landauer floor. Going further requires reversible logic, and on the film that is area-limited.",
+   "numbers": "Gate-level Landauer 1.7e-18 J/FLOP; reliable irreversible 4.9e-16; algorithmic 2.7e-23. Adiabatic gain g costs 2.4 g^2 silicon area: 6x at 10 % of film area, 20x at full film.",
+   "evidence_class": "physics floor"
+  },
+  {
+   "question": "Junction temperature",
+   "answer": "85 C stays the film's design point for every warm technology (optimum flat 85-105 C). Analog and photonic compute prefer <= 85 C; a TFET-class device would allow 105-125 C (film at 0.82-0.74 AU, -10 to -18 % kg/W). Superconducting needs 4.2 K inside a pod.",
+   "numbers": "swarm_node film_vs_tj: 60 C 1.10 g/W at 1.07 AU; 85 C 0.92 g/W at 0.92 AU; 105 C 0.83 g/W at 0.82 AU; 125 C 0.76 g/W at 0.74 AU.",
+   "evidence_class": "physics floor + project model"
+  }
+ ],
+ "wildcards": [
+  {
+   "wildcard": "Steep-slope switch matures (2D/heterojunction TFET, NC-FET, NEMS relay)",
+   "effect": "Vdd 0.15-0.3 V -> 2-4x lower irreversible J/op; TFET swing is weakly T-dependent (hot film 105-125 C cheap); NEMS relays have ~zero off-current, removing the adiabatic leakage floor",
+   "probability_by_2070": "0.2-0.3 (speculation)",
+   "source": "Review of tunnel FETs (no thermal SS limit; low Ion and ambipolarity unsolved): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12388682/ ; Critical review of NC-FET progress (hysteresis, frequency, reliability unproven): https://arxiv.org/abs/1903.03884 ; steep slope tied to hysteresis: https://arxiv.org/abs/1809.02053"
+  },
+  {
+   "wildcard": "Fully reversible stack (logic + memory + links) with MEMS resonators (Q >= 3000)",
+   "effect": "System J/op 10-20x below irreversible CMOS if silicon covers most of the film; 4000x (Frank) needs >1000x the film's area at 358 K",
+   "probability_by_2100": "0.2 (speculation)",
+   "source": "IEEE Spectrum, 'Reversible Computing Escapes the Lab in 2025' (up to 4000x claimed by Frank/Sandia, 10-15 yr out; MEMS resonator 99.97 %): https://spectrum.ieee.org/reversible-computing ; M. P. Frank, 'The Future of Computing Depends on Making It Reversible', IEEE Spectrum 2017 / arXiv:1803.02789: https://spectrum.ieee.org/the-future-of-computing-depends-on-making-it-reversible"
+  },
+  {
+   "wildcard": "Cold reversible superconducting logic + dense cold memory + helium supply",
+   "effect": "Pods at <= 3e-17 J/FLOP electric, 5e15 FLOP per J of sunlight (5x the film) for a sunlight-limited end state; He would come from gas giants or solar-wind capture",
+   "probability_by_2100": "0.1 (speculation)",
+   "source": "Takeuchi, Yamanashi, Yoshikawa, reversible QFP gate, Sci. Rep. 2017 (simulated dissipation below kT ln2 at reduced frequency): https://doaj.org/article/35a3eb152cd640e3a0da43c9e26aaf82 ; Hener et al., JGR 2025, Mercury helium exosphere source ~2.5e23 He/s from solar-wind implantation (He released from regolith at ~400 K): https://wurz.space.unibe.ch/Hener_JGR_2025.pdf"
+  },
+  {
+   "wildcard": "Algorithmic efficiency outruns hardware",
+   "effect": "Useful work per FLOP (sparsity, distillation, better architectures) can change ops/task by 10-1000x; hardware J/op then matters less than memory per site",
+   "probability_by_2070": "high (speculation)",
+   "source": "Epoch AI, leading ML hardware energy efficiency doubling ~2 yr (H100 1.4e12 FLOP/s/W FP16): https://epoch.ai/data-insights/ml-hardware-energy-efficiency"
+  },
+  {
+   "wildcard": "Analog/photonic beat digital by > 10x at system level",
+   "effect": "Would favour <= 85 C operation and NVM weight arrays already in the film design; photonic needs lasers and ring tuning on a 348 K sheet",
+   "probability_by_2070": "0.2 (speculation)",
+   "source": "Murmann, 'Mixed-Signal Computing for Deep Neural Network Inference', IEEE TVLSI 2021 (single-digit fJ/op feasible for 4-bit mixed-signal arithmetic; DNN processors memory-access limited): https://par.nsf.gov/servlets/purl/10295527 ; Ahmed et al. (Lightmatter), 'Universal photonic artificial intelligence acceleration', Nature 640, 368 (2025): 65.5 TOPS (16-bit ABFP) at 78 W electrical + 1.6 W optical, six chips, 4x 128x128 photonic tensor cores: https://www.nature.com/articles/s41586-025-08854-x ; https://www.hackster.io/news/the-bright-side-of-ai-ad44886a24cd"
+  },
+  {
+   "wildcard": "Sunlight-limited end state favours colder shells",
+   "effect": "Near any floor FLOP/J scales ~1/T_reject (Landauer) or ~1/T^2 (Boltzmann CMOS); outer shells at lower T compute more per joule but need radiator area ~T^-4",
+   "probability": "physics (timing speculative)",
+   "source": "floors.py"
+  }
+ ],
+ "technology_table_note": "trajectory entries 'J per FP8-equivalent op: <technology>' carry junction_temperature, logic_power_density_W_per_mm2 and silicon_area_mm2_per_W per era",
+ "sources": [
+  {
+   "key": "architecture_md",
+   "ref": "/home/user/dyson/docs/architecture.md (project decision record; 1.3e-13 J/FLOP basis x0.6)"
+  },
+  {
+   "key": "design_result",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research4/design/result.json (sail spec, sensitivity)"
+  },
+  {
+   "key": "hotsi",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research2/research_hotsi.json (+0.9 %/K hot-designed logic, 0.45 %/K Boltzmann floor)"
+  },
+  {
+   "key": "interconnect",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research3/interconnect_final.json (0.46 pJ/bit/hop, 2 pF/cm)"
+  },
+  {
+   "key": "irds2024_mm9_mm11",
+   "ref": "IRDS 2024 More Moore, Tables MM-9 and MM-11 (Vdd 0.70 V 2024 -> 0.60 V 2027-2039; SS 82->70 mV/dec HP; CV^2 0.65 -> 0.33 fJ/switch; MAC TOPS/W x3.5 by 2039; MAC power density x4.8 with 6 tiers): https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "key": "irds2024_mm6",
+   "ref": "IRDS 2024 More Moore Table MM-6: 'no solutions left to reduce the supply voltage because of lack of steep-subthreshold devices': https://irds.ieee.org/images/files/pdf/2024/2024IRDS_MM.pdf"
+  },
+  {
+   "key": "ho2023",
+   "ref": "Ho, Erdil, Besiroglu, 'Limits to the Energy Efficiency of CMOS Microprocessors', ICRC 2023 (4.7e15 FP4/J, +-0.7 OOM; 3e-20..1e-18 J/switch; 30-3000 switches/op): https://arxiv.org/abs/2312.08595"
+  },
+  {
+   "key": "epoch_eff",
+   "ref": "Epoch AI, leading ML hardware energy efficiency doubling ~2 yr (H100 1.4e12 FLOP/s/W FP16): https://epoch.ai/data-insights/ml-hardware-energy-efficiency"
+  },
+  {
+   "key": "rubin",
+   "ref": "NVIDIA Vera Rubin (third-party compilations of GTC 2026 specs): ~2.3 kW, 35 PF dense NVFP4, 50 PF with sparsity, ~17.5 PF dense FP8: https://www.cudocompute.com/products/nvidia-vera-rubin ; https://blog.barrack.ai/nvidia-rubin-specs-architecture-2026/"
+  },
+  {
+   "key": "b200",
+   "ref": "NVIDIA B200: ~1000 W, 4.5 PF dense FP8 (project constants.js REFS)"
+  },
+  {
+   "key": "ironwood",
+   "ref": "Google Ironwood TPU: 4614 TFLOPS FP8 per chip, ~2x perf/W over Trillium: https://blog.google/products/google-cloud/ironwood-tpu-age-of-inference/"
+  },
+  {
+   "key": "nvfp4_2025",
+   "ref": "NVIDIA, 'Pretraining Large Language Models with NVFP4' (12B model, 10T tokens, matches FP8 loss/accuracy, ~16 % of layers kept in BF16): https://arxiv.org/abs/2509.25149"
+  },
+  {
+   "key": "bitnet2024",
+   "ref": "Ma et al., 'The Era of 1-bit LLMs' (BitNet b1.58; 71.4x lower matmul arithmetic energy at 7 nm vs FP16, an estimate): https://arxiv.org/abs/2402.17764"
+  },
+  {
+   "key": "kumar2024",
+   "ref": "Kumar et al., 'Scaling Laws for Precision', ICLR 2025 (post-training quantisation degrades more with more data; compute-optimal training precision ~7-8 bits per secondary summary): https://arxiv.org/abs/2411.04330"
+  },
+  {
+   "key": "ibm_hermes",
+   "ref": "Le Gallo et al., Nature Electronics 2023, 64-core PCM in-memory chip, 14 nm: 63.1 TOPS at 9.76 TOPS/W (8-bit MVM, low-precision read) or 16.1 TOPS at 2.48 TOPS/W: https://arxiv.org/abs/2212.02872 ; https://www.hpcwire.com/off-the-wire/ibm-develops-a-new-64-core-mixed-signal-in-memory-computing-chip/"
+  },
+  {
+   "key": "encharge",
+   "ref": "EnCharge AI EN100 (16 nm analog in-memory): vendor 40 TOPS/W 8-bit NPU cores; 200+ TOPS at ~8.25 W card: https://www.eejournal.com/article/encharge-me-up-200-ai-tops-at-only-8-watts/ ; https://en100.enchargeai.com/llms.txt"
+  },
+  {
+   "key": "murmann2021",
+   "ref": "Murmann, 'Mixed-Signal Computing for Deep Neural Network Inference', IEEE TVLSI 2021 (single-digit fJ/op feasible for 4-bit mixed-signal arithmetic; DNN processors memory-access limited): https://par.nsf.gov/servlets/purl/10295527"
+  },
+  {
+   "key": "lightmatter2025",
+   "ref": "Ahmed et al. (Lightmatter), 'Universal photonic artificial intelligence acceleration', Nature 640, 368 (2025): 65.5 TOPS (16-bit ABFP) at 78 W electrical + 1.6 W optical, six chips, 4x 128x128 photonic tensor cores: https://www.nature.com/articles/s41586-025-08854-x ; https://www.hackster.io/news/the-bright-side-of-ai-ad44886a24cd"
+  },
+  {
+   "key": "mcmahon2022",
+   "ref": "Wang et al. (McMahon group), 'An optical neural network using less than 1 photon per multiplication', Nat. Commun. 2022 (0.66 photons = 2.5e-19 J optical per MAC at ~90 % MNIST): https://arxiv.org/abs/2104.13467"
+  },
+  {
+   "key": "frank2017",
+   "ref": "M. P. Frank, 'The Future of Computing Depends on Making It Reversible', IEEE Spectrum 2017 / arXiv:1803.02789: https://spectrum.ieee.org/the-future-of-computing-depends-on-making-it-reversible"
+  },
+  {
+   "key": "s2lal2020",
+   "ref": "Frank et al., 'Reversible Computing with Fast, Fully Static, Fully Adiabatic CMOS' (S2LAL, 8-tick clock; dissipation limited only by leakage): https://www.sandia.gov/ccr/publications/details/reversible-computing-with-fast-fully-static-fully-adiabatic-cmos-2020-12-01"
+  },
+  {
+   "key": "spectrum2025",
+   "ref": "IEEE Spectrum, 'Reversible Computing Escapes the Lab in 2025' (up to 4000x claimed by Frank/Sandia, 10-15 yr out; MEMS resonator 99.97 %): https://spectrum.ieee.org/reversible-computing"
+  },
+  {
+   "key": "iceriver",
+   "ref": "Vaire Ice River (22 nm): ~30 % less energy than conventional (Science News) and 1.77x energy-recovery factor at 500 MHz (EE Times Japan 2025-10-31): https://www.sciencenews.org/article/computer-chip-reuses-energy ; https://eetimes.itmedia.co.jp/ee/spv/2510/31/news001_2.html"
+  },
+  {
+   "key": "tolpygo2016",
+   "ref": "Tolpygo, 'Superconductor Digital Electronics: Scalability and Energy Efficiency Issues' (RSFQ <Esw> 2.5e-19 J/JJ; 32-bit FP ~2000 SBOPs ~5e-15 J at 4.2 K; cryocooler 1/eps 352-3520; RSFQ FP adder/multiplier 4.9-5.8 mW for 2.2-2.4 GFLOPS): https://arxiv.org/abs/1602.03546"
+  },
+  {
+   "key": "mana2020",
+   "ref": "Ayala et al., MANA AQFP 4-bit microprocessor, IEEE JSSC 2021: 1.4 zJ per JJ at 5 GHz 4-phase AC clock, 4.2 K, >20,000 JJ: https://www.eenewseurope.com/en/researchers-develop-4bit-processor-using-superconducting-junctions/"
+  },
+  {
+   "key": "aqfp_adder2019",
+   "ref": "Takeuchi et al., 'An adiabatic superconductor 8-bit adder with 24 kBT energy dissipation per junction', APL 114, 042602 (2019), ~1.5 aJ per add at 1 GHz: https://doi.org/10.1063/1.5080753"
+  },
+  {
+   "key": "rqfp2017",
+   "ref": "Takeuchi, Yamanashi, Yoshikawa, reversible QFP gate, Sci. Rep. 2017 (simulated dissipation below kT ln2 at reduced frequency): https://doaj.org/article/35a3eb152cd640e3a0da43c9e26aaf82"
+  },
+  {
+   "key": "imec_scd",
+   "ref": "imec, superconducting digital technology for AI (100-board stack ~20 EFLOPS BF16, ~1 kW cold ~ 500 kW wall; 2e-20 J per JJ switch; projected): https://www.imec-int.com/en/articles/superconducting-digital-technology-revolutionize-ai-and-machine-learning-roadmap"
+  },
+  {
+   "key": "lhc_cryo",
+   "ref": "CERN CAS 2021 cryogenics lecture: LHC 18 kW @ 4.5 K plants at 220-230 W_el/W (~30 % Carnot), 4 MW each: https://cas.web.cern.ch/sites/cas.web.cern.ch/files/lectures/Indico-04%20May%202021/CAS_2021_Introduction_to_Cryogenics_TKoettig.pdf"
+  },
+  {
+   "key": "nist2020",
+   "ref": "NIST/Radebaugh 2020 review of refrigeration methods (4 K: <1 % Carnot for <2 W to ~35 % for very large plants): https://trc.nist.gov/cryogenics/Papers/Review/2020-Review_of_Refrigeration_Methods.pdf"
+  },
+  {
+   "key": "nist2012",
+   "ref": "Radebaugh, 'Cryocoolers for aircraft superconducting generators and motors' (NIST 2012): specific-mass goal 3 kg/kW input; current high-efficiency coolers 10-30 kg/kW; 20 kW Stirling at 41 % Carnot but 49 kg/kW: https://trc.nist.gov/cryogenics/Papers/Review/2012-Cryocoolers_for_Aircraft_Superconducting_Generators_and_Motors.pdf"
+  },
+  {
+   "key": "pico_cooler",
+   "ref": "PICO probe study: NGAS 4.5 K JT cooler, 100 mW lift for 250 W input (projection): https://arxiv.org/abs/1902.10541"
+  },
+  {
+   "key": "cryo_cmos",
+   "ref": "Beckers et al., cryogenic characterisation of 28 nm bulk CMOS (SS 11 mV/dec long-channel, 28 mV/dec short-channel at 4.2 K; band-tail saturation): https://arxiv.org/abs/1806.01142"
+  },
+  {
+   "key": "berut2012",
+   "ref": "Berut et al., 'Experimental verification of Landauer's principle', Nature 483, 187 (2012): https://pubmed.ncbi.nlm.nih.gov/22398556/"
+  },
+  {
+   "key": "landauer1961",
+   "ref": "Landauer 1961, kT ln2 per erased bit (overview): https://en.wikipedia.org/wiki/Landauer%27s_principle"
+  },
+  {
+   "key": "ncfet_review",
+   "ref": "Critical review of NC-FET progress (hysteresis, frequency, reliability unproven): https://arxiv.org/abs/1903.03884 ; steep slope tied to hysteresis: https://arxiv.org/abs/1809.02053"
+  },
+  {
+   "key": "tfet_review",
+   "ref": "Review of tunnel FETs (no thermal SS limit; low Ion and ambipolarity unsolved): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12388682/"
+  },
+  {
+   "key": "miller2017",
+   "ref": "D. A. B. Miller, 'Attojoule optoelectronics for low-energy information processing and communications', JLT 2017 (2 pF/cm, ~10 fJ/bit target): https://arxiv.org/abs/1609.05510"
+  },
+  {
+   "key": "mercury_he",
+   "ref": "Hener et al., JGR 2025, Mercury helium exosphere source ~2.5e23 He/s from solar-wind implantation (He released from regolith at ~400 K): https://wurz.space.unibe.ch/Hener_JGR_2025.pdf"
+  }
+ ],
+ "files": [
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/adiabatic.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/adiabatic.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/build_result.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/cmos.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/cmos.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/comm.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/comm.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/floors.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/floors.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/sc.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/sc.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/swarm_node.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/swarm_node.mjs",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/result.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/dl (downloaded PDFs/text: IRDS 2024 MM, NIST cryocooler reviews, Tolpygo 2016; Table MM-9/MM-11 crops)"
+ ]
+}

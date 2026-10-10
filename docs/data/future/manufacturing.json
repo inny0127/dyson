@@ -1,0 +1,2686 @@
+{
+ "domain": "Making chips and film from Mercury and refreshing the fleet, 2045-2300+: fab throughput, H/C/N/F/Cl-free process chemistry, free vacuum and cold, energy per kg, design for manufacture, and generational refresh",
+ "summary": "MANUFACTURING AND REFRESH. (1) Fab throughput, not Mercury mass, is the first wall. At the heat-wall export (3.94e19 kg/yr) the swarm needs 9.9e17-3.9e18 m2/yr of leading-edge-equivalent die = 1.6e19-6.2e19 300 mm wafers/yr: 8.7e10-3.4e11x today's entire output (1.8e8/yr; the prompt's \"30 M\" is per month in 200 mm-eq) and 1.3e12-5.2e12x the <=7 nm output. A 2026 fab holds ~250 kg of tools per m2/yr of die (110-500, two derivations); at that productivity the fab stock would be 6-25 yr of export and the doubling time x5-18. Keeping T_d <= 1.25 yr needs <=3.6-14 kg per m2/yr of leading-edge-equivalent die (17-69x better). Only an area-parallel process at near-leading-edge density gets there: panel imprint + inorganic self-assembly (9-15 nm, speculative; T_d x1.16 in 2040, x1.23-1.26 later with right-sized NVM). Roll-to-roll imprint is cheap per m2 but its 50-100 nm devices need ~50x the area and ~30x the J/op; a space-native EUV/FEL wafer fab (8-12 nm) costs T_d x1.7-3.8; high-NA EUV buys resolution, not throughput. Adiabatic film logic is unmanufacturable (die = 21-86 % of film area). (2) Chemistry: H is the only hard wall (~5e13 kg; wet processing would use 1.25e22 kg/yr, organic resist >=5.8e14). C (1.1e18 kg/yr), Cl (1.1e17) and S come up with the rock. Use MOE/metallothermic Si, a Cl + Zn/Mg SiCl4 loop for 9N Si, Cl2 etch, O2, PVD oxides and resistless/inorganic patterning; no water, organics, N or F. (3) Free vacuum cuts fab electricity ~60 %. (4) Energy: 1,150 MJ/kg (2026, space fab; 2,710 at terrestrial intensity), 1,030-1,250 MJ/kg in 2040-2100+ with NVM right-sized (up to 5,180 with 32 GB chiplets): 4-20x the model's 255, chips 80-95 % of it, yet only 3-5 % of swarm power. Factories must leave Mercury by model year ~37. (5) Older nodes lose twice (10x J/op and 10x area); the film beats HBM pods on capital only below ~110-190 kg per m2/yr (270-320 with NVM right-sized). Node target: Earth imports (seed), imprint+DSA or space leading edge (growth), leading edge after the wall. (6) Refresh by sail: re-skin on reused frames, recycle in orbit (rho ~0.94; 13-25 MJ/kg to recover feedstock). B_ss = D L/(1-rho): 10-yr lives without recycling cap the swarm at 0.57 % (1 % never reached); rho 0.94 gives 9.5-25 % (90 % of it by ~2466); 10 % needs rho >= 0.945 (2026 mix) or 0.854 (2100+ mix). Replacement share: 0.1 % pre-wall, ~50 % by 2106, 86 % by 2150, 98 % by 2300.",
+ "fab_throughput": [
+  {
+   "era": "y2026",
+   "chip_W_added_per_yr_at_heat_wall": 2.88e+22,
+   "film_m2_per_yr": 1.19e+20,
+   "die_mm2_per_W_film": {
+    "logic": 40.0,
+    "memory": 0.0,
+    "memory_layers": 0,
+    "leading_edge_equivalent": 40.0
+   },
+   "die_fraction_of_film_area": 0.00819,
+   "patterned_die_m2_per_yr": {
+    "raw": 1e+18,
+    "leading_edge_equivalent": 9.92e+17
+   },
+   "wafers_300mm_per_yr": {
+    "leading_edge_equivalent": 1.56e+19,
+    "from_studies_1_2_wafer_counts": 1.6e+19
+   },
+   "x_world_output_2025": {
+    "all_nodes": 87000000000.0,
+    "leading_edge": 1320000000000.0
+   },
+   "die_area_vs_mercury_surface": 13400.0,
+   "chiplet_placements_per_s": 5160000000000000.0,
+   "die_m2_per_kg_delivered": 0.0251,
+   "tool_intensity_required_kg_per_m2yr": {
+    "Td_x1.25": 14.3,
+    "Td_x2": 57.4
+   },
+   "improvement_needed_vs_2026_leading_edge_fab": 17.4,
+   "doubling_time_multiplier_by_fab_model": {
+    "euv_terrestrial": 5.36,
+    "high_na_euv": 5.36,
+    "space_wafer_fab": 1.7,
+    "duv_mp": 7.05,
+    "mature_28": 7.02,
+    "wafer_nil": 4.14,
+    "panel_nil_dsa": 1.16,
+    "r2r_nil": 1.32,
+    "nanofactory": 1.0
+   },
+   "heat_wall_year_by_fab_model": {
+    "euv_terrestrial": 258.0,
+    "high_na_euv": 258.0,
+    "space_wafer_fab": 78.8,
+    "duv_mp": 342.0,
+    "mature_28": 341.0,
+    "wafer_nil": 198.0,
+    "panel_nil_dsa": 53.0,
+    "r2r_nil": 61.0,
+    "nanofactory": 45.7
+   },
+   "doubling_time_note": "T_d multiplier at each class's own area per function (28 nm x10, DUV x2.5, imprint+DSA x3, R2R x50); high-NA and wafer NIL at leading-edge area",
+   "feature_at_scale": {
+    "growth_Td_le_1.25x": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    },
+    "growth_Td_le_2x": {
+     "tech": "space_wafer_fab",
+     "half_pitch_nm": [
+      8,
+      12
+     ],
+     "I_mid": 40,
+     "I_x_area": 40,
+     "evidence": "speculation"
+    },
+    "refresh_tool_stock_le_10pct_of_fleet": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    }
+   },
+   "evidence_class": "model (studies 1-5 chip areas x project heat-wall rate) + demonstrated (world output, tool data) + speculation (future fab classes)",
+   "source": "semi_wff_2025;semi_300mm_2025;study1_logic;study2_memory;study4_hot;project_model",
+   "euv_scanners_needed_2026_style": 230000000000000.0,
+   "euv_scanner_fleet_mass_kg": 4.36e+19
+  },
+  {
+   "era": "y2040",
+   "chip_W_added_per_yr_at_heat_wall": 3.65e+22,
+   "film_m2_per_yr": 1.15e+20,
+   "die_mm2_per_W_film": {
+    "logic": 20.0,
+    "memory": 26.7,
+    "memory_layers": 8,
+    "leading_edge_equivalent": 30.7
+   },
+   "die_fraction_of_film_area": 0.0129,
+   "patterned_die_m2_per_yr": {
+    "raw": 1.52e+18,
+    "leading_edge_equivalent": 9.95e+17
+   },
+   "wafers_300mm_per_yr": {
+    "leading_edge_equivalent": 1.56e+19,
+    "from_studies_1_2_wafer_counts": 2.38e+19
+   },
+   "x_world_output_2025": {
+    "all_nodes": 87300000000.0,
+    "leading_edge": 1330000000000.0
+   },
+   "die_area_vs_mercury_surface": 20300.0,
+   "chiplet_placements_per_s": 6730000000000000.0,
+   "die_m2_per_kg_delivered": 0.0252,
+   "tool_intensity_required_kg_per_m2yr": {
+    "Td_x1.25": 14.3,
+    "Td_x2": 57.2
+   },
+   "improvement_needed_vs_2026_leading_edge_fab": 17.5,
+   "doubling_time_multiplier_by_fab_model": {
+    "euv_terrestrial": 5.37,
+    "high_na_euv": 5.37,
+    "space_wafer_fab": 1.7,
+    "duv_mp": 7.05,
+    "mature_28": 7.02,
+    "wafer_nil": 4.15,
+    "panel_nil_dsa": 1.16,
+    "r2r_nil": 1.32,
+    "nanofactory": 1.0
+   },
+   "heat_wall_year_by_fab_model": {
+    "euv_terrestrial": 258.0,
+    "high_na_euv": 258.0,
+    "space_wafer_fab": 79.0,
+    "duv_mp": 342.0,
+    "mature_28": 341.0,
+    "wafer_nil": 198.0,
+    "panel_nil_dsa": 53.0,
+    "r2r_nil": 60.9,
+    "nanofactory": 45.7
+   },
+   "doubling_time_note": "T_d multiplier at each class's own area per function (28 nm x10, DUV x2.5, imprint+DSA x3, R2R x50); high-NA and wafer NIL at leading-edge area",
+   "feature_at_scale": {
+    "growth_Td_le_1.25x": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    },
+    "growth_Td_le_2x": {
+     "tech": "space_wafer_fab",
+     "half_pitch_nm": [
+      8,
+      12
+     ],
+     "I_mid": 40,
+     "I_x_area": 40,
+     "evidence": "speculation"
+    },
+    "refresh_tool_stock_le_10pct_of_fleet": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    }
+   },
+   "evidence_class": "model (studies 1-5 chip areas x project heat-wall rate) + demonstrated (world output, tool data) + speculation (future fab classes)",
+   "source": "semi_wff_2025;semi_300mm_2025;study1_logic;study2_memory;study4_hot;project_model"
+  },
+  {
+   "era": "y2070",
+   "chip_W_added_per_yr_at_heat_wall": 6.66e+22,
+   "film_m2_per_yr": 2e+20,
+   "die_mm2_per_W_film": {
+    "logic": 20.0,
+    "memory": 40.0,
+    "memory_layers": 64,
+    "leading_edge_equivalent": 40.0
+   },
+   "die_fraction_of_film_area": 0.0194,
+   "patterned_die_m2_per_yr": {
+    "raw": 3.9e+18,
+    "leading_edge_equivalent": 2.6e+18
+   },
+   "wafers_300mm_per_yr": {
+    "leading_edge_equivalent": 4.09e+19,
+    "from_studies_1_2_wafer_counts": 6.13e+19
+   },
+   "x_world_output_2025": {
+    "all_nodes": 228000000000.0,
+    "leading_edge": 3470000000000.0
+   },
+   "die_area_vs_mercury_surface": 52200.0,
+   "chiplet_placements_per_s": 1.37e+16,
+   "die_m2_per_kg_delivered": 0.0659,
+   "tool_intensity_required_kg_per_m2yr": {
+    "Td_x1.25": 5.47,
+    "Td_x2": 21.9
+   },
+   "improvement_needed_vs_2026_leading_edge_fab": 45.7,
+   "doubling_time_multiplier_by_fab_model": {
+    "euv_terrestrial": 12.4,
+    "high_na_euv": 12.4,
+    "space_wafer_fab": 2.83,
+    "duv_mp": 17.0,
+    "mature_28": 16.9,
+    "wafer_nil": 9.23,
+    "panel_nil_dsa": 1.41,
+    "r2r_nil": 1.85,
+    "nanofactory": 1.0
+   },
+   "heat_wall_year_by_fab_model": {
+    "euv_terrestrial": 613.0,
+    "high_na_euv": 613.0,
+    "space_wafer_fab": 133.0,
+    "duv_mp": 844.0,
+    "mature_28": 844.0,
+    "wafer_nil": 451.0,
+    "panel_nil_dsa": 65.1,
+    "r2r_nil": 86.4,
+    "nanofactory": 45.7
+   },
+   "doubling_time_note": "T_d multiplier at each class's own area per function (28 nm x10, DUV x2.5, imprint+DSA x3, R2R x50); high-NA and wafer NIL at leading-edge area",
+   "feature_at_scale": {
+    "growth_Td_le_1.25x": null,
+    "growth_Td_le_2x": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    },
+    "refresh_tool_stock_le_10pct_of_fleet": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    }
+   },
+   "evidence_class": "model (studies 1-5 chip areas x project heat-wall rate) + demonstrated (world output, tool data) + speculation (future fab classes)",
+   "source": "semi_wff_2025;semi_300mm_2025;study1_logic;study2_memory;study4_hot;project_model",
+   "adiabatic_logic_variant": {
+    "die_fraction_of_film_area": 0.21,
+    "patterned_die_m2_per_yr_LEA": 4.09e+19,
+    "wafers_300mm_per_yr": 6.43e+20,
+    "x_world_all_nodes": 3590000000000.0,
+    "tool_intensity_required_Td_x1.25": 0.348,
+    "feature_at_scale": {
+     "era": "y2070",
+     "adiabatic_logic": true,
+     "Td_le_1.25x": null,
+     "Td_le_2x": null,
+     "refresh_tool_stock_le_10pct_fleet_L10": null
+    }
+   }
+  },
+  {
+   "era": "y2100plus",
+   "chip_W_added_per_yr_at_heat_wall": 7.6e+22,
+   "film_m2_per_yr": 1.83e+20,
+   "die_mm2_per_W_film": {
+    "logic": 20.0,
+    "memory": 53.3,
+    "memory_layers": 256,
+    "leading_edge_equivalent": 52.0
+   },
+   "die_fraction_of_film_area": 0.0301,
+   "patterned_die_m2_per_yr": {
+    "raw": 5.52e+18,
+    "leading_edge_equivalent": 3.91e+18
+   },
+   "wafers_300mm_per_yr": {
+    "leading_edge_equivalent": 6.15e+19,
+    "from_studies_1_2_wafer_counts": 8.67e+19
+   },
+   "x_world_output_2025": {
+    "all_nodes": 343000000000.0,
+    "leading_edge": 5220000000000.0
+   },
+   "die_area_vs_mercury_surface": 73800.0,
+   "chiplet_placements_per_s": 1.59e+16,
+   "die_m2_per_kg_delivered": 0.0992,
+   "tool_intensity_required_kg_per_m2yr": {
+    "Td_x1.25": 3.64,
+    "Td_x2": 14.5
+   },
+   "improvement_needed_vs_2026_leading_edge_fab": 68.8,
+   "doubling_time_multiplier_by_fab_model": {
+    "euv_terrestrial": 18.2,
+    "high_na_euv": 18.2,
+    "space_wafer_fab": 3.75,
+    "duv_mp": 25.1,
+    "mature_28": 25.0,
+    "wafer_nil": 13.4,
+    "panel_nil_dsa": 1.62,
+    "r2r_nil": 2.29,
+    "nanofactory": 1.0
+   },
+   "heat_wall_year_by_fab_model": {
+    "euv_terrestrial": 907.0,
+    "high_na_euv": 907.0,
+    "space_wafer_fab": 179.0,
+    "duv_mp": 1260.0,
+    "mature_28": 1260.0,
+    "wafer_nil": 661.0,
+    "panel_nil_dsa": 75.1,
+    "r2r_nil": 107.0,
+    "nanofactory": 45.7
+   },
+   "doubling_time_note": "T_d multiplier at each class's own area per function (28 nm x10, DUV x2.5, imprint+DSA x3, R2R x50); high-NA and wafer NIL at leading-edge area",
+   "feature_at_scale": {
+    "growth_Td_le_1.25x": null,
+    "growth_Td_le_2x": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    },
+    "refresh_tool_stock_le_10pct_of_fleet": {
+     "tech": "panel_nil_dsa",
+     "half_pitch_nm": [
+      9,
+      15
+     ],
+     "I_mid": 3,
+     "I_x_area": 9,
+     "evidence": "speculation"
+    }
+   },
+   "evidence_class": "model (studies 1-5 chip areas x project heat-wall rate) + demonstrated (world output, tool data) + speculation (future fab classes)",
+   "source": "semi_wff_2025;semi_300mm_2025;study1_logic;study2_memory;study4_hot;project_model",
+   "adiabatic_logic_variant": {
+    "die_fraction_of_film_area": 0.862,
+    "patterned_die_m2_per_yr_LEA": 1.57e+20,
+    "wafers_300mm_per_yr": 2.46e+21,
+    "x_world_all_nodes": 13700000000000.0,
+    "tool_intensity_required_Td_x1.25": 0.0909,
+    "feature_at_scale": {
+     "era": "y2100plus",
+     "adiabatic_logic": true,
+     "Td_le_1.25x": null,
+     "Td_le_2x": null,
+     "refresh_tool_stock_le_10pct_fleet_L10": null
+    }
+   }
+  }
+ ],
+ "patterning_technologies": [
+  {
+   "key": "euv_terrestrial",
+   "name": "EUV wafer fab, terrestrial 2026 (N3/N2)",
+   "half_pitch_nm": [
+    10,
+    12
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    110.0,
+    250.0,
+    500.0
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": [
+    1.65,
+    1.74,
+    1.83
+   ],
+   "hydrogen_free_compatible": false,
+   "notes": "~25 EUV + ~40 DUV layers, ~1,000+ steps; LPP source needs flowing H2 and Sn; wet cleans, UPW, organic resist, F/N chemistry.",
+   "evidence_class": "demonstrated",
+   "source": "asml_3800e;euv_mass;euv_layers;euv_h2"
+  },
+  {
+   "key": "high_na_euv",
+   "name": "High-NA EUV wafer fab (EXE:5200B class, 0.55 NA)",
+   "half_pitch_nm": [
+    8,
+    10
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    110.0,
+    250.0,
+    500.0
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": [
+    1.73,
+    2.31,
+    2.88
+   ],
+   "hydrogen_free_compatible": false,
+   "notes": "8 nm resolution, 175 wph at 50 mJ/cm2, ~1.4 MW per tool; replaces EUV double patterning, so fab-level intensity stays ~leading-edge. Buys resolution, not area throughput.",
+   "evidence_class": "demonstrated (tool) / estimate (mass)",
+   "source": "highna;highna_power"
+  },
+  {
+   "key": "space_wafer_fab",
+   "name": "Space-native wafer fab: dry vacuum processing, shared FEL-EUV, 450 mm / panels, no building/HVAC/UPW",
+   "half_pitch_nm": [
+    8,
+    12
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    15,
+    40,
+    120
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": null,
+   "hydrogen_free_compatible": true,
+   "notes": "Removes building, cleanroom air, UPW, abatement and most pumps (~half of terrestrial facility mass and 50-65 % of energy); stages and optics still heavy.",
+   "evidence_class": "speculation",
+   "source": "kek_fel;wsf;semiconductorx_power"
+  },
+  {
+   "key": "duv_mp",
+   "name": "DUV-immersion multipatterning fab (N7-class, no EUV)",
+   "half_pitch_nm": [
+    18,
+    20
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    90,
+    140,
+    250
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": null,
+   "hydrogen_free_compatible": false,
+   "notes": "SAQP needs more deposition/etch steps; N7 wafer ~half the N3 price per area, 2.5-3x the area per function.",
+   "evidence_class": "demonstrated (scaled by wafer price, estimate)",
+   "source": "tsmc_nodes"
+  },
+  {
+   "key": "mature_28",
+   "name": "Mature-node fab (28 nm class, single-patterned ArF)",
+   "half_pitch_nm": [
+    45,
+    50
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    20,
+    35,
+    70
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": null,
+   "hydrogen_free_compatible": false,
+   "notes": "~30-35 masks; wafer ~1/7 of N3 per area; 6x SRAM area and ~10-19x logic area per function vs N3.",
+   "evidence_class": "demonstrated (scaled by wafer price, estimate)",
+   "source": "masks_by_node;sram_cells"
+  },
+  {
+   "key": "wafer_nil",
+   "name": "Wafer nanoimprint (Canon FPA-1200NZ2C class)",
+   "half_pitch_nm": [
+    10,
+    14
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    60,
+    180,
+    400
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": null,
+   "hydrogen_free_compatible": false,
+   "notes": "Replaces the scanner, not the rest of the fab: wafer-level productivity per layer is similar to EUV; resist is organic.",
+   "evidence_class": "demonstrated (resolution) / speculation (fab-level intensity)",
+   "source": "canon_nil"
+  },
+  {
+   "key": "panel_nil_dsa",
+   "name": "Panel/plate imprint + directed self-assembly pitch division, dry vacuum line",
+   "half_pitch_nm": [
+    9,
+    15
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    0.5,
+    3,
+    10
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": null,
+   "hydrogen_free_compatible": true,
+   "notes": "Coarse imprinted guides (~90 nm pitch) multiplied 4-5x by self-assembly (18 nm pitch shown on a 193i guide); needs an inorganic (H-free) self-assembling system and self-aligned design rules for poor overlay.",
+   "evidence_class": "speculation",
+   "source": "imec_dsa;canon_nil"
+  },
+  {
+   "key": "r2r_nil",
+   "name": "Roll-to-roll nanoimprint web line",
+   "half_pitch_nm": [
+    50,
+    100
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    0.0833,
+    0.375,
+    1.33
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": [
+    0.00139,
+    0.00278,
+    0.00556
+   ],
+   "hydrogen_free_compatible": true,
+   "notes": "One 250 mm station patterns 3.6e+06 m2/yr; overlay is micrometre-class, so devices must be self-aligned.",
+   "evidence_class": "demonstrated (100 nm at 30 m/min, pilot) / speculation (full device flow)",
+   "source": "r2r_nil"
+  },
+  {
+   "key": "web_coater",
+   "name": "Vacuum web coater (unpatterned deposition step, TopMet class)",
+   "half_pitch_nm": null,
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": null,
+   "tool_intensity_per_layer_kg_per_m2yr": [
+    1.95e-05,
+    3.9e-05,
+    5.85e-05
+   ],
+   "hydrogen_free_compatible": true,
+   "notes": "2.6e+09 m2/yr per coater: deposition is never the bottleneck.",
+   "evidence_class": "demonstrated (width x speed) / estimate (tool mass)",
+   "source": "topmet"
+  },
+  {
+   "key": "multibeam",
+   "name": "Multi-beam e-beam direct write (IMS MBMW class)",
+   "half_pitch_nm": [
+    5,
+    10
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    38500.0,
+    57700.0,
+    96200.0
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": [
+    1920.0,
+    2880.0,
+    4810.0
+   ],
+   "hydrogen_free_compatible": true,
+   "notes": "10 m2/yr per tool: only for masters, templates and masks (one master seeds ~1e5-1e6 imprint copies).",
+   "evidence_class": "demonstrated",
+   "source": "ims_mbmw"
+  },
+  {
+   "key": "probe_apm",
+   "name": "Scanning-probe atomically precise patterning (H-depassivation lithography)",
+   "half_pitch_nm": [
+    0.3,
+    0.8
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    43000000000.0,
+    4300000000000.0,
+    430000000000000.0
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": [
+    4300000000000.0
+   ],
+   "hydrogen_free_compatible": false,
+   "notes": "2.3e-10 m2/yr per tip: 1e20+ x too slow; needs H as the resist.",
+   "evidence_class": "demonstrated (50 atoms/s)",
+   "source": "zyvex_hdl"
+  },
+  {
+   "key": "nanofactory",
+   "name": "Molecular manufacturing (convergent-assembly nanofactory)",
+   "half_pitch_nm": [
+    0.3,
+    1
+   ],
+   "tool_intensity_full_flow_kg_per_m2yr_low_mid_high": [
+    9.97e-06,
+    9.97e-05,
+    0.00997
+   ],
+   "tool_intensity_per_layer_kg_per_m2yr": null,
+   "hydrogen_free_compatible": false,
+   "notes": "Theoretical design (diamondoid, i.e. carbon-based): 10 kg unit, 1.3 kg/h, self-duplication in ~15 h. No demonstration.",
+   "evidence_class": "speculation",
+   "source": "phoenix2003"
+  }
+ ],
+ "world_output_2025": {
+  "all_nodes_300mm_eq_per_yr": 179200000.0,
+  "all_nodes_m2_per_yr": 12666901.579274047,
+  "le_7nm_and_below_wafers_per_yr": 11784000.0,
+  "le_m2_per_yr": 832961.8761727978,
+  "two_nm_and_below_wafers_per_yr_max": 2400000.0,
+  "note": "The prompt quoted ~30 M 300-mm wafers/yr in total. SEMI gives 33.6 M wafers PER MONTH (200 mm-equivalent) in 2025 = 1.79e+08 300-mm-equivalent wafers/yr; the leading edge (<=7 nm) is 1.18e+07 wafers/yr.",
+  "evidence_class": "demonstrated",
+  "source": "semi_wff_2025;semi_300mm_2025"
+ },
+ "tool_intensity_derivation_2026": {
+  "euv_m2_per_layer_yr_per_tool": 109055.23675741779,
+  "euv_kg_per_m2_layer_yr": [
+   1.65,
+   1.74,
+   1.83
+  ],
+  "methodA_tools_only_kg_per_m2yr": [
+   110.0,
+   174.0,
+   229.0
+  ],
+  "methodA_with_facility_kg_per_m2yr": [
+   143.0,
+   279.0,
+   458.0
+  ],
+  "methodB_fleet_average_kg_per_m2yr": [
+   23.7,
+   67.1,
+   132.0
+  ],
+  "methodB_leading_edge_kg_per_m2yr": [
+   71.1,
+   268.0,
+   789.0
+  ],
+  "adopted_leading_edge_kg_per_m2yr": {
+   "low": 110.0,
+   "mid": 250.0,
+   "high": 500.0
+  },
+  "installed_world_tool_mass_kg": [
+   300000000.0,
+   850000000.0,
+   1670000000.0
+  ],
+  "evidence_class": "demonstrated inputs (tool throughput, mass, WFE) + estimate (capex shares, $/kg)",
+  "source": "asml_3800e;euv_mass;euv_layers;semi_wfe_2025;semi_wff_2025"
+ },
+ "chemistry": [
+  {
+   "process": "Silicon reduction (SiO2 -> Si)",
+   "today": "Carbothermic arc furnace (coke, coal, graphite electrodes): ~0.86 kg C per kg Si; 12 kWh/kg",
+   "mercury": "(a) Molten-oxide electrolysis of the silicate melt with an inert anode: O2 at the anode, Fe then Si at the cathode, leaving an Fe-free Mg-Ca-Al-silicate melt that becomes cover glass and enamel. (b) Metallothermic: SiO2 + 2Mg -> Si + 2MgO, Mg regenerated electrolytically. (c) Carbothermic with crustal graphite and a closed CO -> C loop (Boudouard + solid-oxide CO2 electrolysis).",
+   "limits": "Thermodynamic floor 32.4 MJ/kg Si (dHf SiO2 -910.7 kJ/mol). MOE is lab-scale (1600 C, inert anodes of Ir/Cr-alloys are the open problem). Route (c) needs >=85 % C recycling to live on the carbon that the mines bring up.",
+   "evidence": "demonstrated (lab MOE, magnesiothermic) / speculation (closed C loop at scale)",
+   "source": "sirk2010_moe;ffc_si;project_mercury;iea_pvps_t12_2023"
+  },
+  {
+   "process": "Purification to 6N (PV absorber)",
+   "today": "Siemens trichlorosilane + H2 CVD (HCl, H2): 52-64 kWh/kg; or UMG with H2O-plasma B removal",
+   "mercury": "Vacuum metallurgy in free vacuum: directional solidification (metals, k<<1), electron-beam melting (P, Al, Ca evaporate), O2-plasma / CaO-SiO2 slag for boron (no H2O), and simply choosing low-B feed (Mercury primitive-mantle B ~0.3 ppm).",
+   "limits": "B (k=0.8) and P (k=0.35) do not segregate; EB removes P 25 -> <0.1 ppmw in 1.2 h; B removal without H is the least proven step.",
+   "evidence": "demonstrated (terrestrial UMG/EB) / speculation (H-free boron removal)",
+   "source": "eb_refining;siemens_energy;iea_pvps_t12_2023"
+  },
+  {
+   "process": "Purification to 9N-11N (chip substrates)",
+   "today": "Siemens process (HCl, H2, SiHCl3) + Cz pulling in Ar; EG poly 92-124 kWh/kg",
+   "mercury": "Chloride route without H: Cl2 + MG-Si -> SiCl4; fractional distillation (BCl3 bp 12.5 C, PCl3 76 C vs SiCl4 57.6 C); reduce with Zn or Mg vapour (DuPont 1949 Zn process, Kroll-type MgCl2 loop); float-zone refine and grow crystals in free vacuum.",
+   "limits": "Cl inventory: 2.3e+16 kg in process at the 2026-basis heat wall (0.0022 of crust Cl); losses must stay <=1e-3 per pass (then 0.025 of the Cl that the mines bring up).",
+   "evidence": "demonstrated (historical Zn-SiCl4 hyper-pure Si; Kroll Mg-Cl loop for Ti)",
+   "source": "dupont_zn;mgcl2_electrolysis;evans2015_cl;fraunhofer_egpoly"
+  },
+  {
+   "process": "Thin c-Si absorber formation",
+   "today": "Cz ingot + diamond-wire sawing (water/glycol coolant, ~57 um kerf) to 130-160 um wafers",
+   "mercury": "Kerfless: high-rate e-beam evaporation of Si (1-18 um/min demonstrated) onto the glass cover or a release layer, then line-laser liquid-phase crystallisation; or horizontal ribbon growth from a melt in vacuum.",
+   "limits": "LPC cells reached ~13 %, far from the 20-22.5 % AM0 assumed; grain boundaries need passivation (H) or large grains.",
+   "evidence": "demonstrated (CSG LPC, e-beam rates) / speculation (20 % cells without H)",
+   "source": "eb_si_rate;iea_pvps_t12_2023"
+  },
+  {
+   "process": "Epitaxy and poly/amorphous Si deposition",
+   "today": "SiH4/SiH2Cl2 + H2 CVD, PECVD a-Si:H",
+   "mercury": "Molecular-beam / e-beam evaporation in free vacuum (orbital MBE shown by the Wake Shield Facility); SiCl4 + Zn CVD where conformality matters.",
+   "limits": "Line-of-sight deposition: poor step coverage; conformal layers need chloride CVD or reflow.",
+   "evidence": "demonstrated (MBE; WSF orbital MBE)",
+   "source": "wsf"
+  },
+  {
+   "process": "Dielectrics and passivation",
+   "today": "Wet/dry oxidation, Si3N4 (NH3+SiH4), SiNx:H and a-Si:H passivation, SiCOH low-k, ALD Al2O3 (TMA + H2O)",
+   "mercury": "Dry O2 oxidation (O2 is the reduction by-product: 9.5e+18 kg/yr at the heat wall); PVD Al2O3/MgO/ZrO2 with negative fixed charge for field-effect passivation; porous SiO2 or vacuum gaps for low-k; trace-H anneals with cryo-recapture.",
+   "limits": "a-Si:H layers would use 2.1e+13 kg H/yr (ice+regolith stock lasts 2.3 yr). A 1e13 cm-2 trace-H anneal uses 4e+10 kg/yr (2.1 of an even 250-yr share of the stock at 10x net loss). No nitrides (no N).",
+   "evidence": "demonstrated (dry oxide, PVD Al2O3) / speculation (H-free passivation reaching 20 % cells)",
+   "source": "lawrence2013_ice"
+  },
+  {
+   "process": "High-k / metal gate and memory oxides",
+   "today": "HfO2 by ALD (HfCl4/TEMAH + H2O), TiN/TaN (N), W fill (WF6)",
+   "mercury": "ZrO2 / Zr-rich ferroelectrics and Al2O3 by atomic-layer MBE (metal flux + O atoms) or chloride precursors + O3; NiSi/CoSi2 FUSI gates; Mo-free, W-free, N-free stacks.",
+   "limits": "Hf, W, Ru, Pt, In, Te are scarce (study 2); nitride barriers and work-function metals need redesign.",
+   "evidence": "roadmap (ZrO2 ferroelectrics, silicide gates) / speculation (H-free atomic-layer MBE at scale)",
+   "source": "study2_memory"
+  },
+  {
+   "process": "Lithography resist and development",
+   "today": "Chemically amplified organic resists, solvents (PGMEA), TMAH developer (C, H, N); EUV metal-oxide resists are organometallic",
+   "mercury": "Resistless or inorganic: imprint directly into softened glass / sol-free oxides; stencil (shadow-mask) deposition through Si membranes in UHV; self-developing inorganic resists (radiolytic metal oxides/halides, e.g. NaCl-type); direct-write e-beam/ion only for masters.",
+   "limits": "Organic resist would need 5.8e+14 kg H/yr even with 100 % deposition efficiency (ice+regolith lasts 0.083 yr; closure 0.9997 required); carbon is NOT the limit (0.0046 of the C the mines bring up).",
+   "evidence": "demonstrated (stencil lithography, NIL into inorganics at lab scale) / speculation (production)",
+   "source": "canon_nil;r2r_nil"
+  },
+  {
+   "process": "Etch",
+   "today": "Fluorocarbons, SF6, NF3 (F, C, N); Cl2/HBr (Br); BCl3",
+   "mercury": "Cl2 plasma and atomic-layer etch for Si and Al (Cl from regolith, recaptured by cryo-condensation of SiCl4/AlCl3/Cl2 on cold panels and electrolysis of chlorides); SiO2 removed by the UHV reaction SiO2 + Si -> 2 SiO(g) or avoided by additive patterning; O2+/Mg+ ion milling.",
+   "limits": "Cl2 etch circulates 2.6e+17 kg Cl/yr; 1 % loss = 0.024 of the Cl the mines bring up. No F-based oxide etch (F unmeasured).",
+   "evidence": "demonstrated (Cl2 RIE/ALE; oxide desorption in MBE) / speculation (F-free full flow)",
+   "source": "evans2015_cl"
+  },
+  {
+   "process": "Cleaning, rinsing, ultrapure water",
+   "today": "RCA/SPM/HF wet cleans; ~7 m3 water per 300 mm wafer (2-3 Mgal/day at 40k wpm)",
+   "mercury": "Dry cleans in vacuum: thermal flash, O-atom/UV oxidation, low-energy ion sputter, electrostatic particle control; no airborne particles in vacuum.",
+   "limits": "Wet processing would need 1.3e+22 kg H/yr: Mercury's ice+regolith lasts 3.9e-09 yr (closure 1-2e-11 impossible).",
+   "evidence": "physics floor (H budget) + demonstrated (UHV surface prep)",
+   "source": "upw_per_fab;lawrence2013_ice"
+  },
+  {
+   "process": "Planarisation (CMP)",
+   "today": "Silica/ceria slurries in water with organics",
+   "mercury": "Subtractive Al/Cl2 metal patterning (pre-1997 flow) with glass reflow and gas-cluster/ion-beam planarisation; fewer metal levels on 0.15 W film chiplets.",
+   "limits": "Limits wiring density to ~6-8 levels; pushes chiplets toward SRAM/NVM-friendly, wire-light designs.",
+   "evidence": "demonstrated (pre-CMP Al flows) / speculation",
+   "source": "project_mercury"
+  },
+  {
+   "process": "Interconnect metals",
+   "today": "Cu electroplating (aqueous), Ta/TaN barriers, W contacts, Co/Ru liners",
+   "mercury": "Evaporated/sputtered Al(Si) and Mg-Al, NiSi/CoSi2 contacts, Co lines at the finest pitches (Co from the core is abundant).",
+   "limits": "Mercury Cu ~2.4e18 kg in silicates vs 4.1e18 kg full-swarm demand; W impossible (project pass 1).",
+   "evidence": "demonstrated (Al BEOL)",
+   "source": "project_mercury"
+  },
+  {
+   "process": "Doping",
+   "today": "Implant from BF3, PH3, AsH3, B2H6; POCl3 diffusion",
+   "mercury": "Solid-source ion implantation (evaporated/sputtered P, B, Al), in-situ doping during e-beam epitaxy, Al-alloyed p+ contacts.",
+   "limits": "As/Sb scarce; B needs to be separated from feed (BCl3 distillation gives it as a by-product).",
+   "evidence": "demonstrated (solid-source implant/MBE doping)",
+   "source": "dupont_zn"
+  },
+  {
+   "process": "Packaging and die placement",
+   "today": "Organic substrates, epoxy underfill, Sn-Ag-Cu solder, elastomer stamps for mass transfer",
+   "mercury": "Oxide-oxide / Al-Al direct bonding onto the film, enamel overcoat (design spec), parallel electrostatic or laser-release transfer from glass carriers: 5.2e+15 placements/s at the 2026-basis heat wall.",
+   "limits": "Pick-and-place at ~10/s per head would need ~5e14 heads; only parallel transfer (~1e2-1e3 dies per cycle) or monolithic film logic scales.",
+   "evidence": "demonstrated (hybrid bonding, micro-LED mass transfer) / speculation (H-free transfer)",
+   "source": "design_spec"
+  },
+  {
+   "process": "Ambients, purge and vacuum",
+   "today": "N2, Ar, He, clean dry air, H2; turbo/dry pumps in a pressurised cleanroom",
+   "mercury": "Free vacuum (Mercury exosphere <=1e12 m-3, interplanetary better); reagents recovered by cryo-panels behind sunshades; O2 from refining.",
+   "limits": "Outgassing of the fab itself sets local pressure; Cl/S/O must be trapped, not vented, to stay inside the volatile budget.",
+   "evidence": "demonstrated (WSF wake vacuum, MBE)",
+   "source": "mercury_exo;wsf"
+  },
+  {
+   "process": "EUV light source",
+   "today": "Laser-produced Sn plasma, CO2 drive laser (C, N2, He), flowing H2 buffer for collector protection",
+   "mercury": "Electron-accelerator FEL (ERL) at 13.5 nm feeding many scanners: no Sn, no CO2 laser, no H2 buffer.",
+   "limits": "ERL-FEL is a design study (>10 kW, 800 MeV, ~10 mA).",
+   "evidence": "roadmap/speculation",
+   "source": "kek_fel;euv_h2"
+  }
+ ],
+ "volatiles_budget": {
+  "inventories_kg_low_mid_high": {
+   "H_polar_ice_as_H": [
+    2240000000000.0,
+    44800000000000.0,
+    157000000000000.0
+   ],
+   "H_regolith_implanted": [
+    359000000000.0,
+    3590000000000.0,
+    18000000000000.0
+   ],
+   "C": [
+    5.42e+18,
+    1.05e+20,
+    2.99e+20
+   ],
+   "Cl": [
+    1.19e+18,
+    1.05e+19,
+    1.27e+19
+   ],
+   "S": [
+    2.06e+19,
+    1.57e+20,
+    1.72e+20
+   ],
+   "Na": [
+    2.93e+19,
+    2.17e+20,
+    2.32e+20
+   ],
+   "K": [
+    2.6e+17,
+    9.65e+18,
+    1.87e+19
+   ],
+   "N": "not detected (plan 0)",
+   "F": "unmeasured (plan 0)"
+  },
+  "concentrations": {
+   "C_wt_pct": "1.4 (0.5-4); +1-3 wt% in low-reflectance material",
+   "Cl_wt_pct": "0.14 +/- 0.03 (2.9x higher north of 80N)",
+   "S_wt_pct": "1.9-2.3",
+   "Na_wt_pct": 2.9,
+   "K_ppm": "1288 (240-2500)",
+   "polar_ice_kg": "2e13-1.4e15 (1e14-1e15 in press)"
+  },
+  "mined_flow_at_heat_wall_kg_per_yr": {
+   "rock": 7.89e+19,
+   "C": 1.1e+18,
+   "Cl": 1.1e+17,
+   "S": 1.66e+18,
+   "Na": 2.29e+18
+  },
+  "H_stock_total_kg": [
+   2600000000000.0,
+   48400000000000.0,
+   175000000000000.0
+  ],
+  "H_allowed_rate_over_250yr_kg_per_yr": [
+   10400000000.0,
+   193000000000.0,
+   698000000000.0
+  ],
+  "how_far_they_stretch_2026_basis_heat_wall": {
+   "wet_processing_UPW": "H 1.3e+22 kg/yr (7.2 m3 water per wafer): ice+regolith H lasts 3.9e-09 yr -> impossible",
+   "organic_photoresist": "H 5.8e+14 kg/yr even at 100 % deposition efficiency (stock lasts 0.083 yr; 99.97 % closure needed); C only 0.0046 of mined C flow",
+   "a_Si_H_passivation": "H 2.1e+13 kg/yr: stock lasts 2.3 yr -> no",
+   "trace_H_anneal_1e13_cm2": "H 4e+10 kg/yr bound in product; affordable only with >=90 % recapture of the anneal gas (10x net loss = 2.1 of the 250-yr share)",
+   "chip_Si_chloride_loop": "Cl in process 2.3e+16 kg (0.0022 of crust Cl); 1e-3 loss/pass = 0.025 of mined Cl flow (2100+: 0.099)",
+   "pv_Si_chloride_loop": "would circulate 4.2e+19 kg Cl/yr; 1e-3 loss = 0.38 x mined Cl flow -> PV Si takes the Cl-free MOE/vacuum route",
+   "Cl2_etch": "2.6e+17 kg Cl/yr circulating; 1 % loss = 0.024 of mined Cl (2100+: 0.093)",
+   "carbothermic_PV_Si": "C circulating 7.1e+18 kg/yr; mined C covers it with >=85 % CO->C recycling",
+   "O2": "by-product 9.5e+18 kg/yr from absorber Si alone: oxidation and plasma O are free"
+  },
+  "verdict": "Hydrogen is the only hard wall: Mercury's ~5e13 kg (3e12-2e14) of H is 1e-9 yr of terrestrial wet processing and <0.1 yr of organic resist. Carbon is not scarce while mining the crust (1.1e18 kg/yr comes up with the rock at the heat wall), chlorine is a usable working fluid (1e19 kg in the crust, 1.1e17 kg/yr mined), sulfur and sodium are abundant, N and F must be designed out. So: dry, resistless/inorganic, chloride-and-oxygen process chemistry; H only as a recaptured trace; no water.",
+  "evidence_class": "demonstrated (MESSENGER abundances) + model (demands) + speculation (regolith H, depth of C)",
+  "source": "evans2015_cl;nittler2018;peplowski2016;lawrence2013_ice;lunar_h;upw_per_fab;project_mercury"
+ },
+ "free_vacuum_and_cold": {
+  "fab_electricity_kept_in_space_fraction_low_mid_high": [
+   0.294,
+   0.374,
+   0.522
+  ],
+  "terrestrial_breakdown_pct_mid": {
+   "process_tools_excl_euv_and_pumps": 32,
+   "euv_lpp": 11,
+   "vacuum_pumps_abatement": 12,
+   "cleanroom_hvac_chillers_cda": 33,
+   "upw": 7,
+   "facility_other": 5
+  },
+  "die_MJ_per_cm2": {
+   "terrestrial_3nm": [
+    5.03,
+    6.29,
+    9.43
+   ],
+   "space_native_2026_tech": [
+    1.48,
+    2.35,
+    4.93
+   ]
+  },
+  "saving_per_kg_chips_MJ": 225000.0,
+  "saving_per_kg_sail_2026_MJ": 1560.0,
+  "equipment_mass_saved_fraction": [
+   0.0769,
+   0.312,
+   0.475
+  ],
+  "radiator_kg_per_m2yr_of_die_at_320K": 0.697,
+  "notes": "Free vacuum removes cleanroom air handling, UPW, purge gases, most pumping and abatement: ~60 % (48-71 %) of fab electricity and 30-50 % of equipment mass plus the building. Free cold is weaker near Mercury (9 kW/m2 sunlight): radiators must be edge-on or shaded; cryo-panels at 40-80 K behind multilayer shades recapture Cl, SiCl4, O2 and S instead of venting. Film processing barely benefits (it is enthalpy-bound: reduction, evaporation, melting).",
+  "evidence_class": "demonstrated (terrestrial breakdowns) + speculation (space fractions)",
+  "source": "semiconductorx_power;semi_tools_share;siliconanalysts_energy;techinsights_euv;kek_fel;wsf;mercury_exo"
+ },
+ "energy_per_kg": [
+  {
+   "era": "y2026",
+   "sail_MJ_per_kg": {
+    "terrestrial_fab_intensity": [
+     2110.0,
+     2710.0,
+     4120.0
+    ],
+    "space_native_fab": [
+     703.0,
+     1150.0,
+     2340.0
+    ],
+    "space_fab_right_sized_memory_mid": 1150.0,
+    "web_panel_class_fab": [
+     129.0,
+     261.0,
+     589.0
+    ]
+   },
+   "split_mid_space_fab_MJ_per_kg": {
+    "film_and_structure": 177.0,
+    "chips": 932.0,
+    "launch": 45,
+    "chip_share": 0.808
+   },
+   "film_parts_MJ_per_m2_mid": {
+    "si_absorber": 10.8,
+    "cell_processing": 20,
+    "cover_glass": 0.302,
+    "mg_spreader": 1.63,
+    "enamel": 0.243,
+    "al_grid": 0.26,
+    "dielectrics": 2,
+    "structure_terminals": 1.32,
+    "chip_logic": 193.0,
+    "chip_memory": 0.0
+   },
+   "die_MJ_per_kg_of_die_space_fab": 135000.0,
+   "vs_model_255_MJ_per_kg": 4.52,
+   "processing_power_at_heat_wall_W": 1.44e+21,
+   "share_of_swarm_power": 0.0313,
+   "energy_payback_days": 12.3,
+   "orbital_radiator_area_m2": 1.09e+18,
+   "radiator_disc_equivalent_radius_m": 589000000.0,
+   "if_factories_stayed_on_mercury": {
+    "max_export_kg_per_yr": 1.36e+17,
+    "x_below_heat_wall": 289.0,
+    "must_leave_by_model_year": 37.5
+   },
+   "heat_left_on_mercury_MJ_per_kg": "2 (model) holds only if refining and fabs leave the surface by model year ~38",
+   "evidence_class": "physics floor (enthalpies) + demonstrated (fab kWh/wafer, PV cell kWh/m2, electrolysis kWh/kg) + speculation (space-fab fractions, later eras)",
+   "source": "siliconanalysts_energy;semiconductorx_power;techinsights_euv;iea_pvps_t12_2023;mgcl2_electrolysis;nist_thermo;project_mercury"
+  },
+  {
+   "era": "y2040",
+   "sail_MJ_per_kg": {
+    "terrestrial_fab_intensity": [
+     2650.0,
+     3400.0,
+     5160.0
+    ],
+    "space_native_fab": [
+     867.0,
+     1420.0,
+     2900.0
+    ],
+    "space_fab_right_sized_memory_mid": 1030.0,
+    "web_panel_class_fab": [
+     152.0,
+     331.0,
+     898.0
+    ]
+   },
+   "split_mid_space_fab_MJ_per_kg": {
+    "film_and_structure": 189.0,
+    "chips": 1180.0,
+    "launch": 45,
+    "chip_share": 0.835
+   },
+   "film_parts_MJ_per_m2_mid": {
+    "si_absorber": 7.22,
+    "cell_processing": 20,
+    "cover_glass": 0.336,
+    "mg_spreader": 1.25,
+    "enamel": 0.162,
+    "al_grid": 0.26,
+    "dielectrics": 2,
+    "structure_terminals": 1.36,
+    "chip_logic": 117.0,
+    "chip_memory": 86.7
+   },
+   "die_MJ_per_kg_of_die_space_fab": 90400.0,
+   "vs_model_255_MJ_per_kg": 5.57,
+   "processing_power_at_heat_wall_W": 1.77e+21,
+   "share_of_swarm_power": 0.0303,
+   "energy_payback_days": 10.5,
+   "orbital_radiator_area_m2": 1.39e+18,
+   "radiator_disc_equivalent_radius_m": 664000000.0,
+   "if_factories_stayed_on_mercury": {
+    "max_export_kg_per_yr": 1.11e+17,
+    "x_below_heat_wall": 356.0,
+    "must_leave_by_model_year": 37.2
+   },
+   "heat_left_on_mercury_MJ_per_kg": "2 (model) holds only if refining and fabs leave the surface by model year ~37",
+   "evidence_class": "physics floor (enthalpies) + demonstrated (fab kWh/wafer, PV cell kWh/m2, electrolysis kWh/kg) + speculation (space-fab fractions, later eras)",
+   "source": "siliconanalysts_energy;semiconductorx_power;techinsights_euv;iea_pvps_t12_2023;mgcl2_electrolysis;nist_thermo;project_mercury"
+  },
+  {
+   "era": "y2070",
+   "sail_MJ_per_kg": {
+    "terrestrial_fab_intensity": [
+     5060.0,
+     6420.0,
+     9690.0
+    ],
+    "space_native_fab": [
+     1580.0,
+     2560.0,
+     5280.0
+    ],
+    "space_fab_right_sized_memory_mid": 1170.0,
+    "web_panel_class_fab": [
+     206.0,
+     496.0,
+     1660.0
+    ]
+   },
+   "split_mid_space_fab_MJ_per_kg": {
+    "film_and_structure": 209.0,
+    "chips": 2310.0,
+    "launch": 45,
+    "chip_share": 0.901
+   },
+   "film_parts_MJ_per_m2_mid": {
+    "si_absorber": 7.22,
+    "cell_processing": 20,
+    "cover_glass": 0.239,
+    "mg_spreader": 1.25,
+    "enamel": 0.162,
+    "al_grid": 0.26,
+    "dielectrics": 2,
+    "structure_terminals": 1.2,
+    "chip_logic": 114.0,
+    "chip_memory": 244.0
+   },
+   "die_MJ_per_kg_of_die_space_fab": 106000.0,
+   "vs_model_255_MJ_per_kg": 10.0,
+   "processing_power_at_heat_wall_W": 3.2e+21,
+   "share_of_swarm_power": 0.03,
+   "energy_payback_days": 14.7,
+   "orbital_radiator_area_m2": 2.7e+18,
+   "radiator_disc_equivalent_radius_m": 927000000.0,
+   "if_factories_stayed_on_mercury": {
+    "max_export_kg_per_yr": 6.15e+16,
+    "x_below_heat_wall": 641.0,
+    "must_leave_by_model_year": 36.4
+   },
+   "heat_left_on_mercury_MJ_per_kg": "2 (model) holds only if refining and fabs leave the surface by model year ~36",
+   "evidence_class": "physics floor (enthalpies) + demonstrated (fab kWh/wafer, PV cell kWh/m2, electrolysis kWh/kg) + speculation (space-fab fractions, later eras)",
+   "source": "siliconanalysts_energy;semiconductorx_power;techinsights_euv;iea_pvps_t12_2023;mgcl2_electrolysis;nist_thermo;project_mercury",
+   "adiabatic_logic_MJ_per_kg": {
+    "space_fab": 24300.0,
+    "web_class": 1730.0
+   }
+  },
+  {
+   "era": "y2100plus",
+   "sail_MJ_per_kg": {
+    "terrestrial_fab_intensity": [
+     10700.0,
+     13400.0,
+     20200.0
+    ],
+    "space_native_fab": [
+     3230.0,
+     5180.0,
+     10800.0
+    ],
+    "space_fab_right_sized_memory_mid": 1250.0,
+    "web_panel_class_fab": [
+     312.0,
+     844.0,
+     3380.0
+    ]
+   },
+   "split_mid_space_fab_MJ_per_kg": {
+    "film_and_structure": 216.0,
+    "chips": 4920.0,
+    "launch": 45,
+    "chip_share": 0.95
+   },
+   "film_parts_MJ_per_m2_mid": {
+    "si_absorber": 7.22,
+    "cell_processing": 20,
+    "cover_glass": 0.198,
+    "mg_spreader": 1.25,
+    "enamel": 0.162,
+    "al_grid": 0.26,
+    "dielectrics": 2,
+    "structure_terminals": 1.12,
+    "chip_logic": 116.0,
+    "chip_memory": 618.0
+   },
+   "die_MJ_per_kg_of_die_space_fab": 140000.0,
+   "vs_model_255_MJ_per_kg": 20.3,
+   "processing_power_at_heat_wall_W": 6.48e+21,
+   "share_of_swarm_power": 0.0532,
+   "energy_payback_days": 28.8,
+   "orbital_radiator_area_m2": 5.75e+18,
+   "radiator_disc_equivalent_radius_m": 1350000000.0,
+   "if_factories_stayed_on_mercury": {
+    "max_export_kg_per_yr": 3.04e+16,
+    "x_below_heat_wall": 1300.0,
+    "must_leave_by_model_year": 35.4
+   },
+   "heat_left_on_mercury_MJ_per_kg": "2 (model) holds only if refining and fabs leave the surface by model year ~35",
+   "evidence_class": "physics floor (enthalpies) + demonstrated (fab kWh/wafer, PV cell kWh/m2, electrolysis kWh/kg) + speculation (space-fab fractions, later eras)",
+   "source": "siliconanalysts_energy;semiconductorx_power;techinsights_euv;iea_pvps_t12_2023;mgcl2_electrolysis;nist_thermo;project_mercury",
+   "adiabatic_logic_MJ_per_kg": {
+    "space_fab": 84100.0,
+    "web_class": 6430.0
+   }
+  }
+ ],
+ "node_target_by_era": [
+  {
+   "window": "2045-2060 (seed, built mass < ~1e8 kg)",
+   "tech_basis": "y2040",
+   "film_chiplets": "Imported from Earth: leading edge (N2/A14-class, ~10 nm half-pitch). Mercury makes the film, glass, Mg and coarse power/control electronics (45-100 nm class).",
+   "why": "Earth's entire 2025 leading-edge output (6.7e+05 m2/yr of good die) is 1.7e+10 W/yr of film chiplets = 1.6e+07 kg/yr of sails: it carries only the first ~4.5 doublings (6.1-6.8 if Earth triples-quintuples LE capacity by 2045). A 1e6 kg seed cannot hold even one 2026-style leading-edge fab (~3e7 kg of tools).",
+   "evidence_class": "demonstrated (Earth output) + model"
+  },
+  {
+   "window": "2060-2095 (exponential, capital-limited)",
+   "tech_basis": "y2040-y2070",
+   "film_chiplets": "Panel/plate imprint + inorganic directed self-assembly, self-aligned, ~9-15 nm half-pitch (J/op x2 vs leading edge) if it can be made to work; fallback: space-native leading-edge wafer fab (8-12 nm, J/op x1).",
+   "why": "Doubling-time multipliers (2040 devices): panel imprint+DSA x1.16, space-native leading edge x1.7, terrestrial-style leading edge x5.37, DUV multipatterning x7.05, 28 nm class x7.02. Older nodes lose twice: 10x the J/op AND 10x the area, so 7x slower growth. Compute at model year 60: panel 1.6e+37 FLOP/s vs space leading edge 3.9e+33.",
+   "evidence_class": "speculation (fab classes) + model"
+  },
+  {
+   "window": "2095-2200 (heat wall: Mercury mass-limited)",
+   "tech_basis": "y2070-y2100plus",
+   "film_chiplets": "Leading edge for every new and refreshed sail (~6-10 nm half-pitch, 2D-channel CFET-class); right-size NVM to the useful minimum (0.9-1.65 GB per chiplet).",
+   "why": "Mass now binds, so FLOP/s per kg = 1/(J/op x g/W) decides: the leading edge gives 2x the compute of imprint+DSA chips per kg of Mercury. Fab stock/fleet = I a / L: 0.397 (space leading edge, 2100+ planned memory) -> 0.165 with right-sized memory; pushing I below ~15 keeps fabs <10 % of the fleet. Refresh the 2060-2095 imprint-era sails first (they gain the most).",
+   "evidence_class": "model + speculation"
+  },
+  {
+   "window": "2200+ (refresh steady state)",
+   "tech_basis": "y2100plus",
+   "film_chiplets": "Physics-limited irreversible CMOS (~5-8 nm half-pitch; within ~2x of the ~7e-16 J/op practical floor). Adiabatic film logic only if a <=20 nm web/panel process reaches <=0.1-0.35 kg of tools per m2/yr.",
+   "why": "Adiabatic logic needs 0.862 of the film area as die (2100+) and 84100.0 MJ/kg with a space wafer fab; no demonstrated or plausible wafer-fab class meets the tool intensity it needs (0.0909).",
+   "evidence_class": "speculation"
+  }
+ ],
+ "node_class_numbers": [
+  {
+   "era": "y2026",
+   "class": "leading_edge_space",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 40,
+   "Td_multiplier": 1.7,
+   "Td_multiplier_range": [
+    1.26,
+    3.09
+   ],
+   "Td_multiplier_right_sized_memory": 1.7,
+   "heat_wall_model_year": 78.8,
+   "flops_per_s_per_kg": 9350000000000000.0,
+   "fab_stock_over_fleet_L10": 0.101,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2026",
+   "class": "leading_edge_terrestrial",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 250,
+   "Td_multiplier": 5.36,
+   "Td_multiplier_range": [
+    2.92,
+    9.72
+   ],
+   "Td_multiplier_right_sized_memory": 5.36,
+   "heat_wall_model_year": 258.0,
+   "flops_per_s_per_kg": 9350000000000000.0,
+   "fab_stock_over_fleet_L10": 0.629,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2026",
+   "class": "duv_mp",
+   "J_rel": 2.0,
+   "area_rel": 2.5,
+   "tool_intensity_mid": 140,
+   "Td_multiplier": 7.05,
+   "Td_multiplier_range": [
+    4.12,
+    13.9
+   ],
+   "Td_multiplier_right_sized_memory": 7.05,
+   "heat_wall_model_year": 342.0,
+   "flops_per_s_per_kg": 4670000000000000.0,
+   "fab_stock_over_fleet_L10": 0.873,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2026",
+   "class": "mature_28",
+   "J_rel": 10,
+   "area_rel": 10,
+   "tool_intensity_mid": 35,
+   "Td_multiplier": 7.02,
+   "Td_multiplier_range": [
+    3.07,
+    19.1
+   ],
+   "Td_multiplier_right_sized_memory": 7.02,
+   "heat_wall_model_year": 341.0,
+   "flops_per_s_per_kg": 935000000000000.0,
+   "fab_stock_over_fleet_L10": 0.869,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2026",
+   "class": "panel_nil_dsa",
+   "J_rel": 2.0,
+   "area_rel": 3,
+   "tool_intensity_mid": 3,
+   "Td_multiplier": 1.16,
+   "Td_multiplier_range": [
+    1.02,
+    1.86
+   ],
+   "Td_multiplier_right_sized_memory": 1.16,
+   "heat_wall_model_year": 53.0,
+   "flops_per_s_per_kg": 4670000000000000.0,
+   "fab_stock_over_fleet_L10": 0.0224,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2026",
+   "class": "r2r_nil",
+   "J_rel": 30,
+   "area_rel": 50,
+   "tool_intensity_mid": 0.375,
+   "Td_multiplier": 1.32,
+   "Td_multiplier_range": [
+    1.03,
+    4.43
+   ],
+   "Td_multiplier_right_sized_memory": 1.32,
+   "heat_wall_model_year": 61.0,
+   "flops_per_s_per_kg": 312000000000000.0,
+   "fab_stock_over_fleet_L10": 0.0465,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2040",
+   "class": "leading_edge_space",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 40,
+   "Td_multiplier": 1.7,
+   "Td_multiplier_range": [
+    1.26,
+    3.1
+   ],
+   "Td_multiplier_right_sized_memory": 1.52,
+   "heat_wall_model_year": 79.0,
+   "flops_per_s_per_kg": 9.26e+16,
+   "fab_stock_over_fleet_L10": 0.101,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2040",
+   "class": "leading_edge_terrestrial",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 250,
+   "Td_multiplier": 5.37,
+   "Td_multiplier_range": [
+    2.92,
+    9.74
+   ],
+   "Td_multiplier_right_sized_memory": 4.22,
+   "heat_wall_model_year": 258.0,
+   "flops_per_s_per_kg": 9.26e+16,
+   "fab_stock_over_fleet_L10": 0.631,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2040",
+   "class": "duv_mp",
+   "J_rel": 2.0,
+   "area_rel": 2.5,
+   "tool_intensity_mid": 140,
+   "Td_multiplier": 7.05,
+   "Td_multiplier_range": [
+    4.12,
+    14.0
+   ],
+   "Td_multiplier_right_sized_memory": 5.44,
+   "heat_wall_model_year": 342.0,
+   "flops_per_s_per_kg": 4.63e+16,
+   "fab_stock_over_fleet_L10": 0.873,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2040",
+   "class": "mature_28",
+   "J_rel": 10,
+   "area_rel": 10,
+   "tool_intensity_mid": 35,
+   "Td_multiplier": 7.02,
+   "Td_multiplier_range": [
+    3.07,
+    19.1
+   ],
+   "Td_multiplier_right_sized_memory": 5.41,
+   "heat_wall_model_year": 341.0,
+   "flops_per_s_per_kg": 9260000000000000.0,
+   "fab_stock_over_fleet_L10": 0.869,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2040",
+   "class": "panel_nil_dsa",
+   "J_rel": 2.0,
+   "area_rel": 3,
+   "tool_intensity_mid": 3,
+   "Td_multiplier": 1.16,
+   "Td_multiplier_range": [
+    1.02,
+    1.86
+   ],
+   "Td_multiplier_right_sized_memory": 1.11,
+   "heat_wall_model_year": 53.0,
+   "flops_per_s_per_kg": 4.63e+16,
+   "fab_stock_over_fleet_L10": 0.0224,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2040",
+   "class": "r2r_nil",
+   "J_rel": 30,
+   "area_rel": 50,
+   "tool_intensity_mid": 0.375,
+   "Td_multiplier": 1.32,
+   "Td_multiplier_range": [
+    1.03,
+    4.43
+   ],
+   "Td_multiplier_right_sized_memory": 1.24,
+   "heat_wall_model_year": 60.9,
+   "flops_per_s_per_kg": 3090000000000000.0,
+   "fab_stock_over_fleet_L10": 0.0465,
+   "die_fits_in_half_the_film": false
+  },
+  {
+   "era": "y2070",
+   "class": "leading_edge_space",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 40,
+   "Td_multiplier": 2.83,
+   "Td_multiplier_range": [
+    1.69,
+    6.48
+   ],
+   "Td_multiplier_right_sized_memory": 2.02,
+   "heat_wall_model_year": 133.0,
+   "flops_per_s_per_kg": 6.49e+17,
+   "fab_stock_over_fleet_L10": 0.264,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2070",
+   "class": "leading_edge_terrestrial",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 250,
+   "Td_multiplier": 12.4,
+   "Td_multiplier_range": [
+    6.03,
+    23.8
+   ],
+   "Td_multiplier_right_sized_memory": 7.37,
+   "heat_wall_model_year": 613.0,
+   "flops_per_s_per_kg": 6.49e+17,
+   "fab_stock_over_fleet_L10": 1.65,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2070",
+   "class": "duv_mp",
+   "J_rel": 2.0,
+   "area_rel": 2.5,
+   "tool_intensity_mid": 140,
+   "Td_multiplier": 17.0,
+   "Td_multiplier_range": [
+    9.21,
+    35.2
+   ],
+   "Td_multiplier_right_sized_memory": 9.89,
+   "heat_wall_model_year": 844.0,
+   "flops_per_s_per_kg": 3.25e+17,
+   "fab_stock_over_fleet_L10": 2.3,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2070",
+   "class": "mature_28",
+   "J_rel": 10,
+   "area_rel": 10,
+   "tool_intensity_mid": 35,
+   "Td_multiplier": 16.9,
+   "Td_multiplier_range": [
+    6.47,
+    48.8
+   ],
+   "Td_multiplier_right_sized_memory": 9.87,
+   "heat_wall_model_year": 844.0,
+   "flops_per_s_per_kg": 6.49e+16,
+   "fab_stock_over_fleet_L10": 2.3,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2070",
+   "class": "panel_nil_dsa",
+   "J_rel": 2.0,
+   "area_rel": 3,
+   "tool_intensity_mid": 3,
+   "Td_multiplier": 1.41,
+   "Td_multiplier_range": [
+    1.05,
+    3.28
+   ],
+   "Td_multiplier_right_sized_memory": 1.23,
+   "heat_wall_model_year": 65.1,
+   "flops_per_s_per_kg": 3.25e+17,
+   "fab_stock_over_fleet_L10": 0.0592,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2070",
+   "class": "r2r_nil",
+   "J_rel": 30,
+   "area_rel": 50,
+   "tool_intensity_mid": 0.375,
+   "Td_multiplier": 1.85,
+   "Td_multiplier_range": [
+    1.09,
+    10.1
+   ],
+   "Td_multiplier_right_sized_memory": 1.48,
+   "heat_wall_model_year": 86.4,
+   "flops_per_s_per_kg": 2.16e+16,
+   "fab_stock_over_fleet_L10": 0.123,
+   "die_fits_in_half_the_film": false
+  },
+  {
+   "era": "y2100plus",
+   "class": "leading_edge_space",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 40,
+   "Td_multiplier": 3.75,
+   "Td_multiplier_range": [
+    2.03,
+    9.25
+   ],
+   "Td_multiplier_right_sized_memory": 2.15,
+   "heat_wall_model_year": 179.0,
+   "flops_per_s_per_kg": 1.38e+18,
+   "fab_stock_over_fleet_L10": 0.397,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2100plus",
+   "class": "leading_edge_terrestrial",
+   "J_rel": 1,
+   "area_rel": 1,
+   "tool_intensity_mid": 250,
+   "Td_multiplier": 18.2,
+   "Td_multiplier_range": [
+    8.56,
+    35.4
+   ],
+   "Td_multiplier_right_sized_memory": 8.17,
+   "heat_wall_model_year": 907.0,
+   "flops_per_s_per_kg": 1.38e+18,
+   "fab_stock_over_fleet_L10": 2.48,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2100plus",
+   "class": "duv_mp",
+   "J_rel": 2.0,
+   "area_rel": 2.5,
+   "tool_intensity_mid": 140,
+   "Td_multiplier": 25.1,
+   "Td_multiplier_range": [
+    13.4,
+    52.5
+   ],
+   "Td_multiplier_right_sized_memory": 11.0,
+   "heat_wall_model_year": 1260.0,
+   "flops_per_s_per_kg": 6.88e+17,
+   "fab_stock_over_fleet_L10": 3.47,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2100plus",
+   "class": "mature_28",
+   "J_rel": 10,
+   "area_rel": 10,
+   "tool_intensity_mid": 35,
+   "Td_multiplier": 25.0,
+   "Td_multiplier_range": [
+    9.24,
+    73.1
+   ],
+   "Td_multiplier_right_sized_memory": 11.0,
+   "heat_wall_model_year": 1260.0,
+   "flops_per_s_per_kg": 1.38e+17,
+   "fab_stock_over_fleet_L10": 3.47,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2100plus",
+   "class": "panel_nil_dsa",
+   "J_rel": 2.0,
+   "area_rel": 3,
+   "tool_intensity_mid": 3,
+   "Td_multiplier": 1.62,
+   "Td_multiplier_range": [
+    1.07,
+    4.44
+   ],
+   "Td_multiplier_right_sized_memory": 1.26,
+   "heat_wall_model_year": 75.1,
+   "flops_per_s_per_kg": 6.88e+17,
+   "fab_stock_over_fleet_L10": 0.0892,
+   "die_fits_in_half_the_film": true
+  },
+  {
+   "era": "y2100plus",
+   "class": "r2r_nil",
+   "J_rel": 30,
+   "area_rel": 50,
+   "tool_intensity_mid": 0.375,
+   "Td_multiplier": 2.29,
+   "Td_multiplier_range": [
+    1.14,
+    14.7
+   ],
+   "Td_multiplier_right_sized_memory": 1.54,
+   "heat_wall_model_year": 107.0,
+   "flops_per_s_per_kg": 4.59e+16,
+   "fab_stock_over_fleet_L10": 0.186,
+   "die_fits_in_half_the_film": false
+  }
+ ],
+ "film_vs_pod_manufacturing": [
+  {
+   "era": "y2026",
+   "film_LEA_mm2_W": 40.0,
+   "pod_LEA_mm2_W": 3.3,
+   "film_gW": 0.9237,
+   "pod_gW": 3.91,
+   "I_breakeven_kg_per_m2yr": 117.39292099745809,
+   "capital_at_I": {
+    "250": {
+     "film_capital_kg_yr_per_W": 0.011332617409269134,
+     "pod_capital_kg_yr_per_W": 0.0064659376098758475
+    },
+    "40": {
+     "film_capital_kg_yr_per_W": 0.0029326174092691353,
+     "pod_capital_kg_yr_per_W": 0.005772937609875847
+    },
+    "3": {
+     "film_capital_kg_yr_per_W": 0.0014526174092691353,
+     "pod_capital_kg_yr_per_W": 0.0056508376098758474
+    }
+   }
+  },
+  {
+   "era": "y2040",
+   "film_LEA_mm2_W": 30.666666666666668,
+   "pod_LEA_mm2_W": 3.8500000000000005,
+   "film_gW": 0.638,
+   "pod_gW": 4.087,
+   "I_breakeven_kg_per_m2yr": 185.55084634031198,
+   "capital_at_I": {
+    "250": {
+     "film_capital_kg_yr_per_W": 0.008587106102753825,
+     "pod_capital_kg_yr_per_W": 0.006858794632113192
+    },
+    "40": {
+     "film_capital_kg_yr_per_W": 0.0021471061027538256,
+     "pod_capital_kg_yr_per_W": 0.006050294632113192
+    },
+    "3": {
+     "film_capital_kg_yr_per_W": 0.0010124394360871587,
+     "pod_capital_kg_yr_per_W": 0.005907844632113192
+    }
+   },
+   "I_breakeven_right_sized_memory": 267.4711626604211,
+   "film_LEA_mm2_W_right_sized": 22.45333333333333
+  },
+  {
+   "era": "y2070",
+   "film_LEA_mm2_W": 40.0,
+   "pod_LEA_mm2_W": 4.5,
+   "film_gW": 0.49700000000000005,
+   "pod_gW": 4.023,
+   "I_breakeven_kg_per_m2yr": 143.29416096266155,
+   "capital_at_I": {
+    "250": {
+     "film_capital_kg_yr_per_W": 0.010717019435321813,
+     "pod_capital_kg_yr_per_W": 0.006928962149496299
+    },
+    "40": {
+     "film_capital_kg_yr_per_W": 0.0023170194353218146,
+     "pod_capital_kg_yr_per_W": 0.005983962149496299
+    },
+    "3": {
+     "film_capital_kg_yr_per_W": 0.0008370194353218149,
+     "pod_capital_kg_yr_per_W": 0.005817462149496299
+    }
+   },
+   "I_breakeven_right_sized_memory": 286.5883219253231,
+   "film_LEA_mm2_W_right_sized": 22.25
+  },
+  {
+   "era": "y2100plus",
+   "film_LEA_mm2_W": 52.0,
+   "pod_LEA_mm2_W": 5.5,
+   "film_gW": 0.48000000000000004,
+   "pod_gW": 4.023,
+   "I_breakeven_kg_per_m2yr": 109.92405440579779,
+   "capital_at_I": {
+    "250": {
+     "film_capital_kg_yr_per_W": 0.013692493619626702,
+     "pod_capital_kg_yr_per_W": 0.0071789621494962996
+    },
+    "40": {
+     "film_capital_kg_yr_per_W": 0.0027724936196267024,
+     "pod_capital_kg_yr_per_W": 0.006023962149496299
+    },
+    "3": {
+     "film_capital_kg_yr_per_W": 0.0008484936196267025,
+     "pod_capital_kg_yr_per_W": 0.005820462149496299
+    }
+   },
+   "I_breakeven_right_sized_memory": 316.4995993727305,
+   "film_LEA_mm2_W_right_sized": 21.65
+  }
+ ],
+ "refresh": {
+  "strategy": "Refresh by SAIL, recycle in the swarm shell. A depot craft brings two new film rolls (with chips) and swaps them onto the existing hub cradles, booms and vanes (\"re-skin\", 94 % of sail mass replaced); the old film is rolled up and recycled at co-orbiting depots. Pods swap only their 0.8 g/W compute modules (20 % of pod mass) and keep wings, radiators and loops for 2-3 generations. Chiplet-level swap is impractical (1.06e8 enamel-overcoated dies per sail, ~2,900 head-hours each). A separable rear \"compute laminate\" (31 % of film mass) is a speculative upgrade. Never return material to Mercury: ~17 km/s and 35 % propellant at Isp 4,000 s, and it would re-enter the 5e18 W heat budget.",
+  "options": [
+   {
+    "strategy": "whole_sail_replace_and_recycle",
+    "mass_replaced_fraction": 1.0,
+    "rho": 0.0,
+    "new_mercury_mass_per_generation_fraction": 1.0,
+    "notes": "film, structure and terminals all go to an in-orbit depot; simplest logistics"
+   },
+   {
+    "strategy": "whole_sail_replace_and_recycle",
+    "mass_replaced_fraction": 1.0,
+    "rho": 0.94,
+    "new_mercury_mass_per_generation_fraction": 0.06000000000000005,
+    "notes": "film, structure and terminals all go to an in-orbit depot; simplest logistics"
+   },
+   {
+    "strategy": "reskin_frame_reuse",
+    "mass_replaced_fraction": 0.9404588618562417,
+    "rho": 0.0,
+    "new_mercury_mass_per_generation_fraction": 0.9404588618562417,
+    "notes": "hub, booms, vanes and tensioners stay; new film rolls are swapped onto the hub cradles"
+   },
+   {
+    "strategy": "reskin_frame_reuse",
+    "mass_replaced_fraction": 0.9404588618562417,
+    "rho": 0.94,
+    "new_mercury_mass_per_generation_fraction": 0.05642753171137455,
+    "notes": "hub, booms, vanes and tensioners stay; new film rolls are swapped onto the hub cradles"
+   },
+   {
+    "strategy": "compute_laminate_swap (speculative)",
+    "mass_replaced_fraction": 0.3068468843141332,
+    "rho": 0.0,
+    "new_mercury_mass_per_generation_fraction": 0.3068468843141332,
+    "notes": "only the rear Mg/enamel/chiplet laminate (~31 % of film mass) is replaced; PV and glass serve 2-3 chip generations"
+   },
+   {
+    "strategy": "compute_laminate_swap (speculative)",
+    "mass_replaced_fraction": 0.3068468843141332,
+    "rho": 0.94,
+    "new_mercury_mass_per_generation_fraction": 0.018410813058848008,
+    "notes": "only the rear Mg/enamel/chiplet laminate (~31 % of film mass) is replaced; PV and glass serve 2-3 chip generations"
+   },
+   {
+    "strategy": "pod_module_swap",
+    "mass_replaced_fraction": 0.2,
+    "rho": 0.0,
+    "new_mercury_mass_per_generation_fraction": 0.2,
+    "notes": "pods keep wings, radiators and loops; only the 0.8 g/W compute module of ~4 g/W is replaced"
+   },
+   {
+    "strategy": "pod_module_swap",
+    "mass_replaced_fraction": 0.2,
+    "rho": 0.94,
+    "new_mercury_mass_per_generation_fraction": 0.01200000000000001,
+    "notes": "pods keep wings, radiators and loops; only the 0.8 g/W compute module of ~4 g/W is replaced"
+   }
+  ],
+  "chiplet_swap": {
+   "chiplets_per_sail": 106000000.0,
+   "head_rate_per_s": 10,
+   "head_hours_per_sail": 2940.0,
+   "swarm_rate_if_L10_at_1pct_per_s": 1.6e+16,
+   "verdict": "impractical: enamel-overcoated flip-chip dies, 1e8 per sail, ~3,000 head-hours per sail; parallel transfer only works at manufacture"
+  },
+  "recycle_energy": {
+   "feedstock_recovery_MJ_per_kg_low_mid_high": [
+    12.5,
+    16.6,
+    24.5
+   ],
+   "primary_film_MJ_per_kg_2026": 177.0,
+   "chips_must_be_refabbed_MJ_per_kg_sail_2026": 932.0,
+   "recovery_fraction": {
+    "Si": "0.95-0.98 (98 wt%% commercial mechanical PV recycling)",
+    "Mg": "0.94-0.99 (vacuum distillation 93.8 %% yield, 99.98 %%)",
+    "glass_enamel": "0.90-0.98 (remelt)",
+    "structure": "~1.0 if reused in place",
+    "losses": "dead/uncontrollable sails 1-3 %, transfer propellant 0.3-3 %, meteoroid ablation",
+    "adopted_rho": "0.94 (0.90-0.97)"
+   },
+   "where": "in orbit (swarm-shell depots); Mercury return rejected",
+   "return_propellant_fraction": 0.352,
+   "evidence_class": "demonstrated (terrestrial recycling yields, Mg distillation) + speculation (in-orbit depots)",
+   "source": "iea_pvps_recycling;mg_vacuum_distillation;eb_refining"
+  },
+  "replacement_share_by_era": {
+   "L10_rho0.94_calendar_(seed_2050)": {
+    "2060": 0.000976,
+    "2070": 0.000977,
+    "2080": 0.000977,
+    "2090": 0.000977,
+    "2096": 0.00121,
+    "2100": 0.019,
+    "2106": 0.516,
+    "2110": 0.52,
+    "2120": 0.689,
+    "2150": 0.859,
+    "2200": 0.935,
+    "2300": 0.976,
+    "2500": 0.995,
+    "3000": 1.0
+   },
+   "L10_rho0_calendar": {
+    "2060": 0.000977,
+    "2070": 0.000977,
+    "2080": 0.000977,
+    "2090": 0.000977,
+    "2096": 0.00121,
+    "2100": 0.0193,
+    "2106": 1.0,
+    "2110": 1.0,
+    "2120": 1.0,
+    "2150": 1.0,
+    "2200": 1.0,
+    "2300": 1.0,
+    "2500": 1.0,
+    "3000": 1.0
+   },
+   "L20_rho0.94_calendar": {
+    "2060": 0.0,
+    "2070": 9.54e-07,
+    "2080": 9.54e-07,
+    "2090": 9.54e-07,
+    "2096": 1.18e-06,
+    "2100": 1.89e-05,
+    "2106": 0.00121,
+    "2110": 0.019,
+    "2120": 0.515,
+    "2150": 0.689,
+    "2200": 0.858,
+    "2300": 0.935,
+    "2500": 0.976,
+    "3000": 0.996
+   },
+   "gross_production_over_new_mercury_mass_L10_rho0.94": {
+    "2060": 1.0,
+    "2070": 1.0,
+    "2080": 1.0,
+    "2090": 1.0,
+    "2096": 1.0,
+    "2100": 1.02,
+    "2106": 1.94,
+    "2110": 1.96,
+    "2120": 2.84,
+    "2150": 5.18,
+    "2200": 8.24,
+    "2300": 12.1,
+    "2500": 15.3,
+    "3000": 16.6
+   },
+   "rule": "During exponential growth replacement is 2^(-L/T_d) of output (0.1 % at L = 10, T_d = 1). After the heat wall it climbs to ~50 % within one life and >85 % within a century."
+  },
+  "steady_state": {
+   "formula": "B_ss = D_cap L / (1 - rho); D_cap = 3.94e19 kg/yr; all output is refresh at B_ss",
+   "scenarios": {
+    "model_no_refresh": {
+     "B_ss_kg": "inf",
+     "coverage_2026_mix": null,
+     "coverage_2100_mix": null,
+     "model_year_1pct": 61.8,
+     "model_year_10pct": 225.0,
+     "model_year_10pct_2100_mix": 113.0,
+     "model_year_90pct_of_Bss": null
+    },
+    "L10_rho0": {
+     "B_ss_kg": 3.94e+20,
+     "coverage_2026_mix": 0.00572,
+     "coverage_2100_mix": 0.0151,
+     "model_year_1pct": null,
+     "model_year_10pct": null,
+     "model_year_10pct_2100_mix": null,
+     "model_year_90pct_of_Bss": 53.7
+    },
+    "L10_rho0.90": {
+     "B_ss_kg": 3.94e+21,
+     "coverage_2026_mix": 0.0572,
+     "coverage_2100_mix": 0.151,
+     "model_year_1pct": 62.7,
+     "model_year_10pct": null,
+     "model_year_10pct_2100_mix": 154.0,
+     "model_year_90pct_of_Bss": 263.0
+    },
+    "L10_rho0.94": {
+     "B_ss_kg": 6.57e+21,
+     "coverage_2026_mix": 0.0954,
+     "coverage_2100_mix": 0.252,
+     "model_year_1pct": 62.3,
+     "model_year_10pct": null,
+     "model_year_10pct_2100_mix": 130.0,
+     "model_year_90pct_of_Bss": 416.0
+    },
+    "L10_rho0.97": {
+     "B_ss_kg": 1.31e+22,
+     "coverage_2026_mix": 0.191,
+     "coverage_2100_mix": 0.504,
+     "model_year_1pct": 62.1,
+     "model_year_10pct": 302.0,
+     "model_year_10pct_2100_mix": 120.0,
+     "model_year_90pct_of_Bss": 800.0
+    },
+    "L20_rho0.94": {
+     "B_ss_kg": 1.31e+22,
+     "coverage_2026_mix": 0.191,
+     "coverage_2100_mix": 0.504,
+     "model_year_1pct": 61.8,
+     "model_year_10pct": 298.0,
+     "model_year_10pct_2100_mix": 119.0,
+     "model_year_90pct_of_Bss": 789.0
+    },
+    "L10_rho0.94_Td1.5": {
+     "B_ss_kg": 6.57e+21,
+     "coverage_2026_mix": 0.0954,
+     "coverage_2100_mix": 0.252,
+     "model_year_1pct": 85.3,
+     "model_year_10pct": null,
+     "model_year_10pct_2100_mix": 153.0,
+     "model_year_90pct_of_Bss": 440.0
+    }
+   },
+   "rho_required": [
+    {
+     "L_yr": 10,
+     "target": "1pct_2026mix",
+     "rho_min": 0.428
+    },
+    {
+     "L_yr": 10,
+     "target": "10pct_2026mix",
+     "rho_min": 0.945
+    },
+    {
+     "L_yr": 10,
+     "target": "10pct_2100mix",
+     "rho_min": 0.854
+    },
+    {
+     "L_yr": 10,
+     "target": "rock_limit_4e22",
+     "rho_min": 0.99
+    },
+    {
+     "L_yr": 15,
+     "target": "1pct_2026mix",
+     "rho_min": 0.141
+    },
+    {
+     "L_yr": 15,
+     "target": "10pct_2026mix",
+     "rho_min": 0.917
+    },
+    {
+     "L_yr": 15,
+     "target": "10pct_2100mix",
+     "rho_min": 0.781
+    },
+    {
+     "L_yr": 15,
+     "target": "rock_limit_4e22",
+     "rho_min": 0.985
+    },
+    {
+     "L_yr": 20,
+     "target": "1pct_2026mix",
+     "rho_min": 0.0
+    },
+    {
+     "L_yr": 20,
+     "target": "10pct_2026mix",
+     "rho_min": 0.89
+    },
+    {
+     "L_yr": 20,
+     "target": "10pct_2100mix",
+     "rho_min": 0.708
+    },
+    {
+     "L_yr": 20,
+     "target": "rock_limit_4e22",
+     "rho_min": 0.98
+    },
+    {
+     "L_yr": 30,
+     "target": "1pct_2026mix",
+     "rho_min": 0.0
+    },
+    {
+     "L_yr": 30,
+     "target": "10pct_2026mix",
+     "rho_min": 0.834
+    },
+    {
+     "L_yr": 30,
+     "target": "10pct_2100mix",
+     "rho_min": 0.562
+    },
+    {
+     "L_yr": 30,
+     "target": "rock_limit_4e22",
+     "rho_min": 0.97
+    }
+   ],
+   "headline": "With 10-yr lives and no recycling the fleet saturates at 3.9e20 kg (0.57 % coverage at the 2026 mix): the model's 1 % swarm (year 62) is never reached. With 94 % in-orbit recycling B_ss = 6.6e21 kg (9.5 % coverage, 2026 mix; 25 % with the lighter 2100+ mix), 90 % of it by model year 416.0 (~2466). 10 % coverage needs rho >= 0.945 (2026 mix) or >= 0.854 (2100+ mix) at L = 10, or rho >= 0.89 at L = 20. Mercury's rock limit (4e22 kg) needs rho >= 0.99.",
+   "rock_exhaustion": "cumulative delivery reaches the 4e22 kg rock limit ~1,000 yr after the heat wall (calendar ~3100); after that rho < 1 makes the fleet decay at (1-rho)/L = 0.6 %/yr unless core metal is used"
+  },
+  "economic_refresh_age": {
+   "rule": "If Mercury mass binds and fabs are ample, refresh a sail when (1 - (1+g)^-a)/(1 - rho) > 1, i.e. a* = ln(1/rho)/ln(1+g), g = yearly J/op gain. If fabs bind, refresh only at physical end of life (20-30 yr: PV keeps 92 % after 10 yr).",
+   "values": [
+    {
+     "period": "2026-2040",
+     "g": 0.158,
+     "rho": 0.9,
+     "age_yr": 0.718
+    },
+    {
+     "period": "2026-2040",
+     "g": 0.158,
+     "rho": 0.94,
+     "age_yr": 0.422
+    },
+    {
+     "period": "2026-2040",
+     "g": 0.158,
+     "rho": 0.97,
+     "age_yr": 0.208
+    },
+    {
+     "period": "2040-2070",
+     "g": 0.0459,
+     "rho": 0.9,
+     "age_yr": 2.35
+    },
+    {
+     "period": "2040-2070",
+     "g": 0.0459,
+     "rho": 0.94,
+     "age_yr": 1.38
+    },
+    {
+     "period": "2040-2070",
+     "g": 0.0459,
+     "rho": 0.97,
+     "age_yr": 0.678
+    },
+    {
+     "period": "2070-2100",
+     "g": 0.0208,
+     "rho": 0.9,
+     "age_yr": 5.11
+    },
+    {
+     "period": "2070-2100",
+     "g": 0.0208,
+     "rho": 0.94,
+     "age_yr": 3.0
+    },
+    {
+     "period": "2070-2100",
+     "g": 0.0208,
+     "rho": 0.97,
+     "age_yr": 1.48
+    },
+    {
+     "period": "2100+ (to the ~7e-16 floor over ~100 yr)",
+     "g": 0.00653,
+     "rho": 0.9,
+     "age_yr": 16.2
+    },
+    {
+     "period": "2100+ (to the ~7e-16 floor over ~100 yr)",
+     "g": 0.00653,
+     "rho": 0.94,
+     "age_yr": 9.5
+    },
+    {
+     "period": "2100+ (to the ~7e-16 floor over ~100 yr)",
+     "g": 0.00653,
+     "rho": 0.97,
+     "age_yr": 4.68
+    }
+   ],
+   "recommendation": "L = 10 yr through ~2150 (g 2-5 %/yr, fabs still binding); 15-20 yr after ~2150 as g falls below ~1 %/yr and fab stock (I a / L) must stay small."
+  },
+  "growth_curve_change": {
+   "exponential_phase": "unchanged except T_d -> T_d (1 + I a / kappa): x1.16 (imprint+DSA) to x1.7 (space leading edge) with 2040 chips; x5.4 with 2026-style fabs",
+   "post_heat_wall": "replace linear growth by B(t) = B_ss - (B_ss - B_cap) exp(-(1-rho)(t - t_cap)/L) (within 4 % of the cohort simulation)",
+   "milestones_L10_rho0.94": {
+    "B_ss_kg": 6.57e+21,
+    "coverage_2026_mix": 0.0954,
+    "coverage_2100_mix": 0.252,
+    "model_year_1pct": 62.3,
+    "model_year_10pct": null,
+    "model_year_10pct_2100_mix": 130.0,
+    "model_year_90pct_of_Bss": 416.0
+   },
+   "milestones_model_today": {
+    "B_ss_kg": "inf",
+    "coverage_2026_mix": null,
+    "coverage_2100_mix": null,
+    "model_year_1pct": 61.8,
+    "model_year_10pct": 225.0,
+    "model_year_10pct_2100_mix": 113.0,
+    "model_year_90pct_of_Bss": null
+   },
+   "milestones_L10_rho0.94_Td1.5": {
+    "B_ss_kg": 6.57e+21,
+    "coverage_2026_mix": 0.0954,
+    "coverage_2100_mix": 0.252,
+    "model_year_1pct": 85.3,
+    "model_year_10pct": null,
+    "model_year_10pct_2100_mix": 153.0,
+    "model_year_90pct_of_Bss": 440.0
+   },
+   "visual": "the curve bends over after ~2096 and approaches a ceiling; coverage keeps creeping up as lighter generations replace heavier ones (same kg, more m2)"
+  },
+  "evidence_class": "model (cohort simulation, project growth rule) + speculation (lives, recovery fractions)",
+  "source": "project_model;study4_hot;study1_logic;iea_pvps_recycling;mg_vacuum_distillation;design_spec"
+ },
+ "model_parameters": [
+  {
+   "param": "INDUSTRY.energyPerKg",
+   "unit": "MJ per kg of finished spacecraft",
+   "y2026": 1150.0,
+   "y2040": 1030.0,
+   "y2070": 1170.0,
+   "y2100plus": 1250.0,
+   "notes": "Space-native fab, NVM right-sized to the useful minimum after 2026 (planned 1/8/32 GB: 1420.0/2560.0/5180.0). Terrestrial fab intensity: 2710.0 (2026). Chips are 80-95 % of it; the film is ~180-220 MJ/kg. Model value 255 is ~4.5x low. Energy is still only 3-5 % of swarm output (payback 10-30 days).",
+   "evidence_class": "demonstrated (2026 inputs) / speculation (later)"
+  },
+  {
+   "param": "heatPerKg",
+   "unit": "MJ left on Mercury per kg mined",
+   "y2026": 2,
+   "y2040": 2,
+   "y2070": 2,
+   "y2100plus": 2,
+   "notes": "Valid only if refining and fabs leave the surface by model year ~38 (36-38). Factories on Mercury would cap export at 1.36e+17 kg/yr (289.0x below the wall).",
+   "evidence_class": "model"
+  },
+  {
+   "param": "fabToolIntensity (new)",
+   "unit": "kg of fab equipment per (m2/yr) of leading-edge-equivalent die",
+   "y2026": 250.0,
+   "y2040": 40,
+   "y2070": 15,
+   "y2100plus": 5,
+   "notes": "2026 terrestrial leading edge 110-500 (two derivations: EUV fleet scaling [143.0, 279.0, 458.0]; WFE stock [71.1, 268.0, 789.0]). 2040 space-native wafer fab 15-120; later values assume panel/web area-parallel processes mature (imprint+DSA 0.5-10). R2R imprint 0.08-1.3 at 50-100 nm.",
+   "evidence_class": "demonstrated (2026) / speculation"
+  },
+  {
+   "param": "dieAreaPerW_film (LEA)",
+   "unit": "mm2 of leading-edge-equivalent die per W of film chip power",
+   "y2026": 40,
+   "y2040": 30.7,
+   "y2070": 40.0,
+   "y2100plus": 52.0,
+   "notes": "Logic 40/20/20/20 + memory dies x process weight 0.4-0.6. Right-sized NVM: 22.5/22.2/21.6. Adiabatic logic: 2070 631.0, 2100+ 2080.0 (21-86 % of film area).",
+   "evidence_class": "model (studies 1, 2)"
+  },
+  {
+   "param": "doublingYears (effective)",
+   "unit": "yr",
+   "y2026": 1.7,
+   "y2040": 1.16,
+   "y2070": 1.23,
+   "y2100plus": 1.26,
+   "notes": "T_d' = T_d (1 + I a / 1.443 yr) with T_d = 1. Shown: 2026 space leading edge; later panel imprint+DSA. With 2026-style terrestrial fabs: x5.36 (2026) to x18.2 (2100+). The heat wall moves from model year 46 to 78.8 (space LE, 2026) or 258.0 (terrestrial fabs).",
+   "evidence_class": "model + speculation"
+  },
+  {
+   "param": "lifeYears (new)",
+   "unit": "yr",
+   "y2026": "inf (model)",
+   "y2040": 10,
+   "y2070": 10,
+   "y2100plus": "10 -> 15-20 after ~2150",
+   "notes": "Economic life; physical life 20-30 yr (PV 92 % after 10 yr). Mass-bound optimum age a* = ln(1/rho)/ln(1+g) is 1.4-9.5 yr only if fabs are ample.",
+   "evidence_class": "speculation"
+  },
+  {
+   "param": "recycleFraction rho (new)",
+   "unit": "",
+   "y2026": 0,
+   "y2040": 0.9,
+   "y2070": 0.94,
+   "y2100plus": 0.97,
+   "notes": "Mass fraction of a retired sail returned to production in orbit. 10 % coverage needs >=0.945 (2026 mix) / 0.854 (2100+ mix) at L = 10.",
+   "evidence_class": "demonstrated analogs (PV Si 95-98 %, Mg 94 %) / speculation"
+  },
+  {
+   "param": "steadyStateFleet (output)",
+   "unit": "kg",
+   "y2026": "none (L = inf)",
+   "y2040": 3.94e+21,
+   "y2070": 6.57e+21,
+   "y2100plus": 1.31e+22,
+   "notes": "B_ss = 3.94e19 L/(1-rho); L = 10. Coverage at the 2026 mix 5.7/9.5/19 %, at the 2100+ mix 15/25/50 %.",
+   "evidence_class": "model"
+  },
+  {
+   "param": "replacementShare (output)",
+   "unit": "fraction of gross production",
+   "y2026": 0.001,
+   "y2040": 0.001,
+   "y2070": 0.516,
+   "y2100plus": 0.935,
+   "notes": "Columns read as calendar points for L = 10, rho = 0.94, seed 2050: exponential phase 2^(-L/T_d); 2106 (one life after the wall) ~0.5; 2150 0.86; 2200 0.93; 2300 0.98.",
+   "evidence_class": "model"
+  },
+  {
+   "param": "wafersPerYearAtHeatWall (output)",
+   "unit": "300 mm wafer-equivalents per yr",
+   "y2026": 1.56e+19,
+   "y2040": 1.56e+19,
+   "y2070": 4.09e+19,
+   "y2100plus": 6.15e+19,
+   "notes": "World 2025: 1.8e8 (all nodes, 300 mm-eq), 1.2e7 at <=7 nm. Ratio 9e10-3e11 (all) or 1.3e12-5e12 (leading edge). Adiabatic logic: 6e20 (2070), 2.5e21 (2100+).",
+   "evidence_class": "model"
+  },
+  {
+   "param": "chipletPlacementsPerSecond (output)",
+   "unit": "1/s",
+   "y2026": 5160000000000000.0,
+   "y2040": 6730000000000000.0,
+   "y2070": 1.37e+16,
+   "y2100plus": 1.59e+16,
+   "notes": "At the heat wall; parallel transfer of ~1e2-1e3 dies per cycle from glass carriers, or monolithic logic in the film's own c-Si.",
+   "evidence_class": "model"
+  },
+  {
+   "param": "orbitalFactoryRadiatorArea (output)",
+   "unit": "m2",
+   "y2026": 1.09e+18,
+   "y2040": 1.39e+18,
+   "y2070": 2.7e+18,
+   "y2100plus": 5.75e+18,
+   "notes": "Chip-fab heat at 320 K, refinery heat at 1,000 K, two-sided eps 0.9; replaces INDUSTRY.refineryTemp-only sizing.",
+   "evidence_class": "physics + model"
+  },
+  {
+   "param": "podFrac (manufacturing view)",
+   "unit": "",
+   "y2026": 0.15,
+   "y2040": 0.128,
+   "y2070": 0.027,
+   "y2100plus": 0.011,
+   "notes": "Unchanged (study 5) because the film wins on Mercury mass in every era. On total capital the film wins only if I < 117.0/186.0/143.0/110.0 kg per m2/yr (planned NVM) or 267.0/287.0/316.0 (right-sized); today's 250 favours pods during capital-limited growth.",
+   "evidence_class": "model"
+  }
+ ],
+ "architecture_implications": [
+  {
+   "question": "Does any fab model scale to the heat-wall build rate?",
+   "answer": "No terrestrial-style fab does. The build needs 9e10-3e11x today's whole wafer output; at 2026 tool productivity the fab equipment alone would weigh 6-25 years of the export stream and stretch the doubling time 5-18x.",
+   "numbers": "Die area at the wall: 9.92e+17 m2/yr (2026) to 3.91e+18 (2100+); EUV-style flow needs 230000000000000.0 scanners (4.36e+19 kg) in 2026. Required tool intensity for T_d x1.25: 14.3 -> 3.64 kg per m2/yr, i.e. 17.4x-68.8x better than 2026 (250.0).",
+   "evidence_class": "demonstrated inputs + model"
+  },
+  {
+   "question": "What feature size is achievable at that scale?",
+   "answer": "Area-parallel patterning sets it: ~50-100 nm with roll-to-roll imprint (demonstrated pattern scale), ~9-15 nm only if imprinted guides plus inorganic self-assembly work on panels (speculative), 8-12 nm with space-native wafer fabs at a 1.7-3.8x doubling-time cost. Multi-beam e-beam and probe lithography are 3-12 orders of magnitude too slow and serve only for masters.",
+   "numbers": "Tool intensity per layer: EUV 1.7, R2R imprint 0.0014-0.0056, vacuum web coater 2e-5-6e-5, multi-beam 1,900-4,800, H-depassivation 4e12 kg per m2/yr.",
+   "evidence_class": "demonstrated (layer rates) + speculation (full flows)"
+  },
+  {
+   "question": "Does manufacturing favour distributed film or concentrated pods?",
+   "answer": "Film, provided fab productivity improves ~2x beyond today and film NVM is right-sized. Film chiplets need 7-10x more die area per W than HBM pods, so at today's 250 kg per m2/yr pods need less total capital while growth is capital-limited; after the heat wall Mercury mass binds and the film wins again (0.5-0.9 vs 4 g/W).",
+   "numbers": "Break-even tool intensity: 117.0 (2026), 186.0 (2040), 143.0 (2070), 110.0 (2100+) kg per m2/yr; with right-sized NVM 267.0-316.0.",
+   "evidence_class": "model"
+  },
+  {
+   "question": "Are older nodes fine because film area is cheap?",
+   "answer": "No. Area is cheap for the film but not for the fab: an older node costs ~10x the J/op AND ~10x the patterned area per function, so it is worse in both regimes. What helps is a process with far more area per kg of tool, at whatever feature size it reaches.",
+   "numbers": "28 nm class: J x10, area x10, T_d x7.02 (2040 devices) vs x1.7 for a space leading-edge fab; DUV multipatterning x7.05.",
+   "evidence_class": "demonstrated (node ratios) + model"
+  },
+  {
+   "question": "Memory sizing",
+   "answer": "Size film NVM to the useful minimum (0.23/0.9/1.65 GB per chiplet), not the 1/8/32 GB that study 2 shows is possible: capacity beyond it costs fab output, not mass.",
+   "numbers": "LEA die per W 30.7/40/52 -> 22.5/22.2/21.6 mm2/W; T_d multiplier (panel class, 2100+) 1.62 -> 1.26; energy per kg 2100+ 5180.0 -> 1250.0 MJ/kg.",
+   "evidence_class": "model"
+  },
+  {
+   "question": "Adiabatic logic (study 1)",
+   "answer": "Not manufacturable on the film with any wafer-fab class: the die becomes 21 % (2070) to 86 % (2100+) of the film area. It needs a web-speed process at <=20 nm, which does not exist.",
+   "numbers": "Required tool intensity 0.348 (2070) / 0.0909 (2100+) kg per m2/yr; energy 24300.0 / 84100.0 MJ/kg with a space wafer fab.",
+   "evidence_class": "model + speculation"
+  },
+  {
+   "question": "Where do the factories go?",
+   "answer": "Mercury is a quarry and catapult. Refineries and fabs work on the surface only until model year ~37; after that they must sit in Mercury co-orbit, with refresh depots in the swarm shell.",
+   "numbers": "Processing heat 1.44e+21 W at the 2026-basis wall (3 % of swarm output) vs a 5e18 W surface cap; radiators 1.09e+18 m2 (320 K fab, 1,000 K refinery).",
+   "evidence_class": "model"
+  },
+  {
+   "question": "Chemistry",
+   "answer": "Dry, vacuum, chloride-and-oxygen process chemistry: MOE or metallothermic Si for PV, a Cl/Zn-or-Mg loop with SiCl4 distillation for 9N chip Si, Cl2 etch, O2 oxidation, PVD oxides, resistless or inorganic patterning. No water, no organics, no nitrides, no fluorine; H only as a recaptured trace.",
+   "numbers": "See volatiles_budget: H stock ~5e13 kg vs 1.25e22 kg/yr for wet processing; Cl 1.1e17 kg/yr arrives with the rock.",
+   "evidence_class": "demonstrated (unit processes) + speculation (integrated flow)"
+  },
+  {
+   "question": "Placement",
+   "answer": "Chiplet placement becomes a top-level manufacturing problem: 5e15-1.6e16 dies per second at the wall. Use parallel transfer from glass carriers or monolithic logic in the film's c-Si; keep the 0.15 W chiplet (the P^2 spreader rule forbids fewer, bigger dies).",
+   "numbers": "1,551-2,730 sites per m2 x 1.2e20-2e20 m2/yr of film.",
+   "evidence_class": "model"
+  },
+  {
+   "question": "Refresh and the size of the swarm",
+   "answer": "Service life and in-orbit recycling, not the heat wall alone, set the final swarm. 10-yr lives without recycling cap it at 0.57 % coverage; 94 % recycling gives 9.5-25 %; the rock-limited swarm needs 99 %.",
+   "numbers": "With 10-yr lives and no recycling the fleet saturates at 3.9e20 kg (0.57 % coverage at the 2026 mix): the model's 1 % swarm (year 62) is never reached. With 94 % in-orbit recycling B_ss = 6.6e21 kg (9.5 % coverage, 2026 mix; 25 % with the lighter 2100+ mix), 90 % of it by model year 416.0 (~2466). 10 % coverage needs rho >= 0.945 (2026 mix) or >= 0.854 (2100+ mix) at L = 10, or rho >= 0.89 at L = 20. Mercury's rock limit (4e22 kg) needs rho >= 0.99.",
+   "evidence_class": "model"
+  },
+  {
+   "question": "Seed era",
+   "answer": "The first ~4-7 doublings run on chips imported from Earth; Mercury-made chiplets must take over by a built mass of ~1e8 kg.",
+   "numbers": "Earth's entire 2025 leading-edge output (6.7e+05 m2/yr of good die) is 1.7e+10 W/yr of film chiplets = 1.6e+07 kg/yr of sails: it carries only the first ~4.5 doublings (6.1-6.8 if Earth triples-quintuples LE capacity by 2045). A 1e6 kg seed cannot hold even one 2026-style leading-edge fab (~3e7 kg of tools).",
+   "evidence_class": "demonstrated + model"
+  }
+ ],
+ "render_implications": [
+  {
+   "era": "model years 0-37 (2050-2087)",
+   "element": "Mercury surface",
+   "change": "Polar factory complexes beside the permanently shadowed ice craters: refineries, fabs and radiator fields lying in the shadowed floors; quarries and the first mass-driver tracks on the night side.",
+   "numbers": "Surface factories allowed until processing heat reaches 5e18 W: model year ~37."
+  },
+  {
+   "era": "model year 37+ (2087+)",
+   "element": "Mercury surface",
+   "change": "Only open-pit quarries, beneficiation and equatorial mass-driver tracks remain; pellet streams leave from perihelion.",
+   "numbers": "Mined 7.9e19 kg/yr at the wall; C 1.1e18, Cl 1.1e17, S 1.7e18 kg/yr come up with the rock."
+  },
+  {
+   "era": "2087+",
+   "element": "Mercury co-orbital foundries",
+   "change": "A dim, edge-on ring of factory radiators along Mercury's orbit: 320 K fab radiators (black in visible, bright in thermal IR) and a smaller 1,000 K refinery fraction glowing dull red; sail packages (14.4 t rolls) departing under ion drive.",
+   "numbers": "Radiator area 1.09e+18 m2 (2026 tech) to 5.75e+18 m2 (2100+): disc-equivalent radius 589000000.0-1350000000.0 m (0.85-2 R_sun), ~1-3 % of the film area made per year."
+  },
+  {
+   "era": "2096+",
+   "element": "swarm shell",
+   "change": "Recycling depots co-orbit with the sails; depot craft swap film rolls onto hubs. At any moment ~0.2 % of sails are rolled up or dark for re-skinning.",
+   "numbers": "6460000.0 refreshes per second at 1 % coverage with L = 10 (2e14 sails per year)."
+  },
+  {
+   "era": "2096+",
+   "element": "sail generations",
+   "change": "Mixed generations: newer sails have denser chiplet grids (25.4 -> 19.1 mm pitch), thinner cover glass and sub-bandgap reflecting fronts (brighter in near-IR); ages spread uniformly over 0-10 yr.",
+   "numbers": "Uniform age distribution at steady state; oldest sails show ~8 % PV fade and 1.3 % dead chiplets."
+  },
+  {
+   "era": "all",
+   "element": "growth curve",
+   "change": "Exponential to the heat wall (~2096), then a bend toward a ceiling instead of a straight line: B(t) = B_ss - (B_ss - B_cap) exp(-(1-rho)(t-t_cap)/L).",
+   "numbers": "1 % at model year 62.3; 10 % at 130.0 (2100+ mix) or never (2026 mix) for rho 0.94, L 10."
+  }
+ ],
+ "wildcards": [
+  {
+   "name": "Solar-wind hydrogen harvested from the sails",
+   "evidence_class": "speculation",
+   "detail": "The swarm intercepts ~f of the solar wind (~1e9 kg/s in total). Cover glass at 0.92 AU takes 7.46e+20 protons/m2 in 10 yr, above the ~5e16 cm-2 OH saturation of silica, so each m2 holds ~8.37e-07 kg H at retirement. At 1 % coverage with L = 10, remelting old cover glass in vacuum could yield ~174000000000000.0 kg H/yr, about 3.61x Mercury's whole polar-ice H stock every year. That would pay for trace-H passivation and even a-Si:H layers, but not wet processing.",
+   "source": "lunar_h"
+  },
+  {
+   "name": "Atomically precise manufacturing",
+   "evidence_class": "speculation",
+   "detail": "A working nanofactory (10 kg, 1.3 kg/h, 15-h self-duplication) has tool intensity ~1e-4 kg per m2/yr: fabs would vanish as a constraint and J/op could fall below the CMOS floor. But diamondoid mechanosynthesis assumes H-terminated surfaces, so it inherits the hydrogen problem.",
+   "source": "phoenix2003;zyvex_hdl"
+  },
+  {
+   "name": "Monolithic logic in the film's own silicon",
+   "evidence_class": "speculation",
+   "detail": "The 20-30 um c-Si absorber is itself crystalline silicon: logic islands patterned into its rear surface would remove 5e15-1.6e16 placements/s and every chip-to-film bond, if the film is single-crystal and web-scale steppers can pattern ~1-3 % of its area.",
+   "source": "eb_si_rate"
+  },
+  {
+   "name": "Inorganic directed self-assembly",
+   "evidence_class": "speculation",
+   "detail": "If eutectic or oxide self-assembly gives 10-20 nm periods with low defect density on imprinted guides, the panel imprint+DSA class (0.5-10 kg per m2/yr) exists and the growth phase runs at T_d x1.05-1.2 with near-leading-edge chips.",
+   "source": "imec_dsa"
+  },
+  {
+   "name": "Fluorine on Mercury",
+   "evidence_class": "speculation",
+   "detail": "MESSENGER never measured F. If F tracks Cl (~0.1 wt%), F-based oxide etch and chamber cleans return and the flow simplifies.",
+   "source": "nittler2018;evans2015_cl"
+  },
+  {
+   "name": "Shared FEL EUV light",
+   "evidence_class": "roadmap",
+   "detail": "One ERL free-electron laser (>10 kW at 13.5 nm) can feed many scanners with no Sn, CO2 laser or H2, and cuts EUV electricity ~3x; it is the natural EUV source for a vacuum fab.",
+   "source": "kek_fel"
+  },
+  {
+   "name": "Self-replicating fabs",
+   "evidence_class": "speculation",
+   "detail": "Over 99.9 % of tool mass (Fe, Si, Mg, Al, glass, ULE-type TiO2-SiO2) is Mercury-native; the \"vitamins\" (Mo/Ru for EUV mirrors, Sn, In/Ga/As for lasers and sensors, rare-earth magnets) are tiny by mass. The 1980 NASA lunar factory (100 t seed, ~1 yr replication) is the classic closure estimate.",
+   "source": "nasa1980_ssr;ksrm"
+  },
+  {
+   "name": "Core metal after the rock is gone",
+   "evidence_class": "speculation",
+   "detail": "Around calendar ~3100 cumulative delivery reaches the 4e22 kg rock limit; then the fleet decays at (1-rho)/L unless Fe-Ni-Si core metal replaces structure and Si is drawn from the core alloy (3.2e22 kg Si).",
+   "source": "project_mercury"
+  }
+ ],
+ "assumptions": {
+  "seed_calendar_year": 2050,
+  "kappa_yr": 1.443,
+  "notes": [
+   "Eras use studies 1-5 mid values; LEA = leading-edge-equivalent area (memory dies weighted 0.4-0.6).",
+   "Tool intensity counts equipment only; a terrestrial fab also needs a building several times heavier.",
+   "Fab tools are treated like any other product mass in the capital balance (optimistic: they are chip-heavy themselves).",
+   "Refresh simulation assumes in-orbit re-fab capacity matches gross output (fab stock = I a gross)."
+  ]
+ },
+ "sources": [
+  {
+   "key": "semi_wff_2025",
+   "what": "SEMI World Fab Forecast via Design&Reuse, Jan 2025: global capacity 33.6 M wpm (200 mm-eq) in 2025; 7 nm and below 2.2 M wpm (200 mm-eq); DRAM 4.5 M, 3D NAND 3.7 M wpm",
+   "url": "https://design-reuse.com/news/57247/2025-semiconductor-fabs-construction.html"
+  },
+  {
+   "key": "semi_300mm_2025",
+   "what": "SEMI 300mm Fab Outlook (Jun 2025): 7 nm and below 850k wpm (2024), 982k (2025), 1.4 M (2028); 2 nm and below <200k wpm (2025); all 300 mm capacity 11.1 M wpm in 2028",
+   "url": "https://evertiq.com/news/2025-06-26-advanced-chip-capacity-to-surge-69-by-2028-on-ai-demand"
+  },
+  {
+   "key": "semi_wfe_2025",
+   "what": "SEMI Dec 2025 equipment forecast: WFE $115.7B (2025), $104.3B (2024); total equipment $125.5B (2025 mid-year)",
+   "url": "https://semi.org/en/semi-press-release/global-semiconductor-equipment-sales-projected-to-reach-a-record-of-156-billion-dollars-in-2027-semi-reports"
+  },
+  {
+   "key": "asml_3800e",
+   "what": "ASML TWINSCAN NXE:3800E product page and SPIE 12953-43: >=220 wafers/h at 30 mJ/cm2, >500 W source",
+   "url": "https://asml.com/products/euv-lithography-systems/twinscan-nxe-3800e"
+  },
+  {
+   "key": "euv_mass",
+   "what": "EUV scanner shipped in 40 containers / 3 cargo 747s, \"nearly 200 tons\" (Intel); ~180 t (press)",
+   "url": "https://www.intel.com/content/www/us/en/newsroom/news/euv-most-precise-complex-machine.html"
+  },
+  {
+   "key": "highna",
+   "what": "ASML EXE:5200B high-NA (0.55 NA) EUV: 175 wafers/h at 50 mJ/cm2, 0.7 nm overlay, 8 nm resolution (vs 13 nm low-NA); HVM 2027-28",
+   "url": "https://www.3dtested.com/tech-industry/semiconductors/intel-installs-industrys-first-commercial-high-na-euv-lithography-tool-asml-twinscan-exe-5200b-sets-the-stage-for-14a"
+  },
+  {
+   "key": "highna_power",
+   "what": "TechInsights via technews.tw: low-NA EUV up to 1,170 kW, high-NA ~1,400 kW per tool",
+   "url": "https://finance.technews.tw/2024/11/02/by-2030-global-wafer-fab-euv-electricity-consumption-will-exceed-the-combined-electricity-consumption-of-singapore-or-greece/"
+  },
+  {
+   "key": "techinsights_euv",
+   "what": "TechInsights: EUV tool up to 10.2 GWh/yr (~1.16 MW avg); EUV ~11 % of fab electricity",
+   "url": "https://www.techinsights.com/blog/euv-lithography-power-hungry-path-innovation"
+  },
+  {
+   "key": "siliconanalysts_energy",
+   "what": "Silicon Analysts 2026: 3 nm ~1,000+ kWh per 300 mm wafer (800-1,500 for 3-7 nm), legacy 200-400 kWh; HVAC 50-57 % of fab electricity; EUV ~1/3 of per-wafer electricity",
+   "url": "https://siliconanalysts.com/analysis/chip-manufacturing-energy-cost"
+  },
+  {
+   "key": "semiconductorx_power",
+   "what": "SemiconductorX fab power breakdown: cleanroom HVAC 30-50 %, etch+CVD 15-25 %, EUV 5-15 %, DUV 5-10 %, UPW 5-10 %, facility 5-10 %; N3-N5 fab 400-600 MW",
+   "url": "https://semiconductorx.com/fab-power.html"
+  },
+  {
+   "key": "semi_tools_share",
+   "what": "SEMI / SEMATECH-ISMI: process equipment uses 40-50 % (up to 44 %) of fab electricity",
+   "url": "https://www.semi.org/en/taxonomy/term/60776"
+  },
+  {
+   "key": "upw_per_fab",
+   "what": "Ultrapure Water journal: a 300 mm fab at ~40,000 wafers/month uses 2-3 million gallons of water per day",
+   "url": "https://ultrapurewater.com/articles/micro/is-pou-water-recovery-and-reuse-practical-in-microelectronics-fabs"
+  },
+  {
+   "key": "evans2015_cl",
+   "what": "Evans et al. 2015 Icarus 257:417 (MESSENGER GRS): Cl/Si = 0.0057+/-0.001 -> 0.14+/-0.03 wt% Cl; 2.9x higher >80N",
+   "url": "https://cosmochemistry-papers.com/2015/05/12/chlorine-on-the-surface-of-mercury-messenger-gamma-ray-measurements-and-implications-for-the-planets-formation-and-evolution/"
+  },
+  {
+   "key": "nittler2018",
+   "what": "Nittler et al. 2018, The Chemical Composition of Mercury (arXiv:1712.02187): Table 2.1 surface ratios; C 1.4+/-0.9 wt% (GRS), S/Si 0.076-0.092, Na ~2.9 wt%, K 1288 ppm",
+   "url": "https://arxiv.org/pdf/1712.02187"
+  },
+  {
+   "key": "peplowski2016",
+   "what": "Peplowski et al. 2016 Nature Geosci. 9:273: graphite in low-reflectance material at 1-3 wt% above surroundings",
+   "url": "https://www.nature.com/articles/ngeo2669"
+  },
+  {
+   "key": "lawrence2013_ice",
+   "what": "MESSENGER polar ice: 100 billion to 1 trillion tons (Sky & Telescope on Lawrence et al. 2013 Science); project research gives 2e13-1.4e15 kg",
+   "url": "https://skyandtelescope.org/astronomy-news/mercurys-polar-ice-defiesthe-odds/"
+  },
+  {
+   "key": "lunar_h",
+   "what": "Taylor (NASA) 1990 lunar resources review: solar-wind H 50-100 ppm in lunar soil, uniform to 2-3 m (via Lunar Resources review)",
+   "url": "https://arxiv.org/pdf/1410.6865"
+  },
+  {
+   "key": "mercury_exo",
+   "what": "Mercury exosphere: Na 1.7-3.8e4 cm-3 at the surface; total density upper limit 1e12 m-3",
+   "url": "https://en.wikipedia.org/wiki/Atmosphere_of_Mercury"
+  },
+  {
+   "key": "sirk2010_moe",
+   "what": "Sirk, Sadoway, Sibille 2010 ECS Trans.: direct electrolysis of molten lunar regolith at 1600 C gives O2 at the anode, Fe and Si at the cathode (NASA NTRS 20110008535)",
+   "url": "https://ntrs.nasa.gov/citations/20110008535"
+  },
+  {
+   "key": "ffc_si",
+   "what": "FFC-Cambridge electro-deoxidation of SiO2 in molten CaCl2: 9.3 kWh/kg vs 13 kWh/kg carbothermic (table, unverified); 2.3 V cell at 750 C",
+   "url": "https://nottingham-repository.worktribe.com/OutputFile/3677309"
+  },
+  {
+   "key": "dupont_zn",
+   "what": "Lyon, Olson, Lewis (DuPont) 1949 J. Electrochem. Soc. \"Hyper-pure silicon\": gaseous Zn + SiCl4 at 950 C; Battelle/JPL fluidized bed 50 MT/yr design (cited in patent US8658118)",
+   "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8658118"
+  },
+  {
+   "key": "mgcl2_electrolysis",
+   "what": "MgCl2 electrolysis: theoretical ~6.2 kWh/kg Mg, lab 7.0, best industrial cells 10.5-11.5 kWh/kg",
+   "url": "https://open.metu.edu.tr/handle/11511/53557"
+  },
+  {
+   "key": "eb_refining",
+   "what": "Electron-beam refining of UMG-Si: P 25 ppmw -> <0.1 ppmw in 1.2 h at 0.001-0.01 Pa; B needs an oxidising species (H2O in patent; O2/inert in 2025 work)",
+   "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/7815882"
+  },
+  {
+   "key": "siemens_energy",
+   "what": "Siemens-reactor polysilicon 65-200 kWh/kg (patent); UMG ~1/5 of vapour-phase energy",
+   "url": "https://patents.google.com/patent/US9352970"
+  },
+  {
+   "key": "fraunhofer_egpoly",
+   "what": "Fraunhofer ISE 2025 report: electricity for electronic-grade polysilicon (92-124 kWh/kg per project research)",
+   "url": "https://www.ise.fraunhofer.de/content/dam/ise/en/documents/publications/studies/25_en_ISE_Report_Analysis-of-the-Electricity-Consumption-for-the-Production-of-Electronic-Grade-Polysilicon.pdf"
+  },
+  {
+   "key": "iea_pvps_t12_2023",
+   "what": "IEA PVPS Task 12 LCI update 2023 (mono-Si PERC/TOPCon): MG-Si 12 kWh/kg; polysilicon 52.3 kWh/kg el. + 11.6 thermal; Cz 13.5 kWh/kg; wafer 2.7 kWh/m2; cell 9.7 kWh/m2; panel 3.6 kWh/m2; CdTe panel 19-23 kWh/m2",
+   "url": "https://iea-pvps.org/wp-content/uploads/2024/05/Slides_IEA-PVPS-T12_Fact-Sheet-update-2023_v2.0.pdf"
+  },
+  {
+   "key": "iea_pvps_recycling",
+   "what": "IEA-PVPS 2026 recycling review (pv magazine): 98 wt% Si recovery mechanical commercial; 95 wt% pilot; Cu 95-99 %",
+   "url": "https://pv-magazine-usa.com/2026/05/06/pv-module-recycling-technologies-progressing-says-iea-pvps/"
+  },
+  {
+   "key": "mg_vacuum_distillation",
+   "what": "Mg vacuum distillation: 1-2 kWh/kg at >=0.8 kg/h (patent US11773500); 93.8 % yield, 99.98 % purity at 1073 K, 100 Pa",
+   "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11773500"
+  },
+  {
+   "key": "eb_si_rate",
+   "what": "High-rate e-beam Si: ~1 um/min (CSG LPC, ~13 % cells), 1.5 um/min epitaxial (SINTEF), >300 nm/s static (Fraunhofer FEP)",
+   "url": "https://arena.gov.au/knowledge-bank/next-generation-crystalline-silicon-on-glass-modules-final-report"
+  },
+  {
+   "key": "canon_nil",
+   "what": "Canon FPA-1200NZ2C nanoimprint: 14 nm minimum linewidth (5 nm node), 10 nm expected; power \"significantly\" lower",
+   "url": "https://global.canon/en/product/indtech/semicon/fpa1200nz2c.html"
+  },
+  {
+   "key": "r2r_nil",
+   "what": "JOANNEUM R2R UV-NIL/hot-embossing pilot line: down to 100 nm at web speeds up to 30 m/min; Fraunhofer ENAS 250 mm web, 0.5-30 m/min",
+   "url": "https://www.joanneum.at/en/materials/research-areas/large-area-micro-and-nanostructuring/details-and-solutions"
+  },
+  {
+   "key": "topmet",
+   "what": "Applied Materials TopMet vacuum web coater: up to 4,450 mm coating width, up to 20 m/s",
+   "url": "https://www.appliedmaterials.com/eu/en/semiconductor/products/semiconductor-products/applied-topmet.html"
+  },
+  {
+   "key": "ims_mbmw",
+   "what": "IMS MBMW-101: 262,144 beams, any 100 x 130 mm field in <10 h (BACUS 2016)",
+   "url": "https://www.ims.co.at/wp-content/uploads/2019/01/2016-10-17_BACUS-2016_IMS_MBMW-101_998505.pdf"
+  },
+  {
+   "key": "imec_dsa",
+   "what": "imec 2021: 18 nm pitch line/space by high-chi DSA on a 90 nm 193i guide, no dislocations detected (best case)",
+   "url": "https://techxplore.com/news/2021-02-imec-18nm-pitch-linespace-patterning.html"
+  },
+  {
+   "key": "zyvex_hdl",
+   "what": "Zyvex hydrogen-depassivation lithography: 50 H atoms/s demonstrated (2010), >1e6/s targeted with 10 tips",
+   "url": "https://www.nextbigfuture.com/2010/10/what-is-optimal-bootstrapping-pathway.html"
+  },
+  {
+   "key": "phoenix2003",
+   "what": "Phoenix 2003 J. Evol. Tech. 13 \"Design of a Primitive Nanofactory\": <=10 kg tabletop unit, 4 kg product in 3 h, duplicate in as little as 15 h (theoretical)",
+   "url": "https://www.jetpress.org/volume13/Nanofactory.htm"
+  },
+  {
+   "key": "nasa1980_ssr",
+   "what": "NASA CP-2255 (1982), Advanced Automation for Space Missions: self-replicating lunar factory; ~100 t seed, ~1 yr replication (secondary summary)",
+   "url": "https://ntrs.nasa.gov/citations/19830007081"
+  },
+  {
+   "key": "ksrm",
+   "what": "Freitas & Merkle 2004, Kinematic Self-Replicating Machines (review of replicator designs and closure)",
+   "url": "https://www.molecularassembler.com/KSRM/4.19.htm"
+  },
+  {
+   "key": "wsf",
+   "what": "Wake Shield Facility: first crystalline semiconductor (GaAs/AlGaAs) MBE films grown in orbit in the wake vacuum; predicted 1e-14 Torr equivalent",
+   "url": "https://en.wikipedia.org/wiki/Wake_Shield_Facility"
+  },
+  {
+   "key": "kek_fel",
+   "what": "KEK ERL-FEL EUV source design: >10 kW at 13.5 nm, 800 MeV, ~10 mA; tens of kW to feed several scanners",
+   "url": "https://arxiv.org/pdf/2207.02095"
+  },
+  {
+   "key": "euv_h2",
+   "what": "EUV LPP sources use flowing H2 buffer gas to protect the collector and remove Sn as SnH4 (patents)",
+   "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9377693"
+  },
+  {
+   "key": "tsmc_nodes",
+   "what": "TSMC node claims (AnandTech): N7 vs 16FF+ -60 % power; N5 vs N7 -30 %; N3 vs N5 -25-30 % (1.7x density)",
+   "url": "https://anandtech.com/show/16024"
+  },
+  {
+   "key": "tsmc_16_28",
+   "what": "TSMC: 16FinFET reduces total power >60 % at the same speed vs 28HPM (eeNews Europe)",
+   "url": "https://www.eenewseurope.com/en/16nm-finfets-boost-arms-64-bit-big-little/"
+  },
+  {
+   "key": "sram_cells",
+   "what": "SRAM 6T bitcells: TSMC 28 nm 0.127 um2, 16 nm 0.070 (semiwiki); N5 0.021, N3B 0.0199, N3E 0.021 (WikiChip IEDM 2022)",
+   "url": "https://fuse.wikichip.org/?p=7343"
+  },
+  {
+   "key": "euv_layers",
+   "what": "TSMC N3 up to 25 EUV layers; Samsung 3 nm 20 EUV layers, 2 nm late 20s (TrendForce)",
+   "url": "https://www.trendforce.com/news/2024/07/22/news-samsungs-2nm-node-will-reportedly-feature-30-more-euv-layers/"
+  },
+  {
+   "key": "masks_by_node",
+   "what": "SemiconductorX: ~30-35 masks at 28 nm, ~40-50 at 16/14 nm (unverified)",
+   "url": "https://semiconductorx.com/semiconductor-photomasks.html"
+  },
+  {
+   "key": "nist_thermo",
+   "what": "Si: heat of fusion 50.21 kJ/mol, vaporization 383 kJ/mol, mp 1687 K; Mg vaporization 128 kJ/mol (standard tables)",
+   "url": "https://en.wikipedia.org/wiki/Silicon"
+  },
+  {
+   "key": "project_mercury",
+   "what": "Project research pass 1 (Mercury): element inventory, dHf SiO2 -910.7, MgO -601.6, Al2O3 -1675.7 kJ/mol (NIST/CRC), Hall-Heroult 13-15 kWh/kg, fab 1.5 kWh/cm2, 255 MJ/kg",
+   "url": "file:research/mercury_result.json"
+  },
+  {
+   "key": "project_model",
+   "what": "Project model src/model/hybrid.js + constants.js (run via baseline.mjs)",
+   "url": "file:/home/user/dyson/src/model/hybrid.js"
+  },
+  {
+   "key": "study1_logic",
+   "what": "Study 1 (logic) result.json",
+   "url": "file:research5/future/logic/result.json"
+  },
+  {
+   "key": "study2_memory",
+   "what": "Study 2 (memory) result.json",
+   "url": "file:research5/future/memory/result.json"
+  },
+  {
+   "key": "study3_ic",
+   "what": "Study 3 (interconnect) result.json",
+   "url": "file:research5/future/interconnect/result.json"
+  },
+  {
+   "key": "study4_hot",
+   "what": "Study 4 (hot_power) result.json",
+   "url": "file:research5/future/hot_power/result.json"
+  },
+  {
+   "key": "study5_wl",
+   "what": "Study 5 (workloads) result.json",
+   "url": "file:research5/future/workloads/result.json"
+  },
+  {
+   "key": "design_spec",
+   "what": "Research 4 design spec (sail stack, mass breakdown, stowage)",
+   "url": "file:research4/design/result.json"
+  }
+ ],
+ "files": [
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/baseline.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/baseline.mjs",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/build_result.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/common.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/energy.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/energy.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/fab_throughput.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/fab_throughput.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/log_build_result.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/log_energy.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/log_fab_throughput.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/log_node_target.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/log_refresh.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/log_volatiles.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/node_target.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/node_target.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/refresh.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/refresh.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/result.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/volatiles.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/volatiles.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/manufacturing/dl/iea.txt"
+ ]
+}

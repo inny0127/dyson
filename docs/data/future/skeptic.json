@@ -1,0 +1,491 @@
+{
+ "verdict": "partly refuted",
+ "verdict_detail": "The architecture invariants survive: film >> pods per kg, Si-only PV, the sail as the synchronous unit, no HBM on the film, a cool Tj when coverage binds. The quantitative headline does not. The ~22 % ceiling at 0.91 AU drives Earth past the project's own runaway-greenhouse limit; the mid presets bundle several speculative or internally inconsistent choices (imprint fab, thin high-eps film, 25 % H-free PV, 1 % pods, yield 0.5); and the proposed code has real bugs (no finite rock, atYear coverage vs steadyCoverage, NaN leak, free adiabatic gain, techAt before 2040, sim override bug) plus tests that pin about half of the new behaviour.",
+ "errors": [
+  {
+   "claim": "7/8: steady state ~22 % (8-48 %) at 0.91 AU is a usable end state",
+   "problem": "By the project's own earthImpact (model.js) a uniform interior shell at f = 0.2217, r = 0.913 AU gives Earth 287 W/m2 absorbed (238 now): +49 W/m2, 12.5 CO2 doublings, above the 282 W/m2 runaway-greenhouse limit already in constants.js. The scenario lists this only as an open question.",
+   "correct_value": "forcing +1.9 W/m2 at 1 % (2117), +20 at 10 % (2238), +49 at 22 % (runaway). Forcing <= 1 W/m2 needs f <= 0.53 % (uniform shell) or <= 0.23 % (shadow corridor)",
+   "severity": "critical",
+   "study": "scenarios (and hot_power earth_crossing)"
+  },
+  {
+   "claim": "Open question: 'a sunlight corridor or an exterior placement (Tj 116-141 C)' fixes Earth",
+   "problem": "Both make it worse. A corridor removes the dimming that offsets part of the IR. An exterior shell bathes Earth in panel IR from every direction, and hotter panels make it worse again.",
+   "correct_value": "per 1 % coverage: uniform interior +1.9, corridor +4.2, exterior 348 K +6.8, exterior 388 K +10.5 W/m2. At 22 %: +49 / +102 / +156 / +241 W/m2",
+   "severity": "high",
+   "study": "scenarios, hot_power"
+  },
+  {
+   "claim": "4: alpha 0.80 with eps 0.86/0.93 on a lighter film (0.165-0.185 kg/m2)",
+   "problem": "The design spec's own IR model (optics.py) gives eps_b 0.61 for 5 um enamel and 0.73 (conservative) to 0.90 (assumed) only with 15 um enamel at 0.203 kg/m2. The eras pair higher emissivity than the spec with a thinner stack, and leave out the mass of the short-pass IR-reflecting cover that alpha 0.80 needs (about 27 % sub-gap absorptance).",
+   "correct_value": "2100 mid with the design-spec stack (0.203 kg/m2, eps 0.85/0.90): 0.69 g/W at 0.862 AU (claimed 0.555 at 0.852); with the conservative eps 0.76/0.73: 0.81 g/W at 0.934 AU; ceiling 18.3 % / 15.9 %",
+   "severity": "high",
+   "study": "hot_power, scenarios"
+  },
+  {
+   "claim": "4: hot logic never pays; Tj stays 85 C",
+   "problem": "In the proposed model with 2100+ parts (slope 0.56 %/K), sail FLOP/s per kg rises with Tj, and the refresh-limited ceiling and fleet FLOP/s rise too, because post-wall the binding constraint is mass. 'Never pays' holds only per joule of sunlight, i.e. when coverage (Earth's climate) binds.",
+   "correct_value": "Tj 105/125/150 C: sail FLOP/s/kg +4.9/+8.8/+12 %; ceiling 22 -> 27/31/38 %; fleet FLOP/s at the ceiling +4/+7/+10 %; FLOP per J of sunlight -16/-29/-43 %",
+   "severity": "medium",
+   "study": "hot_power, logic, scenarios"
+  },
+  {
+   "claim": "6: build needs 1e18-4e18 m2/yr of die (~1e11 x today)",
+   "problem": "That is the heat-wall export only. At the refresh-limited steady state every re-skin re-fabs its chips (rho recycles mass, not dies): gross output is D_cap/(1-rho) = 6.6e20 kg/yr.",
+   "correct_value": "steady state 1.8e+19 m2/yr of die (1.4e+12 x 2025 world output), 17 x the wall figure; fab stock 0.9 % of the fleet (mid) to 21 % (low), not deducted from B_ss",
+   "severity": "medium",
+   "study": "manufacturing, scenarios"
+  },
+  {
+   "claim": "6/7: heat wall 2109, 1 % 2117 (mid)",
+   "problem": "The mid presets use I = 15 (2070) and 5 (2100), i.e. the speculative panel imprint + inorganic self-assembly that the manufacturing study itself calls speculative. A space-native wafer fab (I = 40) is already a large leap from 2026 (~250).",
+   "correct_value": "I = 40 in all eras (scenario's own simulator): wall 2145, 1 % 2151, 10 % 2273; base doubling 2 yr instead of 1: wall 2156, 1 % 2163",
+   "severity": "medium",
+   "study": "manufacturing, scenarios"
+  },
+  {
+   "claim": "2/4: PV efficiency 0.225 -> 0.25 AM0 (mid) from a 30 um, H-free, kerfless absorber",
+   "problem": "0.25 is 96 % of the ~26 % Auger-limited AM0 value for 30 um c-Si (AM0 SQ 30.0 %). Today's record cell reaches 94.6 % of its limit, and that is with H passivation. The manufacturing study says H-free LPC cells reached ~13 % and 20 % without H is speculation.",
+   "correct_value": "mid 0.21 AM0: 2100 FLOP/J_sun 1.10e+14 (claimed 1.31e14), 0.656 g/W",
+   "severity": "medium",
+   "study": "hot_power, manufacturing, scenarios"
+  },
+  {
+   "claim": "7: D_cap 3.94e19 kg/yr (yieldDelivered 0.5) in every era",
+   "problem": "Silicon-limited. The film is 54 % Si by mass; Mercury rock is ~25-27 wt % Si (mantle likely lower). A yield of 0.5 needs ~100 % Si recovery.",
+   "correct_value": "yield 0.42-0.45 at 90 % recovery -> D_cap 3.3e19 kg/yr; mid ceiling 18.7 % (21.7), 10 % in 2273 (2238)",
+   "severity": "medium",
+   "study": "scenarios (v3 basis)"
+  },
+  {
+   "claim": "5: pods 1.1 % in the mid 2100+ preset",
+   "problem": "The mid uses the favourable branch, in which chiplets host sandboxes. That branch needs NVM main memory with 1e10-1e15 write endurance: MRAM or FeRAM, not RRAM. Fe/MgO MTJs without Ru/Pt/W/Ta are unproven, cross-point selectors (chalcogenide OTS) have no element budget, and ZrO2 FeRAM is Zr-limited at 32 GB.",
+   "correct_value": "present both branches, or a probability-weighted mid (~5-8 %). With pods 15 % and the sceptical stack: ceiling 12.3 %, 10 % in 2496",
+   "severity": "medium",
+   "study": "workloads, memory, scenarios"
+  },
+  {
+   "claim": "1: chiplet NVM 1/8/32 GB (2040/2070/2100+)",
+   "problem": "32 GB is ~20 x the useful minimum (1.7 GB) and is not used by the model, which right-sizes at 0.9-1.7 GB. At 32 GB, ZrO2-only ferroelectrics cap coverage at 12.5-25 % and HZO (Hf) at 0.3-0.6 %, below the 22-48 % ceilings. Roadmap base rates argue against it: standalone MRAM is still ~1 Gb/die after ~20 yr of products; 3D XPoint/Optane was cancelled in 2022 with a $559M charge; the HP memristor promised for 2013 never shipped.",
+   "correct_value": "quote 1-2 GB/chiplet (right-sized) for 2070-2100+; 32 GB only as a high-case capability, conditional on a Zr-free or Ti-based cell",
+   "severity": "medium",
+   "study": "memory"
+  },
+  {
+   "claim": "3: cross-sail tensor parallelism is ruled out by light time",
+   "problem": "In a thin, phased shell the neighbouring sail is 2.6 km away at 1 % (9 us) and 562 m at 22 % (1.9 us). That is comparable to the 0.9-2.7 us inside a sail. The 0.15-1 ms figure assumes a thick random cloud.",
+   "correct_value": "conclusion holds, but for terminal bandwidth (~100 Pbps needed vs ~6 Pbps) and formation keeping, not light time",
+   "severity": "low",
+   "study": "interconnect, workloads"
+  },
+  {
+   "claim": "2: 'practical irreversible floor ~7e-16 J/FLOP'",
+   "problem": "It is the Ho et al. 2023 estimate (+-0.7 OOM, 1.1e-16 to 5.5e-15), not a bound. Recent ML-hardware efficiency doubles every ~2-3 yr (Epoch); at 2.5-3 yr the 2026 basis reaches 7.3e-16 by 2043-2046. The 2100+ mid stays 1.9 x above the floor for ~1,000 yr of production.",
+   "correct_value": "label it an estimate; the built swarm can have up to ~1.9 x (irreversible) and ~2 x more (moderate adiabatic) FLOP/s per kg",
+   "severity": "low",
+   "study": "logic"
+  },
+  {
+   "claim": "2/6: adiabatic logic excluded as unmanufacturable",
+   "problem": "The exclusion rests on the pre-wall doubling-time penalty. Over 99.99999 % of the mass is built post-wall, where growth is mass-limited. There, moderate gain g = 2-4 adds die area 2.4 g^2 and fab stock I.a/L, and still wins.",
+   "correct_value": "post-wall FLOP/s per kg of fleet + fabs: x1.7 (g = 2) to x2.4 (g = 4) at I = 5; x3.0-3.4 at I = 1.5; no gain at I >= 40",
+   "severity": "medium",
+   "study": "logic, manufacturing"
+  },
+  {
+   "claim": "6: hydrogen is the hard chemical wall",
+   "problem": "This ignores the solar wind the swarm itself intercepts: ~1.3e9 kg/s of solar wind, ~80 % H by mass, times coverage. The protons implant into the cover glass and can be recovered at each re-skin.",
+   "correct_value": "H intercepted 3.3e+13 kg/yr at f = 1e-3, 3.3e+14 at 1 %, vs Mercury's whole stock ~5e13 kg and the 'allowed' 2e11 kg/yr. The wall binds only before ~f = 1e-5 (pre-2100)",
+   "severity": "medium",
+   "study": "manufacturing"
+  },
+  {
+   "claim": "8: 1 % coverage gives 5e38 FLOP/s and ~2e23 brain-equivalents",
+   "problem": "2e23 is the 2070-logic figure (workloads study: 1.9e38 FLOP/s).",
+   "correct_value": "5.0e+23 brain-equivalents at 5.0e38 FLOP/s (Carlsmith 1e13-1e17: 5e21-5e25)",
+   "severity": "low",
+   "study": "workloads, scenarios"
+  },
+  {
+   "claim": "7: high-case ceiling ~48 %; the closed form's steadyCoverage",
+   "problem": "The closed form reports B_ss coverage 0.57 for the high case. Before the rock runs out the fleet reaches only 78 % of B_ss (0.48). The closed form ignores the finite rock; with rho = 0.99 and L = 50 it reports B_ss = 1.97e23 kg, 4.9 x everything the rock can deliver.",
+   "correct_value": "cap B_ss at M_SHELL x yield (4.0e22 kg) and model the exhaustion; high peak 0.477 at 1.008 AU (outside Earth orbit)",
+   "severity": "low",
+   "study": "scenarios (code)"
+  },
+  {
+   "claim": "7: after the rock is exhausted (~3127) the swarm shrinks",
+   "problem": "Mercury's core is Fe-Si alloy. Estimates run from 1 to 25 wt % Si, 8-20 % under reduced-formation models.",
+   "correct_value": "5-15 wt % Si = 1.2e+22-3.7e+22 kg Si, comparable to all the Si in the rock; Fe for structure. But the night-side radiator area shrinks to 69 %, and deep mining adds ~1.5 MJ/kg of lift heat",
+   "severity": "low",
+   "study": "scenarios"
+  },
+  {
+   "claim": "Model v4: the 2026 preset reproduces v3 exactly",
+   "problem": "True for the physics outputs. I re-ran equiv.mjs: no DIFF lines, but its 'worst' prints NaN because v3 itself gives NaN at f = 1, podFrac 0 (the 0 x Infinity that v4 fixes). The default sailArea changed from 1e6 to 69,543 m2 (nSails x 14.4). The new keys keep known-wrong defaults (energyPerKg 255 vs 1,150).",
+   "correct_value": "say 'physics identical; counts change with sailArea'; ship corrected defaults in a separate, re-pinned commit",
+   "severity": "low",
+   "study": "scenarios"
+  }
+ ],
+ "code_bugs": [
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "235-296 (growthPlan), 267-273 (deliveredBy), 393-395 (atYear)",
+   "problem": "No finite Mercury. Cumulative export grows without bound: atYear(...).mercuryRemoved = 1.184 (118 % of the planet) at model year 5,000 (the UI timeline runs to 5,000). steadyMass is not capped by the rock (rho 0.99, L 50: 1.97e23 kg vs 4.0e22 deliverable). Results disagree with sim.mjs, which does stop at the rock.",
+   "fix": "Pass rockDeliverable = MERCURY.M_SHELL * yieldDelivered into growthPlan. Find tRockOut where deliveredBy = rockDeliverable; for t > tRockOut use B(t) = B(tRockOut) exp(-(1-rho)(t-tRockOut)/L) and freeze deliveredBy. Use reachableMass = min(massSwarm, steadyMass, rockDeliverable)."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "370-376 (atYear: f = d.f*frac; tSail at d.sail.S), 338 and 402 (earth at d.rSail)",
+   "problem": "When the target coverage is above the refresh ceiling, atYear scales coverage linearly from the unreachable target and keeps the target's orbit. With 2100 parts, target 1 gives f = 0.1083 at 1.318 AU (exterior, Earth forcing 35.47 W/m2); target 0.5 gives f = 0.1804 at 1.015 AU. Meanwhile steadyCoverage = 0.2217 at 0.913 AU (forcing 48.6). The timeline depends on a slider that cannot be reached.",
+   "fix": "In atYear compute f = coverageForMass(p, built) and rSail = sailThermalRadius(p, f) (or cache a table as sim.mjs does), then call earthImpact at that radius. At minimum, when steadyMass < mass, rebuild d at coverageForMass(steadyMass)."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "149 (sailAt), 52-53 (PARAMS adiabaticGain)",
+   "problem": "adiabaticGain divides J/op with no cost. Die area per W, die mass, fab penalty and kg/W are unchanged, so the slider gives a free x g (edge case adiab10: x10 FLOP/s, identical tCap). The help text says to raise die area with it, but the code does not.",
+   "fix": "For g > 1: dieMm2PerW_eff = dieMm2PerW * 2.4*g^2, kgPerW += dieMm2PerW_eff*1e-6*0.1165 (50 um Si), and use dieMm2PerW_eff in the fab penalty. Or remove the slider until it is coupled."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "140-158 (sailAt), 202-206 (swarmAt)",
+   "problem": "NaN leak when the sail PV dies (eta = 0). Manual placement at rManual 0.5 AU with coverage >= ~0.9 (both within slider ranges) gives chipWm2 = 0 and kgPerW = Infinity. Then chipPower = NaN (podFrac 1), or massSails = 0 x Infinity = NaN (podFrac 0), and NaN spreads to mass, growth, atYear and earth.",
+   "fix": "If sail.chipWm2 <= 0: mark sail.feasible = false, set sailPower = 0 and treat q as 1 (or return an 'infeasible' result); guard massSails like massPods (q < 1 ? sailPower*kgPerW : 0)."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "499-518 (techAt), 494 (LOG_KEYS)",
+   "problem": "Between 2026 and 2040 techAt blends from the 2026 'off' values. fabToolIntensity rises 0 -> 40 (2026 fabs are ~250, so the trend runs backwards). serviceLife jumps to 10 at once while recycleFrac ramps 0 -> 0.9 (2030: L 10, rho 0.2571, so a tiny B_ss). energyPerKg goes 255 -> 1030 and dieMm2PerW 40 -> 22.5. A zero fabToolIntensity also silently drops out of log interpolation.",
+   "fix": "Interpolate from a physical 2026 set (ERAS[0].corrected plus fabToolIntensity 250, energyPerKg 1150, serviceLife 10, recycleFrac = the 2040 value), or clamp techAt(year < 2040) to the 2040 preset (no hardware is built before the 2050 seed)."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "236-256 (growthPlan pre-wall)",
+   "problem": "Pre-wall retirements are ignored. The serviceLife slider allows 1-5 yr: with L = 1 and rho = 0 the true net growth rate ln2/T_d - 1/L is negative, yet the model grows exponentially to B_ss (edge case L1_rho0). The comment's own bound (2^-L/T_d < 0.3 %) fails for L < ~8.",
+   "fix": "Use the net e-folding rate r = ln2/T_d - (1-rho)*2^(-L/T_d)*ln2/T_d (renewal approximation), or set the slider minimum to 8 yr."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "253",
+   "problem": "steadyMass - (steadyMass - massAtCap)*exp(-(t-tCap)/tau) cancels catastrophically when tau or steadyMass is huge (large L, rho -> 1).",
+   "fix": "massAtCap + (steadyMass - massAtCap) * -Math.expm1(-(t - tCap) / tau)"
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "240-243",
+   "problem": "rho = 1 sets refresh = false. Sails then never retire in the bookkeeping (retireRate, processingPower, replacementShare and fab stock all go to 0), though they are re-skinned every L years.",
+   "fix": "refresh = Number.isFinite(L); steadyMass = rho < 1 ? ... : Infinity; tau likewise."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "335 (fabStockPerFleet), 242 (steadyMass)",
+   "problem": "Fab tool mass is reported but not deducted from the Mercury-delivered budget. It is 0.9 % of the fleet (mid) but 21 % (2100 low: I 40, L 10).",
+   "fix": "B_ss_eff = B_ss / (1 + I*a/L), and include fab-tool replacement if tools have a finite life."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "398 (atYear replacementShare)",
+   "problem": "retireRate/gross exceeds 1 whenever export < (1-rho)*retire. sim.mjs line 111 shows 1.064 after the rock runs out.",
+   "fix": "replacementShare = min(1, retireRate/gross), or report recycledShare = rho*retireRate/gross."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "34-42 (energyPenalty)",
+   "problem": "Raising the 2026 table to the power slope/0.00912 does not give E ~ T^2 as the comment claims: 2.38 vs 1.75 at 200 C and 1.42 vs 1.40 at 150 C. Harmless at Tj 85 C, wrong for the hot-logic sliders.",
+   "fix": "For slope <= 0.0056 use (T/358.15)^2 (Boltzmann regime) or exp(slope*(Tj-85)); keep the table only for 2026."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "108, 324, 399 (energyPerKg default 255 and ?? 255 fallbacks)",
+   "problem": "The default stays at 255 MJ/kg although the study (and the help text) give 1,150. The UI and any caller that omits the key get the known-wrong value.",
+   "fix": "Default to 1150 (and INDUSTRY.energyPerKg in constants.js), then re-pin; remove the ?? 255 fallbacks once the key is always present."
+  },
+  {
+   "file": "scenarios/src/model/hybrid.js",
+   "line": "286-290 (yearsTo1pct, yearsTo10pct)",
+   "problem": "These are 1 % and 10 % of the target mass, not of the Sun. With the refresh ceiling they read as coverage milestones in the UI (model_changes says the 'initial year' falls back on them).",
+   "fix": "Rename to yearsTo1pctOfTarget, or add yearsToCoverage(f) = yearsForMass(swarmAt(p, f).mass)."
+  },
+  {
+   "file": "scenarios/test/hybrid.test.js",
+   "line": "138, 140-141",
+   "problem": "h.atYear(d, d, t) passes the compute() result as p. filmOptics then uses alpha 0.9 instead of 0.8 (tSail 338.7 vs 328.5 K), heatOnMercury is NaN, and processingPower uses 255 instead of 1,250 MJ/kg (5.16e+21 vs 2.53e+22 W). The test passes only because it checks other fields.",
+   "fix": "const q = h.eraParams('2100'); use h.atYear(q, d, t) and h.atYear({ ...q, coverage: 0.01 }, small, ...)."
+  },
+  {
+   "file": "scenarios/test/hybrid.test.js",
+   "line": "whole file",
+   "problem": "Mutation test: 8/16 plausible bugs in the new code survive. These include cumulative Mercury mining (the v4 'counts every kg ever exported' claim), the (1-rho) factor in deliveredBy, era optics in earthImpact, processingPower, heatOnMercury, adiabaticGain and seedYear. Nothing pins the headline timeline (2109/2117/2238/3127), the finite rock, NaN-freeness, atYear-vs-steadyCoverage consistency, techAt before 2040, or Earth forcing.",
+   "fix": "Add tests for: cumulative mining at t = yearsToFull + 300 equal to (1-rho)*B/L*300*minedPerDelivered; mercuryRemoved <= M_SHELL/M; no NaN over a slider grid; atYear(late).f == steadyCoverage; earth.forcing for the 2100 preset at f = 0.01 (1.86 W/m2); techAt(2030).fabToolIntensity >= 40; a golden timeline from a deterministic closed form or a fast sim."
+  },
+  {
+   "file": "scenarios/test/hybrid.test.js",
+   "line": "72-81",
+   "problem": "'2026 mid preset is the v3 default set' compares against v4 defaults (sailArea 69,543), not v3. The v3-equivalence evidence lives in equiv.mjs, outside the suite, and its 'worst' is NaN.",
+   "fix": "Vendor a frozen v3 snapshot (test/fixtures/hybrid_v3.js) and assert equality of the physics fields in-suite; filter NaN cases explicitly."
+  },
+  {
+   "file": "scenarios/sim.mjs",
+   "line": "38-40, 48",
+   "problem": "p0 = h.techAt(seedYear, level) ignores `overrides`. Overrides of yieldDelivered, heatPerKg, mercuryHeatLimit and seedMass have no effect on D_cap, the rock limit or the seed: my yield-0.42 variant came out identical to mid until patched. None of the scenario's own variants used these keys, so its numbers stand.",
+   "fix": "const p0 = { ...h.techAt(seedYear, level), ...overrides };"
+  },
+  {
+   "file": "scenarios/sim.mjs",
+   "line": "111",
+   "problem": "replacementShare = Rrate/P reaches 1/rho = 1.064 after the rock runs out (P = rho*R). The scenario snapshots 3200/3400 publish 1.064.",
+   "fix": "min(1, Rrate/P), or rho*Rrate/P as recycled share."
+  },
+  {
+   "file": "scenarios/sim.mjs",
+   "line": "39, 88",
+   "problem": "D_cap stays constant for ~1,000 yr, but Mercury's night-side area falls to 69 % as the crust and mantle are removed, and lifting rock from ~400 km adds ~1.5 MJ/kg of surface heat.",
+   "fix": "D_cap(t) = D_cap0 * (R(t)/R0)^2 * 2/(2 + g*depth/1e6)."
+  },
+  {
+   "file": "scenarios/equiv.mjs",
+   "line": "9-13",
+   "problem": "worst = Math.max(worst, NaN) poisons the summary (it prints 'worst relative difference NaN'), so the '1,620 values identical' claim rests on the absence of DIFF lines, not on the summary.",
+   "fix": "Skip or count NaN cases separately before Math.max."
+  }
+ ],
+ "too_optimistic": [
+  "Ceiling ~22 % (8-48 %) presented as reachable: Earth's absorbed flux passes the project's own runaway limit at ~20 % (uniform interior shell). An Earth-tolerable isotropic swarm is <= 0.5 % (<= 1 W/m2), reached ~2113.",
+  "Mid fab productivity (I 15 -> 5) is the speculative imprint + self-assembly path. Space-native wafer fab (I 40) as mid: wall 2145, 1 % 2152.",
+  "Film stack 0.165-0.185 kg/m2 with eps 0.86/0.93: the design spec's IR model needs 0.203 kg/m2 for eps_b ~0.9. That costs +24 % g/W (+45 % at conservative eps), and the ceiling falls 22 -> 18 (16) %.",
+  "PV 0.225-0.25 AM0 from H-free kerfless 30 um cells: 96 % of the Auger limit, above today's record ratio; the H-free route is demonstrated at 13 %.",
+  "yieldDelivered 0.5 needs ~100 % Si recovery (film 54 % Si, rock 25-27 % Si): D_cap -16 %.",
+  "Pods 1.1 % (mid) assumes sandbox-capable chiplets with MRAM/FeRAM main memory built from Mercury elements (Fe/MgO MTJ without Ru/Pt/W/Ta; OTS selectors not budgeted).",
+  "32 GB/chiplet NVM by 2100+: arbitrary capability extrapolated from 3D NAND, Zr/Hf-limited at the ceiling coverage. Base rates: MRAM ~1 Gb/die after ~20 yr of products; Optane cancelled; memristor 2013 never shipped.",
+  "On-film photonic lanes by 2045-2050: co-packaged optics took ~15-20 yr from first promises to 2025 samples; 2060-2070 is the base-rate date.",
+  "Base doubling 1 yr for ~46 doublings, and a 2050 seed: no industry has sustained >2-3 doublings at that rate. A 2-yr doubling moves the wall 2109 -> 2156 (2183 with the sceptical stack).",
+  "Recycling rho 0.94 in orbit has no data. Each re-skin re-fabs every die: 1.8e19 m2/yr of leading-edge die at steady state, 1.4e12 x today.",
+  "Sceptical mid combined (I 40, design-spec film, PV 0.21, yield 0.42): wall 2130, 1 % 2142, 10 % 2358, ceiling 15.5 % (12.3 % with pods 15 %); FLOP/s at the ceiling 6.5e39 (vs 1.1e40)."
+ ],
+ "too_conservative": [
+  "Hydrogen wall: the swarm intercepts 3e13 kg/yr of solar-wind H at f = 1e-3 and 3e14 at 1 %, more than Mercury's entire 5e13 kg stock each year. Recovered at re-skin, it removes the wall after ~2100; it only constrains the pre-wall decades.",
+  "Adiabatic logic: post-wall (mass-limited, where >99.99999 % is built) g = 2-4 gives x1.7-2.4 FLOP/s per kg including die mass and fab stock at I = 5 (x3 at I = 1.5).",
+  "Hot logic: with 2100 parts, Tj 105-150 C raises FLOP/s per kg by 5-12 % and the refresh ceiling to 27-38 %. Cold is right only if coverage (Earth) binds, which it does.",
+  "J/op frozen at the 2100 value for ~1,000 yr of production: still 1.9 x above the stated irreversible floor, which 2-3 yr halving would reach by ~2045.",
+  "Service life 10-15 yr after J/op plateaus: refresh becomes degradation-driven. L = 30 yr gives a ceiling of 35 % (closed form 39 %) and 10 % by 2220 (but see Earth).",
+  "After rock exhaustion the swarm need not shrink: Mercury's Fe-Si core may hold 1.2e22-3.7e22 kg Si (5-15 wt %)."
+ ],
+ "missing": [
+  "Earth climate as a hard constraint (see earth_flag): forcing per 1 % coverage of +1.9 (uniform), +4.2 (corridor) or +6.8 W/m2 (exterior), independent of technology.",
+  "Collision and debris dynamics: 3e16 (1 %) to 7.8e17 (22 %) sails in crossing orbits. The losses (1-rho) are ~3e19 kg/yr at the ceiling (the 1-3 % of sails that die per cycle, propellant, ablation), adding up to ~2e22 kg over 1,000 yr: as massive as the fleet, with no fate modelled. Dust from it could exceed the natural zodiacal cloud (1e16-1e17 kg) by orders of magnitude, and some crosses 1 AU.",
+  "Fab tool mass (0.9-21 % of the fleet) and tool replacement are not deducted from B_ss.",
+  "Element budget for cross-point NVM selectors (chalcogenide OTS: Ge/Se/As/Te) and for N-free, F-free 9-15 nm CMOS: no TiN/SiN spacers or etch stops; SiO2 etch without fluorocarbons is unsolved. The interconnect study assumes SiN waveguides ('N ppm suffices') while manufacturing bans N.",
+  "Mercury's shrinking radiator area (to 69 %) and deep-mining lift heat (~1.5 MJ/kg at 400 km) in D_cap.",
+  "The co-orbital foundry ring (~1e18 m2 of 320 K radiators at the wall) and its mass.",
+  "Solar-wind H/He implantation and blistering of the cover glass as a service-life driver (and as an H source).",
+  "The headline timeline comes from sim.mjs, which no test pins. The closed form the UI will use disagrees with it (rock, high case, atYear coverage).",
+  "Swarm geometry: thin phased shell vs thick cloud. This sets neighbour light time, collision risk and Earth view factors, and no study fixes it."
+ ],
+ "earth_flag": {
+  "summary": "At the mid ceiling (f = 0.22, sails at 0.91 AU, inside Earth's orbit) a uniform shell cuts Earth's sunlight by 22 % but re-radiates f.S0 = 300 W/m2 of 348 K IR past Earth. Earth absorbs IR at ~0.95 vs 0.70 for sunlight, and the shell fills a 65.5 deg disk (sphere factor 1.41). Net +49 W/m2 absorbed (287 vs 238 W/m2): 12.5 CO2 doublings, ~+39 K linear, beyond the 282 W/m2 runaway-greenhouse limit the project already uses. At 1 % (2117): +1.9 W/m2 uniform, already ~70 % of today's anthropogenic forcing (2.7); at 10 % (2238): +20 W/m2.",
+  "numbers": {
+   "f_0.01": {
+    "uniform": 1.8637567364052359,
+    "corridor": 4.243756736405231,
+    "exterior_348K": 6.815658619215405
+   },
+   "f_0.1": {
+    "uniform": 19.871615986128404,
+    "corridor": 43.67161598612836,
+    "exterior_348K": 69.02755270941688
+   },
+   "f_0.2217": {
+    "uniform": 49.043038480652115,
+    "corridor": 101.80763848065209,
+    "exterior_348K": 155.72499971699852,
+    "absorbed_uniform": 287.0430384806521,
+    "runaway_limit": 282
+   },
+   "max_coverage_for_1Wm2": {
+    "uniform": 0.005260440651867843,
+    "corridor": 0.0023359129583542435
+   },
+   "max_coverage_for_0.1Wm2": {
+    "uniform": 0.0005260440651867575,
+    "corridor": 0.0002335912958354458
+   },
+   "ir_split_at_0.22": {
+    "near_cap_back_faces_Wm2_absorbed": 48.22833780742049,
+    "far_side_front_faces_through_gaps_Wm2_absorbed": 34.710816313272275,
+    "note": "Removing the Earth-facing cap (a keep-out zone) does not remove the far-side front-face IR that shines through the gaps; the IR term is ~half from each."
+   },
+   "geometry_r0.91": {
+    "cap_halfangle_deg_back_faces_visible": 24.494648471419676,
+    "cap_area_fraction_of_shell": 0.044999999999999984,
+    "shell_disk_radius_seen_from_earth_deg": 65.50535152858032,
+    "disk_solid_angle_sr": 3.678124849879403
+   }
+  },
+  "what_the_earth_safe_orbit_study_must_handle": [
+   "IR, not shadow, is the dominant term. Total IR through the 1 AU sphere is f.S0 whatever the shell radius, so moving the shell in or out only changes the 1.0-1.41 view factor. Exterior shells are worse (+6.8 W/m2 per 1 %).",
+   "Only a 24.5 deg cap (4.5 % of the shell at 0.91 AU) shows back faces to Earth (~48 of ~83 W/m2 at f = 0.22). The rest is far-side front faces seen through the gaps, so a co-moving keep-out cap alone cannot fix it. Options: an anisotropic, out-of-ecliptic-weighted swarm; angle-selective emitters that send IR away from the ecliptic; a coverage cap; or deliberate partial dimming (needs ~2x the IR forcing in shade, and costs the biosphere light).",
+   "Shadow: a penumbral keep-out cone of radius R_E + d x 4.65 mrad (~6e7 m at 0.09 AU) that co-moves with Earth. Sails at 0.91 AU have a 0.868-yr period and a 6.6-yr synodic period, so every near-ecliptic orbit must be phased or must manoeuvre.",
+   "Clearance: Earth's orbit spans 0.983-1.017 AU and the shell 0.85-0.92 AU (0.06-0.17 AU). The high case crosses 1 AU (peak 0.477 at 1.008 AU, ~2990); hot-logic or adiabatic variants change radii; at Tj >= 125 C sails approach Venus's orbit (0.72 AU).",
+   "Debris and dust: losses of ~3e19 kg/yr at the ceiling, derelict sails (1-3 % per cycle) and collision fragments in crossing orbits; flux of beta > 0.5 dust across 1 AU; meteoroid-like infall to Earth and the Moon.",
+   "Scattered and reflected sunlight: the swarm sits at elongations up to 58-65 deg (twilight sky brightness, astronomy), plus specular glints from sun-facing sails.",
+   "Earth-swarm communication and the L1/L2 assets that must see the Sun.",
+   "Time profile: forcing passes 1 W/m2 at f ~0.5 % (uniform) / ~0.23 % (corridor), i.e. ~2111-2113 in the mid timeline, only a few years after the heat wall. The study must give a coverage-vs-geometry envelope, not a single orbit."
+  ]
+ },
+ "revised_numbers": {
+  "scenario_mid_reproduced": {
+   "heat_wall": 2108.6,
+   "one_pct": 2116.8,
+   "ten_pct": 2237.9,
+   "ceiling": 0.2173,
+   "rock_out": 3126.7
+  },
+  "sceptical_mid": {
+   "definition": "I = 40 (space-native wafer fab), design-spec film 0.203 kg/m2 with eps 0.85/0.90, PV 0.21 AM0, yield 0.42 (sim.mjs with the p0 fix)",
+   "heat_wall": 2130,
+   "one_pct": 2142,
+   "five_pct": 2213,
+   "ten_pct": 2358,
+   "ceiling_coverage": 0.155,
+   "ceiling_flops": 6.533942309285418e+39,
+   "rock_out": 3147
+  },
+  "sceptical_mid_pods15": {
+   "ceiling_coverage": 0.123,
+   "ten_pct": 2496,
+   "ceiling_flops": 5.1014722538973214e+39
+  },
+  "sceptical_mid_Td2": {
+   "heat_wall": 2183,
+   "one_pct": 2194,
+   "ten_pct": 2410
+  },
+  "g_per_W_2100_mid": {
+   "claimed": 0.555,
+   "design_spec_film": 0.691,
+   "conservative_eps": 0.806,
+   "sceptical": 0.817,
+   "sceptical_pods15": 1.066
+  },
+  "flop_per_J_sun_2100": {
+   "claimed": 131500000000000.0,
+   "pv_0.21": 110400000000000
+  },
+  "sail_r_AU_2100_f0.01": {
+   "claimed": 0.852,
+   "design_spec_eps": 0.862,
+   "conservative_eps": 0.934
+  },
+  "brain_equivalents_at_1pct_2100": 5.0146800000000003e+23,
+  "earth_forcing_W_m2_per_1pct": {
+   "uniform": 1.8637567364052359,
+   "corridor": 4.243756736405231,
+   "exterior": 6.815658619215405
+  },
+  "earth_safe_coverage_max_1Wm2": {
+   "uniform": 0.005260440651867843,
+   "corridor": 0.0023359129583542435
+  },
+  "fab_die_m2_per_yr": {
+   "at_wall": 1083000000000000000,
+   "refresh_steady_state": 18050000000000000000
+  },
+  "hot_logic_2100": {
+   "85": {
+    "sail_flops_per_kg": 1348000000000000000,
+    "ceiling": 0.2217,
+    "flops_per_J_sun": 131500000000000
+   },
+   "105": {
+    "sail_flops_per_kg": 1414000000000000000,
+    "ceiling": 0.2661,
+    "flops_per_J_sun": 110700000000000
+   },
+   "125": {
+    "sail_flops_per_kg": 1466000000000000000,
+    "ceiling": 0.3141,
+    "flops_per_J_sun": 93320000000000
+   },
+   "150": {
+    "sail_flops_per_kg": 1513000000000000000,
+    "ceiling": 0.3778,
+    "flops_per_J_sun": 75410000000000
+   }
+  },
+  "adiabatic_post_wall_gain_I5": {
+   "1": 1.0,
+   "1.5": 1.38,
+   "2": 1.72,
+   "3": 2.18,
+   "4": 2.38,
+   "6": 2.36
+  },
+  "solar_wind_H_kg_per_yr_at_1pct": 328199040000000.0,
+  "pv_limits": {
+   "SQ_AM0_Si_301K": 0.30019797888835836,
+   "auger_est_30um": 0.25967125173843,
+   "best_2T_Si_tandem_AM0": {
+    "Eg_top_eV": 1.8,
+    "eta": 0.408380212512503
+   }
+  },
+  "thermal_spread_K_20.9mm": 7.077024362266133,
+  "landauer_358K_J": 3.42747029230315e-21,
+  "upside_L30": {
+   "ceiling": 0.351,
+   "ten_pct": 2220
+  }
+ },
+ "checks_that_hold": [
+  "Landauer 3.43e-21 J at 358 K; the 7e-16 J/FLOP 'floor' is ~2e5 x Landauer (an engineering estimate).",
+  "AM0 SQ for Si 30.0 % at 301 K (claimed 30.2 %); a 2-terminal Si-family tandem limit of ~41 % allows 30 % in principle.",
+  "Thermal spreading: 7.1 K die-to-film-mean at 20.9 mm pitch with 30 um Si + 13 um Mg (10.8 K without Mg); 9.0 K assumed. OK if the Mg spreader stays.",
+  "r scales as sqrt(alpha): 0.919 -> 0.852 AU at f = 0.01 (alpha 0.9 -> 0.8); the cavity formula is reproduced; sails cross 1 AU at f ~0.48.",
+  "Links are not photon-limited: 0.6-12 W transmit for 10 photons/bit at 50-400 Tbps over 350-5,000 km with 10-30 cm optics.",
+  "B_ss = D_cap.L/(1-rho) = 9.86e21 kg; a fixed-life renewal model gives the same steady state (98 % of B_ss after 1,000 yr; 0.45 B_ss ~45 yr later than the ODE).",
+  "Growth formula T_d' = T_d + ln2.I.a is dimensionally right (I.a in yr) and correct for capital that must include fab tools.",
+  "Scenario mid timeline reproduced exactly by re-running its simulator (wall 2108.6, 1 % 2116.8, 10 % 2237.9, peak 0.2173, rock out 3126.7); dominant-era shares hold within the model.",
+  "Per-era numbers reproduced: 1.37/1.04/0.632/0.555 g/W; 0.919/0.887/0.855/0.852 AU; 1.64e12/1.55e13/6.84e13/1.31e14 FLOP/J_sun; 14.6/19.3/22.8/23.9 MW per sail; pitch 20.9 mm.",
+  "energyPerKg ~1,150 MJ/kg and the ~1e11 x today's wafer output at the heat wall are consistent.",
+  "Film beats pods per kg 5-5.4 x in every era: holds."
+ ],
+ "revised_recommendation": "Adopt model v4's structure (eras, fab penalty, refresh with B_ss, cumulative mining) only after the code fixes: rock cap and exhaustion in growthPlan; atYear coverage from coverageForMass with thermal radius; NaN guards when PV dies; couple adiabaticGain to die area and mass (or drop it); physical 2026 anchors in techAt; the sim p0 override fix; corrected atYear calls in the tests plus new pins for mining, Earth forcing, NaN-freeness and the timeline. Re-centre the mid presets: film 0.19-0.20 kg/m2 with eps 0.85/0.90 unless a thin eps >= 0.9 emitter is demonstrated; PV 0.21-0.22 AM0; yield 0.42-0.45; I = 40 as mid with imprint+DSA as 'high'; pods ~5-8 % mid with a sandbox toggle; NVM right-sized at 1-2 GB, 32 GB only as an option. Then quote: wall ~2130, 1 % ~2140, 10 % ~2360, ceiling ~15 % (12-18 %), 6.5e39 FLOP/s. Present the ceiling as the assumption ratio D_cap.L/(1-rho), not physics. Above all, make Earth a first-class constraint: until the Earth-safe study shows a geometry with low IR toward the ecliptic, cap the visualizer's 'Earth-safe' coverage at ~0.5 % (<= 1 W/m2), label anything above it as Earth-hostile, and drop 'exterior placement' and 'sunlight corridor' as Earth fixes. Revisit two too-conservative exclusions once the Earth constraint is set: moderate adiabatic logic post-wall (x1.7-2.4 per kg) and solar-wind hydrogen, which removes the H wall after ~2100.",
+ "sources": [
+  "scratchpad/research5/future/{logic,memory,interconnect,hot_power,workloads,manufacturing,scenarios}/result.json",
+  "docs/data/design_spec.json (optics_findings, mass_breakdown), docs/architecture.md, src/model/{model,sat2,constants}.js",
+  "Ho, Erdil, Besiroglu, Limits to the Energy Efficiency of CMOS Microprocessors (2023): https://arxiv.org/abs/2312.08595",
+  "Epoch AI, ML hardware energy efficiency (doubling ~2 yr, leading chips): https://epoch.ai/data-insights/ml-hardware-energy-efficiency",
+  "Intel Optane wind-down, $559M charge (2022): https://www.techcentral.ie/intel-kills-off-optane-memory-business-with-559m-loss/",
+  "HP/Hynix memristor commercial target 2013: https://www.technologyreview.com/2010/08/31/120987/nano-switches-that-store-more-data-head-to-market/ ; https://www.3dtested.com/news/ReRAM-memristor-Kavli-Foundation-Stan-Williams-Hynix,17986.html",
+  "EUV roadmap slips (Intel EUV at 45 nm/2007 planned; 32 nm/2009 then pushed): https://www.eetimes.com/?p=1164380",
+  "LONGi 27.81 % HIBC record (ISFH-certified, 2025): https://www.pv-magazine.com/2025/04/14/longi-claims-worlds-highest-efficiency-for-silicon-solar-cells/",
+  "NVIDIA co-packaged optics switches (announced 2025): https://www.techinsights.com/blog/nvidia-launches-new-switches-tsmcs-co-packaged-optics",
+  "Mercury core Si content (1-25 wt %; 8-20 % under reduced conditions): https://arxiv.org/pdf/1806.02024 ; https://goldschmidtabstracts.info/2021/5829.pdf",
+  "Solar-wind mass loss ~2-3e-14 Msun/yr (~1.3e9 kg/s): https://arxiv.org/pdf/2507.13460",
+  "Runaway-greenhouse absorbed-flux limit 282 W/m2: Goldblatt et al. 2013, Nat. Geosci. 6, 661 (as used in constants.js)",
+  "Richter, Hermle, Glunz, Reassessment of the limiting efficiency for crystalline silicon solar cells, IEEE JPV 3, 1184 (2013)"
+ ],
+ "files": {
+  "scripts": [
+   "skeptic/scripts/physics_checks.py",
+   "skeptic/scripts/edge_cases.mjs",
+   "skeptic/scripts/model_checks.mjs",
+   "skeptic/scripts/mutate.py",
+   "skeptic/scripts/sim_core.mjs (scenarios/sim.mjs lines 1-137, p0 override fixed)",
+   "skeptic/scripts/sim_skeptic.mjs",
+   "skeptic/scripts/sim_skeptic2.mjs",
+   "skeptic/scripts/build_result.py"
+  ],
+  "outputs": [
+   "skeptic/physics_checks.json",
+   "skeptic/model_checks.json",
+   "skeptic/edge_cases.json",
+   "skeptic/mutation.json",
+   "skeptic/sim_skeptic.json",
+   "skeptic/sim_skeptic2.json"
+  ],
+  "repo_copy": "skeptic/repo (proposed hybrid.js + hybrid.test.js dropped in; node --test: 32/32 pass)"
+ }
+}

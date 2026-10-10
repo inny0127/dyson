@@ -1,0 +1,1201 @@
+{
+ "domain": "AI workloads and algorithms, 2026-2100+, as they constrain the Dyson-swarm compute architecture (study 5 of 8)",
+ "summary": "WORKLOADS 2026-2100+. Durable properties to design a swarm around, all measured: forward-pass generation dominates. Self-play, RL rollouts and serving take 50-92 % of compute, and inference went 26 % -> ~50 % -> ~67 % (2024-2026). Most training compute is many experiments: final runs were ~7 % of OpenAI's 2024 compute. Per-sequence working state stays ~1-70 GB because KV/token fell x0.35/yr while context grew x3/yr. Training state per FLOP falls (N~C^0.5). Sparsity rose 3.6 -> 32. Critical batch grows as D^0.38-0.47. Low-comm methods cut traffic 100-1,000x but are proven only to 4.75e23 FLOP and M<=8-16 replicas. Agents need general-purpose sandboxes: CPU:GPU went 1:8 -> 1:4, forecast 1:1-1:2. The human text stock (3e14 tokens) is exhausted by a single 2070 sail-year run. SHAPE: the sail (14.8 MW, 1.5e21/5.7e21/1.1e22 FLOP/s, 0.1/0.85/3.4 EB) is the synchronous unit. A 2070 sail trains a 7e28-FLOP, ~1e13-active (7e14 total) model per year using 0.5 % of its memory. It serves ~1.35e7 agents (6.7e8 tok/s, 1.4x Google 2025) and decodes a 1e12-active model single-stream at ~4.7e4 tok/s, as fast as a pod. Cross-sail DiLoCo/SparseLoCo needs only 1e-4-4e-2 of a sail's laser capacity, so the limit is the replica penalty. 1e2-1e5 sails may give 3e30-8e32 effective FLOP/yr (speculative), and the largest coherent learner+actor enterprise is <=1e-9 of a 3.4e16-sail swarm. The swarm is therefore a population: ~1e23-1e25 agent streams, ~2e23 (2e21-2e25) human-brain-equivalents at f=0.01/2070, searches, self-play, ensembles and science (60-230 exascale machines per sail). POD SHARE from workloads: 12.8 % (7.8-24.5) in 2040, 2.7 % (1.6-5.7) in 2070 and 1.1 % (0.55-2.4) in 2100+ when combined with studies 2-3. That is ~2.5x their 5/1/0.3 % because agent tool/environment CPU work is rising. It stays ~15 % (6-33 %) forever unless film chiplets get a sandbox-capable core + MMU + NVM main memory, which is worth 10-30 % of swarm mass. Pods are for dies >~3.8 W, radiation-intolerant memory, cryogenics and archives, never for synchronous work. The user's intuition holds if 'satellite' means the sail: concentration happens inside it via photonic lanes.",
+ "trends": [
+  {
+   "metric": "Frontier training compute growth",
+   "years": "2010-2024",
+   "value": "4-5x per year (largest 2025 runs ~5e26 FLOP)",
+   "unit": "x/yr",
+   "evidence_class": "measured trend",
+   "source": "https://epoch.ai/blog/training-compute-of-frontier-ai-models-grows-by-4-5x-per-year"
+  },
+  {
+   "metric": "Decentralized (low-communication, internet) training compute growth",
+   "years": "2020-2025",
+   "value": "~20x per year; largest runs 6e22-6e23 FLOP, ~1,000x below frontier; Covenant-72B (SparseLoCo, 72B x 1.1T tokens) = 4.75e23 FLOP by 6ND",
+   "unit": "x/yr; FLOP",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale",
+    "https://arxiv.org/abs/2603.08163"
+   ]
+  },
+  {
+   "metric": "Global AI compute stock",
+   "years": "2022-2025",
+   "value": "3.3x per year (2.7-4.1); 15.7M H100e = 3.1e+22 FLOP/s dense FP8 (Dec 2025)",
+   "unit": "FLOP/s",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://epoch.ai/data-insights/ai-chip-production",
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale"
+   ]
+  },
+  {
+   "metric": "HBM shipped (cumulative) and world bytes per FLOP/s",
+   "years": "2022-2025",
+   "value": "2.08 EB by Q4 2025 (1.28 EB in 2025 alone); 6.7e-05 B per FLOP/s",
+   "unit": "bytes; B/(FLOP/s)",
+   "evidence_class": "measured trend",
+   "source": "https://epoch.ai/data-insights/hbm-shipped"
+  },
+  {
+   "metric": "Accelerator memory capacity per FLOP/s",
+   "years": "2017-2026",
+   "value": "2.6e-4 (V100, FP16) -> 4.0e-5 (H100, FP8) -> 5.8e-6 B per FLOP/s (Rubin, NVFP4): -34 %/yr at lowest precision, -17 %/yr at 16-bit (Epoch: memory doubles every ~4 yr, compute every ~2.3 yr)",
+   "unit": "B/(FLOP/s)",
+   "evidence_class": "measured trend (computed from NVIDIA dense specs)",
+   "source": [
+    "https://www.nvidia.com/en-us/data-center/v100/",
+    "https://www.nvidia.com/en-us/data-center/a100/",
+    "https://inferencex.semianalysis.com/chips/h100",
+    "https://www.nvidia.com/en-us/data-center/dgx-b200/",
+    "https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72",
+    "https://epoch.ai/blog/trends-in-machine-learning-hardware"
+   ]
+  },
+  {
+   "metric": "KV-cache bytes per token (16-bit) of frontier-class open models",
+   "years": "2020-2025",
+   "value": "4.7 MB (GPT-3, MHA) -> 0.33-0.52 MB (GQA) -> 70 KB (DeepSeek-V3 MLA) -> 25 KB (Qwen3-Next 3:1 hybrid) -> 8 KB (Kimi Linear): x0.35/yr",
+   "unit": "B/token",
+   "evidence_class": "measured trend (computed from published configs)",
+   "source": [
+    "https://arxiv.org/abs/2005.14165",
+    "https://arxiv.org/abs/2307.09288",
+    "https://arxiv.org/abs/2407.21783",
+    "https://arxiv.org/abs/2412.19437",
+    "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct",
+    "https://arxiv.org/abs/2510.26692"
+   ]
+  },
+  {
+   "metric": "Maximum context length",
+   "years": "2020-2025",
+   "value": "2k -> 128k -> 1M tokens: x3.0/yr",
+   "unit": "tokens",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://arxiv.org/abs/2005.14165",
+    "https://arxiv.org/abs/2407.21783",
+    "https://arxiv.org/abs/2510.26692"
+   ]
+  },
+  {
+   "metric": "KV state per sequence at maximum context",
+   "years": "2020-2025",
+   "value": "1.3-68 GB, no trend (fit x1.05/yr): KV compression has exactly offset context growth",
+   "unit": "GB/sequence",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://arxiv.org/abs/2412.19437",
+    "https://arxiv.org/abs/2510.26692",
+    "https://arxiv.org/abs/2407.21783"
+   ]
+  },
+  {
+   "metric": "MoE sparsity (total/active params), open frontier-class models",
+   "years": "2023-2025",
+   "value": "3.6 (Mixtral) -> 18 (DeepSeek-V3) -> 23-27 (Llama 4, gpt-oss, Qwen3-Next) -> 32 (Kimi K2): fit x2.7/yr (cannot continue; an optimum exists per compute)",
+   "unit": "ratio",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://mistral.ai/news/mixtral-of-experts",
+    "https://arxiv.org/abs/2412.19437",
+    "https://arxiv.org/abs/2507.20534",
+    "https://openai.com/index/introducing-gpt-oss/",
+    "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct",
+    "https://arxiv.org/abs/2501.12370"
+   ]
+  },
+  {
+   "metric": "Frontier training precision",
+   "years": "2016-2025",
+   "value": "FP32 -> BF16 (2018) -> FP8 (DeepSeek-V3, 2024) -> NVFP4 (12B/10T tokens, 2025): bits halve every ~4 yr; compute-optimal integer precision ~7-8 bits (Kumar 2024); ternary weights work for inference",
+   "unit": "bits",
+   "evidence_class": "measured trend + published finding",
+   "source": [
+    "https://arxiv.org/abs/2412.19437",
+    "https://arxiv.org/abs/2509.25149",
+    "https://arxiv.org/abs/2411.04330",
+    "https://arxiv.org/abs/2402.17764"
+   ]
+  },
+  {
+   "metric": "Compute split at a frontier lab (OpenAI)",
+   "years": "2024-2026",
+   "value": "2024: inference 26 %, R&D 74 %, final training runs of released models ~7 % of all compute (~10 % of R&D; ~90 % of R&D went to experiments/unreleased runs). 2025: ~even R&D vs inference. 2026: inference ~2/3 of AI compute (Deloitte forecast)",
+   "unit": "share of compute spend",
+   "evidence_class": "measured trend (estimates) + published forecast (2026)",
+   "source": [
+    "https://epoch.ai/data-insights/openai-compute-spend",
+    "https://epoch.ai/latest/introducing-the-ai-chip-users-explorer",
+    "https://www.deloitte.com/us/en/about/press-room/deloitte-2026-tmt-predictions.html"
+   ]
+  },
+  {
+   "metric": "Generation (actor) share of RL / self-play compute",
+   "years": "2017-2026",
+   "value": "AlphaZero 5,000 TPUv1 self-play vs 64 TPUv2 learners (~92 % of power); OpenAI Five 128,000 CPU cores vs 256 GPUs (~86-94 % CPU power, approx.); INTELLECT-2 inference 4x training (80 %); LLM RL rollouts 49-90+ % of step time; Nemotron SWE-RL 32 of 64 nodes generate",
+   "unit": "share",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://arxiv.org/abs/1712.01815",
+    "https://www.theregister.co.uk/2018/06/25/openai_dota_2/",
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale",
+    "https://arxiv.org/abs/2609.25463",
+    "https://arxiv.org/abs/2509.18521",
+    "https://docs.nvidia.com/nemotron/latest/nemotron/super3/rl/swe.html"
+   ]
+  },
+  {
+   "metric": "RL / reasoning training compute",
+   "years": "2024-2025",
+   "value": "reasoning phases 1e23-1e24 FLOP vs ~1e26 pretraining (Epoch, early 2025); o3 ~10x o1 RL; Grok 4 RL compute read as ~pretraining scale; Epoch expects RL to converge with frontier growth (~4x/yr)",
+   "unit": "FLOP",
+   "evidence_class": "measured trend (sparse) + published forecast",
+   "source": [
+    "https://epoch.ai/gradient-updates/how-far-can-reasoning-models-scale",
+    "https://x.ai/news/grok-4"
+   ]
+  },
+  {
+   "metric": "Output length per answer",
+   "years": "2023-2025",
+   "value": "reasoning models x5/yr, non-reasoning x2.2/yr",
+   "unit": "tokens",
+   "evidence_class": "measured trend",
+   "source": "https://epoch.ai/data-insights/output-length"
+  },
+  {
+   "metric": "AI task horizon (METR)",
+   "years": "2019-2025",
+   "value": "doubles every ~7 months (2019-2024); ~4.3 months post-2023 (TH 1.1)",
+   "unit": "minutes of human task length",
+   "evidence_class": "measured trend",
+   "source": [
+    "https://arxiv.org/abs/2503.14499",
+    "https://metr.org/blog/2025-07-14-how-does-time-horizon-vary-across-domains"
+   ]
+  },
+  {
+   "metric": "CPU:GPU ratio in AI data centres (agentic shift)",
+   "years": "2024-2026",
+   "value": "1:8 -> 1:4 sockets (Intel, 2026) -> 1:1-1:2 forecast (TrendForce); Arm 30M -> 120M CPU cores per GW. Implied CPU power share 3.9 %-7.5 % -> 13.9 %-24.4 % (Arm: 30-48 %)",
+   "unit": "ratio; share of power",
+   "evidence_class": "measured trend + published forecast (power share is this study's conversion)",
+   "source": [
+    "https://insights.trendforce.com/p/agentic-ai-cpu-gpu",
+    "https://arxiv.org/abs/2511.00739"
+   ]
+  },
+  {
+   "metric": "Algorithmic efficiency (pretraining)",
+   "years": "2012-2023",
+   "value": "compute for fixed performance halves every ~8 months (5-14)",
+   "unit": "months",
+   "evidence_class": "measured trend",
+   "source": "https://arxiv.org/abs/2403.05812"
+  },
+  {
+   "metric": "Price of fixed capability (inference)",
+   "years": "2023-2025",
+   "value": "~40x/yr (10-900x) Epoch dashboard; 5-10x/yr (MIT/Epoch data); ~3x/yr algorithmic only",
+   "unit": "x/yr",
+   "evidence_class": "measured trend",
+   "source": "https://epoch.ai/gradient-updates/how-persistent-is-the-inference-cost-burden"
+  },
+  {
+   "metric": "Batch size at frontier scale and its scaling",
+   "years": "2024-2025",
+   "value": "Llama 3 405B 16M tokens, DeepSeek-V3 63M tokens at D~15T; critical batch grows with data as D^0.47 (Zhang) / optimal batch D^0.383 (Bergsma), not with model size",
+   "unit": "tokens",
+   "evidence_class": "measured trend (fits to <=1.2B-param models)",
+   "source": [
+    "https://arxiv.org/abs/2407.21783",
+    "https://arxiv.org/abs/2412.19437",
+    "https://arxiv.org/abs/2410.21676",
+    "https://arxiv.org/abs/2505.13738"
+   ]
+  },
+  {
+   "metric": "Low-communication training penalty vs replicas",
+   "years": "2025",
+   "value": "DiLoCo M=8: +1.1 % loss at 2.4B; M=1-2 beat data-parallel at 4-10B; >100x less traffic (H=30-500). Epoch: 1->8 nodes ~1.5x compute, ~6x extrapolated at 1e4 nodes",
+   "unit": "loss / compute multiplier",
+   "evidence_class": "measured trend (small scale) + extrapolation",
+   "source": [
+    "https://arxiv.org/abs/2503.09799",
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale"
+   ]
+  },
+  {
+   "metric": "Human-generated public text stock",
+   "years": "2024 estimate",
+   "value": "3e14 tokens (1e14-1e15, 90 % CI), fully used 2026-2032",
+   "unit": "tokens",
+   "evidence_class": "published forecast",
+   "source": "https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data"
+  },
+  {
+   "metric": "Production serving per stream (DeepSeek V3/R1)",
+   "years": "Feb 2025",
+   "value": "168B output tokens/day = 1.94M tok/s on 1,814 H800s (~1,070 tok/s per GPU, ~51 streams per GPU at 20-22 tok/s), mean KV 4,989 tokens = 0.35 GB/stream (BF16 MLA)",
+   "unit": "tokens/s",
+   "evidence_class": "measured trend (single snapshot)",
+   "source": "https://github.com/deepseek-ai/open-infra-index/blob/main/202502OpenSourceWeek/day_6_one_more_thing_deepseekV3R1_inference_system_overview.md"
+  },
+  {
+   "metric": "World AI token throughput proxy (Google)",
+   "years": "2025",
+   "value": "480T (May) -> 980T (Jul) -> 1.3e15 tokens/month (Oct) = 4.9e+08 tokens/s",
+   "unit": "tokens/s",
+   "evidence_class": "measured trend (company-reported)",
+   "source": "https://the-decoder.com/google-boasts-1-3-quadrillion-tokens-each-month-but-the-figure-is-mostly-window-dressing/"
+  },
+  {
+   "metric": "Value of massive parallel sampling with verifiers",
+   "years": "2024",
+   "value": "coverage scales log-linearly over 4 orders of magnitude of samples; SWE-bench Lite 15.9 % -> 56 % at 250 samples",
+   "unit": "fraction solved",
+   "evidence_class": "measured trend",
+   "source": "https://arxiv.org/abs/2407.21787"
+  },
+  {
+   "metric": "Agent sandbox footprint",
+   "years": "2025-2026",
+   "value": "E2B default 2 vCPU + 512 MiB (max 8 vCPU/8 GiB); SWE-bench Verified 500 images in 30 GiB; Nemotron SWE-RL 768 concurrent containers, 1 h timeouts, 200 turns",
+   "unit": "vCPU, GB",
+   "evidence_class": "measured trend (current practice)",
+   "source": [
+    "https://e2b.dev/docs/sandbox/compute",
+    "https://epoch.ai/blog/swebench-docker",
+    "https://docs.nvidia.com/nemotron/latest/nemotron/super3/rl/swe.html"
+   ]
+  }
+ ],
+ "forecasts": [
+  {
+   "metric": "Sail FLOP/s (279 m, 14.8 MW chips)",
+   "y2040": 1.48e+21,
+   "y2070": 5.68e+21,
+   "y2100plus": 1.06e+22,
+   "unit": "FLOP/s (FP8-eq.)",
+   "basis": "prior study (studies 1 and 3); = 0.05 / 0.18 / 0.34 x the whole world's 2025 AI compute"
+  },
+  {
+   "metric": "Sail memory (rad-tolerant NVM, 1/8/32 GB per chiplet)",
+   "y2040": 1.06e+17,
+   "y2070": 8.48e+17,
+   "y2100plus": 3.392e+18,
+   "unit": "bytes",
+   "basis": "prior study (study 2); = 0.05 / 0.41 / 1.6 x all HBM shipped through 2025"
+  },
+  {
+   "metric": "Film memory supply per FLOP/s",
+   "y2040": 7.162162162162162e-05,
+   "y2070": 0.0001492957746478873,
+   "y2100plus": 0.00032,
+   "unit": "B/(FLOP/s)",
+   "basis": "prior study; vs 2025 world stock 6.7e-05 and Rubin 5.8e-6: the film holds 1-50x more memory per FLOP/s than any GPU, reversing the 2017-2026 -17 to -34 %/yr trend"
+  },
+  {
+   "metric": "Training-state need per FLOP/s (1e28 replica on one sail)",
+   "y2040": 7.804054054054054e-07,
+   "y2070": 1.9524647887323945e-07,
+   "y2100plus": 1.3613207547169811e-07,
+   "unit": "B/(FLOP/s)",
+   "basis": "computed (state ~1.1-1.4 PB from study 2): 90-2,000x below supply; 612 replicas of the 1e28 state fit in one 2070 sail. Falls as C^-0.5 (Chinchilla). Speculation on model shapes."
+  },
+  {
+   "metric": "Agent working set (KV + sandbox + persistent memory)",
+   "y2040": "20 GB (5-200)",
+   "y2070": "50 GB (10-1,000)",
+   "y2100plus": "100 GB (20-5,000)",
+   "unit": "GB per agent",
+   "basis": "speculation anchored on per-sequence KV flat at 1-70 GB (measured), sandboxes 0.5-8 GB (E2B), task horizons doubling every 4-7 months (METR)"
+  },
+  {
+   "metric": "Agent memory need per hardware FLOP/s (1e12 active params, 50 tok/s, 30 % util.)",
+   "y2040": 5.9999999999999995e-05,
+   "y2070": 0.00015,
+   "y2100plus": 0.0003,
+   "unit": "B/(FLOP/s)",
+   "basis": "computed from the working-set forecast; ranges 1.5e-5 to 1.5e-2. Agents, not training, set film memory per chiplet: they match the study-2 mid values and want the high end (8-32 GB in 2070) if working sets grow"
+  },
+  {
+   "metric": "KV bytes per token (frontier, 8-bit)",
+   "y2040": "~4 KB (1-20)",
+   "y2070": "~2 KB (0.5-10)",
+   "y2100plus": "~1 KB (0.3-10)",
+   "unit": "B/token + 0.05-1 GB constant recurrent state",
+   "basis": "speculation: measured x0.35/yr cannot continue; hybrid linear/sparse attention keeps per-sequence state ~1-100 GB at 1e7-1e9-token working contexts"
+  },
+  {
+   "metric": "MoE sparsity (total/active)",
+   "y2040": "40 (20-100)",
+   "y2070": "64 (30-300)",
+   "y2100plus": "100 (50-1,000)",
+   "unit": "ratio",
+   "basis": "prior study 2 mid values; measured 3.6 -> 32 in 2023-2025; on film NVM, idle experts cost no power, so sparsity is cheap"
+  },
+  {
+   "metric": "Training precision (matmul weights/activations)",
+   "y2040": "4-8 bit",
+   "y2070": "4 bit (2-8)",
+   "y2100plus": "2-4 bit",
+   "unit": "bits",
+   "basis": "published finding (7-8 bit compute-optimal) + NVFP4 practice; already inside study 1's J/op; residual gain <=2x; accumulators stay 16-32 bit"
+  },
+  {
+   "metric": "Largest model ONE sail trains in a year (MFU 0.4, 100 tokens/active param)",
+   "y2040": 5580250890417.025,
+   "y2070": 10931934869912.098,
+   "y2100plus": 14933988080884.49,
+   "unit": "active params",
+   "basis": "computed: C = 1.9e+28 / 7.2e+28 / 1.3e+29 FLOP; total MoE params 2.2e+14 / 7.0e+14 / 1.5e+15; state 0.2-2 % of sail memory; data 1.9-5.0x the human text stock (must be generated)"
+  },
+  {
+   "metric": "Largest single coherent training run per year (1e2-1e5 sails, DiLoCo-class penalty M^0.19)",
+   "y2040": "7.6e+29-2.0e+32",
+   "y2070": "2.9e+30-7.6e+32",
+   "y2100plus": "5.5e+30-1.4e+33",
+   "unit": "effective FLOP/yr",
+   "basis": "speculation: extrapolates DiLoCo/Epoch replica penalties 7-10 orders of magnitude beyond the largest public run (4.75e23). Bandwidth needs 1e-4-4e-2 of a sail's lasers; island light time 1-190 ms << outer period; latency wall 3e29-7e33 FLOP/yr if synchronous cross-sail steps floor at 1 s"
+  },
+  {
+   "metric": "Share of swarm FLOPs by workload",
+   "y2040": "serving/agents 50-70 %, generation for learning 10-30 %, learner 5-15 %, tools 5-15 %, science 1-10 %",
+   "y2070": "serving/agents 55 % (30-80), generation 20 % (8-40), learner 5 % (2-12), tools on film 8 % (3-20), science 10 % (1-25)",
+   "y2100plus": "similar to 2070; science/simulation share may grow if AI demand saturates",
+   "unit": "share of FLOPs",
+   "basis": "speculation anchored on measured inference share (26 % -> ~50 % -> ~67 %, 2024-2026), experiments ~90 % of R&D, generation:learner 4:1-300:1"
+  },
+  {
+   "metric": "Generation : learner compute ratio",
+   "y2040": "4-30",
+   "y2070": "10-300",
+   "y2100plus": "10-1,000",
+   "unit": "ratio",
+   "basis": "measured 1:1 (colocated LLM RL) to 12:1 (AlphaZero, power) and 4:1 (INTELLECT-2); rises once human data is exhausted and search/verification keeps 1 in 10-1,000 samples"
+  },
+  {
+   "metric": "Agents served per sail (1e12 active, 50 tok/s)",
+   "y2040": 4090000.0,
+   "y2070": 13472000.0,
+   "y2100plus": 27061000.0,
+   "unit": "concurrent agent streams",
+   "basis": "computed; binding = memory (mid values); range 2.8e+04-2.1e+08 in 2070"
+  },
+  {
+   "metric": "Tokens per second per sail",
+   "y2040": 204500000.0,
+   "y2070": 673600000.0,
+   "y2100plus": 1353050000.0,
+   "unit": "tokens/s",
+   "basis": "computed; one 2070 sail ~1.4x Google's entire Oct-2025 token rate (4.95e8/s)"
+  },
+  {
+   "metric": "Single-stream decode speed, 1e12-active model, film patch",
+   "y2040": 35307.43714590863,
+   "y2070": 47343.32031894486,
+   "y2100plus": 48541.63398702552,
+   "unit": "tokens/s",
+   "basis": "computed: optimum patch 6-12 m; a pod with 0.1-1 us switched collectives gives 3.9e3-3.9e4 tok/s at 4-8x the J/token (film 0.27 J vs pod 2.0 J in 2070): concentration buys no serial speed"
+  },
+  {
+   "metric": "CPU-type tool/environment work, as share of power on server cores",
+   "y2040": "7-40 %",
+   "y2070": "5-40 %",
+   "y2100plus": "5-40 %",
+   "unit": "share of swarm power",
+   "basis": "measured 4-12 % (2026) -> published forecast 14-48 % (agentic); swarm era speculation"
+  },
+  {
+   "metric": "Pod share, workload-driven (p50, p10-p90)",
+   "y2040": "11.9 % (6.5 %-23.7 %)",
+   "y2070": "2.3 % (1.0 %-5.6 %)",
+   "y2100plus": "1.0 % (0.4 %-2.3 %)",
+   "unit": "share of chip power",
+   "basis": "pod_share.py Monte Carlo (speculation anchored on measured CPU ratios)"
+  },
+  {
+   "metric": "Pod share, combined with studies 2-3 (p50, p10-p90)",
+   "y2040": "12.7 % (7.8 %-24.5 %)",
+   "y2070": "2.6 % (1.6 %-5.7 %)",
+   "y2100plus": "1.1 % (0.6 %-2.4 %)",
+   "unit": "share of chip power",
+   "basis": "max(memory-driven, workload sandbox+storage+hedge) + special + 0.5 x switching"
+  }
+ ],
+ "pod_share_by_era": [
+  {
+   "era": "2026 (reference)",
+   "workload_driven": "15 % (10-20 %): 5-10 % shielded CPU+DRAM/flash (sandboxes, RL environments, storage, switching) + 5-10 % HBM training/hedge islands",
+   "memory_study2": "15 % (10-20 %)",
+   "interconnect_study3": "4 %",
+   "combined": "15 % (10-20 %)",
+   "recommended_visualizer_value": 0.15,
+   "reasons": "architecture.md baseline; film has 16 MB/chiplet, no DRAM, electrical mesh only."
+  },
+  {
+   "era": "2040",
+   "components_p50": {
+    "cpu_sandbox_env": 0.09593511830360532,
+    "storage": 0.005476973265441453,
+    "training_hedge": 0.015011095434912622,
+    "special_cryo_quantum_hot_dies": 0.0007124971045014015
+   },
+   "workload_driven": {
+    "p10": 0.06534321305856289,
+    "p50": 0.11910632619658998,
+    "p90": 0.23675030205278294
+   },
+   "memory_study2": {
+    "p10": 0.03546625070204916,
+    "p50": 0.05524933500619923,
+    "p90": 0.08009308842946797
+   },
+   "interconnect_study3": {
+    "p10": 0.00999827381183989,
+    "p50": 0.016296128791876432,
+    "p90": 0.023877269658852496
+   },
+   "combined": {
+    "p10": 0.07825350149303818,
+    "p50": 0.12747336909293366,
+    "p90": 0.24510871644169277
+   },
+   "combined_if_film_chiplets_cannot_host_sandboxes": {
+    "p10": 0.11443651107626075,
+    "p50": 0.19834808098929058,
+    "p90": 0.3669960071621343
+   },
+   "recommended_visualizer_value": 0.12,
+   "mass_cost": "each +1 % of power in pods adds 5.4 % to swarm mass (pod 4.09 vs film 0.638 g/W, study 4)",
+   "reasons": "Agent tool/environment CPU work is the largest pod driver: measured CPU:GPU went 1:8 -> 1:4 and is forecast 1:1-1:2, so CPU work is 7-40 % of power; in 2040 30-90 % of it still needs DRAM or fast cores because NVM-as-main-memory on the film is not yet mature (study 2: 2045-2070). Training hedge 0-3 % (photonic lanes nascent, MoE all-to-all 20 % of energy). Higher than study 2's 5 % because study 2 used the 2026 CPU share."
+  },
+  {
+   "era": "2070",
+   "components_p50": {
+    "cpu_sandbox_env": 0.017522709722915492,
+    "storage": 0.000775596437058567,
+    "training_hedge": 0.001500394379060533,
+    "special_cryo_quantum_hot_dies": 0.0014230748097631238
+   },
+   "workload_driven": {
+    "p10": 0.010376886039666657,
+    "p50": 0.022867198615405003,
+    "p90": 0.056174867997713235
+   },
+   "memory_study2": {
+    "p10": 0.007369083628854457,
+    "p50": 0.013581194074618776,
+    "p90": 0.022635628963354408
+   },
+   "interconnect_study3": {
+    "p10": 0.0013210400133676795,
+    "p50": 0.0024006711926333572,
+    "p90": 0.0038378740302444612
+   },
+   "combined": {
+    "p10": 0.01556075106059087,
+    "p50": 0.026462664364483007,
+    "p90": 0.05739901847732197
+   },
+   "combined_if_film_chiplets_cannot_host_sandboxes": {
+    "p10": 0.06788660952475385,
+    "p50": 0.14721566559824611,
+    "p90": 0.3310997752100197
+   },
+   "recommended_visualizer_value": 0.025,
+   "mass_cost": "each +1 % of power in pods adds 7.1 % to swarm mass (pod 4.02 vs film 0.497 g/W, study 4)",
+   "reasons": "MRAM/FeRAM main memory (8 GB/chiplet) and 0.15 W cores that match a 2026 server core leave only latency-critical single-thread work, write-heavy DRAM work and cryogenic/quantum devices: 3-25 % of a 5-40 % CPU share. Training needs no pods (state is 600x below sail memory). Storage 0.02-0.3 %."
+  },
+  {
+   "era": "2100+",
+   "components_p50": {
+    "cpu_sandbox_env": 0.006845537376619703,
+    "storage": 0.0003182102184812709,
+    "training_hedge": 0.0,
+    "special_cryo_quantum_hot_dies": 0.0014172484906418653
+   },
+   "workload_driven": {
+    "p10": 0.004092278615216449,
+    "p50": 0.010157939947228932,
+    "p90": 0.02349099997412815
+   },
+   "memory_study2": {
+    "p10": 0.0017313675700625743,
+    "p50": 0.004082091341208375,
+    "p90": 0.007354994533240706
+   },
+   "interconnect_study3": {
+    "p10": 5.126959618488303e-05,
+    "p50": 0.00029248802110243613,
+    "p90": 0.0006829005474270863
+   },
+   "combined": {
+    "p10": 0.005505281402180798,
+    "p50": 0.010841038113036047,
+    "p90": 0.023646704911663693
+   },
+   "combined_if_film_chiplets_cannot_host_sandboxes": {
+    "p10": 0.06484142444914263,
+    "p50": 0.14494832636021054,
+    "p90": 0.3276659224797275
+   },
+   "recommended_visualizer_value": 0.01,
+   "mass_cost": "each +1 % of power in pods adds 7.4 % to swarm mass (pod 4.02 vs film 0.48 g/W, study 4)",
+   "reasons": "Residual: dies above ~3.8 W (fast single-thread cores, switch ASICs, cryostats), radiation-intolerant special memory, glass archives. 0.5-2.4 %."
+  },
+  {
+   "era": "design rule",
+   "statement": "Above ~3.8 W per die a pod beats the film per kg (film spreader mass ~0.94 g/W per W of die power vs pod 4.02 g/W); below it, everything goes on the film. If film chiplets are pure tensor engines (no general-purpose core, MMU and NVM main memory), the pod share stays ~15 % (6-33 %) in every era because agent environments need somewhere to run. Putting a sandbox-capable core on each chiplet (or 1 in N) is worth 10-30 % of swarm mass."
+  }
+ ],
+ "durable_properties": [
+  {
+   "property": "Generation dominates; learning is a small synchronous core",
+   "numbers": "actor:learner 1:1 to 300:1 measured (AlphaZero ~92 % of power in self-play, INTELLECT-2 80 %, LLM RL rollouts 49-90+ % of time); inference 26 % -> ~50 % -> ~67 % of compute 2024-2026",
+   "evidence_class": "measured trend",
+   "design_consequence": "80-95 % of swarm FLOPs are forward passes that need no cross-sail coupling; design sails for batched decode with local memory, not for one global job."
+  },
+  {
+   "property": "Most R&D compute is many small experiments",
+   "numbers": "OpenAI 2024: final runs of released models ~7 % of all compute; ~90 % of R&D went to experiments and unreleased runs",
+   "evidence_class": "measured trend (estimate)",
+   "design_consequence": "even training demand arrives as thousands of independent jobs: the sail-sized job is the natural unit."
+  },
+  {
+   "property": "Per-sequence working state is ~1-100 GB and stable",
+   "numbers": "KV/token fell x0.35/yr (4.7 MB -> 8 KB) while context grew x3/yr (2k -> 1M); state at max context 1.3-68 GB since 2020",
+   "evidence_class": "measured trend",
+   "design_consequence": "an agent's memory fits in 1-10 film chiplets (2070, 8 GB each); memory per agent, not per parameter, sizes chiplet NVM."
+  },
+  {
+   "property": "Weights/state per training FLOP falls",
+   "numbers": "N ~ C^0.5 (Chinchilla); 1e28 replica state ~1.1-1.4 PB stays flat while sails grow: need 2e-7 vs supply 1.5e-4 B/(FLOP/s) in 2070",
+   "evidence_class": "measured law + prior study",
+   "design_consequence": "training never again needs HBM pods once film NVM exists; any sail holds hundreds of replicas."
+  },
+  {
+   "property": "Sparsity rises and is cheap on NVM",
+   "numbers": "3.6 -> 32 total/active in 2023-2025; idle experts in NVM cost zero standby power",
+   "evidence_class": "measured trend",
+   "design_consequence": "capacity (GB per chiplet) matters more than bandwidth for weights; favours the film's stacked NVM."
+  },
+  {
+   "property": "Critical batch grows with data, not model size",
+   "numbers": "B ~ D^0.38-0.47; 16-63M tokens at D~15T",
+   "evidence_class": "measured trend (small models)",
+   "design_consequence": "larger runs get more parallel per step, so one sail stays compute-bound (1.6-21 s steps); the cross-sail latency wall is 3e29-7e33 FLOP/yr at a 1 s step floor."
+  },
+  {
+   "property": "Low-communication methods cut traffic 100-1,000x",
+   "numbers": "DiLoCo >100x (H=30-500), SparseLoCo 97-99 % sparse + 2-bit, Covenant >146x; penalty +1.1 % loss at M=8",
+   "evidence_class": "measured trend (<=72B, <=4.75e23 FLOP)",
+   "design_consequence": "cross-sail training needs 1e-4-4e-2 of a sail's lasers: bandwidth is not the limit, the replica penalty is."
+  },
+  {
+   "property": "Verification-friendly search scales with independent samples",
+   "numbers": "coverage log-linear over 1e4x samples; ES needs ~12 B per evaluation (~1e-10 of a sail's lasers)",
+   "evidence_class": "measured trend",
+   "design_consequence": "1e16+ loosely coupled sails have a use: search, self-play, evolution, ensembles."
+  },
+  {
+   "property": "Precision has a floor",
+   "numbers": "compute-optimal ~7-8 bit integer; FP4 training demonstrated; accumulators 16-32 bit",
+   "evidence_class": "published finding + measured practice",
+   "design_consequence": "at most ~2x more from precision after 2030 (already in study 1); FP64 science costs 16-60x per op."
+  },
+  {
+   "property": "Agents need general-purpose compute beside the model",
+   "numbers": "CPU:GPU 1:8 -> 1:4 (2026) -> 1:1-1:2 forecast; sandboxes 0.5-8 GB, 1-8 vCPU",
+   "evidence_class": "measured trend + published forecast",
+   "design_consequence": "every chiplet (or 1 in N) needs a sandbox-capable core, MMU and NVM main memory, or pods stay ~15 %."
+  },
+  {
+   "property": "Human data runs out at ~1e28-1e29 FLOP",
+   "numbers": "3e14 tokens (1e14-1e15); a 2070 sail-year run needs 1.6-7x that; 1e32 needs 60-270x",
+   "evidence_class": "published forecast",
+   "design_consequence": "beyond one sail-year, data is generated by the swarm (rollouts, simulation, self-play): another reason generation dominates."
+  }
+ ],
+ "invalid_assumptions": [
+  {
+   "assumption": "Pods for DRAM-capacity CPU work (agent sandboxes, RL environments)",
+   "verdict": "valid to ~2045, then invalid if chiplets carry a general-purpose core + NVM main memory",
+   "why": "Demand is rising (CPU 4-12 % of AI power in 2026, forecast 14-48 %), so this driver grows before it disappears. Film NVM 1/8/32 GB per chiplet hosts a 0.5-8 GB sandbox on 1-8 chiplets from 2045-2070.",
+   "replacement": "Sandbox-capable film chiplets (MRAM/FeRAM main memory, MMU, microVM isolation); pods only for >~3.8 W dies and write-heavy DRAM work."
+  },
+  {
+   "assumption": "Pods for storage, datasets, checkpoints, weight stores",
+   "verdict": "invalid by ~2050-2070",
+   "why": "A 2070 sail holds 0.85 EB (0.41 x all HBM ever shipped by 2025); NVM weights survive brownouts, so the backing store and reload path disappear (study 2).",
+   "replacement": "Distributed film NVM; glass archives (Project Silica class) for cold data, ~0.01-0.1 % of power."
+  },
+  {
+   "assumption": "Pods as training islands and a hedge (HBM)",
+   "verdict": "invalid by ~2040-2050",
+   "why": "Training state per FLOP/s is 90-2,000x below film supply from 2040. With photonic lanes, MoE all-to-all costs 2-5 % of energy (study 3).",
+   "replacement": "The sail is the training island: a 1e28 run in ~20 days (2070), 7e28 FLOP per sail-year."
+  },
+  {
+   "assumption": "Film for inference and 2D-TP training only",
+   "verdict": "valid but too narrow from ~2050-2070",
+   "why": "Photonic lanes make all-to-all sail-wide (3e-4-6e-4 B/FLOP). Film patches serve 1e12-active models single-stream at 3.5-4.9e4 tok/s, as fast as a pod.",
+   "replacement": "Film for all synchronous work inside a sail: dense, MoE, RL learners, serving, tool execution."
+  },
+  {
+   "assumption": "Inference dominates future demand (plausible, not established)",
+   "verdict": "now better supported; the distinction blurs at swarm scale",
+   "why": "Inference share 26 % (2024) -> ~50 % (2025) -> ~67 % forecast (2026). RL rollouts, search and synthetic data are inference-shaped.",
+   "replacement": "Forward-pass-shaped compute is 80-95 % of swarm FLOPs (speculation on measured anchors)."
+  },
+  {
+   "assumption": "Film's latency-bound decode edge only helps in-swarm agents",
+   "verdict": "valid, and at swarm scale nearly all consumers are in-swarm agents",
+   "why": "Earth is 200-1,200 s away and receives <1e-15 of swarm output (5e8 tok/s for all of Google in 2025 vs ~1e25 tok/s).",
+   "replacement": "Design for agent-to-agent loops inside a sail (decode floor 12-17 us per token in a patch)."
+  },
+  {
+   "assumption": "Low-communication training at swarm scale is unproven",
+   "verdict": "still valid",
+   "why": "Evidence reaches 4.75e23 FLOP and M<=8-16 replicas; decentralized runs grow 20x/yr vs frontier 5x/yr. Bandwidth across 1e2-1e5 sails is ample.",
+   "replacement": "Plan for 1e2-1e5-sail islands (1e30-1e33 effective FLOP/yr) as speculative upside; no single model spans the swarm."
+  },
+  {
+   "assumption": "FP8 dense FLOP as the unit; J/op is the lever",
+   "verdict": "unit drifts to FP4/INT4-equivalents (inside study 1)",
+   "why": "Precision floor near 4-8 bits; FP64 science costs 16-60x per op.",
+   "replacement": "Report FP8-equivalent FLOP; tag science workloads separately."
+  },
+  {
+   "assumption": "Global shuffles need a switched fabric in pods",
+   "verdict": "invalid by 2050-2070 (study 3)",
+   "why": "Film photonic global bit 0.11 pJ vs pod fabric 0.5-0.8 pJ (2070).",
+   "replacement": "In-film switching."
+  }
+ ],
+ "sail_as_unit": {
+  "answer": "Yes, the original intuition holds if 'satellite' means the sail. Synchronous chips should share one satellite. The satellite is the 279 m sail, and photonic lanes concentrate it logically, not physically. By 2050-2070 the sail is one tightly coupled 14.8 MW machine: 0.9 us mean and 2.75 us worst latency, 3e-4-6e-4 B/FLOP all-to-all, and NVLink-class bandwidth flat in distance. A physically dense pod buys nothing for synchronous work. Its switched-fabric collectives (0.1-1 us) and 2 km pod islands (6.7 us) are no faster. It costs 8x more mass per watt (4.0 vs 0.5 g/W, study 4).",
+  "what_concentrated_means_by_2070": "Concentration splits into three meanings. (1) Coupling: chips that can share per-layer collectives at microsecond latency. That is the sail, or a 3-12 m patch inside it when a token must take under ~20 us. (2) Thermal concentration: dies above ~3.8 W. Only these belong in pods: fast single-thread cores, switch ASICs, cryostats. (3) Radiation shielding: DRAM, NAND and qubits. Workloads need (1) everywhere and (2)-(3) for only ~1-3 % of power.",
+  "hierarchy": [
+   {
+    "level": "chiplet",
+    "2070": "0.15 W, 5.8e13 FLOP/s, 8 GB NVM; hosts one agent's sandbox core or a slice of a layer"
+   },
+   {
+    "level": "patch (3-12 m)",
+    "2070": "1.7-27 kW (6.6e+17-1.1e+19 FLOP/s at the sail-mean 190 W/m2); one frontier model instance; decode floor 12-17 us/token (study 3); batch-1 1e12-active model at ~4.7e4 tok/s on a 6.6 m patch"
+   },
+   {
+    "level": "sail (279 m)",
+    "2070": "14.8 MW, 5.7e+21 FLOP/s, 8.5e+17 B; synchronous unit; 1e28 run in ~20 days; 1.3e+07 agents; = 0.18 x 2025 world AI compute"
+   },
+   {
+    "level": "island (1e2-1e5 sails, 250-57,000 km)",
+    "2070": "DiLoCo/SparseLoCo-class training; 1-190 ms light; 1e30-1e33 effective FLOP/yr (speculative)"
+   },
+   {
+    "level": "swarm (3.4e16-3.4e18 sails)",
+    "2070": "asynchronous, hour-scale; RL actors, agents, search, science; light 15-35 min across"
+   }
+  ],
+  "largest_single_model_one_sail": {
+   "train_per_year": {
+    "2040": {
+     "C_FLOP": 1.8683520000000002e+28,
+     "N_active_k100": 5580250890417.025,
+     "N_total_MoE": 223210035616681.0,
+     "D_tokens": 558025089041702.56,
+     "state_bytes": 2232100356166810.0
+    },
+    "2070": {
+     "C_FLOP": 7.170432000000001e+28,
+     "N_active_k100": 10931934869912.098,
+     "N_total_MoE": 699643831674374.2,
+     "D_tokens": 1093193486991209.8,
+     "state_bytes": 4197862990046245.5
+    },
+    "2100+": {
+     "C_FLOP": 1.3381440000000002e+29,
+     "N_active_k100": 14933988080884.49,
+     "N_total_MoE": 1493398808088449.0,
+     "D_tokens": 1493398808088449.0,
+     "state_bytes": 7466994040442245.0
+    }
+   },
+   "serve_memory_limit_params": {
+    "2040": 5.6533333333333336e+16,
+    "2070": 4.522666666666667e+17,
+    "2100+": 1.8090666666666668e+18
+   },
+   "note": "One sail can serve any model it can train, with 100-10,000x headroom: ~14,000 replicas of a 1e12-active (64x sparse) model fit in 2070 memory."
+  },
+  "units_in_swarm": {
+   "f=0.01": 3.42e+16,
+   "f=0.1": 3.58e+17,
+   "f=0.5": 2.3e+18,
+   "rock_limited_2070_sail_equivalents": 3.380281690140845e+18
+  },
+  "largest_coherent_enterprise": "About 1e5 learner sails plus up to 3e7 actor sails. That is <=9e-10 of a 3.4e16-sail swarm, so >99.9999999 % of the swarm runs workloads that are independent or loosely coupled."
+ },
+ "what_the_swarm_computes": [
+  {
+   "metric": "Swarm FLOP/s",
+   "value": "5.1e+37 (f=0.01, 2040 logic); 1.9e+38 (f=0.01, 2070); 3.6e+40 (rock-limited, 2100+ logic)",
+   "unit": "FLOP/s",
+   "comparison": "6.3e+15-1.2e+18 x the world's 2025 AI compute (3.1e22 FLOP/s); 3.4e16-3.4e18 sail-equivalents",
+   "evidence_class": "prior study (studies 1, 3, 4) x measured 2025 stock",
+   "source": [
+    "prior study: /tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/result.json",
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale"
+   ]
+  },
+  {
+   "metric": "Human-brain equivalents (functional, Carlsmith 1e15 FLOP/s; 1e13-1e17 range)",
+   "value": "1.9e+23 (1.9e+21-1.9e+25) at f=0.01/2070; 3.6e+25 rock-limited/2100+",
+   "unit": "brain-equivalents",
+   "comparison": "2.4e+13-4.4e+15 per living human (8.2e9). Per sail (2070): 5.7e6. FLOP parity is not capability parity.",
+   "evidence_class": "published estimate x prior study",
+   "source": [
+    "https://coefficientgiving.org/research/how-much-computational-power-does-it-take-to-match-the-human-brain/",
+    "https://forum.nunosempere.com/posts/nGQJEYp5X2pCbeweg/new-report-on-how-much-computational-power-it-takes-to-match",
+    "https://population.un.org/wpp/"
+   ]
+  },
+  {
+   "metric": "Whole-brain emulations (Sandberg & Bostrom spiking-network level 1e18 FLOP/s; electrophysiology 1e22)",
+   "value": "1.9e+20 spiking or 1.9e+16 electrophysiological (f=0.01, 2070)",
+   "unit": "emulations",
+   "comparison": "~5,700 spiking-level emulations per 2070 sail; memory (1e14-1e15 synapses x 1-8 B = 0.1-8 PB each) also allows 100-8,000 per sail",
+   "evidence_class": "published estimate (wide; 1e12-1e28 FLOP/s across sources)",
+   "source": [
+    "https://aiimpacts.org/brain-performance-in-flops/",
+    "https://www.fhi.ox.ac.uk/reports/2008-3.pdf"
+   ]
+  },
+  {
+   "metric": "Frontier-model agent streams (1e12 active params, 50 tok/s, 55 % of swarm on serving)",
+   "value": "2.5e+23 (f=0.01, 2070) to 5.1e+25 (rock-limited, 2100+)",
+   "unit": "concurrent agents",
+   "comparison": "3.1e+13-6.2e+15 per living human; 1.35e7 per 2070 sail",
+   "evidence_class": "speculation (model size, speed, mix) on prior-study hardware",
+   "source": "https://github.com/deepseek-ai/open-infra-index/blob/main/202502OpenSourceWeek/day_6_one_more_thing_deepseekV3R1_inference_system_overview.md"
+  },
+  {
+   "metric": "Tokens per second",
+   "value": "1.3e+25 (f=0.01, 2070) to 2.5e+27",
+   "unit": "tokens/s",
+   "comparison": "2.6e+16-5.1e+18 x Google's Oct-2025 rate (4.95e8 tok/s); one 2070 sail = 6.7e8 tok/s",
+   "evidence_class": "speculation",
+   "source": "https://the-decoder.com/google-boasts-1-3-quadrillion-tokens-each-month-but-the-figure-is-mostly-window-dressing/"
+  },
+  {
+   "metric": "Training runs per year if 10 % of FLOPs train",
+   "value": "1e28-FLOP runs: 2.5e+16; 1e30: 2.5e+14 (f=0.01, 2070)",
+   "unit": "runs/yr",
+   "comparison": "a 2070 sail does a 1e28 run in ~20 days and 7e28 FLOP per year; today's frontier run (~5e26) is ~2.5 sail-days",
+   "evidence_class": "computed capacity, not demand",
+   "source": "https://epoch.ai/blog/training-compute-of-frontier-ai-models-grows-by-4-5x-per-year"
+  },
+  {
+   "metric": "Largest single model per year",
+   "value": "7e28 FLOP on one sail (2070; ordinary synchronous training inside one machine); 2.9e+30-7.6e+32 effective FLOP over 1e2-1e5 sails (speculative; 2.3e32-2.3e33 at 1e5 sails for penalty exponents 0.3-0.1)",
+   "unit": "FLOP/yr",
+   "comparison": "<=1e-9 of the swarm; data 60-900x the human text stock must be generated",
+   "evidence_class": "speculation",
+   "source": [
+    "https://arxiv.org/abs/2503.09799",
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale",
+    "https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data"
+   ]
+  },
+  {
+   "metric": "Scientific simulation (FP64)",
+   "value": "60-230 Frontier-class exascale machines per 2070 sail (110-420 in 2100+); 1.8-6.6 simulated years/day of a 1 km global atmosphere per sail",
+   "unit": "Frontier-equivalents; SYPD",
+   "comparison": "SCREAM: ~1 SYPD at 3.25 km on 8,192 Frontier nodes; cost ~dx^-3; FP64 costs 16-60x per op",
+   "evidence_class": "measured anchor x speculation",
+   "source": [
+    "https://e3sm.org/exascale-performance-of-the-simple-cloud-resolving-e3sm-atmosphere-model/",
+    "https://www.olcf.ornl.gov/frontier/"
+   ]
+  },
+  {
+   "metric": "Cryptography (thermodynamic sanity check)",
+   "value": "AES-128 exhaustive search: 11-112 s of the whole swarm (f=0.01, 2070), ~1e10 years for one sail; AES-256 needs 2e+19 x the Sun's 10-Gyr output",
+   "unit": "s; ratio",
+   "comparison": "128-bit symmetric keys fall to a Dyson swarm; 256-bit keys are thermodynamically safe",
+   "evidence_class": "speculation (J per trial 1e-12-1e-11 in 2026 ASICs, scaled with study 1)",
+   "source": "https://epoch.ai/blog/trends-in-machine-learning-hardware"
+  }
+ ],
+ "architecture_implications": [
+  {
+   "question": "1. Which workload properties are durable enough to design around; which architecture.md assumptions survive 10-1000x memory per chip, cheaper links and new algorithms?",
+   "answer": "Durable: generation-dominated compute; many independent jobs; ~1-100 GB working state per sequence; falling state per training FLOP; rising sparsity; critical batch growing with data; 100-1,000x low-comm compression with a replica penalty; agents' need for general-purpose sandboxes; a precision floor at 4-8 bit; human data exhausted at ~1e28-1e29 FLOP. Survive: film as the majority, sail as the synchronous unit, low-comm between sails, a small pod tier. Fail: pods for storage, training islands and shuffles (2040-2070). Pods for sandboxes survive only until chiplets can host them.",
+   "numbers": "see durable_properties and invalid_assumptions; training need 2e-7 vs film supply 1.5e-4 B/(FLOP/s) (2070); agents need ~1.5e-4 (1.5e-5-1.5e-2)."
+  },
+  {
+   "question": "2. Pod share per era from workload reasons, combined with studies 2-3",
+   "answer": "Workload-driven p50 11.9 % / 2.3 % / 1.0 %; combined 12.7 % (7.8 %-24.5 %) / 2.6 % (1.6 %-5.7 %) / 1.1 % (0.6 %-2.4 %) for 2040/2070/2100+. That is about 2.5x studies 2-3 (5/1/0.3 %), because agentic CPU work is a rising share. If chiplets cannot run sandboxes it stays ~15 % (6-33 %) in every era.",
+   "numbers": "recommended visualizer values 12 % (2040), 2.5 % (2070), 1 % (2100+); each +1 % pods = +5.4-7.4 % swarm mass."
+  },
+  {
+   "question": "3. What does 'concentrated' mean when the sail is one tightly coupled 15 MW machine?",
+   "answer": "Yes, the original intuition holds if 'satellite' means the sail. Synchronous chips should share one satellite. The satellite is the 279 m sail, and photonic lanes concentrate it logically, not physically. By 2050-2070 the sail is one tightly coupled 14.8 MW machine: 0.9 us mean and 2.75 us worst latency, 3e-4-6e-4 B/FLOP all-to-all, and NVLink-class bandwidth flat in distance. A physically dense pod buys nothing for synchronous work. Its switched-fabric collectives (0.1-1 us) and 2 km pod islands (6.7 us) are no faster. It costs 8x more mass per watt (4.0 vs 0.5 g/W, study 4).",
+   "numbers": "Concentration splits into three meanings. (1) Coupling: chips that can share per-layer collectives at microsecond latency. That is the sail, or a 3-12 m patch inside it when a token must take under ~20 us. (2) Thermal concentration: dies above ~3.8 W. Only these belong in pods: fast single-thread cores, switch ASICs, cryostats. (3) Radiation shielding: DRAM, NAND and qubits. Workloads need (1) everywhere and (2)-(3) for only ~1-3 % of power."
+  },
+  {
+   "question": "4. What should the visualizer say the swarm computes?",
+   "answer": "Mostly a population, not a monolith. At f=0.01 with 2070 logic: 1.9e38 FLOP/s and 3.4e16 sails. That is ~2e23 human-brain equivalents (2e21-2e25), ~2.5e23 frontier-class agents and 1.3e25 tokens/s (2.6e16 x Google 2025). Each sail could run a 1e28-FLOP training run every ~20 days. The largest single model is 7e28 FLOP/yr per sail, and 1e30-1e33 only if low-comm training scales 7-10 orders of magnitude beyond today's evidence. Science: 60-230 exascale machines per sail.",
+   "numbers": "see what_the_swarm_computes"
+  },
+  {
+   "question": "Design rules from workloads",
+   "answer": "(a) Give every chiplet, or 1 in N, a sandbox-capable core with MMU and NVM main memory: worth 10-30 % of swarm mass. (b) Size chiplet NVM by agent working sets, not training state. Take the high end (8-32 GB in 2070) if agents dominate. (c) Keep sails at 150-300 m. Each is a 1e21-1e22 FLOP/s island holding thousands of model replicas and ~1e7 agents. (d) Lasers: 1e-4-4e-2 of capacity for cross-sail training. The rest goes to policy broadcast (~350 TB per update, ~6 s per terminal) and agent traffic. (e) Pods only for dies above ~3.8 W, radiation-intolerant memory, cryogenic/quantum devices and archives.",
+   "numbers": "pod_share.json die_power_breakeven_W; lowcomm.json"
+  }
+ ],
+ "wildcards": [
+  {
+   "wildcard": "Asynchronous/hierarchical low-comm training works at 1e6+ sails (or ES-style seed-only training scales to pretraining)",
+   "effect": "one model at 1e35+ FLOP/yr; a learner tier spans 1e-10 -> 1e-6 of the swarm; pods unaffected",
+   "probability_by_2100": "0.2-0.4 (speculation)",
+   "source": [
+    "https://arxiv.org/abs/2511.16652",
+    "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale"
+   ]
+  },
+  {
+   "wildcard": "Agent demand saturates (no use for 1e23 agents)",
+   "effect": "swarm compute shifts to science, simulation, search and brain-scale emulation; FP64 share rises 10x; per-sail memory need rises (simulation ~1e-4-1e-3 B/(FLOP/s))",
+   "probability_by_2100": "unknown",
+   "source": "https://www.olcf.ornl.gov/frontier/"
+  },
+  {
+   "wildcard": "Lifelong-learning agents with per-agent weights (LoRA-like deltas 0.1-1 % of params) and TB-scale memories",
+   "effect": "memory per agent x10-100; NVM per chiplet at the high end (32-256 GB) or storage pods return at 1-5 %",
+   "probability_by_2100": "0.3-0.6",
+   "source": "https://arxiv.org/abs/2503.14499"
+  },
+  {
+   "wildcard": "Constant-state (recurrent/SSM) models dominate",
+   "effect": "per-agent state falls 10-100x; agents become compute-bound; memory per chiplet can fall to the study-2 low values",
+   "probability_by_2100": "0.3",
+   "source": [
+    "https://arxiv.org/abs/2510.26692",
+    "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct"
+   ]
+  },
+  {
+   "wildcard": "Useful quantum or superconducting computing",
+   "effect": "cryostat pods (1-10 kW cold) at 0.1-2 % of power; Mercury lacks He (study 1)",
+   "probability_by_2100": "0.2-0.5",
+   "source": "https://epoch.ai/blog/trends-in-machine-learning-hardware"
+  },
+  {
+   "wildcard": "Critical batch stops growing / latency wall at a ~1 s cross-sail step",
+   "effect": "single runs cap near 3e29-1e31 FLOP/yr; even more independent units",
+   "probability_by_2100": "0.3",
+   "source": [
+    "https://arxiv.org/abs/2411.01137",
+    "https://arxiv.org/abs/2410.21676"
+   ]
+  },
+  {
+   "wildcard": "Film chiplets stay pure tensor engines (no general-purpose cores)",
+   "effect": "pod share ~15 % (6-33 %) permanently; +40-200 % swarm mass vs the 1-3 % case",
+   "probability_by_2100": "0.2 (engineering choice)",
+   "source": "https://insights.trendforce.com/p/agentic-ai-cpu-gpu"
+  },
+  {
+   "wildcard": "Verification of untrusted rollouts at swarm scale (TOPLOC-like)",
+   "effect": "+1-5 % compute overhead; needed if sails are owned by different parties",
+   "probability_by_2100": "0.5",
+   "source": "https://arxiv.org/abs/2505.07291"
+  }
+ ],
+ "low_comm_feasibility": {
+  "by_era_frac_of_laser": {
+   "2040": {
+    "sync DP, BF16 grads every step": 0.4120448767008588,
+    "DiLoCo H=30, FP32 pseudo-grads": 0.027469658446723923,
+    "DiLoCo H=30, 4-bit": 0.0034337073058404903,
+    "DiLoCo H=100, FP32 pseudo-grads": 0.008240897534017176,
+    "DiLoCo H=100, 4-bit": 0.001030112191752147,
+    "DiLoCo H=500, FP32 pseudo-grads": 0.0016481795068034356,
+    "DiLoCo H=500, 4-bit": 0.00020602243835042945,
+    "SparseLoCo H=30, density 1%": 0.00018885390182122696,
+    "SparseLoCo H=30, density 3%": 0.0005665617054636808,
+    "SparseLoCo H=100, density 1%": 5.6656170546368085e-05,
+    "SparseLoCo H=100, density 3%": 0.00016996851163910424,
+    "Streaming DiLoCo (~100x below DP)": 0.004120448767008588,
+    "Covenant-72B-class (>146x vs dense DiLoCo H=30 FP32)": 0.0001881483455255063
+   },
+   "2070": {
+    "sync DP, BF16 grads every step": 0.46527326948363285,
+    "DiLoCo H=30, FP32 pseudo-grads": 0.031018217965575526,
+    "DiLoCo H=30, 4-bit": 0.003877277245696941,
+    "DiLoCo H=100, FP32 pseudo-grads": 0.009305465389672656,
+    "DiLoCo H=100, 4-bit": 0.001163183173709082,
+    "DiLoCo H=500, FP32 pseudo-grads": 0.0018610930779345313,
+    "DiLoCo H=500, 4-bit": 0.0002326366347418164,
+    "SparseLoCo H=30, density 1%": 0.00021325024851333172,
+    "SparseLoCo H=30, density 3%": 0.0006397507455399952,
+    "SparseLoCo H=100, density 1%": 6.39750745539995e-05,
+    "SparseLoCo H=100, density 3%": 0.00019192522366199853,
+    "Streaming DiLoCo (~100x below DP)": 0.004652732694836328,
+    "Covenant-72B-class (>146x vs dense DiLoCo H=30 FP32)": 0.00021245354770942142
+   },
+   "2100+": {
+    "sync DP, BF16 grads every step": 0.5881863162555218,
+    "DiLoCo H=30, FP32 pseudo-grads": 0.03921242108370145,
+    "DiLoCo H=30, 4-bit": 0.004901552635462682,
+    "DiLoCo H=100, FP32 pseudo-grads": 0.011763726325110435,
+    "DiLoCo H=100, 4-bit": 0.0014704657906388044,
+    "DiLoCo H=500, FP32 pseudo-grads": 0.0023527452650220874,
+    "DiLoCo H=500, 4-bit": 0.00029409315812776093,
+    "SparseLoCo H=30, density 1%": 0.0002695853949504475,
+    "SparseLoCo H=30, density 3%": 0.0008087561848513422,
+    "SparseLoCo H=100, density 1%": 8.087561848513424e-05,
+    "SparseLoCo H=100, density 3%": 0.00024262685545540271,
+    "Streaming DiLoCo (~100x below DP)": 0.005881863162555218,
+    "Covenant-72B-class (>146x vs dense DiLoCo H=30 FP32)": 0.00026857822660069486
+   }
+  },
+  "island_light": [
+   {
+    "sails": 100.0,
+    "spacing_km": 44.0,
+    "radius_km": 248.24341676101275,
+    "one_way_light_s": 0.0008274780558700425,
+    "allreduce_tree_latency_s": 0.00298372734969503
+   },
+   {
+    "sails": 100.0,
+    "spacing_km": 317.0,
+    "radius_km": 1788.4809798463873,
+    "one_way_light_s": 0.005961603266154625,
+    "allreduce_tree_latency_s": 0.013251977770264194
+   },
+   {
+    "sails": 1000.0,
+    "spacing_km": 44.0,
+    "radius_km": 785.0146111072194,
+    "one_way_light_s": 0.002616715370357398,
+    "allreduce_tree_latency_s": 0.007226587597647213
+   },
+   {
+    "sails": 1000.0,
+    "spacing_km": 317.0,
+    "radius_km": 5655.673448204285,
+    "one_way_light_s": 0.018852244827347615,
+    "allreduce_tree_latency_s": 0.039697646511627646
+   },
+   {
+    "sails": 10000.0,
+    "spacing_km": 44.0,
+    "radius_km": 2482.434167610128,
+    "one_way_light_s": 0.008274780558700427,
+    "allreduce_tree_latency_s": 0.019207103593310744
+   },
+   {
+    "sails": 10000.0,
+    "spacing_km": 317.0,
+    "radius_km": 17884.809798463877,
+    "one_way_light_s": 0.059616032661546255,
+    "allreduce_tree_latency_s": 0.1218896077990024
+   },
+   {
+    "sails": 100000.0,
+    "spacing_km": 44.0,
+    "radius_km": 7850.146111072193,
+    "one_way_light_s": 0.026167153703573975,
+    "allreduce_tree_latency_s": 0.055656235502035314
+   },
+   {
+    "sails": 100000.0,
+    "spacing_km": 317.0,
+    "radius_km": 56556.73448204284,
+    "one_way_light_s": 0.18852244827347614,
+    "allreduce_tree_latency_s": 0.38036682464183963
+   },
+   {
+    "sails": 1000000.0,
+    "spacing_km": 44.0,
+    "radius_km": 24824.341676101278,
+    "one_way_light_s": 0.08274780558700426,
+    "allreduce_tree_latency_s": 0.16948192488787336
+   },
+   {
+    "sails": 1000000.0,
+    "spacing_km": 317.0,
+    "radius_km": 178848.09798463876,
+    "one_way_light_s": 0.5961603266154625,
+    "allreduce_tree_latency_s": 1.1963069669447899
+   }
+  ],
+  "evidence": [
+   {
+    "run": "DiLoCo scaling laws (Google DeepMind)",
+    "params": "35M-2.4B swept; 4B, 10B predicted",
+    "replicas": "M<=8",
+    "result": "M=1-2 beat DP; M=8 +1.1 % loss at 2.4B; M=4 +0.2-0.3 % at 4-10B",
+    "src": "https://arxiv.org/abs/2503.09799"
+   },
+   {
+    "run": "INTELLECT-1",
+    "params": "10B",
+    "tokens": "1T",
+    "FLOP": 6e+22,
+    "note": "7 min sync after ~38 min local",
+    "src": "https://arxiv.org/abs/2412.01152"
+   },
+   {
+    "run": "Covenant-72B (SparseLoCo, permissionless)",
+    "params": "72B",
+    "tokens": "1.1T",
+    "FLOP": 4.75e+23,
+    "note": ">146x compression; competitive with centralized runs of similar size",
+    "src": "https://arxiv.org/abs/2603.08163"
+   },
+   {
+    "run": "Consilience 40B (DisTrO/DeMo)",
+    "params": "40B",
+    "note": "largest distributed pretraining claimed by Nous; token count unconfirmed",
+    "src": "https://nousresearch.com/the-next-phase-of-psyche"
+   },
+   {
+    "run": "DiLoCoX",
+    "params": "107B",
+    "note": "1 Gbps emulated, small dataset (WikiText-103); 357x vs AllReduce",
+    "src": "https://arxiv.org/abs/2506.21263"
+   },
+   {
+    "run": "INTELLECT-2 (async RL)",
+    "params": "32B",
+    "note": "inference workers 4x training compute; rollouts 2-5 steps stale",
+    "src": "https://arxiv.org/abs/2505.07291"
+   },
+   {
+    "run": "Epoch synthesis",
+    "note": "decentralized compute 20x/yr vs frontier 5x/yr; largest 6e22-6e23 FLOP; 1->8 nodes ~1.5x compute penalty, ~6x extrapolated at 1e4",
+    "src": "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale"
+   },
+   {
+    "run": "EGGROLL (ES at hyperscale)",
+    "note": "low-rank ES at billion-param scale, up to 91 % of batch-inference throughput; competitive with GRPO for post-training",
+    "src": "https://arxiv.org/abs/2511.16652"
+   }
+  ],
+  "note": "sync DP row is per sail at ONE sail's critical-batch step; splitting a step over M sails multiplies it by M (infeasible beyond M~2)."
+ },
+ "sources": [
+  "https://ai.meta.com/blog/llama-4-multimodal-intelligence/",
+  "https://aiimpacts.org/brain-performance-in-flops/",
+  "https://arxiv.org/abs/1712.01815",
+  "https://arxiv.org/abs/1912.06680",
+  "https://arxiv.org/abs/2005.14165",
+  "https://arxiv.org/abs/2203.15556",
+  "https://arxiv.org/abs/2307.09288",
+  "https://arxiv.org/abs/2311.08105",
+  "https://arxiv.org/abs/2402.17764",
+  "https://arxiv.org/abs/2403.05812",
+  "https://arxiv.org/abs/2403.07816",
+  "https://arxiv.org/abs/2405.04434",
+  "https://arxiv.org/abs/2407.21783",
+  "https://arxiv.org/abs/2407.21787",
+  "https://arxiv.org/abs/2410.21676",
+  "https://arxiv.org/abs/2411.01137",
+  "https://arxiv.org/abs/2411.04330",
+  "https://arxiv.org/abs/2411.19870",
+  "https://arxiv.org/abs/2412.01152",
+  "https://arxiv.org/abs/2412.19437",
+  "https://arxiv.org/abs/2501.12370",
+  "https://arxiv.org/abs/2501.18512",
+  "https://arxiv.org/abs/2503.09799",
+  "https://arxiv.org/abs/2503.14499",
+  "https://arxiv.org/abs/2505.07291",
+  "https://arxiv.org/abs/2505.13738",
+  "https://arxiv.org/abs/2506.21263",
+  "https://arxiv.org/abs/2507.20534",
+  "https://arxiv.org/abs/2508.15706",
+  "https://arxiv.org/abs/2509.18521",
+  "https://arxiv.org/abs/2509.25149",
+  "https://arxiv.org/abs/2510.26692",
+  "https://arxiv.org/abs/2511.00739",
+  "https://arxiv.org/abs/2511.16652",
+  "https://arxiv.org/abs/2512.02556",
+  "https://arxiv.org/abs/2603.08163",
+  "https://arxiv.org/abs/2603.23414",
+  "https://arxiv.org/abs/2609.25463",
+  "https://coefficientgiving.org/research/how-much-computational-power-does-it-take-to-match-the-human-brain/",
+  "https://docs.nvidia.com/nemotron/latest/nemotron/super3/rl/swe.html",
+  "https://e2b.dev/docs/sandbox/compute",
+  "https://e3sm.org/exascale-performance-of-the-simple-cloud-resolving-e3sm-atmosphere-model/",
+  "https://epoch.ai/blog/can-ai-scaling-continue-through-2030",
+  "https://epoch.ai/blog/swebench-docker",
+  "https://epoch.ai/blog/training-compute-of-frontier-ai-models-grows-by-4-5x-per-year",
+  "https://epoch.ai/blog/trends-in-machine-learning-hardware",
+  "https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data",
+  "https://epoch.ai/data-insights/ai-chip-production",
+  "https://epoch.ai/data-insights/hbm-shipped",
+  "https://epoch.ai/data-insights/openai-compute-spend",
+  "https://epoch.ai/data-insights/output-length",
+  "https://epoch.ai/gradient-updates/how-far-can-decentralized-training-over-the-internet-scale",
+  "https://epoch.ai/gradient-updates/how-far-can-reasoning-models-scale",
+  "https://epoch.ai/gradient-updates/how-persistent-is-the-inference-cost-burden",
+  "https://epoch.ai/latest/introducing-the-ai-chip-users-explorer",
+  "https://forum.nunosempere.com/posts/nGQJEYp5X2pCbeweg/new-report-on-how-much-computational-power-it-takes-to-match",
+  "https://github.com/deepseek-ai/open-infra-index/blob/main/202502OpenSourceWeek/day_6_one_more_thing_deepseekV3R1_inference_system_overview.md",
+  "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct",
+  "https://inferencex.semianalysis.com/chips/h100",
+  "https://insights.trendforce.com/p/agentic-ai-cpu-gpu",
+  "https://metr.org/blog/2025-07-14-how-does-time-horizon-vary-across-domains",
+  "https://mistral.ai/news/mixtral-of-experts",
+  "https://nousresearch.com/the-next-phase-of-psyche",
+  "https://openai.com/index/introducing-gpt-oss/",
+  "https://ora.ox.ac.uk/objects/uuid:cc69b4e2-968c-41d6-91d0-a9afbb27b766",
+  "https://population.un.org/wpp/",
+  "https://qwenlm.github.io/blog/qwen3/",
+  "https://the-decoder.com/google-boasts-1-3-quadrillion-tokens-each-month-but-the-figure-is-mostly-window-dressing/",
+  "https://www.deloitte.com/us/en/about/press-room/deloitte-2026-tmt-predictions.html",
+  "https://www.fhi.ox.ac.uk/reports/2008-3.pdf",
+  "https://www.nvidia.com/en-us/data-center/a100/",
+  "https://www.nvidia.com/en-us/data-center/dgx-b200/",
+  "https://www.nvidia.com/en-us/data-center/v100/",
+  "https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72",
+  "https://www.olcf.ornl.gov/frontier/",
+  "https://www.theregister.co.uk/2018/06/25/openai_dota_2/",
+  "https://x.ai/news/grok-4",
+  "prior study: /tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/result.json",
+  "prior study: /tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/result.json",
+  "prior study: /tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/result.json",
+  "prior study: /tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/result.json",
+  "/home/user/dyson/docs/architecture.md"
+ ],
+ "files": [
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/common.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/trends.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/trends.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/sail_unit.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/sail_unit.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/log_sail_unit.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/lowcomm.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/lowcomm.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/log_lowcomm.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/pod_share.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/pod_share.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/log_pod_share.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/swarm_computes.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/swarm_computes.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/log_swarm_computes.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/build_result.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/workloads/result.json"
+ ]
+}

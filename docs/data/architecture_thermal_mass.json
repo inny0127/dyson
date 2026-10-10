@@ -1,0 +1,2682 @@
+{
+ "angle": "THERMAL, MASS, RELIABILITY and MANUFACTURING per watt of compute and per kg of Mercury: concentrated (A) vs film-distributed (B) vs hybrid (C)",
+ "scripts_dir": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research3/thermal_mass/scripts/",
+ "assumptions": {
+  "PV": "thin c-Si, AM0 eta 0.20 at 301 K, -0.42 %/K, packing 0.90, alpha 0.90, eps_f 0.85, eps_b 0.90 (film) / 0.85 (wings); radiosity swarm model (thermal_result.json).",
+  "energy_per_FLOP": "1.3e-13 J system-level dense FP8 at 85 C full clock x0.60 under-clocking = 7.8e-14 J at Tj 85 C; +0.89 %/K above 85 C (research_hotsi), -0.45 %/K below. A at Tj 105 C: 9.3e-14 J (+19.5 %%); B at Tj 85 C: 7.8e-14 J. Range low 4.1e-14 .. high 1.5e-13 J at 85 C. Same base for both: workload-matched (B neighbour-dataflow; A tightly coupled). For global/MoE/TP traffic on film, comm adds 10-99 %% energy (interconnect_final.json).",
+  "delivered_satellite_kg_per_kg_rock": "0.50 (0.38-0.62): oxides reduced to Si/Mg/Al/Ca, O used as glass and EP propellant (17-37 %% overhead).",
+  "Mercury": "M 3.3011e23 kg; rock (crust+mantle) 8.05e22 kg = 24.4 %%; core 2.50e23 kg Fe-Ni-Si (Si 12.8 wt%%). Rock Si 1.87e22, Mg 1.61e22, Al 2.1e21, Na 1.05e21, K 3.5e19 kg.",
+  "whole_planet_budget": "rock x0.50 + core x0.65 (core Fe useful to A for pipes/structure/shielding; to B only its Si).",
+  "meteoroids": "Grun 1985 flux (SPENVIS), 20 km/s at 1 AU, flux ~r^-1.8 and speed ~r^-0.5 inside 1 AU; SPENVIS thin-plate BLE (K1 0.57) and Christiansen Whipple BLE.",
+  "lifetime": "10 yr design life; attrition spares included in mass (B overbuild 5/10/20 %%, A radiator spares + A/B loops + PV reserve)."
+ },
+ "table": [
+  {
+   "architecture": "A concentrated (1 MW sats, HBM, Tj 105 C, NaK loops + SO2 heat-pipe blades)",
+   "placement_AU_f0.01_0.1_1": [
+    0.86,
+    0.91,
+    1.59
+   ],
+   "PV_T_K_f0.01_0.1_1": [
+    347.0,
+    341.0,
+    310.0
+   ],
+   "PV_eta_f0.01_0.1_1": [
+    0.145,
+    0.15,
+    0.173
+   ],
+   "W_e_per_m2_PV_f0.01_0.1_1": [
+    267.0,
+    246.0,
+    93.2
+   ],
+   "chip_W_per_W_sunlight_intercepted_f0.01_f1": [
+    0.116,
+    0.139
+   ],
+   "g_per_W_f0.01_low_mid_high": [
+    4.4,
+    7.18,
+    15.1
+   ],
+   "g_per_W_f1_low_mid_high": [
+    6.09,
+    10.0,
+    20.7
+   ],
+   "J_per_FLOP_mid": 9.32e-14,
+   "FLOPs_per_kg_satellite_low_mid_high": [
+    4820000000000000.0,
+    1490000000000000.0,
+    348000000000000.0
+   ],
+   "FLOPs_per_kg_Mercury_rock_low_mid_high": [
+    2990000000000000.0,
+    747000000000000.0,
+    132000000000000.0
+   ],
+   "FLOPs_per_W_sunlight_f0.01_f1": [
+    1250000000000.0,
+    1490000000000.0
+   ],
+   "swarm_FLOPs_mass_limited_rock_low_mid_high": [
+    2.29e+38,
+    5.84e+37,
+    1.05e+37
+   ],
+   "coverage_f_mass_limited_rock_mid": 0.118,
+   "placement_AU_mass_limited_rock_mid": 0.924,
+   "swarm_FLOPs_mass_limited_whole_planet_low_mid_high": [
+    9.25e+38,
+    2.66e+38,
+    5.11e+37
+   ],
+   "swarm_FLOPs_sun_limited_f1_low_mid_high": [
+    1.28e+39,
+    5.7e+38,
+    2.3e+38
+   ],
+   "Mercury_masses_needed_for_sun_limited_mid": 1.62,
+   "element_limited_note": "Rock-mass limit 5.8e37 FLOP/s is NOT reachable with NaK cooling: Mercury K (3.5e19 kg) caps NaK-78 loops at 1.4e+23 W of chips (1.5e+36 FLOP/s, f~0.3 %); Na-rich NaK 3.8e+23 W; Al-finned radiators cap at 1e+24 W unless Mg replaces Al. K-free options: SO2 pumped two-phase loops or pure-Na loops at >=105 C (Tj >= ~130 C, energy/op x1.5).",
+   "failure_blast_radius": "Pumped-loop trunk hit drains one of two loops -> 0.5 MW (half a 1 MW satellite) throttled; both loops or module -> 1 MW. P(lose >=1 loop per satellite per decade) ~11 %; plus ~2.0 %/yr capacity from branch and heat-pipe hits (covered by spares). HV strings (300-1000 V) see ~5.8e+05 cell perforations/yr per MW, each a possible impact-plasma arc trigger (sustained arcs >=80-183 V)."
+  },
+  {
+   "architecture": "A' concentrated wafer-scale SRAM module (single hot loop)",
+   "placement_AU_f0.01_0.1_1": [
+    0.85,
+    0.9,
+    1.56
+   ],
+   "PV_T_K_f0.01_0.1_1": [
+    349.0,
+    343.0,
+    313.0
+   ],
+   "PV_eta_f0.01_0.1_1": [
+    0.144,
+    0.148,
+    0.171
+   ],
+   "W_e_per_m2_PV_f0.01_0.1_1": [
+    271.0,
+    249.0,
+    95.5
+   ],
+   "chip_W_per_W_sunlight_intercepted_f0.01_f1": [
+    0.115,
+    0.137
+   ],
+   "g_per_W_f0.01_low_mid_high": [
+    4.33,
+    7.05,
+    15.0
+   ],
+   "g_per_W_f1_low_mid_high": [
+    5.97,
+    9.8,
+    20.4
+   ],
+   "J_per_FLOP_mid": 7.46e-14,
+   "FLOPs_per_kg_satellite_low_mid_high": [
+    6120000000000000.0,
+    1900000000000000.0,
+    439000000000000.0
+   ],
+   "FLOPs_per_kg_Mercury_rock_low_mid_high": [
+    3790000000000000.0,
+    952000000000000.0,
+    167000000000000.0
+   ],
+   "FLOPs_per_W_sunlight_f0.01_f1": [
+    1550000000000.0,
+    1840000000000.0
+   ],
+   "swarm_FLOPs_mass_limited_rock_low_mid_high": [
+    2.91e+38,
+    7.44e+37,
+    1.33e+37
+   ],
+   "coverage_f_mass_limited_rock_mid": 0.121,
+   "placement_AU_mass_limited_rock_mid": 0.916,
+   "swarm_FLOPs_mass_limited_whole_planet_low_mid_high": [
+    1.17e+39,
+    3.38e+38,
+    6.45e+37
+   ],
+   "swarm_FLOPs_sun_limited_f1_low_mid_high": [
+    1.58e+39,
+    7.03e+38,
+    2.84e+38
+   ],
+   "Mercury_masses_needed_for_sun_limited_mid": 1.56,
+   "failure_blast_radius": "Pumped-loop trunk hit drains one of two loops -> 0.5 MW (half a 1 MW satellite) throttled; both loops or module -> 1 MW. P(lose >=1 loop per satellite per decade) ~11 %; plus ~2.0 %/yr capacity from branch and heat-pipe hits (covered by spares). HV strings (300-1000 V) see ~5.8e+05 cell perforations/yr per MW, each a possible impact-plasma arc trigger (sustained arcs >=80-183 V)."
+  },
+  {
+   "architecture": "B film-distributed (0.15 W chiplets at 2.5 cm, Tj 85 C, film = radiator)",
+   "placement_AU_f0.01_0.1_1": [
+    0.919,
+    0.941,
+    1.35
+   ],
+   "PV_T_K_f0.01_0.1_1": [
+    348.0,
+    348.0,
+    348.0
+   ],
+   "PV_eta_f0.01_0.1_1": [
+    0.144,
+    0.144,
+    0.144
+   ],
+   "W_e_per_m2_PV_f0.01_0.1_1": [
+    233.0,
+    222.0,
+    108.0
+   ],
+   "chip_W_per_W_sunlight_intercepted_f0.01_f1": [
+    0.134,
+    0.134
+   ],
+   "g_per_W_f0.01_low_mid_high": [
+    0.472,
+    0.893,
+    1.98
+   ],
+   "g_per_W_f1_low_mid_high": [
+    1.08,
+    2.01,
+    4.36
+   ],
+   "J_per_FLOP_mid": 6.43e-14,
+   "FLOPs_per_kg_satellite_low_mid_high": [
+    6.3e+16,
+    1.74e+16,
+    3970000000000000.0
+   ],
+   "FLOPs_per_kg_Mercury_rock_low_mid_high": [
+    3.91e+16,
+    8710000000000000.0,
+    1510000000000000.0
+   ],
+   "FLOPs_per_W_sunlight_f0.01_f1": [
+    2090000000000.0,
+    2090000000000.0
+   ],
+   "swarm_FLOPs_mass_limited_rock_low_mid_high": [
+    1.49e+39,
+    4.7e+38,
+    1.04e+38
+   ],
+   "coverage_f_mass_limited_rock_mid": 0.588,
+   "placement_AU_mass_limited_rock_mid": 1.11,
+   "swarm_FLOPs_mass_limited_whole_planet_low_mid_high": [
+    1.59e+39,
+    8e+38,
+    3.3e+38
+   ],
+   "swarm_FLOPs_sun_limited_f1_low_mid_high": [
+    1.59e+39,
+    8e+38,
+    3.83e+38
+   ],
+   "Mercury_masses_needed_for_sun_limited_mid": 0.313,
+   "element_limited_note": "Rock-only Si (1.87e22 kg at 0.0995 kg Si/m2) builds 1.88e+23 m2 of film -> f=0.56 at 1.09 AU, 4.49e+38 FLOP/s (vs bulk-mass limit 4.7e+38); full shell needs core Si (whole planet: 5.1e+23 m2 vs 5.11e+23 needed).",
+   "failure_blast_radius": "One chiplet + its PV cell: 0.10-0.25 W (4-11 cm2). Expected attrition 0.13 %/yr mid (0.019-1.22 %/yr) at 0.92 AU; no fluids, no HV (cell-level 0.5-1 V); latch-up current is limited by the chip's own cell."
+  },
+  {
+   "architecture": "C hybrid: B film + 10 % compute in A-type pods (switch/gateway + coupled shards)",
+   "placement_AU_f0.01_0.1_1": [
+    0.919,
+    0.941,
+    1.35
+   ],
+   "PV_T_K_f0.01_0.1_1": [
+    348.0,
+    348.0,
+    348.0
+   ],
+   "PV_eta_f0.01_0.1_1": [
+    0.144,
+    0.144,
+    0.144
+   ],
+   "W_e_per_m2_PV_f0.01_0.1_1": [
+    233.0,
+    222.0,
+    108.0
+   ],
+   "chip_W_per_W_sunlight_intercepted_f0.01_f1": [
+    0.133,
+    0.133
+   ],
+   "g_per_W_f0.01_low_mid_high": [
+    0.589,
+    1.53,
+    6.09
+   ],
+   "g_per_W_f1_low_mid_high": [
+    1.23,
+    2.83,
+    9.29
+   ],
+   "J_per_FLOP_mid": 6.53e-14,
+   "FLOPs_per_kg_satellite_low_mid_high": [
+    5.03e+16,
+    9990000000000000.0,
+    1220000000000000.0
+   ],
+   "FLOPs_per_kg_Mercury_rock_low_mid_high": [
+    3.12e+16,
+    4990000000000000.0,
+    464000000000000.0
+   ],
+   "FLOPs_per_W_sunlight_f0.01_f1": [
+    2040000000000.0,
+    2040000000000.0
+   ],
+   "swarm_FLOPs_mass_limited_rock_low_mid_high": [
+    1.38e+39,
+    3.3e+38,
+    3.64e+37
+   ],
+   "coverage_f_mass_limited_rock_mid": 0.423,
+   "placement_AU_mass_limited_rock_mid": 1.04,
+   "swarm_FLOPs_mass_limited_whole_planet_low_mid_high": [
+    1.58e+39,
+    7.79e+38,
+    1.64e+38
+   ],
+   "swarm_FLOPs_sun_limited_f1_low_mid_high": [
+    1.58e+39,
+    7.79e+38,
+    3.46e+38
+   ],
+   "Mercury_masses_needed_for_sun_limited_mid": 0.436,
+   "failure_blast_radius": "Film part as B (0.15 W); pods 0.1-0.3 MW each (as A)."
+  }
+ ],
+ "headline_table": [
+  {
+   "arch": "A concentrated",
+   "placement_AU": [
+    0.86,
+    0.91,
+    1.59
+   ],
+   "g_per_W": [
+    4.4,
+    7.18,
+    15.1
+   ],
+   "W_per_m2": 267.0,
+   "FLOPs_per_kg_Mercury_rock": 747000000000000.0,
+   "swarm_FLOPs_mass_limited_rock": "5.84e+37 (bulk mass) but 1.47e+36 with NaK-78 (K-limited)",
+   "swarm_FLOPs_sun_limited": 5.7e+38,
+   "blast_radius": "Pumped-loop trunk hit drains one of two loops -> 0.5 MW (half a 1 MW satellite) "
+  },
+  {
+   "arch": "A' concentrated wafer-scale SRAM module",
+   "placement_AU": [
+    0.85,
+    0.9,
+    1.56
+   ],
+   "g_per_W": [
+    4.33,
+    7.05,
+    15.0
+   ],
+   "W_per_m2": 271.0,
+   "FLOPs_per_kg_Mercury_rock": 952000000000000.0,
+   "swarm_FLOPs_mass_limited_rock": 7.44e+37,
+   "swarm_FLOPs_sun_limited": 7.03e+38,
+   "blast_radius": "Pumped-loop trunk hit drains one of two loops -> 0.5 MW (half a 1 MW satellite) "
+  },
+  {
+   "arch": "B film-distributed",
+   "placement_AU": [
+    0.919,
+    0.941,
+    1.35
+   ],
+   "g_per_W": [
+    0.472,
+    0.893,
+    1.98
+   ],
+   "W_per_m2": 233.0,
+   "FLOPs_per_kg_Mercury_rock": 8710000000000000.0,
+   "swarm_FLOPs_mass_limited_rock": 4.49e+38,
+   "swarm_FLOPs_sun_limited": 8e+38,
+   "blast_radius": "One chiplet + its PV cell: 0.10-0.25 W (4-11 cm2). Expected attrition 0.13 %/yr "
+  },
+  {
+   "arch": "C hybrid",
+   "placement_AU": [
+    0.919,
+    0.941,
+    1.35
+   ],
+   "g_per_W": [
+    0.589,
+    1.53,
+    6.09
+   ],
+   "W_per_m2": 233.0,
+   "FLOPs_per_kg_Mercury_rock": 4990000000000000.0,
+   "swarm_FLOPs_mass_limited_rock": 3.3e+38,
+   "swarm_FLOPs_sun_limited": 7.79e+38,
+   "blast_radius": "Film part as B (0.15 W); pods 0.1-0.3 MW each (as A)."
+  }
+ ],
+ "film_B": {
+  "placement": [
+   {
+    "Tj_C": 80,
+    "T_sheet_K": 343.15,
+    "f": 0.01,
+    "r_AU": 0.946,
+    "S": 1520.9,
+    "T_check_K": 343.15,
+    "eta": 0.1481,
+    "q_e_W_m2": 225.3
+   },
+   {
+    "Tj_C": 80,
+    "T_sheet_K": 343.15,
+    "f": 0.1,
+    "r_AU": 0.9689,
+    "S": 1450.0,
+    "T_check_K": 343.15,
+    "eta": 0.1481,
+    "q_e_W_m2": 214.8
+   },
+   {
+    "Tj_C": 80,
+    "T_sheet_K": 343.15,
+    "f": 1.0,
+    "r_AU": 1.3869,
+    "S": 707.6,
+    "T_check_K": 343.15,
+    "eta": 0.1481,
+    "q_e_W_m2": 104.8
+   },
+   {
+    "Tj_C": 85,
+    "T_sheet_K": 348.15,
+    "f": 0.01,
+    "r_AU": 0.919,
+    "S": 1611.5,
+    "T_check_K": 348.15,
+    "eta": 0.1444,
+    "q_e_W_m2": 232.6
+   },
+   {
+    "Tj_C": 85,
+    "T_sheet_K": 348.15,
+    "f": 0.1,
+    "r_AU": 0.9412,
+    "S": 1536.4,
+    "T_check_K": 348.15,
+    "eta": 0.1444,
+    "q_e_W_m2": 221.8
+   },
+   {
+    "Tj_C": 85,
+    "T_sheet_K": 348.15,
+    "f": 1.0,
+    "r_AU": 1.3474,
+    "S": 749.8,
+    "T_check_K": 348.15,
+    "eta": 0.1444,
+    "q_e_W_m2": 108.2
+   },
+   {
+    "Tj_C": 95,
+    "T_sheet_K": 358.15,
+    "f": 0.01,
+    "r_AU": 0.8684,
+    "S": 1804.8,
+    "T_check_K": 358.15,
+    "eta": 0.1368,
+    "q_e_W_m2": 246.9
+   },
+   {
+    "Tj_C": 95,
+    "T_sheet_K": 358.15,
+    "f": 0.1,
+    "r_AU": 0.8894,
+    "S": 1720.7,
+    "T_check_K": 358.15,
+    "eta": 0.1368,
+    "q_e_W_m2": 235.4
+   },
+   {
+    "Tj_C": 95,
+    "T_sheet_K": 358.15,
+    "f": 1.0,
+    "r_AU": 1.2732,
+    "S": 839.7,
+    "T_check_K": 358.15,
+    "eta": 0.1368,
+    "q_e_W_m2": 114.9
+   },
+   {
+    "Tj_C": 105,
+    "T_sheet_K": 368.15,
+    "f": 0.01,
+    "r_AU": 0.8219,
+    "S": 2015.0,
+    "T_check_K": 368.15,
+    "eta": 0.1292,
+    "q_e_W_m2": 260.4
+   },
+   {
+    "Tj_C": 105,
+    "T_sheet_K": 368.15,
+    "f": 0.1,
+    "r_AU": 0.8417,
+    "S": 1921.1,
+    "T_check_K": 368.15,
+    "eta": 0.1292,
+    "q_e_W_m2": 248.3
+   },
+   {
+    "Tj_C": 105,
+    "T_sheet_K": 368.15,
+    "f": 1.0,
+    "r_AU": 1.205,
+    "S": 937.5,
+    "T_check_K": 368.15,
+    "eta": 0.1292,
+    "q_e_W_m2": 121.2
+   }
+  ],
+  "itemised_mid_f0.01_g_per_W": {
+   "Si absorber (20/30/50 um c-Si)": 0.35539994363899985,
+   "front glass/oxide cover + IR emitter (10/20/40 um)": 0.2542202744198855,
+   "back emissive glass enamel (3/5/10 um)": 0.06355506860497137,
+   "front grid + cell interconnect (Al)": 0.02033762195359084,
+   "chiplet signal mesh wiring (interconnect_final)": 0.0018303859758231754,
+   "structure: spin-tension rim/frame, attitude vanes": 0.06101286586077251,
+   "Mg spreader (uniform, sized for dT=10 K at 0.15 W chips)": 0.11443749645882029,
+   "chiplets (Si dies 50 um, logic+SRAM)": 0.002066935483870968,
+   "laser/comm terminals": 0.02
+  },
+  "areal_kg_m2_mid": 0.171674071705836,
+  "Mg_um_mid": 12.935371947780077,
+  "clustering_penalty": {
+   "T_sheet": 348.15,
+   "f": 0.01,
+   "r_AU": 0.9190436854321097,
+   "q_e": 232.63205533543618,
+   "h": 16.749774909216605,
+   "rows": [
+    {
+     "P_W": 0.03,
+     "pitch_cm": 1.1356012149209618,
+     "Mg_uniform_um": 0.0,
+     "Mg_uniform_g_per_W": 0.0,
+     "Mg_tapered_bound_g_per_W": 0.028242701563904085,
+     "Al_tapered_bound_g_per_W": 0.028846757599098896,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 7754.401844514539
+    },
+    {
+     "P_W": 0.1,
+     "pitch_cm": 2.073314672474943,
+     "Mg_uniform_um": 0.0,
+     "Mg_uniform_g_per_W": 0.0,
+     "Mg_tapered_bound_g_per_W": 0.09414233854634697,
+     "Al_tapered_bound_g_per_W": 0.096155858663663,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 2326.3205533543614
+    },
+    {
+     "P_W": 0.25,
+     "pitch_cm": 3.2781983356334163,
+     "Mg_uniform_um": 39.951980511448724,
+     "Mg_uniform_g_per_W": 0.2988257400283199,
+     "Mg_tapered_bound_g_per_W": 0.23535584636586743,
+     "Al_tapered_bound_g_per_W": 0.24038964665915746,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 930.5282213417447
+    },
+    {
+     "P_W": 0.5,
+     "pitch_cm": 4.636072546401685,
+     "Mg_uniform_um": 108.92422369932149,
+     "Mg_uniform_g_per_W": 0.814712095302324,
+     "Mg_tapered_bound_g_per_W": 0.47071169273173485,
+     "Al_tapered_bound_g_per_W": 0.4807792933183149,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 465.26411067087236
+    },
+    {
+     "P_W": 1,
+     "pitch_cm": 6.556396671266833,
+     "Mg_uniform_um": 248.24941809802326,
+     "Mg_uniform_g_per_W": 1.8568119809100194,
+     "Mg_tapered_bound_g_per_W": 0.9414233854634697,
+     "Al_tapered_bound_g_per_W": 0.9615585866366299,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 232.63205533543618
+    },
+    {
+     "P_W": 2,
+     "pitch_cm": 9.27214509280337,
+     "Mg_uniform_um": 528.0546674393659,
+     "Mg_uniform_g_per_W": 3.9496496732560833,
+     "Mg_tapered_bound_g_per_W": 1.8828467709269394,
+     "Al_tapered_bound_g_per_W": 1.9231171732732597,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 116.31602766771809
+    },
+    {
+     "P_W": 5,
+     "pitch_cm": 14.660548644405983,
+     "Mg_uniform_um": 1368.1100660887914,
+     "Mg_uniform_g_per_W": 10.232947095627024,
+     "Mg_tapered_bound_g_per_W": 4.707116927317347,
+     "Al_tapered_bound_g_per_W": 4.807792933183149,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 46.52641106708724
+    },
+    {
+     "P_W": 10,
+     "pitch_cm": 20.73314672474943,
+     "Mg_uniform_um": 2769.2484941038074,
+     "Mg_uniform_g_per_W": 20.712933876600786,
+     "Mg_tapered_bound_g_per_W": 9.414233854634695,
+     "Al_tapered_bound_g_per_W": 9.615585866366297,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 23.26320553354362
+    },
+    {
+     "P_W": 30,
+     "pitch_cm": 35.91086352804628,
+     "Mg_uniform_um": 8369.65164111712,
+     "Mg_uniform_g_per_W": 62.60183633998706,
+     "Mg_tapered_bound_g_per_W": 28.242701563904088,
+     "Al_tapered_bound_g_per_W": 28.846757599098897,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 7.754401844514539
+    },
+    {
+     "P_W": 100,
+     "pitch_cm": 65.56396671266833,
+     "Mg_uniform_um": 27991.334089919957,
+     "Mg_uniform_g_per_W": 209.3646176415037,
+     "Mg_tapered_bound_g_per_W": 94.14233854634696,
+     "Al_tapered_bound_g_per_W": 96.155858663663,
+     "SO2_heatpipe_net": {
+      "len_m_per_W": 0.14029393742661317,
+      "g_per_W_1g_m": 0.14029393742661317,
+      "g_per_W_3g_m": 0.4208818122798395
+     },
+     "chips_per_m2": 2.326320553354362
+    }
+   ],
+   "note": "Solid spreader mass per W grows linearly with chip power (P/(q_e k dT)); a heat-pipe vascular network costs a constant ~1/(2 w q_e) metres of pipe per W because the film between pipes cannot spread heat more than ~1.5-2 cm."
+  },
+  "sheet_T_trade": [
+   {
+    "f": 0.01,
+    "Tj_C": 60,
+    "r_AU": 1.0667450442663051,
+    "eta": 0.16325460000000003,
+    "q_e": 195.27893606511594,
+    "g_per_W": 1.0747407183642699,
+    "J_per_FLOP": 6.970059307446422e-14,
+    "FLOPs_per_kg": 1.3349340889090384e+16,
+    "FLOPs_per_W_sun": 2178270963028.9194
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 70,
+    "r_AU": 1.0036662471411257,
+    "eta": 0.15569460000000004,
+    "q_e": 210.3808243673318,
+    "g_per_W": 0.9931556684063281,
+    "J_per_FLOP": 7.290876220805015e-14,
+    "FLOPs_per_kg": 1.381029479593722e+16,
+    "FLOPs_per_W_sun": 1985988701698.361
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 80,
+    "r_AU": 0.9460213723458507,
+    "eta": 0.14813460000000003,
+    "q_e": 225.30241871574952,
+    "g_per_W": 0.9236358755804284,
+    "J_per_FLOP": 7.626459650108023e-14,
+    "FLOPs_per_kg": 1.4196334696840734e+16,
+    "FLOPs_per_W_sun": 1806410632462.3208
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 85,
+    "r_AU": 0.9190436854321097,
+    "eta": 0.14435460000000003,
+    "q_e": 232.63205533543618,
+    "g_per_W": 0.8928605923967344,
+    "J_per_FLOP": 7.8e-14,
+    "FLOPs_per_kg": 1.4358918883516078e+16,
+    "FLOPs_per_W_sun": 1721151000000.0007
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 90,
+    "r_AU": 0.8932037408740101,
+    "eta": 0.14057460000000005,
+    "q_e": 239.8374681096251,
+    "g_per_W": 0.864499994505462,
+    "J_per_FLOP": 8.154938818341554e-14,
+    "FLOPs_per_kg": 1.4184508700341562e+16,
+    "FLOPs_per_W_sun": 1603131316030.978
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 95,
+    "r_AU": 0.8684384498800756,
+    "eta": 0.13679460000000004,
+    "q_e": 246.88920877894478,
+    "g_per_W": 0.8383979271579097,
+    "J_per_FLOP": 8.526029119345375e-14,
+    "FLOPs_per_kg": 1.3989525766792104e+16,
+    "FLOPs_per_W_sun": 1492124601255.9697
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 105,
+    "r_AU": 0.8219006896186263,
+    "eta": 0.12923460000000003,
+    "q_e": 260.40622047249275,
+    "g_per_W": 0.7924494337514415,
+    "J_per_FLOP": 9.319637505631446e-14,
+    "FLOPs_per_kg": 1.3540335336695296e+16,
+    "FLOPs_per_W_sun": 1289622884231.0188
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 115,
+    "r_AU": 0.7790058965560184,
+    "eta": 0.12167460000000004,
+    "q_e": 272.9164278031965,
+    "g_per_W": 0.7540375806438816,
+    "J_per_FLOP": 1.0187115481379104e-13,
+    "FLOPs_per_kg": 1.3018345081237174e+16,
+    "FLOPs_per_W_sun": 1110789194515.7483
+   },
+   {
+    "f": 0.01,
+    "Tj_C": 125,
+    "r_AU": 0.739383531994358,
+    "eta": 0.11411460000000004,
+    "q_e": 284.1272620496324,
+    "g_per_W": 0.7225908298652987,
+    "J_per_FLOP": 1.1135338876457989e-13,
+    "FLOPs_per_kg": 1.2428082169017206e+16,
+    "FLOPs_per_W_sun": 953061053439.2427
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 60,
+    "r_AU": 1.563940322140029,
+    "eta": 0.16325460000000003,
+    "q_e": 90.8523811605329,
+    "g_per_W": 2.4236750915125937,
+    "J_per_FLOP": 6.970059307446422e-14,
+    "FLOPs_per_kg": 5919555912041261.0,
+    "FLOPs_per_W_sun": 2178270963028.9194
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 70,
+    "r_AU": 1.4714613602489899,
+    "eta": 0.15569460000000004,
+    "q_e": 97.87844623402961,
+    "g_per_W": 2.238418344645577,
+    "J_per_FLOP": 7.290876220805015e-14,
+    "FLOPs_per_kg": 6127439310777793.0,
+    "FLOPs_per_W_sun": 1985988701698.361
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 80,
+    "r_AU": 1.3869489975793792,
+    "eta": 0.14813460000000003,
+    "q_e": 104.82063060159115,
+    "g_per_W": 2.0804974167678436,
+    "J_per_FLOP": 7.626459650108023e-14,
+    "FLOPs_per_kg": 6302456288611900.0,
+    "FLOPs_per_W_sun": 1806410632462.3208
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 85,
+    "r_AU": 1.3473973797028809,
+    "eta": 0.1443546,
+    "q_e": 108.23070110565172,
+    "g_per_W": 2.0105660068209628,
+    "J_per_FLOP": 7.8e-14,
+    "FLOPs_per_kg": 6376568974616343.0,
+    "FLOPs_per_W_sun": 1721151000000.0002
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 90,
+    "r_AU": 1.3095137903358736,
+    "eta": 0.14057460000000005,
+    "q_e": 111.5829771932339,
+    "g_per_W": 1.946106817057822,
+    "J_per_FLOP": 8.154938818341554e-14,
+    "FLOPs_per_kg": 6301045546948320.0,
+    "FLOPs_per_W_sun": 1603131316030.978
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 95,
+    "r_AU": 1.2732057358638844,
+    "eta": 0.13679460000000004,
+    "q_e": 114.863758234158,
+    "g_per_W": 1.8867664734604628,
+    "J_per_FLOP": 8.526029119345375e-14,
+    "FLOPs_per_kg": 6216343977794582.0,
+    "FLOPs_per_W_sun": 1492124601255.9697
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 105,
+    "r_AU": 1.2049773619275186,
+    "eta": 0.12923460000000003,
+    "q_e": 121.15246874886559,
+    "g_per_W": 1.782585428805453,
+    "J_per_FLOP": 9.319637505631446e-14,
+    "FLOPs_per_kg": 6019364287948452.0,
+    "FLOPs_per_W_sun": 1289622884231.0188
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 115,
+    "r_AU": 1.142089892385436,
+    "eta": 0.12167460000000004,
+    "q_e": 126.97276943110299,
+    "g_per_W": 1.6952423475437728,
+    "J_per_FLOP": 1.0187115481379104e-13,
+    "FLOPs_per_kg": 5790512160851851.0,
+    "FLOPs_per_W_sun": 1110789194515.7483
+   },
+   {
+    "f": 1.0,
+    "Tj_C": 125,
+    "r_AU": 1.0840000855196044,
+    "eta": 0.11411460000000004,
+    "q_e": 132.18854439694522,
+    "g_per_W": 1.6237288618448396,
+    "J_per_FLOP": 1.1135338876457989e-13,
+    "FLOPs_per_kg": 5530737562884077.0,
+    "FLOPs_per_W_sun": 953061053439.2427
+   }
+  ]
+ },
+ "conc_A": {
+  "panels": {
+   "r0.6_T338": {
+    "m_kg_m2": 1.657748925941193,
+    "eff": 0.656075914585997,
+    "m_eff": 2.526763883699771,
+    "t_f_mm": 0.15,
+    "pitch_m": 0.14,
+    "mode": "whipple",
+    "t_wall_mm": 0.75,
+    "perf_rate_m2_yr": 0.023386649614454236,
+    "d_crit_um": 436.73067883174576,
+    "loss_frac_yr": 0.00514299286345936,
+    "parts": {
+     "tube": 0.36352714991539026,
+     "wick_fluid": 0.17492976943810515,
+     "bumper": 0.3392920065876977,
+     "fin": 0.40499999999999997,
+     "coat": 0.075,
+     "frame": 0.3
+    }
+   },
+   "r0.6_T356": {
+    "m_kg_m2": 2.00884849631767,
+    "eff": 0.7657802551471521,
+    "m_eff": 2.6232701650575336,
+    "t_f_mm": 0.15,
+    "pitch_m": 0.1,
+    "mode": "whipple",
+    "t_wall_mm": 0.75,
+    "perf_rate_m2_yr": 0.023386649614454236,
+    "d_crit_um": 436.73067883174576,
+    "loss_frac_yr": 0.00514299286345936,
+    "parts": {
+     "tube": 0.5089380098815464,
+     "wick_fluid": 0.2449016772133472,
+     "bumper": 0.4750088092227768,
+     "fin": 0.40499999999999997,
+     "coat": 0.075,
+     "frame": 0.3
+    }
+   },
+   "r1.0_T338": {
+    "m_kg_m2": 1.815589889940359,
+    "eff": 0.7903884986375598,
+    "m_eff": 2.2970854118828914,
+    "t_f_mm": 0.15,
+    "pitch_m": 0.1,
+    "mode": "whipple",
+    "t_wall_mm": 0.5,
+    "perf_rate_m2_yr": 0.013369509333554927,
+    "d_crit_um": 395.15648277611433,
+    "loss_frac_yr": 0.002940108661307743,
+    "parts": {
+     "tube": 0.33929200658769765,
+     "wick_fluid": 0.22128907412988463,
+     "bumper": 0.4750088092227768,
+     "fin": 0.40499999999999997,
+     "coat": 0.075,
+     "frame": 0.3
+    }
+   },
+   "r1.0_T356": {
+    "m_kg_m2": 1.815589889940359,
+    "eff": 0.7657802551471521,
+    "m_eff": 2.3709019366025257,
+    "t_f_mm": 0.15,
+    "pitch_m": 0.1,
+    "mode": "whipple",
+    "t_wall_mm": 0.5,
+    "perf_rate_m2_yr": 0.013369509333554927,
+    "d_crit_um": 395.15648277611433,
+    "loss_frac_yr": 0.002940108661307743,
+    "parts": {
+     "tube": 0.33929200658769765,
+     "wick_fluid": 0.22128907412988463,
+     "bumper": 0.4750088092227768,
+     "fin": 0.40499999999999997,
+     "coat": 0.075,
+     "frame": 0.3
+    }
+   },
+   "r1.3_T338": {
+    "m_kg_m2": 1.815589889940359,
+    "eff": 0.7903884986375598,
+    "m_eff": 2.2970854118828914,
+    "t_f_mm": 0.15,
+    "pitch_m": 0.1,
+    "mode": "whipple",
+    "t_wall_mm": 0.5,
+    "perf_rate_m2_yr": 0.005774481428402889,
+    "d_crit_um": 431.2709729973096,
+    "loss_frac_yr": 0.0012698747903632848,
+    "parts": {
+     "tube": 0.33929200658769765,
+     "wick_fluid": 0.22128907412988463,
+     "bumper": 0.4750088092227768,
+     "fin": 0.40499999999999997,
+     "coat": 0.075,
+     "frame": 0.3
+    }
+   },
+   "r1.3_T356": {
+    "m_kg_m2": 1.815589889940359,
+    "eff": 0.7657802551471521,
+    "m_eff": 2.3709019366025257,
+    "t_f_mm": 0.15,
+    "pitch_m": 0.1,
+    "mode": "whipple",
+    "t_wall_mm": 0.5,
+    "perf_rate_m2_yr": 0.005774481428402889,
+    "d_crit_um": 431.2709729973096,
+    "loss_frac_yr": 0.0012698747903632848,
+    "parts": {
+     "tube": 0.33929200658769765,
+     "wick_fluid": 0.22128907412988463,
+     "bumper": 0.4750088092227768,
+     "fin": 0.40499999999999997,
+     "coat": 0.075,
+     "frame": 0.3
+    }
+   }
+  },
+  "size_scan": [
+   {
+    "P_MW": 0.03,
+    "g_per_W": 12.965617805283285,
+    "L_wing_m": 14.380706633632336,
+    "eps_bus": 0.015968090487954542,
+    "bus_g_per_W": 0.015340175262586374,
+    "loops_g_per_W": 2.3421333250578464,
+    "pump_frac": 0.04116494587549514,
+    "nak_kg_per_kW": 0.13529706997054047,
+    "dT_loop": 40.0,
+    "v": 4.5,
+    "trunk_D": 0.008650139126798524,
+    "blade_side": 3.25045023302922,
+    "loop_kill_per_yr": 0.0034658922951706483,
+    "branch_loss_per_yr": 0.003610304964093619
+   },
+   {
+    "P_MW": 0.1,
+    "g_per_W": 8.746366537436082,
+    "L_wing_m": 26.15973136631613,
+    "eps_bus": 0.02309786663093164,
+    "bus_g_per_W": 0.02202807603387978,
+    "loops_g_per_W": 1.6540423930508303,
+    "pump_frac": 0.03295374163065375,
+    "nak_kg_per_kW": 0.2389815764865737,
+    "dT_loop": 30.0,
+    "v": 4.5,
+    "trunk_D": 0.01816960622635791,
+    "blade_side": 5.341059739228472,
+    "loop_kill_per_yr": 0.0049333692265746566,
+    "branch_loss_per_yr": 0.006704025958675185
+   },
+   {
+    "P_MW": 0.3,
+    "g_per_W": 7.654548630321836,
+    "L_wing_m": 45.58045877890694,
+    "eps_bus": 0.034853121597104256,
+    "bus_g_per_W": 0.03363689880984241,
+    "loops_g_per_W": 1.3819503859171562,
+    "pump_frac": 0.04636410858478584,
+    "nak_kg_per_kW": 0.26760752347969896,
+    "dT_loop": 30.0,
+    "v": 6.0,
+    "trunk_D": 0.027417102139877417,
+    "blade_side": 9.306209787165294,
+    "loop_kill_per_yr": 0.0076743520914456555,
+    "branch_loss_per_yr": 0.012059942838501902
+   },
+   {
+    "P_MW": 1.0,
+    "g_per_W": 7.6278833425645685,
+    "L_wing_m": 82.92735013173387,
+    "eps_bus": 0.05745898082778383,
+    "bus_g_per_W": 0.05506702728860168,
+    "loops_g_per_W": 1.4231834787615496,
+    "pump_frac": 0.03845729097254107,
+    "nak_kg_per_kW": 0.4303982306156406,
+    "dT_loop": 30.0,
+    "v": 6.0,
+    "trunk_D": 0.04988163169952781,
+    "blade_side": 16.931363743462196,
+    "loop_kill_per_yr": 0.014002589626230402,
+    "branch_loss_per_yr": 0.023861810419378307
+   },
+   {
+    "P_MW": 3.0,
+    "g_per_W": 8.249855856677604,
+    "L_wing_m": 145.0386740819504,
+    "eps_bus": 0.09505460913818273,
+    "bus_g_per_W": 0.09288759212564152,
+    "loops_g_per_W": 1.5498804655311538,
+    "pump_frac": 0.0605708458775322,
+    "nak_kg_per_kW": 0.5385577378856367,
+    "dT_loop": 30.0,
+    "v": 8.0,
+    "trunk_D": 0.07555397516760085,
+    "blade_side": 29.612697885251475,
+    "loop_kill_per_yr": 0.025768837468557373,
+    "branch_loss_per_yr": 0.04362113895838543
+   },
+   {
+    "P_MW": 10.0,
+    "g_per_W": 9.800155081116339,
+    "L_wing_m": 263.9641672279245,
+    "eps_bus": 0.16703952835405056,
+    "bus_g_per_W": 0.1621986909016814,
+    "loops_g_per_W": 1.9896174026035924,
+    "pump_frac": 0.05331063875646038,
+    "nak_kg_per_kW": 0.9335860643782847,
+    "dT_loop": 30.0,
+    "v": 8.0,
+    "trunk_D": 0.1375049952250738,
+    "blade_side": 53.89384042706427,
+    "loop_kill_per_yr": 0.05714394513639378,
+    "branch_loss_per_yr": 0.08883788515642366
+   },
+   {
+    "P_MW": 30.0,
+    "g_per_W": 12.664619568774405,
+    "L_wing_m": 455.5881087253861,
+    "eps_bus": 0.2,
+    "bus_g_per_W": 0.3861816953387324,
+    "loops_g_per_W": 2.4445725485556147,
+    "pump_frac": 0.04528784943887863,
+    "nak_kg_per_kW": 1.2950635386446587,
+    "dT_loop": 40.0,
+    "v": 8.0,
+    "trunk_D": 0.20553060334171588,
+    "blade_side": 102.97591560610698,
+    "loop_kill_per_yr": 0.1310511585665722,
+    "branch_loss_per_yr": 0.17541955776106627
+   },
+   {
+    "P_MW": 100.0,
+    "g_per_W": 19.19682743280326,
+    "L_wing_m": 830.2873314113689,
+    "eps_bus": 0.2,
+    "bus_g_per_W": 1.2485864671649092,
+    "loops_g_per_W": 3.6512779082133457,
+    "pump_frac": 0.041210727185173344,
+    "nak_kg_per_kW": 2.321648606456463,
+    "dT_loop": 40.0,
+    "v": 8.0,
+    "trunk_D": 0.37456960557609453,
+    "blade_side": 187.6686365207002,
+    "loop_kill_per_yr": 0.34700262460903836,
+    "branch_loss_per_yr": 0.3678208318207619
+   }
+  ],
+  "best_P_W": 1000000.0,
+  "r_scan_mid_f0.01": [
+   {
+    "r": 0.45,
+    "T_pv": 496.6507137116555,
+    "q_e": 215.68983606295717,
+    "g_per_W": 9.83112106164994,
+    "W_chip_per_W_int": 0.025694895822953822
+   },
+   {
+    "r": 0.5,
+    "T_pv": 468.2230876587132,
+    "q_e": 291.72163458490246,
+    "g_per_W": 8.64257546091292,
+    "W_chip_per_W_int": 0.04272752466768889
+   },
+   {
+    "r": 0.55,
+    "T_pv": 444.00141795389015,
+    "q_e": 323.48932362731244,
+    "g_per_W": 8.118769427142517,
+    "W_chip_per_W_int": 0.05732463581842143
+   },
+   {
+    "r": 0.6,
+    "T_pv": 423.05417992176524,
+    "q_e": 331.6975136921396,
+    "g_per_W": 7.813029081489274,
+    "W_chip_per_W_int": 0.06995944271792788
+   },
+   {
+    "r": 0.65,
+    "T_pv": 404.7134741927647,
+    "q_e": 327.30049383051744,
+    "g_per_W": 7.6278833425645685,
+    "W_chip_per_W_int": 0.08103280123171745
+   },
+   {
+    "r": 0.7,
+    "T_pv": 388.4866072091211,
+    "q_e": 316.2909874062046,
+    "g_per_W": 7.339349455364834,
+    "W_chip_per_W_int": 0.09120543610238656
+   },
+   {
+    "r": 0.75,
+    "T_pv": 374.0013240250197,
+    "q_e": 302.0240824949729,
+    "g_per_W": 7.248900574814691,
+    "W_chip_per_W_int": 0.10001216903270926
+   },
+   {
+    "r": 0.8,
+    "T_pv": 360.9705593872994,
+    "q_e": 286.40273207047795,
+    "g_per_W": 7.200877455726144,
+    "W_chip_per_W_int": 0.10794158155191481
+   },
+   {
+    "r": 0.9,
+    "T_pv": 338.4170533109683,
+    "q_e": 254.94598776958594,
+    "g_per_W": 7.188170884640811,
+    "W_chip_per_W_int": 0.1216814669069059
+   },
+   {
+    "r": 1.0,
+    "T_pv": 319.5080373982031,
+    "q_e": 225.9644187692404,
+    "g_per_W": 7.246534326400399,
+    "W_chip_per_W_int": 0.1332164101820651
+   },
+   {
+    "r": 1.2,
+    "T_pv": 289.3831334498242,
+    "q_e": 178.44736499621553,
+    "g_per_W": 7.482244488062904,
+    "W_chip_per_W_int": 0.15162260027607605
+   }
+  ],
+  "itemised_mid_f0.01_g_per_W": {
+   "wing: PV Si absorber 20/30/50 um": 0.3260508764172088,
+   "wing: cover glass 15/30/60 um (2.8x proton fluence at 0.6 AU)": 0.3498399961558034,
+   "wing: back emitter 3/5/10 um": 0.05830666602596725,
+   "wing: grid, string interconnect, bypass": 0.03265173297454165,
+   "wing: wing frame/booms/tension (km-scale)": 0.233226664103869,
+   "HV bus (Al, glass-insulated), I2R-optimised": 0.06616842168344408,
+   "compute module: dies, memory, packaging, Si cold plates, PDN": 1.5,
+   "module MMOD + radiation shielding (Mercury rock/metal)": 0.3,
+   "power conversion HV -> core (2 stage)": 0.3,
+   "laser terminals (4-6 x 10-30 cm)": 0.1,
+   "attitude, avionics, EP thrusters": 0.1,
+   "blade/boom structure": 0.1,
+   "NaK loops: inventory, armoured manifolds, pumps (x A/B redundancy)": 1.2270038783131254,
+   "radiator: SO2/Al heat-pipe panels (MMOD-sized, attrition spares)": 2.339360535100094,
+   "fixed per-satellite (TT&C, safe-mode)": 0.15
+  },
+  "mid_f0.01": {
+   "r_AU": 0.8599999999999999,
+   "T_rad_logic": 341.15,
+   "q_logic": 1321.1684687979348,
+   "dT_loop": 40.0,
+   "v_nak": 6.0,
+   "A_pv": 4664.533282077379,
+   "A_rad": 1320.7716091384227,
+   "L_wing": 91.55059295828929,
+   "eps_bus": 0.05664874786297056,
+   "P_pump_frac": 0.03346467419231124,
+   "nak_kg": 327.8221294399083,
+   "K_kg": 255.70126096312848,
+   "eta_chain": 0.8419612691750192,
+   "W_chip_per_m2_pv": 214.3837206269528
+  },
+  "envelope_f1_ideal": {
+   "low": {
+    "r_AU": 0.9800000000000002,
+    "T_pv": 422.8875487509346,
+    "eta": 0.08785301314429345,
+    "x_rad": 0.1613250678929017,
+    "P_chip_per_m2_env": 118.28763703483492,
+    "q_e_per_m2_pv": 148.4643183850775,
+    "kg_per_W": 0.005660585265183925
+   },
+   "mid": {
+    "r_AU": 0.9800000000000002,
+    "T_pv": 422.8875487509346,
+    "eta": 0.08785301314429345,
+    "x_rad": 0.1613250678929017,
+    "P_chip_per_m2_env": 114.55223797057698,
+    "q_e_per_m2_pv": 148.4643183850775,
+    "kg_per_W": 0.008387143217162649
+   },
+   "high": {
+    "r_AU": 0.9800000000000002,
+    "T_pv": 422.8875487509346,
+    "eta": 0.08785301314429345,
+    "x_rad": 0.1613250678929017,
+    "P_chip_per_m2_env": 109.57170588489971,
+    "q_e_per_m2_pv": 148.4643183850775,
+    "kg_per_W": 0.014764810827166502
+   }
+  },
+  "sram_variant_mid_kg_per_W": {
+   "0.01": 0.00704790476026747,
+   "0.1": 0.007203193438052497,
+   "1.0": 0.009796666721116766
+  }
+ },
+ "hybrids": {
+  "C1_heatpipe_tiles": {
+   "fin_half_width_m": 0.013691888516884671,
+   "rows": [
+    {
+     "pipe_g_per_m": 1.0,
+     "wall_mm": 0.1,
+     "L_hp_m": 0.1,
+     "g_per_W": 0.1567294930962073,
+     "m_per_m2": 36.517971891416295,
+     "hits_per_m2_yr": 26.07347237480184,
+     "frac_area_lost_per_yr": 0.07139901540077181
+    },
+    {
+     "pipe_g_per_m": 1.0,
+     "wall_mm": 0.1,
+     "L_hp_m": 0.3,
+     "g_per_W": 0.1567294930962073,
+     "m_per_m2": 36.517971891416295,
+     "hits_per_m2_yr": 26.07347237480184,
+     "frac_area_lost_per_yr": 0.21419704620231544
+    },
+    {
+     "pipe_g_per_m": 2.0,
+     "wall_mm": 0.2,
+     "L_hp_m": 0.1,
+     "g_per_W": 0.3134589861924146,
+     "m_per_m2": 36.517971891416295,
+     "hits_per_m2_yr": 11.050511333444115,
+     "frac_area_lost_per_yr": 0.030260473846417484
+    },
+    {
+     "pipe_g_per_m": 2.0,
+     "wall_mm": 0.2,
+     "L_hp_m": 0.3,
+     "g_per_W": 0.3134589861924146,
+     "m_per_m2": 36.517971891416295,
+     "hits_per_m2_yr": 11.050511333444115,
+     "frac_area_lost_per_yr": 0.09078142153925245
+    },
+    {
+     "pipe_g_per_m": 4.0,
+     "wall_mm": 0.4,
+     "L_hp_m": 0.1,
+     "g_per_W": 0.6269179723848292,
+     "m_per_m2": 36.517971891416295,
+     "hits_per_m2_yr": 3.381161099407661,
+     "frac_area_lost_per_yr": 0.009258896166143381
+    },
+    {
+     "pipe_g_per_m": 4.0,
+     "wall_mm": 0.4,
+     "L_hp_m": 0.3,
+     "g_per_W": 0.6269179723848292,
+     "m_per_m2": 36.517971891416295,
+     "hits_per_m2_yr": 3.381161099407661,
+     "frac_area_lost_per_yr": 0.02777668849843014
+    }
+   ],
+   "verdict": "The film cannot spread heat beyond ~1.5-2 cm, so tiles need a heat pipe every ~3 cm (~20-35 m of pipe per m2): 0.1-0.6 g/W (no lighter than Mg spreading for 0.15 W chiplets) and thin pipes are perforated at 1-10 %/yr. Rejected."
+  },
+  "C2_radiator_film": {
+   "scan": [
+    {
+     "r_AU": 0.5,
+     "T_pv": 468.2230876587132,
+     "eta": 0.053579345730012835,
+     "q_rad": 1452.8807059109527,
+     "kg_per_W": 0.00147279775911632,
+     "chipW_per_Wint": 0.0465233352953139,
+     "items_g_per_W": {
+      "wing PV film": 0.8887344308320726,
+      "HV bus": 0.05835167518535767,
+      "radiator film with chiplets (both faces)": 0.07571165309888969,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    {
+     "r_AU": 0.6,
+     "T_pv": 423.05417992176524,
+     "eta": 0.0877270399791455,
+     "q_rad": 1459.556554463069,
+     "kg_per_W": 0.0013591016826915395,
+     "chipW_per_Wint": 0.07613732247928508,
+     "items_g_per_W": {
+      "wing PV film": 0.782001777019272,
+      "HV bus": 0.051734549212704976,
+      "radiator film with chiplets (both faces)": 0.07536535645956248,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    {
+     "r_AU": 0.7,
+     "T_pv": 388.4866072091211,
+     "eta": 0.11386012494990447,
+     "q_rad": 1463.410464661752,
+     "kg_per_W": 0.0013992005379598884,
+     "chipW_per_Wint": 0.09883593625399514,
+     "items_g_per_W": {
+      "wing PV film": 0.8199437097793619,
+      "HV bus": 0.05408994735230633,
+      "radiator film with chiplets (both faces)": 0.07516688082822004,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    {
+     "r_AU": 0.8,
+     "T_pv": 360.9705593872994,
+     "eta": 0.13466225710320168,
+     "q_rad": 1465.8255135942522,
+     "kg_per_W": 0.0014895912046273506,
+     "chipW_per_Wint": 0.11693599705596373,
+     "items_g_per_W": {
+      "wing PV film": 0.9051792505725537,
+      "HV bus": 0.05936891586242942,
+      "radiator film with chiplets (both faces)": 0.07504303819236739,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    {
+     "r_AU": 0.9,
+     "T_pv": 338.4170533109683,
+     "eta": 0.15171270769690798,
+     "q_rad": 1467.4336899443297,
+     "kg_per_W": 0.0016076508091768195,
+     "chipW_per_Wint": 0.13179560782809355,
+     "items_g_per_W": {
+      "wing PV film": 1.0164521073903148,
+      "HV bus": 0.06623790406611621,
+      "radiator film with chiplets (both faces)": 0.07496079772038837,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    {
+     "r_AU": 1.0,
+     "T_pv": 319.5080373982031,
+     "eta": 0.16600792372695847,
+     "q_rad": 1468.5558925344608,
+     "kg_per_W": 0.0017454973899706815,
+     "chipW_per_Wint": 0.14427145135987374,
+     "items_g_per_W": {
+      "wing PV film": 1.1463637337633468,
+      "HV bus": 0.07423014006661752,
+      "radiator film with chiplets (both faces)": 0.07490351614071698,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    {
+     "r_AU": 1.2,
+     "T_pv": 289.3831334498242,
+     "eta": 0.18878235111193292,
+     "q_rad": 1469.975345045597,
+     "kg_per_W": 0.0020682726976489333,
+     "chipW_per_Wint": 0.16418058598682742,
+     "items_g_per_W": {
+      "wing PV film": 1.450586160803867,
+      "HV bus": 0.09285534979778454,
+      "radiator film with chiplets (both faces)": 0.07483118704728203,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    }
+   ],
+   "best": {
+    "low": {
+     "r_AU": 0.6000000000000001,
+     "T_pv": 423.0541799217652,
+     "eta": 0.08772703997914554,
+     "q_rad": 1459.556554463069,
+     "kg_per_W": 0.0006629158919654056,
+     "chipW_per_Wint": 0.07953684736500057,
+     "items_g_per_W": {
+      "wing PV film": 0.3959295769632987,
+      "HV bus": 0.021767101126369353,
+      "radiator film with chiplets (both faces)": 0.045219213875737484,
+      "distributed conversion": 0.05,
+      "lasers": 0.05,
+      "attitude/avionics": 0.05,
+      "booms/structure": 0.05
+     }
+    },
+    "mid": {
+     "r_AU": 0.6000000000000001,
+     "T_pv": 423.0541799217652,
+     "eta": 0.08772703997914554,
+     "q_rad": 1459.556554463069,
+     "kg_per_W": 0.0013591016826915393,
+     "chipW_per_Wint": 0.0761373224792851,
+     "items_g_per_W": {
+      "wing PV film": 0.7820017770192718,
+      "HV bus": 0.05173454921270497,
+      "radiator film with chiplets (both faces)": 0.07536535645956248,
+      "distributed conversion": 0.15,
+      "lasers": 0.1,
+      "attitude/avionics": 0.1,
+      "booms/structure": 0.1
+     }
+    },
+    "high": {
+     "r_AU": 0.6000000000000001,
+     "T_pv": 423.0541799217652,
+     "eta": 0.08772703997914554,
+     "q_rad": 1459.556554463069,
+     "kg_per_W": 0.003047340859674434,
+     "chipW_per_Wint": 0.07070002749328978,
+     "items_g_per_W": {
+      "wing PV film": 1.660381559234382,
+      "HV bus": 0.15130165881283958,
+      "radiator film with chiplets (both faces)": 0.13565764162721244,
+      "distributed conversion": 0.4,
+      "lasers": 0.2,
+      "attitude/avionics": 0.3,
+      "booms/structure": 0.2
+     }
+    }
+   },
+   "verdict": "No pumps or NaK; radiator film carries chiplets at ~1.4 kW/m2. ~1.5-2x the film (B) per W because the PV wing, HV bus and conversion are still needed, and c-Si gains little from running hot. Dominated by B on mass and sunlight; useful only where radiator orientation must be controlled (e.g. to aim IR away from Earth)."
+  },
+  "equal_Tj": {
+   "85.0": {
+    "A_r": 0.8999999999999998,
+    "A_g_per_W": 7.854491877207111,
+    "A_FLOPs_per_kg": 1632252349476172.8,
+    "B_r": 0.9190436854321097,
+    "B_g_per_W": 0.8928605923967344,
+    "B_FLOPs_per_kg": 1.4358918883516078e+16,
+    "ratio_B_over_A": 8.79699691541212
+   },
+   "105.0": {
+    "A_r": 0.8599999999999999,
+    "A_g_per_W": 7.182608770774054,
+    "A_FLOPs_per_kg": 1493890508700569.5,
+    "B_r": 0.8219006896186263,
+    "B_g_per_W": 0.7924494337514415,
+    "B_FLOPs_per_kg": 1.3540335336695296e+16,
+    "ratio_B_over_A": 9.063807058037396
+   }
+  },
+  "C4_pod_sweep": {
+   "pod_g_per_W": 7.300304232647413,
+   "pod_P_W": 300000.0,
+   "rows": [
+    {
+     "x_pod": 0.0,
+     "g_per_W": 0.8928605923967344
+    },
+    {
+     "x_pod": 0.01,
+     "g_per_W": 0.9569350287992412
+    },
+    {
+     "x_pod": 0.03,
+     "g_per_W": 1.0850839016042548
+    },
+    {
+     "x_pod": 0.1,
+     "g_per_W": 1.5336049564218024
+    },
+    {
+     "x_pod": 0.2,
+     "g_per_W": 2.1743493204468702
+    },
+    {
+     "x_pod": 0.3,
+     "g_per_W": 2.815093684471938
+    },
+    {
+     "x_pod": 0.5,
+     "g_per_W": 4.096582412522073
+    },
+    {
+     "x_pod": 1.0,
+     "g_per_W": 7.300304232647413
+    }
+   ]
+  }
+ },
+ "swarm": {
+  "totals": {
+   "A_conc_HBM": {
+    "low": {
+     "rock_24pct": {
+      "f": 0.19593490178761883,
+      "binding": "Mercury mass",
+      "P_chip": 1.0820734349199308e+25,
+      "FLOPs": 2.291867877935109e+38,
+      "r_AU": 1.078222464423253,
+      "kg_per_W": 0.00461039384719857,
+      "mass_used": 4.988706e+22
+     },
+     "whole_planet": {
+      "f": 0.7317203988692871,
+      "binding": "Mercury mass",
+      "P_chip": 4.368078966347398e+25,
+      "FLOPs": 9.251737958058618e+38,
+      "r_AU": 1.4796738571374057,
+      "kg_per_W": 0.005431097474310108,
+      "mass_used": 2.3716206e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 6.027034022587169e+25,
+      "FLOPs": 1.2765460485231928e+39,
+      "mass_needed": 3.672052723958178e+23,
+      "r_AU": 1.7399999999999995,
+      "frac_Mercury": 1.1123724588646746
+     },
+     "per_kg_satellite_FLOPs": 4819050877599022.0,
+     "per_kg_Mercury_rock_FLOPs": 2987811544111393.5,
+     "per_W_sun_FLOPs_f0.01": 2883017924357.7676,
+     "per_W_sun_FLOPs_f1": 3334759792380.336
+    },
+    "mid": {
+     "rock_24pct": {
+      "f": 0.11761183523948265,
+      "binding": "Mercury mass",
+      "P_chip": 5.444027030215995e+24,
+      "FLOPs": 5.841457918214533e+37,
+      "r_AU": 0.9240419947238099,
+      "kg_per_W": 0.007391112233285266,
+      "mass_used": 4.02315e+22
+     },
+     "whole_planet": {
+      "f": 0.4876101213794497,
+      "binding": "Mercury mass",
+      "P_chip": 2.4755180654407887e+25,
+      "FLOPs": 2.656238575743898e+38,
+      "r_AU": 1.1636143519408195,
+      "kg_per_W": 0.008182482854366971,
+      "mass_used": 2.025365e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.311106810015402e+25,
+      "FLOPs": 5.698834108951271e+38,
+      "mass_needed": 5.3362450748513105e+23,
+      "r_AU": 1.5899999999999996,
+      "frac_Mercury": 1.61650512703381
+     },
+     "per_kg_satellite_FLOPs": 1493890508700569.5,
+     "per_kg_Mercury_rock_FLOPs": 746945254350284.8,
+     "per_W_sun_FLOPs_f0.01": 1249909142849.9626,
+     "per_W_sun_FLOPs_f1": 1488723643926.664
+    },
+    "high": {
+     "rock_24pct": {
+      "f": 0.05451054947212173,
+      "binding": "Mercury mass",
+      "P_chip": 1.9975000470274e+24,
+      "FLOPs": 1.0513909541851418e+37,
+      "r_AU": 0.8298408757216165,
+      "kg_per_W": 0.01530934475234947,
+      "mass_used": 3.057594e+22
+     },
+     "whole_planet": {
+      "f": 0.2495217798647686,
+      "binding": "Mercury mass",
+      "P_chip": 9.717020458828344e+24,
+      "FLOPs": 5.114586819283283e+37,
+      "r_AU": 0.9327370470785542,
+      "kg_per_W": 0.015998415359695324,
+      "mass_used": 1.5542594000000002e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 4.360221113639585e+25,
+      "FLOPs": 2.2950172361446964e+38,
+      "mass_needed": 9.016878160836777e+23,
+      "r_AU": 1.4799999999999995,
+      "frac_Mercury": 2.7314768291892935
+     },
+     "per_kg_satellite_FLOPs": 347956863892963.8,
+     "per_kg_Mercury_rock_FLOPs": 132223608279326.25,
+     "per_W_sun_FLOPs_f0.01": 492437403552.4858,
+     "per_W_sun_FLOPs_f1": 599534283214.393
+    }
+   },
+   "A_conc_SRAMwafer": {
+    "low": {
+     "rock_24pct": {
+      "f": 0.200375916608396,
+      "binding": "Mercury mass",
+      "P_chip": 1.099810557065614e+25,
+      "FLOPs": 2.9117946229535643e+38,
+      "r_AU": 1.070324188976799,
+      "kg_per_W": 0.00453598155956686,
+      "mass_used": 4.988706e+22
+     },
+     "whole_planet": {
+      "f": 0.747508740892056,
+      "binding": "Mercury mass",
+      "P_chip": 4.427090580263519e+25,
+      "FLOPs": 1.1720908172888758e+39,
+      "r_AU": 1.4739674057979542,
+      "kg_per_W": 0.005359098439763135,
+      "mass_used": 2.3716206e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.96059528600766e+25,
+      "FLOPs": 1.578092626216173e+39,
+      "mass_needed": 3.5562641825649936e+23,
+      "r_AU": 1.7099999999999997,
+      "frac_Mercury": 1.0772967139938183
+     },
+     "per_kg_satellite_FLOPs": 6120851909399691.0,
+     "per_kg_Mercury_rock_FLOPs": 3794928183827808.5,
+     "per_W_sun_FLOPs_f0.01": 3604917774023.1,
+     "per_W_sun_FLOPs_f1": 4122499023553.2207
+    },
+    "mid": {
+     "rock_24pct": {
+      "f": 0.12084801301176025,
+      "binding": "Mercury mass",
+      "P_chip": 5.547663799238659e+24,
+      "FLOPs": 7.440825616723894e+37,
+      "r_AU": 0.9163916251466665,
+      "kg_per_W": 0.007253179218478007,
+      "mass_used": 4.02315e+22
+     },
+     "whole_planet": {
+      "f": 0.5021851900604616,
+      "binding": "Mercury mass",
+      "P_chip": 2.5216960302066518e+25,
+      "FLOPs": 3.382234594267886e+38,
+      "r_AU": 1.1518144738783755,
+      "kg_per_W": 0.008032019930574142,
+      "mass_used": 2.025365e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.241192854769912e+25,
+      "FLOPs": 7.029770272184527e+38,
+      "mass_needed": 5.1346219619279375e+23,
+      "r_AU": 1.5599999999999998,
+      "frac_Mercury": 1.5554275732113347
+     },
+     "per_kg_satellite_FLOPs": 1903053360421972.5,
+     "per_kg_Mercury_rock_FLOPs": 951526680210986.2,
+     "per_W_sun_FLOPs_f0.01": 1545211056474.4182,
+     "per_W_sun_FLOPs_f1": 1836408117080.5972
+    },
+    "high": {
+     "rock_24pct": {
+      "f": 0.05533857793962452,
+      "binding": "Mercury mass",
+      "P_chip": 2.0161698809322856e+24,
+      "FLOPs": 1.3265223560741062e+37,
+      "r_AU": 0.8252563137649676,
+      "kg_per_W": 0.015166392392916807,
+      "mass_used": 3.057594e+22
+     },
+     "whole_planet": {
+      "f": 0.25559639511728455,
+      "binding": "Mercury mass",
+      "P_chip": 9.808254361148203e+24,
+      "FLOPs": 6.453260118194088e+37,
+      "r_AU": 0.920247023398676,
+      "kg_per_W": 0.01584848314036997,
+      "mass_used": 1.5542594000000002e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 4.314399617688533e+25,
+      "FLOPs": 2.8386236695763988e+38,
+      "mass_needed": 8.783421931883284e+23,
+      "r_AU": 1.4599999999999997,
+      "frac_Mercury": 2.660756090964613
+     },
+     "per_kg_satellite_FLOPs": 438959378039647.7,
+     "per_kg_Mercury_rock_FLOPs": 166804563655066.12,
+     "per_W_sun_FLOPs_f0.01": 615741621174.2688,
+     "per_W_sun_FLOPs_f1": 741542233431.661
+    }
+   },
+   "B_film": {
+    "low": {
+     "rock_24pct": {
+      "f": 0.9321139463585044,
+      "binding": "Mercury mass",
+      "P_chip": 4.996240057159065e+25,
+      "FLOPs": 1.4861269920637806e+39,
+      "r_AU": 1.3007097045341105,
+      "kg_per_W": 0.0010024188490354595,
+      "mass_used": 4.988706e+22
+     },
+     "whole_planet": {
+      "f": 1.0,
+      "binding": "sunlight",
+      "P_chip": 5.36011726536e+25,
+      "FLOPs": 1.5943619316818964e+39,
+      "r_AU": 1.3473973797028809,
+      "mass_used": 5.784591093699867e+22
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.36011726536e+25,
+      "FLOPs": 1.5943619316818964e+39,
+      "mass_needed": 5.784591093699867e+22,
+      "r_AU": 1.3473973797028809,
+      "frac_Mercury": 0.1752322284602062
+     },
+     "per_kg_satellite_FLOPs": 6.302049638168759e+16,
+     "per_kg_Mercury_rock_FLOPs": 3.90727077566463e+16,
+     "per_W_sun_FLOPs_f0.01": 4164999821530.555,
+     "per_W_sun_FLOPs_f1": 4164999821530.554
+    },
+    "mid": {
+     "rock_24pct": {
+      "f": 0.5882844497484053,
+      "binding": "Mercury mass",
+      "P_chip": 3.023241733522154e+25,
+      "FLOPs": 4.703823956811914e+38,
+      "r_AU": 1.1096544002932907,
+      "kg_per_W": 0.0013354316463648392,
+      "mass_used": 4.02315e+22
+     },
+     "whole_planet": {
+      "f": 1.0,
+      "binding": "sunlight",
+      "P_chip": 5.139081501840001e+25,
+      "FLOPs": 7.995832558252427e+38,
+      "r_AU": 1.3473973797028809,
+      "mass_used": 1.0332462573881926e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.139081501840001e+25,
+      "FLOPs": 7.995832558252427e+38,
+      "mass_needed": 1.0332462573881926e+23,
+      "r_AU": 1.3473973797028809,
+      "frac_Mercury": 0.31300059295028704
+     },
+     "per_kg_satellite_FLOPs": 1.7425872431451548e+16,
+     "per_kg_Mercury_rock_FLOPs": 8712936215725774.0,
+     "per_W_sun_FLOPs_f0.01": 2088775485436.8936,
+     "per_W_sun_FLOPs_f1": 2088775485436.8933
+    },
+    "high": {
+     "rock_24pct": {
+      "f": 0.2723686741424145,
+      "binding": "Mercury mass",
+      "P_chip": 1.324470792655971e+25,
+      "FLOPs": 1.0437451083217525e+38,
+      "r_AU": 0.9906438484751035,
+      "kg_per_W": 0.0023093204785810486,
+      "mass_used": 3.057594e+22
+     },
+     "whole_planet": {
+      "f": 0.8599282891406255,
+      "binding": "Mercury mass",
+      "P_chip": 4.1816479311782016e+25,
+      "FLOPs": 3.295334708090248e+38,
+      "r_AU": 1.2471777201630938,
+      "kg_per_W": 0.003720741332536225,
+      "mass_used": 1.5542594000000002e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 4.86278679744e+25,
+      "FLOPs": 3.832104083217753e+38,
+      "mass_needed": 2.122493941839973e+23,
+      "r_AU": 1.3473973797028809,
+      "frac_Mercury": 0.6429656604889197
+     },
+     "per_kg_satellite_FLOPs": 3974558802348233.0,
+     "per_kg_Mercury_rock_FLOPs": 1510332344892328.5,
+     "per_W_sun_FLOPs_f0.01": 1001072122052.7048,
+     "per_W_sun_FLOPs_f1": 1001072122052.7046
+    }
+   },
+   "C_film+pods": {
+    "low": {
+     "rock_24pct": {
+      "f": 0.8696078084271547,
+      "binding": "Mercury mass",
+      "P_chip": 4.65022801016759e+25,
+      "FLOPs": 1.3781005194298585e+39,
+      "r_AU": 1.254611407736587,
+      "kg_per_W": 0.0010745844968594574,
+      "mass_used": 4.988706e+22
+     },
+     "whole_planet": {
+      "f": 1.0,
+      "binding": "sunlight",
+      "P_chip": 5.346559241097379e+25,
+      "FLOPs": 1.5844590955988993e+39,
+      "r_AU": 1.3473973797028809,
+      "mass_used": 6.6005511636797815e+22
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.346559241097379e+25,
+      "FLOPs": 1.5844590955988993e+39,
+      "mass_needed": 6.6005511636797815e+22,
+      "r_AU": 1.3473973797028809,
+      "frac_Mercury": 0.1999500519123862
+     },
+     "per_kg_satellite_FLOPs": 5.031551845786518e+16,
+     "per_kg_Mercury_rock_FLOPs": 3.1195621443876412e+16,
+     "per_W_sun_FLOPs_f0.01": 4143943050317.017,
+     "per_W_sun_FLOPs_f1": 4139130343779.7783
+    },
+    "mid": {
+     "rock_24pct": {
+      "f": 0.4227217926835223,
+      "binding": "Mercury mass",
+      "P_chip": 2.156876845013175e+25,
+      "FLOPs": 3.3030015307144913e+38,
+      "r_AU": 1.0442685372022211,
+      "kg_per_W": 0.0018675868473525795,
+      "mass_used": 4.02315e+22
+     },
+     "whole_planet": {
+      "f": 1.0,
+      "binding": "sunlight",
+      "P_chip": 5.089688210682901e+25,
+      "FLOPs": 7.794254915209325e+38,
+      "r_AU": 1.3473973797028809,
+      "mass_used": 1.438633044905684e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 5.089688210682901e+25,
+      "FLOPs": 7.794254915209325e+38,
+      "mass_needed": 1.438633044905684e+23,
+      "r_AU": 1.3473973797028809,
+      "frac_Mercury": 0.4358041395006767
+     },
+     "per_kg_satellite_FLOPs": 9985502468379170.0,
+     "per_kg_Mercury_rock_FLOPs": 4992751234189585.0,
+     "per_W_sun_FLOPs_f0.01": 2043005012785.6528,
+     "per_W_sun_FLOPs_f1": 2036116749009.7507
+    },
+    "high": {
+     "rock_24pct": {
+      "f": 0.10512710029742144,
+      "binding": "Mercury mass",
+      "P_chip": 4.895735926431122e+24,
+      "FLOPs": 3.642011896478132e+37,
+      "r_AU": 0.9431764673589101,
+      "kg_per_W": 0.006245584564881685,
+      "mass_used": 3.057594e+22
+     },
+     "whole_planet": {
+      "f": 0.4750641072156751,
+      "binding": "Mercury mass",
+      "P_chip": 2.207045998811155e+25,
+      "FLOPs": 1.641854851759594e+38,
+      "r_AU": 1.060122869215912,
+      "kg_per_W": 0.007043836630133015,
+      "mass_used": 1.5542594000000002e+23
+     },
+     "sun_limited_f1": {
+      "P_chip": 4.6553044582389905e+25,
+      "FLOPs": 3.463151296028676e+38,
+      "mass_needed": 4.3262206899937984e+23,
+      "r_AU": 1.3473973797028809,
+      "frac_Mercury": 1.310539120291357
+     },
+     "per_kg_satellite_FLOPs": 1221296982584997.2,
+     "per_kg_Mercury_rock_FLOPs": 464092853382298.94,
+     "per_W_sun_FLOPs_f0.01": 905498264883.1252,
+     "per_W_sun_FLOPs_f1": 904689471271.8589
+    }
+   }
+  },
+  "element_limits": {
+   "NaK-78 (liquid to -12.6 C)": {
+    "K_frac": 0.78,
+    "P_chip_limit_K": 1.3688841135667803e+23,
+    "P_chip_limit_Na": 1.4621517961515774e+25,
+    "frac_L_K": 0.0003575977308168183
+   },
+   "Na-rich NaK ~25-30 wt% K (liquidus ~40-60 C, estimate)": {
+    "K_frac": 0.28,
+    "P_chip_limit_K": 3.8133200306503164e+23,
+    "P_chip_limit_Na": 4.467686043796486e+24,
+    "frac_L_K": 0.0009961651072754223
+   },
+   "pure Na (melts 97.8 C: loop >= ~105 C, Tj >= ~130 C)": {
+    "K_frac": 0.0,
+    "P_chip_limit_K": Infinity,
+    "P_chip_limit_Na": 3.21673395153347e+24,
+    "frac_L_K": Infinity
+   },
+   "Al radiators (Al fins/tubes/bumpers, 90 % Al)": {
+    "P_chip_limit": 1.0003586436470124e+24,
+    "frac_L": 0.002613267094166699
+   },
+   "nak_kg_per_kW_mid": 0.3278221294399083,
+   "radiator_kg_per_kW_mid": 2.339360535100094,
+   "B_film_elements": {
+    "Si": {
+     "kg_per_m2": 0.09949402451669868,
+     "P_chip_limit_rock": 4.069117192801388e+25,
+     "P_chip_limit_whole": 1.1035393669250263e+26
+    },
+    "Mg": {
+     "kg_per_m2": 0.03450754718913733,
+     "P_chip_limit_rock": 1.0099393357069254e+26,
+     "P_chip_limit_whole": 1.0099393357069254e+26
+    },
+    "O": {
+     "kg_per_m2": 0.0333125,
+     "P_chip_limit_rock": 1.1284194046063153e+26,
+     "P_chip_limit_whole": 1.1284194046063153e+26
+    },
+    "Al": {
+     "kg_per_m2": 0.004,
+     "P_chip_limit_rock": 1.1391683559965485e+26,
+     "P_chip_limit_whole": 1.1391683559965485e+26
+    }
+   },
+   "note_O": "Half of rock O assumed available for glass; the rest is EP propellant (17-37 % of delivered mass)."
+  },
+  "A_coolant_limits": {
+   "NaK-78 (liquid to -12.6 C)": {
+    "P_chip_W": 1.37e+23,
+    "FLOPs": 1.47e+36,
+    "frac_L": 0.000358
+   },
+   "Na-rich NaK ~25-30 wt% K (liquidus ~40-60 C, estimate)": {
+    "P_chip_W": 3.81e+23,
+    "FLOPs": 4.09e+36,
+    "frac_L": 0.000996
+   },
+   "Al radiators (if not substituted by Mg)": {
+    "P_chip_W": 1e+24,
+    "FLOPs": 1.07e+37,
+    "frac_L": 0.00261
+   }
+  },
+  "B_Si_limit": {
+   "area_rock_m2": 1.880821980728441e+23,
+   "f_rock": 0.5611583136349901,
+   "r_AU": 1.0916698978260537,
+   "FLOPs": 4.486927914496682e+38,
+   "area_whole_m2": 5.100765103505942e+23,
+   "f_whole": 0.9995590829825202
+  },
+  "earth": {
+   "rows": [
+    {
+     "arch": "A_conc_HBM",
+     "f": 0.01,
+     "r_AU": 0.8599999999999999,
+     "forcing_W_m2": 1.7862827108117334,
+     "x_CO2x2": 0.4827791110301982
+    },
+    {
+     "arch": "A_conc_HBM",
+     "f": 0.1,
+     "r_AU": 0.9099999999999998,
+     "forcing_W_m2": 20.682331044139282,
+     "x_CO2x2": 5.589819201118725
+    },
+    {
+     "arch": "A_conc_HBM",
+     "f": 0.3,
+     "r_AU": 1.0399999999999998,
+     "forcing_W_m2": 185.42824812895742,
+     "x_CO2x2": 50.115742737556054
+    },
+    {
+     "arch": "A_conc_HBM",
+     "f": 1.0,
+     "r_AU": 1.5899999999999996,
+     "forcing_W_m2": 460.5975029082926,
+     "x_CO2x2": 124.48581159683583
+    },
+    {
+     "arch": "B_film",
+     "f": 0.01,
+     "r_AU": 0.9190436854321097,
+     "forcing_W_m2": 2.133519586529507,
+     "x_CO2x2": 0.5766269152782451
+    },
+    {
+     "arch": "B_film",
+     "f": 0.1,
+     "r_AU": 0.9412379663311419,
+     "forcing_W_m2": 23.239370616714506,
+     "x_CO2x2": 6.280910977490406
+    },
+    {
+     "arch": "B_film",
+     "f": 0.3,
+     "r_AU": 0.9976935481506548,
+     "forcing_W_m2": NaN,
+     "x_CO2x2": null
+    },
+    {
+     "arch": "B_film",
+     "f": 1.0,
+     "r_AU": 1.3473973797028809,
+     "forcing_W_m2": 725.1804877439134,
+     "x_CO2x2": 195.99472641727388
+    },
+    {
+     "arch": "C_film+pods",
+     "f": 0.01,
+     "r_AU": 0.9190436854321097,
+     "forcing_W_m2": 2.133519586529507,
+     "x_CO2x2": 0.5766269152782451
+    },
+    {
+     "arch": "C_film+pods",
+     "f": 0.1,
+     "r_AU": 0.9412379663311419,
+     "forcing_W_m2": 23.239370616714506,
+     "x_CO2x2": 6.280910977490406
+    },
+    {
+     "arch": "C_film+pods",
+     "f": 0.3,
+     "r_AU": 0.9976935481506548,
+     "forcing_W_m2": NaN,
+     "x_CO2x2": null
+    },
+    {
+     "arch": "C_film+pods",
+     "f": 1.0,
+     "r_AU": 1.3473973797028809,
+     "forcing_W_m2": 725.1804877439134,
+     "x_CO2x2": 195.99472641727388
+    }
+   ],
+   "forcing_per_unit_f": {
+    "0.4": 90.27722382359052,
+    "0.6": 111.54002980431372,
+    "0.7": 129.05784609277833,
+    "0.8": 155.25804996066572,
+    "0.9": 200.227459114044,
+    "0.95": 241.53641971672192,
+    "1.2": 737.7068201412078,
+    "1.35": 723.8197480061239,
+    "1.6": 515.2974573207661,
+    "2.0": 329.79037268529027
+   },
+   "f_for_1Wm2": {
+    "0.4": 0.011076991046535572,
+    "0.6": 0.008965391185159302,
+    "0.7": 0.007748463423766661,
+    "0.8": 0.006440889862093127,
+    "0.9": 0.004994319982008201,
+    "0.95": 0.0041401623869924764,
+    "1.2": 0.001355552060381637,
+    "1.35": 0.0013815594321026172,
+    "1.6": 0.001940626692006968,
+    "2.0": 0.0030322292062608877
+   }
+  },
+  "B_earth_crossing": {
+   "85": {
+    "r_vs_f": [
+     [
+      0.01,
+      0.919
+     ],
+     [
+      0.1,
+      0.941
+     ],
+     [
+      0.2,
+      0.968
+     ],
+     [
+      0.3,
+      0.998
+     ],
+     [
+      0.5,
+      1.067
+     ],
+     [
+      1.0,
+      1.347
+     ]
+    ],
+    "f_where_r_reaches_0p983AU": 0.252
+   },
+   "105": {
+    "r_vs_f": [
+     [
+      0.01,
+      0.822
+     ],
+     [
+      0.1,
+      0.842
+     ],
+     [
+      0.2,
+      0.866
+     ],
+     [
+      0.3,
+      0.892
+     ],
+     [
+      0.5,
+      0.954
+     ],
+     [
+      1.0,
+      1.205
+     ]
+    ],
+    "f_where_r_reaches_0p983AU": 0.579
+   },
+   "125": {
+    "r_vs_f": [
+     [
+      0.01,
+      0.739
+     ],
+     [
+      0.1,
+      0.757
+     ],
+     [
+      0.2,
+      0.779
+     ],
+     [
+      0.3,
+      0.803
+     ],
+     [
+      0.5,
+      0.858
+     ],
+     [
+      1.0,
+      1.084
+     ]
+    ],
+    "f_where_r_reaches_0p983AU": 0.821
+   }
+  },
+  "earth_safe_1Wm2": {
+   "A_conc_HBM": {
+    "r_AU": 0.86,
+    "forcing_per_unit_f": 179.0,
+    "f_safe": 0.0056,
+    "P_chip_W": 2.5e+23,
+    "FLOPs": 2.68e+36,
+    "mass_kg": 1.79e+21,
+    "frac_Mercury": 0.00543
+   },
+   "A_conc_SRAMwafer": {
+    "r_AU": 0.85,
+    "forcing_per_unit_f": 174.0,
+    "f_safe": 0.00574,
+    "P_chip_W": 2.53e+23,
+    "FLOPs": 3.4e+36,
+    "mass_kg": 1.79e+21,
+    "frac_Mercury": 0.00541
+   },
+   "B_film": {
+    "r_AU": 0.919,
+    "forcing_per_unit_f": 213.0,
+    "f_safe": 0.00469,
+    "P_chip_W": 2.41e+23,
+    "FLOPs": 3.75e+36,
+    "mass_kg": 2.15e+20,
+    "frac_Mercury": 0.000651
+   },
+   "C_film+pods": {
+    "r_AU": 0.919,
+    "forcing_per_unit_f": 213.0,
+    "f_safe": 0.00469,
+    "P_chip_W": 2.39e+23,
+    "FLOPs": 3.67e+36,
+    "mass_kg": 3.67e+20,
+    "frac_Mercury": 0.00111
+   }
+  }
+ },
+ "reliability": {
+  "B_film_MMOD": {
+   "low": {
+    "r_AU": 0.92,
+    "kill_mass_g": 1e-05,
+    "kill_flux_m2_yr": 0.17017410926476131,
+    "cell_area_m2": 0.0004291845493562232,
+    "frac_power_lost_per_yr": 0.00019024645109321677,
+    "from_cell_cracks": 7.303609839689328e-05,
+    "from_direct_die_hits": 0.00011721035269632349,
+    "blast_radius_W": 0.1,
+    "blast_radius_m2": 0.0004291845493562232
+   },
+   "mid": {
+    "r_AU": 0.92,
+    "kill_mass_g": 1e-06,
+    "kill_flux_m2_yr": 1.7289442921382379,
+    "cell_area_m2": 0.0006437768240343348,
+    "frac_power_lost_per_yr": 0.001288869794369531,
+    "from_cell_cracks": 0.0011130542653250458,
+    "from_direct_die_hits": 0.00017581552904448526,
+    "blast_radius_W": 0.15,
+    "blast_radius_m2": 0.0006437768240343348
+   },
+   "high": {
+    "r_AU": 0.92,
+    "kill_mass_g": 1e-07,
+    "kill_flux_m2_yr": 11.089199850200405,
+    "cell_area_m2": 0.001072961373390558,
+    "frac_power_lost_per_yr": 0.012191308982814205,
+    "from_cell_cracks": 0.011898283101073395,
+    "from_direct_die_hits": 0.00029302588174080877,
+    "blast_radius_W": 0.25,
+    "blast_radius_m2": 0.001072961373390558
+   }
+  },
+  "B_film_perforations": {
+   "m>=1e-10 g": 234.420705392647,
+   "m>=1e-09 g": 110.45763653645105,
+   "m>=1e-08 g": 43.396738754694496,
+   "m>=1e-07 g": 11.089199850200405,
+   "m>=1e-06 g": 1.7289442921382379,
+   "m>=1e-05 g": 0.17017410926476131,
+   "m>=0.0001 g": 0.012025196322161855
+  },
+  "A_conc_MMOD": {
+   "P_sat_W": 1000000.0,
+   "r_AU": 0.86,
+   "loop_kill_per_yr_each": 0.005788289687577897,
+   "n_loops": 2,
+   "P_lose_one_loop_10yr": 0.10931619741681575,
+   "branch_loss_frac_per_yr": 0.009921742942963292,
+   "heatpipe_loss_frac_per_yr": 0.0046166454247503945,
+   "module_penetration_per_yr": 0.0005103922661224608,
+   "expected_capacity_loss_per_yr": 0.02032667805529158,
+   "blast_radius": {
+    "loop_trunk_hit": "50 % of satellite (A/B loops) = 0.5 MW",
+    "both_loops_or_module": "1 MW",
+    "branch_hit": "1/14 of radiator, throttles 7.2 %",
+    "heat_pipe_hit": "one heat pipe = 0.25 m2 of panel"
+   },
+   "pipe_area_m2": 150.56691049816595,
+   "NaK_kg": 327.8221294399083,
+   "wing_area_m2": 4664.533282077381,
+   "wing_cell_perforations_per_yr": 581734.4986155361
+  },
+  "radiation": {
+   "event": "Aug-1972-class SEP (>10 MeV 1.96e10, >30 MeV 8.42e9 cm^-2; SWSC 2014 table)",
+   "gamma_hi": 0.7690790888627008,
+   "per_event": {
+    "film chiplet, back side (~5 um glass, 1.3 mg/cm2)": {
+     "E_cut_MeV": 0.7428748124244738,
+     "dose_per_event_rad_1AU_soft": 2388573.2759687835,
+     "dose_per_event_rad_1AU_hard": 271420.69564722735,
+     "at_0p9AU_soft": 3108367.041263903
+    },
+    "film chiplet via front (30 um Si + 20 um glass)": {
+     "E_cut_MeV": 2.607640856613695,
+     "dose_per_event_rad_1AU_soft": 140062.22486347877,
+     "dose_per_event_rad_1AU_hard": 40289.877256275424,
+     "at_0p9AU_soft": 182269.81264167037
+    },
+    "film chiplet with 100 um glass cap over the die (25 mg/cm2)": {
+     "E_cut_MeV": 3.9476393863498096,
+     "dose_per_event_rad_1AU_soft": 54087.9202719221,
+     "dose_per_event_rad_1AU_hard": 21457.544987545025,
+     "at_0p9AU_soft": 70387.251835748
+    },
+    "film chiplet with 0.5 mm glass cap (125 mg/cm2)": {
+     "E_cut_MeV": 9.800219003603916,
+     "dose_per_event_rad_1AU_soft": 5544.865999541748,
+     "dose_per_event_rad_1AU_hard": 5387.770110078894,
+     "at_0p9AU_soft": 7215.804888468346
+    },
+    "module behind 1 g/cm2": {
+     "E_cut_MeV": 31.728980115855677,
+     "dose_per_event_rad_1AU_soft": 900.379238008456,
+     "dose_per_event_rad_1AU_hard": 900.379238008456,
+     "at_0p9AU_soft": 1171.7074691496166
+    },
+    "module behind 5 g/cm2 (Mercury rock/metal)": {
+     "E_cut_MeV": 78.76883460317808,
+     "dose_per_event_rad_1AU_soft": 222.64017934502164,
+     "dose_per_event_rad_1AU_hard": 222.64017934502164,
+     "at_0p9AU_soft": 289.7325372010878
+    },
+    "module behind 20 g/cm2": {
+     "E_cut_MeV": 172.3857282186636,
+     "dose_per_event_rad_1AU_soft": 64.41517981759546,
+     "dose_per_event_rad_1AU_hard": 64.41517981759546,
+     "at_0p9AU_soft": 83.82661897650665
+    }
+   },
+   "tolerance": {
+    "FinFET16_logic_rad": "~1e8 (100 Mrad: variability rises; to 1 Grad with degradation; Bonaldo/Ma et al.)",
+    "HBM_rad": "2e3 (Suncatcher: HBM irregularities from 2 krad, no hard fails to 15 krad)"
+   },
+   "note": "Order-of-magnitude only: single power-law spectra, approximate stopping power and range fits; 10-yr design assumed ~3-10 such event-equivalents. r^-2.5 radial scaling assumed."
+  }
+ },
+ "manufacturing": {
+  "per_MW": {
+   "A": {
+    "PV_area_m2": 4664.533282077381,
+    "die_area_mm2": 3333333.3333333335,
+    "wafers_300mm": 47.157020175376395,
+    "heat_pipes": 5283.086436553691,
+    "heat_pipe_fill_and_seal_ops": 5283.086436553691,
+    "NaK_pipe_area_m2": 150.56691049816595,
+    "branch_isolation_valves": 28,
+    "pumps": 4,
+    "NaK_kg": 327.8221294399083,
+    "HV_string_cells_in_series": 1200.0,
+    "satellites": 1
+   },
+   "B": {
+    "film_area_m2": 4622.186807634281,
+    "chiplets": 6666666.666666667,
+    "die_area_mm2": 3333333.3333333335,
+    "wafers_300mm": 47.157020175376395,
+    "fluid_ops": 0,
+    "HV_ops": 0
+   }
+  },
+  "yield": {
+   "D0_per_cm2": 0.1,
+   "die_yield": {
+    "film chiplet 0.75 mm2 (0.15 W @0.2 W/mm2)": 0.9992502811797007,
+    "reticle-size die 800 mm2": 0.44932896411722156,
+    "wafer-scale 46,000 mm2": 1.0530617357553812e-20
+   },
+   "film_bond_yield": {
+    "low": 0.9999,
+    "mid": 0.999,
+    "high": 0.99
+   },
+   "film_capacity_yield": {
+    "low": 0.9991503561515828,
+    "mid": 0.998251030898521,
+    "high": 0.9892577783679037
+   },
+   "module_note": "A module = 47 wafers + 2 NaK loops (~150 m2 armoured pipe, ~28 valves, 4 pumps) + ~5000 sealed SO2 heat pipes per MW; one leak or a failed weld scraps or reworks the loop; wafer-scale dies need on-wafer spare cores (Cerebras-style)."
+  },
+  "build_rate_heat_cap": {
+   "A": {
+    "kg_per_W": 0.007182608770774053,
+    "surface_heat_J_per_W": 96965.21840544972,
+    "W_per_yr_at_cap": 1.334356402509048e+21,
+    "years_to_1e25W_linear": 7494.249648142408,
+    "years_to_1e24W_linear": 749.4249648142406
+   },
+   "B": {
+    "kg_per_W": 0.0008928605923967344,
+    "surface_heat_J_per_W": 12053.617997355914,
+    "W_per_yr_at_cap": 1.0734217728517877e+22,
+    "years_to_1e25W_linear": 931.6002575048146,
+    "years_to_1e24W_linear": 93.16002575048145
+   }
+  },
+  "assembly_rate_at_heat_cap": {
+   "A": {
+    "satellites_1MW_per_s": 42283202.85791847,
+    "heat_pipes_per_s": 223385815512.71735,
+    "PV_m2_per_s": 197231407003.59015,
+    "wafers_per_s": 1993949850.250394,
+    "armoured_NaK_pipe_m2_per_s": 6366451220.284005
+   },
+   "B": {
+    "chiplet_placements_per_s": 2267645559974539.5,
+    "film_m2_per_s": 1572222208755.7148,
+    "wafers_per_s": 16040311113.348309
+   }
+  }
+ },
+ "fluids": {
+  "so2": {
+   "330": {
+    "P_MPa": 1.014,
+    "rho_l": 1271.5,
+    "sigma": 0.0155,
+    "hfg_kJ": 320.7,
+    "mu_l_uPas": 211.1,
+    "merit_W_m2": 30000000000.0
+   },
+   "345": {
+    "P_MPa": 1.484,
+    "rho_l": 1221.6,
+    "sigma": 0.0127,
+    "hfg_kJ": 301.1,
+    "mu_l_uPas": 183.0,
+    "merit_W_m2": 25500000000.0
+   },
+   "356": {
+    "P_MPa": 1.92,
+    "rho_l": 1182.0,
+    "sigma": 0.0107,
+    "hfg_kJ": 285.2,
+    "mu_l_uPas": 164.6,
+    "merit_W_m2": 21800000000.0
+   },
+   "370": {
+    "P_MPa": 2.604,
+    "rho_l": 1126.8,
+    "sigma": 0.0081,
+    "hfg_kJ": 262.5,
+    "mu_l_uPas": 143.3,
+    "merit_W_m2": 16700000000.0
+   },
+   "385": {
+    "P_MPa": 3.522,
+    "rho_l": 1058.7,
+    "sigma": 0.0054,
+    "hfg_kJ": 233.9,
+    "mu_l_uPas": 122.2,
+    "merit_W_m2": 10900000000.0
+   },
+   "400": {
+    "P_MPa": 4.663,
+    "rho_l": 976.2,
+    "sigma": 0.0028,
+    "hfg_kJ": 198.6,
+    "mu_l_uPas": 101.8,
+    "merit_W_m2": 5280000000.0
+   }
+  },
+  "ammonia": {
+   "330": {
+    "P_MPa": 2.42,
+    "rho_l": 551.0,
+    "sigma": 0.0134,
+    "hfg_kJ": 1015.1,
+    "mu_l_uPas": 93.8,
+    "merit_W_m2": 80100000000.0
+   },
+   "345": {
+    "P_MPa": 3.456,
+    "rho_l": 522.7,
+    "sigma": 0.0103,
+    "hfg_kJ": 927.8,
+    "mu_l_uPas": 80.9,
+    "merit_W_m2": 61600000000.0
+   },
+   "356": {
+    "P_MPa": 4.403,
+    "rho_l": 499.5,
+    "sigma": 0.0081,
+    "hfg_kJ": 854.2,
+    "mu_l_uPas": 72.1,
+    "merit_W_m2": 47700000000.0
+   },
+   "370": {
+    "P_MPa": 5.878,
+    "rho_l": 465.4,
+    "sigma": 0.0054,
+    "hfg_kJ": 743.9,
+    "mu_l_uPas": 61.4,
+    "merit_W_m2": 30400000000.0
+   },
+   "385": {
+    "P_MPa": 7.844,
+    "rho_l": 419.2,
+    "sigma": 0.0028,
+    "hfg_kJ": 591.9,
+    "mu_l_uPas": 50.2,
+    "merit_W_m2": 13700000000.0
+   },
+   "400": {
+    "P_MPa": 10.297,
+    "rho_l": 344.0,
+    "sigma": 0.0006,
+    "hfg_kJ": 346.1,
+    "mu_l_uPas": 37.3,
+    "merit_W_m2": 1820000000.0
+   }
+  },
+  "water": {
+   "330": {
+    "P_MPa": 0.029,
+    "rho_l": 981.0,
+    "sigma": 0.0665,
+    "hfg_kJ": 2364.3,
+    "mu_l_uPas": 711.4,
+    "merit_W_m2": 217000000000.0
+   },
+   "345": {
+    "P_MPa": 0.036,
+    "rho_l": 976.1,
+    "sigma": 0.0641,
+    "hfg_kJ": 2328.2,
+    "mu_l_uPas": 426.6,
+    "merit_W_m2": 342000000000.0
+   },
+   "356": {
+    "P_MPa": 0.056,
+    "rho_l": 969.8,
+    "sigma": 0.0621,
+    "hfg_kJ": 2300.6,
+    "mu_l_uPas": 345.1,
+    "merit_W_m2": 402000000000.0
+   },
+   "370": {
+    "P_MPa": 0.092,
+    "rho_l": 960.5,
+    "sigma": 0.0595,
+    "hfg_kJ": 2264.6,
+    "mu_l_uPas": 292.1,
+    "merit_W_m2": 443000000000.0
+   },
+   "385": {
+    "P_MPa": 0.153,
+    "rho_l": 949.5,
+    "sigma": 0.0566,
+    "hfg_kJ": 2224.6,
+    "mu_l_uPas": 250.3,
+    "merit_W_m2": 478000000000.0
+   },
+   "400": {
+    "P_MPa": 0.246,
+    "rho_l": 937.5,
+    "sigma": 0.0536,
+    "hfg_kJ": 2182.7,
+    "mu_l_uPas": 218.7,
+    "merit_W_m2": 501000000000.0
+   }
+  }
+ },
+ "verdict": "On thermal, mass, reliability and manufacturing grounds the film-distributed design (B) wins by ~8x in kg per watt (0.89 vs 7.2 g/W mid; even B-high 2.0 < A-low 4.4), ~10x in FLOP/s per kg of Mercury, ~1.7x in FLOP/s per W of sunlight, and by 6-7 orders of magnitude in failure blast radius (0.15 W vs 0.5-1 MW). Concentration buys no PV advantage: at its mass optimum the concentrated wing sits at 0.86 AU and 347 K, the same temperature as the film; running wings hot at 0.6 AU costs +9 % mass and -40 % sunlight use. The concentrated design pays a ~3.7 g/W \"heat-transport tax\" (MMOD-armoured NaK manifolds 1.2 g/W + heat-pipe radiator 2.3 g/W) that the film does not have (its Mg spreader is 0.11 g/W), and NaK-78 cooling is capped by Mercury's potassium at ~1.4e23 W of chips (0.04 % of L), below even an Earth-safe swarm. Best hybrid from this angle: C = film for the bulk of the compute plus a few % (3-10 %) of power in concentrated, shielded, pumped pods for switching, gateways and the tightly coupled shards that the interconnect study says the film cannot do; it costs 1.1-1.5 g/W. Use pure concentrated modules (A or wafer-scale-SRAM A') only where coupling demands it, and cool them with SO2 heat-pipe blades fed by Na-rich or K-free loops.",
+ "findings": [
+  {
+   "headline": "Mass per watt of compute: film 0.89 g/W (0.47-1.98) vs concentrated 7.2 g/W (4.4-15.1); 8-9x at equal junction temperature too",
+   "detail": "B at 0.92 AU, f=0.01: c-Si 30 um 0.36 g/W, glass cover+emitters 0.32, Mg spreader (13 um for 0.15 W chiplets, dT 10 K) 0.11, structure 0.06, grid 0.02, lasers 0.02, chiplets 0.002; areal 0.17 kg/m2 (inside the 0.06-0.2 target). A at 0.86 AU, 1 MW satellites: radiator (SO2/Al heat-pipe blades sized for <=1 %/yr MMOD loss, 1.8 kg/m2, 1.3 m2/kW) 2.3 g/W, compute module 1.5, NaK loops 1.2, PV wing 1.0, shielding 0.3, conversion 0.3, lasers/attitude/booms 0.3, bus 0.07, fixed 0.15. Equal-Tj check: Tj 85 C 7.85 vs 0.89 g/W; Tj 105 C 7.18 vs 0.79 g/W.",
+   "confidence": "medium-high"
+  },
+  {
+   "headline": "Concentrated wings do not want to run hot: mass optimum is 0.86 AU (flat 0.7-1.0 AU) at 347 K, not 0.6 AU at 422 K",
+   "detail": "c-Si yield peaks at 0.6 AU (332 W/m2) but the wing is only ~1 g/W of 7.2; meteoroid flux (~r^-1.8) thickens radiator/loop armour inward. At 0.6 AU: 7.81 g/W and 0.070 W of chip power per W of sunlight intercepted, vs 7.19 g/W and 0.116-0.122 at 0.86-0.9 AU. Under a sunlight limit, hot PV wastes 40 % of the light.",
+   "confidence": "medium"
+  },
+  {
+   "headline": "Heat transport is the concentrated design's structural tax: coolant inventory ~ path length/(c_p dT v)",
+   "detail": "Branched NaK manifolds over 4 square blades, optimised dT_loop 40 K and 6 m/s: 0.33 kg NaK/kW, pump power 3.3 % (EM pump eta 0.25; 15-18 % if eta 0.05 as in NASA FSP ALIP tests), loops 1.2 g/W with A/B redundancy. Satellite optimum ~0.3-1 MW (7.6 g/W); 10 MW 9.8, 100 MW 19.2 g/W: km-scale wings need 830 m Al buses at 20 % I2R loss (1.25 g/W) and 2.3 kg/kW of NaK.",
+   "confidence": "medium"
+  },
+  {
+   "headline": "Film lateral spreading forbids clustering: spreader mass per W grows linearly with chip power",
+   "detail": "Minimum-mass tapered spreader M = rho pi P^2/(16 q_e k dT): Mg 0.09 g/W at 0.1 W, 0.94 g/W at 1 W, 9.4 g/W at 10 W. Uniform Mg: 0.15 W -> 13 um; 0.25 W -> 40 um (0.30 g/W); 1 W -> 248 um (1.9 g/W). Heat-pipe \"tiles\" need a pipe every ~3 cm (36 m of pipe per m2, 0.16-0.63 g/W) and thin pipes lose 1-21 %/yr to meteoroids. Clustered tiles are rejected.",
+   "confidence": "high"
+  },
+  {
+   "headline": "Mercury potassium caps NaK-cooled concentrated compute below an Earth-safe swarm",
+   "detail": "Rock K ~3.5e19 kg (surface 1288 ppm GRS, mantle K2O 0.045 wt%). NaK-78 at 0.33 kg/kW -> 1.4e23 W of chips (1.5e36 FLOP/s, f~0.3 %); Na-rich NaK (~28 wt% K, liquidus estimated 40-60 C) 3.8e23 W. Al-finned radiators cap at 1e24 W (Al 2.1e21 kg) unless Mg replaces Al. K-free cooling: SO2 pumped two-phase (S and O are abundant), or pure Na loops >=105 C (Tj >=130 C, E/op x1.5). The film needs no K or Al beyond grid lines; it is Si-limited (rock Si builds 1.9e23 m2 = f 0.56).",
+   "confidence": "medium"
+  },
+  {
+   "headline": "SO2 is a Mercury-native heat-pipe fluid for 330-370 K; ammonia/water are not (no hydrogen)",
+   "detail": "NIST properties: SO2 merit number 2.2e10 W/m2 at 356 K (0.46x ammonia, 0.05x water), 1.9 MPa. NH3 inventory for 1e25 W of radiators would need ~1e19 kg of H vs ~1e13 kg in Mercury's polar ice.",
+   "confidence": "medium"
+  },
+  {
+   "headline": "Swarm totals: film reaches ~4.5e38 FLOP/s from Mercury's rock and the sunlight limit 8e38 with the whole planet; concentrated 5.8e37 (bulk) but 1.5e36 (K-limited)",
+   "detail": "Mass-limited coverage: B f=0.56-0.59 (Si/mass) at ~1.1 AU; A f=0.12 at 0.92 AU. Sunlight-limited (f=1): B 8.0e38 FLOP/s at 1.35 AU needing 0.31 Mercury masses (core Si needed); A 5.7e38 at 1.59 AU needing 1.6 Mercury masses (impossible). FLOP/s per kg of Mercury rock: B 8.7e15, C 5.0e15, A' 9.5e14, A 7.5e14. FLOP/s per W of sunlight: B 2.1e12, A 1.25e12 (f=0.01).",
+   "confidence": "medium"
+  },
+  {
+   "headline": "Blast radius: film 0.10-0.25 W per failure, ~0.13 %/yr attrition; concentrated 0.5-1 MW per loop/module failure, ~11 % chance per satellite-decade",
+   "detail": "Grun flux at 0.92 AU: 110 /m2/yr perforate (>=1e-9 g), 1.7 /m2/yr >=1e-6 g. Film loses a 0.15 W cell when hit by >=1e-6 g (0.11 %/yr; 0.007-1.2 %/yr for 1e-5..1e-7 g kill thresholds) plus 0.02 %/yr direct die hits. A: Whipple-armoured trunks still give 0.006 loop drains/yr per loop, branches 1 %/yr and heat pipes 0.5 %/yr of radiator; 1 MW of HV wing sees 5.8e5 cell perforations/yr, each a potential impact-plasma arc trigger (sustained arcs above 80-183 V in light-gas-gun tests). Film cells run at 0.5-1 V and latch-up is limited by each chip's own cell.",
+   "confidence": "medium"
+  },
+  {
+   "headline": "Radiation: unshielded film chiplets take ~0.1-1 Mrad per decade even with a 0.1-0.5 mm glass die cap; fine for FinFET/SOI logic+SRAM, fatal for DRAM/HBM",
+   "detail": "Aug-1972-class event (>10 MeV 2e10 cm^-2): bare back side 0.27-2.4 Mrad, through the 30 um Si + 20 um glass front 40-140 krad, with 0.5 mm glass cap 5.5 krad; a module behind 5 g/cm2 of Mercury rock ~0.2 krad. 16 nm bulk FinFETs tolerate ~100 Mrad; HBM shows errors from ~2 krad. So film memory must be SRAM/MRAM; HBM-class memory only in shielded modules.",
+   "confidence": "low-medium"
+  },
+  {
+   "headline": "Manufacturing: same PV area and die area per MW; the film adds 6.7e6 chiplet placements/MW, the module adds ~5,300 sealed heat pipes, 150 m2 of armoured NaK pipe, 28 valves and 4 pumps per MW",
+   "detail": "PV 4,620 (B) vs 4,660 (A) m2/MW; 47 x 300 mm wafers/MW at 0.3 W/mm2 either way. Film tolerates dead chiplets (die yield 99.93 % at 0.75 mm2, bond yield 99-99.99 %, no rework); modules need leak-tight welds and on-wafer redundancy (reticle die yield 45 %). Under Mercury's surface heat cap (4.1e18 W, 13.5 MJ/kg) the film adds 1.1e22 W/yr of compute vs 1.3e21 for modules (1e24 W in 93 vs 750 yr), needing 2.3e15 chiplet placements/s.",
+   "confidence": "medium"
+  },
+  {
+   "headline": "Earth: both sit just inside Earth's orbit; the film must stay below f~0.25 (Tj 85 C) to avoid crossing 0.983 AU; any f above ~0.5 % forces Earth by >1 W/m2",
+   "detail": "Mass-optimal: A 0.86-0.91 AU, B 0.92-0.94 AU (f 0.01-0.1). Forcing per unit coverage 179 W/m2 (A at 0.86 AU), 213 (B at 0.92 AU); 1 % coverage = 1.8-2.1 W/m2 (0.5-0.6x CO2 doubling); 10 % = 21-23 W/m2. Film placement reaches Earth perihelion at f=0.25 (Tj 85 C), 0.58 (105 C), 0.82 (125 C); the rock-mass-limited film (f~0.56, 1.1 AU) encloses Earth (~400 W/m2). Earth-safe cap (1 W/m2): f<=0.5 %, ~2.5e23 W, ~3.4e36 FLOP/s, needing 2e20 kg (film) or 1.8e21 kg (modules), and A cannot reach even that with NaK-78.",
+   "confidence": "medium"
+  }
+ ],
+ "sources": [
+  "SPENVIS meteoroid/debris background (Grun 1985 flux formula, single-wall and Whipple ballistic limits): https://spenvis.oma.be/help/background/metdeb/metdeb.html",
+  "Grun & Zook / Helios dust radial dependence n~r^-1.3 (0.08-1 AU): https://www.cambridge.org/core/journals/international-astronomical-union-colloquium/article/orbits-of-interplanetary-dust-particles-inside-1-au-as-observed-by-helios/6919186D0E438FD1F3482B973DA24007 ; https://earth-planets-space.springeropen.com/articles/10.1186/BF03352144",
+  "HST retrieved solar arrays, hypervelocity impacts: https://oro.open.ac.uk/18165",
+  "Impact-induced sustained arcs on solar arrays (JAXA light-gas-gun: TSA >80 V, PSA >=183 V/2.4 A): https://jaxa.repo.nii.ac.jp/records/8024 ; https://jaxa.repo.nii.ac.jp/records/6324",
+  "NASA Glenn solar-array arc thresholds (-100 to -250 V; sustained below trigger): https://ntrs.nasa.gov/api/citations/20010056310/downloads/20010056310.pdf ; https://ntrs.nasa.gov/api/citations/20050214579/downloads/20050214579.pdf",
+  "ESA high-voltage (>300 V) solar arrays for exploration: https://www.esa.int/Our_Activities/Space_Engineering_Technology/Shaping_the_Future/High-Voltage_High-Power_Solar_Array_For_Exploration_Missions",
+  "16 nm bulk FinFET TID to 1 Grad / 100 Mrad: https://www.research.unipd.it/handle/11577/3399257 ; https://infoscience.epfl.ch/record/288559",
+  "NASA FSP annular linear induction pump, max efficiency 4-5.4 %: https://ntrs.nasa.gov/citations/20140001493 ; https://ntrs.nasa.gov/citations/20130011195",
+  "NIST Chemistry WebBook fluid saturation properties (SO2, NH3, H2O): https://webbook.nist.gov/cgi/fluid.cgi?ID=C7446095",
+  "NaK eutectic and room-temperature range (40-90 wt% K): https://en.wikipedia.org/wiki/Sodium%E2%80%93potassium_alloy",
+  "SEP event fluences (Aug 1972 >10 MeV 1.96e10, >30 MeV 8.42e9 cm^-2): https://www.swsc-journal.org/articles/swsc/full_html/2014/01/swsc130038/T1.html",
+  "Space converter specific mass (~0.8-1.2 kg/kW boards/modules): https://ntrs.nasa.gov/citations/20160005343 ; https://ntrs.nasa.gov/api/citations/19950021440/downloads/19950021440.pdf",
+  "Thin c-Si efficiency limits vs thickness: https://arxiv.org/pdf/1505.03985",
+  "Prior verified project work: research/thermal_result.json, research/mercury_result.json, research/verify_early.json, research2/research_ai1.json, research2/research_hotsi.json, research3/interconnect_final.json, src/model/v2.js, src/model/sat2.js"
+ ],
+ "open_questions": [
+  "Na-K liquidus on the Na-rich side (ideal-solution estimate used): sets how much K a concentrated swarm needs.",
+  "SO2 heat pipes and pumped two-phase SO2 loops are untested at scale (merit computed from NIST properties only); Mg/Al compatibility with dry SO2 over 10 yr.",
+  "Cell-kill threshold for meteoroid hits on free-standing 20-50 um c-Si film (crack propagation, shunting): drives film attrition 0.007-1.2 %/yr; a monolithic brittle film under spin tension may need segmenting into tiles on a Mg mesh.",
+  "Impact-plasma arc probability per perforation on 300-1000 V strings in solar-wind plasma (no data found for interplanetary densities).",
+  "Solar-proton dose: order-of-magnitude only (single power-law spectra, approximate stopping powers); needs SHIELDOSE/ESP runs at 0.9 AU.",
+  "Workload mix: the film's FLOP/s assume neighbour-dataflow work (comm +3 %); global/MoE/TP traffic on film costs 10-99 % extra energy (interconnect_final).",
+  "High-throughput chiplet placement (2e15/s at the heat-cap build rate) on c-Si film without polymers (Al-Al thermocompression or direct bonding)."
+ ]
+}

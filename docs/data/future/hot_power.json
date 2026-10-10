@@ -1,0 +1,3727 @@
+{
+ "domain": "Hot electronics (Si, SOI, SiC, GaN, Ga2O3, diamond, vacuum/NEMS; hot memory) and solar power conversion (c-Si, tandems, III-V, hot PV, TPV, heat engines; Mercury manufacturability), 2026-2300",
+ "summary": "HOT COMPUTE IS NOT AN ARCHITECTURAL LEVER; PV PHYSICS AND SUNLIGHT ARE. (1) Every thermionic switch - Si, SiC, GaN, Ga2O3, diamond - obeys the Boltzmann floor SS = ln10 kT/q (71 mV/dec at 85 C, 114 at 300 C, 153 at 500 C), so switching energy scales as T^2: x1.12 at 105 C, x2.6 at 300 C, x4.7 at 500 C even for perfect devices. On top, 2026 wide-bandgap logic is 1e4-1e7 x worse per op (NASA SiC JFET-R ICs: 6 um, +25/-10 V, 175-195 transistors, >1 yr at 500 C; GaN E/D-mode 5 V; HiTSiC CMOS 15 V at 300 C); the gap may close to ~1000x (2040), ~30x (2070), ~5x (2100+). Hot Si: qualified to 150-175 C, SOI 225 C continuous; Si ni at 300 C is x3400 its 85 C value and Cu electromigration allows 1/16 of the current at 200 C, 1/110 at 300 C. Dense memory stops near 150 C (MRAM/RRAM); only AlScN ferro-diodes (600 C, 60 h) and bit-scale SiC/GaN SRAM survive 300-500 C. (2) PV: a one-diode c-Si model calibrated to 20 % AM0 gives -0.34 %/K for a thin IBC cell (the project's -0.42 %/K matches legacy Voc 0.60 V cells) and eta ~ 0 near 575-600 K. The AM0 Shockley-Queisser limit is 30.2 % at 301 K, 23.6 % at 473 K, 14.5 % at 773 K. The film temperature is set by alpha, eps and coverage, never by eta (chips re-dissipate the electricity in the same sheet). (3) Placement (f=0.01): Tj 85/105/125/200/300/500 C puts sails at 0.92/0.82/0.74/0.52/0.35/0.19 AU; the closed-shell floor moves 1.36/1.22/1.10/0.76/0.52/0.27 AU. With Mercury-buildable c-Si, FLOP/s per kg at 105/125 C is -6/-13 % (2026 logic) or within +/-4 % (2100+ logic) of 85 C and falls beyond ~150 C (-11 to -66 % at 200 C), while FLOP per joule of sunlight always falls (-17 % at 105, -31 % at 125 C, 2100+). Even an ideal hot film (SQ-limit PV, Boltzmann-floor logic) gains only 1.3-1.6x FLOP/s/kg at 200-300 C and loses 2-4x sunlight efficiency; a Mercury-built swarm is close to the sunlight limit, so cold wins. (4) Where is the swarm: the rock-limited swarm (4e22 kg delivered) sits OUTSIDE Earth's orbit at 1.11-1.24 AU (f 0.49-0.73) for Tj 60-85 C; keeping it inside 1 AU needs Tj >= 116-130 C and costs 16-20 % of the swarm's compute (full shell: Tj >= 137-141 C, -50-63 %). (5) Concentration: hot pods shrink radiators (1.45 g/W at 85 C -> 0.20 at 300 C) but wings and module dominate; the film stays 4.8-8.4x better per kg and pods' own optimum Tj is flat 85-150 C. (6) Mercury-buildable PV is silicon only: perovskites are iodine-limited (f <= 1e-5), III-V In/Ge-limited (f <= 3e-6; 3e-3 at 1000x concentration). Heat engines and solar TPV cost 2.3-3.7x the film's mass per W (incl. chip cooling). (7) Combined 2100+ (30 % all-Si tandem, alpha 0.80, 0.135 kg/m2): r 0.85-0.69 AU (Tj 85-125 C), 410-545 W/m2, pitch 19-17 mm, film 0.30-0.38 g/W, swarm 1.8e+18 FLOP/s/kg (x201 vs 2026) and 1.6e+14 FLOP/J of sunlight (x95).",
+ "sota_2026": [
+  {
+   "item": "SiC JFET-R ICs (NASA Glenn)",
+   "value": ">1 yr at 500 C in air; 175-195 transistors/chip; 6 um features; +25 V / -10 V supplies; TaSi2/Pt/Ir/Pt metal; 60 d Venus 460 C; -190..+812 C; 7 Mrad",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://ntrs.nasa.gov/citations/20180003391 ; https://ntrs.nasa.gov/citations/20240013278"
+  },
+  {
+   "item": "SiC CMOS (Raytheon HiTSiC)",
+   "value": "15 V single supply, ICs at 300 C, >1500 h at 300 C; 400 C transistors",
+   "evidence_class": "demonstrated",
+   "source": "https://newelectronics.co.uk/content/features/the-quest-for-high-temperature-analogue-and-mixed-signal-electronics-is-taking-advantage-of-silicon-carbide-s-properties ; https://eepower.com/technical-articles/de-risking-the-route-to-silicon-carbide/ ; https://durham-repository.worktribe.com/OutputFile/1318312"
+  },
+  {
+   "item": "GaN logic (MIT p-GaN-gate E-mode)",
+   "value": "ring oscillators/flip-flops to 500 C, >350-transistor ROM/SRAM at 300 C, VDD 5 V, LG 1-3.6 um; complementary inverter only to 300 C",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://dspace.mit.edu/handle/1721.1/147361 ; https://dspace.mit.edu/handle/1721.1/153863 ; https://www.mtl.mit.edu/sites/default/files/media/documents/2024/palacios_talk-extreme-environment-electronics_palaciospublications.pdf"
+  },
+  {
+   "item": "GaN transistor at 800 C (Illinois, 2025)",
+   "value": "on/off 770 at 800 C, ~1 h hold",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://ece.illinois.edu/news/record-setting-gallium-nitride-transistor"
+  },
+  {
+   "item": "beta-Ga2O3 FETs",
+   "value": "stable at 500 C (~20 h), single devices; no p-type",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://impact.ornl.gov/en/publications/500-c-operation-of-%CE%B2-gasub2subosub3subfield-effect-transistors/"
+  },
+  {
+   "item": "diamond logic",
+   "value": "2-MOSFET NOR at 300 C, fails at 400 C; CMOS at 500 C only simulated",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://publishing.aip.org/publications/latest-content/diamond-based-circuits-can-take-the-heat-for-advanced-applications/"
+  },
+  {
+   "item": "hot Si",
+   "value": "FinFET IP AEC-Q100 Grade 1 (Tj 150 C) on TSMC 16FFC; AURIX 165 C; X-FAB SOI 175 C; Honeywell HT-SOI >=5 yr at 225 C, 300 C excursions; 300 C 8-kbit SRAM",
+   "evidence_class": "demonstrated",
+   "source": "research2/research_hotsi.json ; https://aerospace.honeywell.com/us/en/products-and-services/product/hardware-and-systems/sensors/silicon-on-insulator-cmos-technology ; https://militaryaerospace.com/power/article/16709945/honeywell-develops-high-temp-sram"
+  },
+  {
+   "item": "hot non-volatile memory",
+   "value": "AlScN ferroelectric diode: 600 C, >60 h, 1e6 reads (45 nm Al0.68Sc0.32N, Ni/Pt)",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://www.engineering.upenn.edu/stories/turning-up-the-heat-on-data-storage/ ; https://archive.aps.org/smt/2025/mar-t20/12"
+  },
+  {
+   "item": "vacuum channel transistors",
+   "value": "NASA Ames NVCT (2012, ~2 V drive at 50 nm gap); SiC 150 mm wafer vertical surround-gate devices (Nature Electronics 2019); radiation-immune channel",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://science.nasa.gov/technology/technology-highlights/nanoscale-vacuum-electronics-back-to-the-future ; https://www.techbriefs.com/component/content/article/22187-arc-17130-1 ; https://physicsworld.com/a/vacuum-technology-comeback-immunizes-nanoelectronics-from-radiation/"
+  },
+  {
+   "item": "SiC NEMS logic",
+   "value": "NOT gate at 500 C, 500 kHz, +/-6 V; 1e6-1e7 cycles",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://physicsworld.com/a/logic-circuit-takes-the-heat/ ; https://spectrum.ieee.org/semiconductors/devices/silicon-carbide-nanomechanical-switches-built-to-last"
+  },
+  {
+   "item": "c-Si cell record",
+   "value": "28.29 % AM1.5 (LONGi HIBC, ISFH, Sept 2026) = 96.2 % of the 29.4 % intrinsic limit",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://taiyangnews.info/technology/longi-raises-single-junction-silicon-cell-world-record-to-2829"
+  },
+  {
+   "item": "perovskite/Si tandem record",
+   "value": "35.5 % AM1.5 (LONGi, ESTI-certified, July 2026); 33 % on 261 cm2",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://www.pv-magazine.com/2026/07/15/longi-sets-new-world-record-with-35-5-efficient-perovskite-silicon-tandem-cell/"
+  },
+  {
+   "item": "space III-V",
+   "value": "XTJ Prime 30.7 % AM0 BOL (production average), 26.7 % EOL at 1e15 e/cm2; dVmp/dT -6.3 mV/K -> -0.23 %/K; 50-84 mg/cm2; AZUR 4J 32 % BOL",
+   "evidence_class": "demonstrated",
+   "source": "https://www.spectrolab.com/photovoltaics/XTJ-Prime_Data_Sheet.pdf ; https://www.azurspace.com/en/about-us/milestones-achievements/"
+  },
+  {
+   "item": "temperature coefficients",
+   "value": "IBC c-Si modules -0.27..-0.29 %/K, HJT/Maxeon 7 -0.24 %/K; perovskite/Si tandem -0.26 %/K (outdoor)",
+   "evidence_class": "demonstrated",
+   "source": "https://www.choice.com.au/products/home-improvement/energy-saving/solar/sunpower-maxeon-5-spr-max5-400-e3-ac-solar-panel ; https://www.ohmsnap.com/solar-panels/maxeon-7-440 ; https://kpv.kaust.edu.sa/publications/detail/outdoor-performance-of-perovskite-silicon-tandem-solar-cells"
+  },
+  {
+   "item": "specific power (cells)",
+   "value": "ultrathin perovskite 23 W/g (2015), 29.4 W/g max in 2023 review, 44 W/g claimed 2024; realistic limit ~74 W/g",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://spectrum.ieee.org/ultrathin-solar-cells-for-lightweight-and-flexible-applications- ; https://infoscience.epfl.ch/record/310297 ; https://research.jku.at/en/activities/high-specific-power-perovskite-solar-cells-for-healthcare-devices/"
+  },
+  {
+   "item": "radiation",
+   "value": "perovskite/CIGS keeps >85 % after 2e12 p/cm2 at 68 MeV; perovskite/Si-HJT (thick wafer) falls to 1 %; Si heterojunction 19.2 -> 13.6 % at 1e15 1-MeV e",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7238692/ ; https://j.ioffe.ru/articles/viewPDF/56689"
+  },
+  {
+   "item": "hot PV in flight / lab",
+   "value": "BepiColombo MMO array designed for ~230 C at ~11 suns (UV + heat cost 20 % in a simulated month); InGaN EQE 81 % at 450 C; NASA goal >25 % above 400 C (tandem InGaN)",
+   "evidence_class": "demonstrated / roadmap claim",
+   "source": "https://jaxa.repo.nii.ac.jp/records/7956/export/json ; https://www.solardaily.com/reports/Hot_stuff_the_making_of_BepiColombo_999.html ; https://labs.engineering.asu.edu/zhao/wp-content/uploads/sites/30/2014/08/acsphotonics.9b00655.pdf ; https://www.nasa.gov/directorates/stmd/space-tech-research-grants/high-temperature-ingan-based-solar-cells"
+  },
+  {
+   "item": "alternatives",
+   "value": "TPV 41 % heat-to-electricity at 2400 C emitter; solar TPV 6.8 % system; Brayton DIPS 2.5 kWe/352 kg, 6 kWe/675 kg (7-9 W/kg conversion only)",
+   "evidence_class": "demonstrated",
+   "source": "https://arxiv.org/pdf/2108.09613 ; https://ideas.repec.org/a/nat/natene/v1y2016i6d10.1038_nenergy.2016.68.html ; https://ntrs.nasa.gov/api/citations/20230006422/downloads/MIT%20Gas%20Turbine%20Workshop_Mason_final.pdf"
+  }
+ ],
+ "trajectory": [
+  {
+   "metric": "Mercury-buildable film PV efficiency, AM0 at 301 K (thin c-Si; all-Si tandem in high case)",
+   "year": 2026,
+   "low": 0.19,
+   "mid": 0.2,
+   "high": 0.21,
+   "unit": "fraction",
+   "evidence_class": "demonstrated lab result (project basis)",
+   "source": "pv_db.json (one-diode c-Si; AM0 E-490); LONGi HIBC 28.29 %; arXiv:1505.03985 thin-Si"
+  },
+  {
+   "metric": "Mercury-buildable film PV efficiency, AM0 at 301 K (thin c-Si; all-Si tandem in high case)",
+   "year": 2040,
+   "low": 0.21,
+   "mid": 0.225,
+   "high": 0.235,
+   "unit": "fraction",
+   "evidence_class": "roadmap claim",
+   "source": "pv_db.json (one-diode c-Si; AM0 E-490); LONGi HIBC 28.29 %; arXiv:1505.03985 thin-Si"
+  },
+  {
+   "metric": "Mercury-buildable film PV efficiency, AM0 at 301 K (thin c-Si; all-Si tandem in high case)",
+   "year": 2070,
+   "low": 0.23,
+   "mid": 0.24,
+   "high": 0.25,
+   "unit": "fraction",
+   "evidence_class": "speculation",
+   "source": "pv_db.json (one-diode c-Si; AM0 E-490); LONGi HIBC 28.29 %; arXiv:1505.03985 thin-Si"
+  },
+  {
+   "metric": "Mercury-buildable film PV efficiency, AM0 at 301 K (thin c-Si; all-Si tandem in high case)",
+   "year": 2100,
+   "low": 0.24,
+   "mid": 0.25,
+   "high": 0.3,
+   "unit": "fraction",
+   "evidence_class": "speculation (0.30 needs an all-Si tandem)",
+   "source": "pv_db.json (one-diode c-Si; AM0 E-490); LONGi HIBC 28.29 %; arXiv:1505.03985 thin-Si"
+  },
+  {
+   "metric": "Best space PV efficiency AM0, any material (pods/seed only; not Mercury-scale)",
+   "year": 2026,
+   "low": 0.307,
+   "mid": 0.31,
+   "high": 0.32,
+   "unit": "fraction",
+   "evidence_class": "demonstrated (XTJ 30.7 % prod.; AZUR 4J 32 %; perovskite/Si 35.5 % AM1.5 ~ 31 % AM0 est.)",
+   "source": "XTJ Prime datasheet; AZUR milestones; LONGi 35.5 %"
+  },
+  {
+   "metric": "Best space PV efficiency AM0, any material (pods/seed only; not Mercury-scale)",
+   "year": 2040,
+   "low": 0.33,
+   "mid": 0.35,
+   "high": 0.37,
+   "unit": "fraction",
+   "evidence_class": "roadmap claim",
+   "source": "XTJ Prime datasheet; AZUR milestones; LONGi 35.5 %"
+  },
+  {
+   "metric": "Best space PV efficiency AM0, any material (pods/seed only; not Mercury-scale)",
+   "year": 2070,
+   "low": 0.35,
+   "mid": 0.38,
+   "high": 0.42,
+   "unit": "fraction",
+   "evidence_class": "speculation",
+   "source": "XTJ Prime datasheet; AZUR milestones; LONGi 35.5 %"
+  },
+  {
+   "metric": "Best space PV efficiency AM0, any material (pods/seed only; not Mercury-scale)",
+   "year": 2100,
+   "low": 0.36,
+   "mid": 0.4,
+   "high": 0.45,
+   "unit": "fraction",
+   "evidence_class": "speculation",
+   "source": "XTJ Prime datasheet; AZUR milestones; LONGi 35.5 %"
+  },
+  {
+   "metric": "c-Si film PV temperature coefficient near 301-348 K",
+   "year": 2026,
+   "low": -0.0042,
+   "mid": -0.0034,
+   "high": -0.0029,
+   "unit": "1/K",
+   "evidence_class": "physics (diode law, Voc-dependent) + demonstrated (IBC -0.29, HJT -0.24 %/K)",
+   "source": "pv_db.json; Maxeon/HJT datasheets via retailers; Dupre, Vaillon & Green 2015"
+  },
+  {
+   "metric": "c-Si film PV temperature coefficient near 301-348 K",
+   "year": 2040,
+   "low": -0.0032,
+   "mid": -0.0029,
+   "high": -0.0025,
+   "unit": "1/K",
+   "evidence_class": "physics (diode law, Voc-dependent) + demonstrated (IBC -0.29, HJT -0.24 %/K)",
+   "source": "pv_db.json; Maxeon/HJT datasheets via retailers; Dupre, Vaillon & Green 2015"
+  },
+  {
+   "metric": "c-Si film PV temperature coefficient near 301-348 K",
+   "year": 2070,
+   "low": -0.0029,
+   "mid": -0.0026,
+   "high": -0.0023,
+   "unit": "1/K",
+   "evidence_class": "physics (diode law, Voc-dependent) + demonstrated (IBC -0.29, HJT -0.24 %/K)",
+   "source": "pv_db.json; Maxeon/HJT datasheets via retailers; Dupre, Vaillon & Green 2015"
+  },
+  {
+   "metric": "c-Si film PV temperature coefficient near 301-348 K",
+   "year": 2100,
+   "low": -0.0029,
+   "mid": -0.0026,
+   "high": -0.0022,
+   "unit": "1/K",
+   "evidence_class": "physics (diode law, Voc-dependent) + demonstrated (IBC -0.29, HJT -0.24 %/K)",
+   "source": "pv_db.json; Maxeon/HJT datasheets via retailers; Dupre, Vaillon & Green 2015"
+  },
+  {
+   "metric": "compute-sail film areal density (stack, Mg spreader; +0.0126 if Al spreader above 400 K film)",
+   "year": 2026,
+   "low": 0.165,
+   "mid": 0.172,
+   "high": 0.207,
+   "unit": "kg/m2",
+   "evidence_class": "design (2026) + speculation",
+   "source": "hybrid.js filmAreal; research4/design/result.json (0.19-0.207)"
+  },
+  {
+   "metric": "compute-sail film areal density (stack, Mg spreader; +0.0126 if Al spreader above 400 K film)",
+   "year": 2040,
+   "low": 0.14,
+   "mid": 0.155,
+   "high": 0.175,
+   "unit": "kg/m2",
+   "evidence_class": "design (2026) + speculation",
+   "source": "hybrid.js filmAreal; research4/design/result.json (0.19-0.207)"
+  },
+  {
+   "metric": "compute-sail film areal density (stack, Mg spreader; +0.0126 if Al spreader above 400 K film)",
+   "year": 2070,
+   "low": 0.12,
+   "mid": 0.14,
+   "high": 0.16,
+   "unit": "kg/m2",
+   "evidence_class": "design (2026) + speculation",
+   "source": "hybrid.js filmAreal; research4/design/result.json (0.19-0.207)"
+  },
+  {
+   "metric": "compute-sail film areal density (stack, Mg spreader; +0.0126 if Al spreader above 400 K film)",
+   "year": 2100,
+   "low": 0.11,
+   "mid": 0.135,
+   "high": 0.16,
+   "unit": "kg/m2",
+   "evidence_class": "design (2026) + speculation",
+   "source": "hybrid.js filmAreal; research4/design/result.json (0.19-0.207)"
+  },
+  {
+   "metric": "film electric specific power at f=0.01 placement (PV W per kg of film incl. chips)",
+   "year": 2026,
+   "low": 1132,
+   "mid": 1415,
+   "high": 1627,
+   "unit": "W/kg",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "film electric specific power at f=0.01 placement (PV W per kg of film incl. chips)",
+   "year": 2040,
+   "low": 1585,
+   "mid": 1981,
+   "high": 2278,
+   "unit": "W/kg",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "film electric specific power at f=0.01 placement (PV W per kg of film incl. chips)",
+   "year": 2070,
+   "low": 2054,
+   "mid": 2567,
+   "high": 2952,
+   "unit": "W/kg",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "film electric specific power at f=0.01 placement (PV W per kg of film incl. chips)",
+   "year": 2100,
+   "low": 2699,
+   "mid": 3374,
+   "high": 3880,
+   "unit": "W/kg",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "max Tj of dense leading-edge Si logic (FinFET/GAA/thin-body SOI), 10-yr life",
+   "year": 2026,
+   "low": 150,
+   "mid": 175,
+   "high": 200,
+   "unit": "C",
+   "evidence_class": "demonstrated (2026) / roadmap / speculation",
+   "source": "research_hotsi.json; Honeywell HT-SOI; hot_logic.json"
+  },
+  {
+   "metric": "max Tj of dense leading-edge Si logic (FinFET/GAA/thin-body SOI), 10-yr life",
+   "year": 2040,
+   "low": 175,
+   "mid": 175,
+   "high": 225,
+   "unit": "C",
+   "evidence_class": "demonstrated (2026) / roadmap / speculation",
+   "source": "research_hotsi.json; Honeywell HT-SOI; hot_logic.json"
+  },
+  {
+   "metric": "max Tj of dense leading-edge Si logic (FinFET/GAA/thin-body SOI), 10-yr life",
+   "year": 2070,
+   "low": 175,
+   "mid": 200,
+   "high": 250,
+   "unit": "C",
+   "evidence_class": "demonstrated (2026) / roadmap / speculation",
+   "source": "research_hotsi.json; Honeywell HT-SOI; hot_logic.json"
+  },
+  {
+   "metric": "max Tj of dense leading-edge Si logic (FinFET/GAA/thin-body SOI), 10-yr life",
+   "year": 2100,
+   "low": 200,
+   "mid": 225,
+   "high": 300,
+   "unit": "C",
+   "evidence_class": "demonstrated (2026) / roadmap / speculation",
+   "source": "research_hotsi.json; Honeywell HT-SOI; hot_logic.json"
+  },
+  {
+   "metric": "wide-bandgap (SiC/GaN) logic energy per op relative to same-era Si at the same T (maturity gap; multiply by (T/358)^2 vs Si at 85 C)",
+   "year": 2026,
+   "low": 10000.0,
+   "mid": 300000.0,
+   "high": 10000000.0,
+   "unit": "x",
+   "evidence_class": "derived from demonstrated (2026: CV^2 from 6 um/25 V and 1-2 um/15 V) + speculation",
+   "source": "hot_logic.json"
+  },
+  {
+   "metric": "wide-bandgap (SiC/GaN) logic energy per op relative to same-era Si at the same T (maturity gap; multiply by (T/358)^2 vs Si at 85 C)",
+   "year": 2040,
+   "low": 100,
+   "mid": 1000,
+   "high": 10000.0,
+   "unit": "x",
+   "evidence_class": "derived from demonstrated (2026: CV^2 from 6 um/25 V and 1-2 um/15 V) + speculation",
+   "source": "hot_logic.json"
+  },
+  {
+   "metric": "wide-bandgap (SiC/GaN) logic energy per op relative to same-era Si at the same T (maturity gap; multiply by (T/358)^2 vs Si at 85 C)",
+   "year": 2070,
+   "low": 5,
+   "mid": 30,
+   "high": 300,
+   "unit": "x",
+   "evidence_class": "derived from demonstrated (2026: CV^2 from 6 um/25 V and 1-2 um/15 V) + speculation",
+   "source": "hot_logic.json"
+  },
+  {
+   "metric": "wide-bandgap (SiC/GaN) logic energy per op relative to same-era Si at the same T (maturity gap; multiply by (T/358)^2 vs Si at 85 C)",
+   "year": 2100,
+   "low": 2,
+   "mid": 5,
+   "high": 30,
+   "unit": "x",
+   "evidence_class": "derived from demonstrated (2026: CV^2 from 6 um/25 V and 1-2 um/15 V) + speculation",
+   "source": "hot_logic.json"
+  },
+  {
+   "metric": "optimum compute-sail Tj (max FLOP/s/kg, f <= 0.1; FLOP per J of sunlight always prefers colder)",
+   "year": 2026,
+   "low": 85,
+   "mid": 85,
+   "high": 95,
+   "unit": "C",
+   "evidence_class": "model output",
+   "source": "placement.json optimum_Tj"
+  },
+  {
+   "metric": "optimum compute-sail Tj (max FLOP/s/kg, f <= 0.1; FLOP per J of sunlight always prefers colder)",
+   "year": 2040,
+   "low": 85,
+   "mid": 85,
+   "high": 105,
+   "unit": "C",
+   "evidence_class": "model output",
+   "source": "placement.json optimum_Tj"
+  },
+  {
+   "metric": "optimum compute-sail Tj (max FLOP/s/kg, f <= 0.1; FLOP per J of sunlight always prefers colder)",
+   "year": 2070,
+   "low": 85,
+   "mid": 105,
+   "high": 125,
+   "unit": "C",
+   "evidence_class": "model output",
+   "source": "placement.json optimum_Tj"
+  },
+  {
+   "metric": "optimum compute-sail Tj (max FLOP/s/kg, f <= 0.1; FLOP per J of sunlight always prefers colder)",
+   "year": 2100,
+   "low": 85,
+   "mid": 105,
+   "high": 135,
+   "unit": "C",
+   "evidence_class": "model output + judgement (FLOP/J_sun favours the low end)",
+   "source": "placement.json optimum_Tj"
+  },
+  {
+   "metric": "compute-sail orbit at f=0.01 (Tj 85 C .. optimum)",
+   "year": 2026,
+   "low": 0.921,
+   "mid": 0.921,
+   "high": 0.921,
+   "unit": "AU",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chip power per m2 of sail at f=0.01",
+   "year": 2026,
+   "low": 209,
+   "mid": 209,
+   "high": 209,
+   "unit": "W/m2",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chiplet pitch at 0.15 W per chiplet",
+   "year": 2026,
+   "low": 26.79,
+   "mid": 26.79,
+   "high": 26.79,
+   "unit": "mm",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP/s per kg incl. pods (f=0.01)",
+   "year": 2026,
+   "low": 9110000000000000.0,
+   "mid": 9110000000000000.0,
+   "high": 9110000000000000.0,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "model output (study-1 J/op mid)",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP per J of intercepted sunlight",
+   "year": 2026,
+   "low": 1650000000000.0,
+   "mid": 1650000000000.0,
+   "high": 1650000000000.0,
+   "unit": "FLOP/J",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "compute-sail orbit at f=0.01 (Tj 85 C .. optimum)",
+   "year": 2040,
+   "low": 0.794,
+   "mid": 0.887,
+   "high": 0.887,
+   "unit": "AU",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chip power per m2 of sail at f=0.01",
+   "year": 2040,
+   "low": 276.3,
+   "mid": 276.3,
+   "high": 317.8,
+   "unit": "W/m2",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chiplet pitch at 0.15 W per chiplet",
+   "year": 2040,
+   "low": 21.72,
+   "mid": 23.3,
+   "high": 23.3,
+   "unit": "mm",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP/s per kg incl. pods (f=0.01)",
+   "year": 2040,
+   "low": 1.22e+17,
+   "mid": 1.27e+17,
+   "high": 1.27e+17,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "model output (study-1 J/op mid)",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP per J of intercepted sunlight",
+   "year": 2040,
+   "low": 12300000000000.0,
+   "mid": 15600000000000.0,
+   "high": 15600000000000.0,
+   "unit": "FLOP/J",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "compute-sail orbit at f=0.01 (Tj 85 C .. optimum)",
+   "year": 2070,
+   "low": 0.765,
+   "mid": 0.854,
+   "high": 0.854,
+   "unit": "AU",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chip power per m2 of sail at f=0.01",
+   "year": 2070,
+   "low": 323.4,
+   "mid": 323.4,
+   "high": 374.7,
+   "unit": "W/m2",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chiplet pitch at 0.15 W per chiplet",
+   "year": 2070,
+   "low": 20.01,
+   "mid": 21.54,
+   "high": 21.54,
+   "unit": "mm",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP/s per kg incl. pods (f=0.01)",
+   "year": 2070,
+   "low": 7.45e+17,
+   "mid": 7.45e+17,
+   "high": 7.53e+17,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "model output (study-1 J/op mid)",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP per J of intercepted sunlight",
+   "year": 2070,
+   "low": 55700000000000.0,
+   "mid": 67600000000000.0,
+   "high": 67600000000000.0,
+   "unit": "FLOP/J",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "compute-sail orbit at f=0.01 (Tj 85 C .. optimum)",
+   "year": 2100,
+   "low": 0.686,
+   "mid": 0.852,
+   "high": 0.852,
+   "unit": "AU",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chip power per m2 of sail at f=0.01",
+   "year": 2100,
+   "low": 409.9,
+   "mid": 409.9,
+   "high": 544.6,
+   "unit": "W/m2",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "chiplet pitch at 0.15 W per chiplet",
+   "year": 2100,
+   "low": 16.6,
+   "mid": 19.13,
+   "high": 19.13,
+   "unit": "mm",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP/s per kg incl. pods (f=0.01)",
+   "year": 2100,
+   "low": 1.84e+18,
+   "mid": 1.84e+18,
+   "high": 1.89e+18,
+   "unit": "FLOP/s/kg",
+   "evidence_class": "model output (study-1 J/op mid)",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "swarm FLOP per J of intercepted sunlight",
+   "year": 2100,
+   "low": 108000000000000.0,
+   "mid": 157000000000000.0,
+   "high": 157000000000000.0,
+   "unit": "FLOP/J",
+   "evidence_class": "model output",
+   "source": "placement.json combined"
+  },
+  {
+   "metric": "film/pod FLOP/s per kg ratio (best-credible pod at its best Tj 85-150 C; lite pod = 1 kg/kW module)",
+   "year": 2026,
+   "low": 3.13,
+   "mid": 4.75,
+   "high": 6.29,
+   "unit": "x",
+   "evidence_class": "model output",
+   "source": "placement.json pods_vs_film"
+  },
+  {
+   "metric": "film/pod FLOP/s per kg ratio (best-credible pod at its best Tj 85-150 C; lite pod = 1 kg/kW module)",
+   "year": 2040,
+   "low": 4.16,
+   "mid": 6.41,
+   "high": 8.04,
+   "unit": "x",
+   "evidence_class": "model output",
+   "source": "placement.json pods_vs_film"
+  },
+  {
+   "metric": "film/pod FLOP/s per kg ratio (best-credible pod at its best Tj 85-150 C; lite pod = 1 kg/kW module)",
+   "year": 2070,
+   "low": 5.21,
+   "mid": 8.09,
+   "high": 8.89,
+   "unit": "x",
+   "evidence_class": "model output",
+   "source": "placement.json pods_vs_film"
+  },
+  {
+   "metric": "film/pod FLOP/s per kg ratio (best-credible pod at its best Tj 85-150 C; lite pod = 1 kg/kW module)",
+   "year": 2100,
+   "low": 5.39,
+   "mid": 8.38,
+   "high": 9.12,
+   "unit": "x",
+   "evidence_class": "model output",
+   "source": "placement.json pods_vs_film"
+  },
+  {
+   "metric": "PV power retained after 10 yr at 0.92 AU (SEP displacement damage + UV; scale damage ~ r^-2)",
+   "year": 2026,
+   "low": 0.85,
+   "mid": 0.92,
+   "high": 0.97,
+   "unit": "fraction",
+   "evidence_class": "speculation anchored on XTJ (0.94 at 1e14, 0.88-0.90 at 5e14 e/cm2) and Si HJT (0.71 at 1e15)",
+   "source": "XTJ Prime datasheet; j.ioffe.ru 56689; memory study SEP spectra"
+  },
+  {
+   "metric": "PV power retained after 10 yr at 0.92 AU (SEP displacement damage + UV; scale damage ~ r^-2)",
+   "year": 2040,
+   "low": 0.87,
+   "mid": 0.93,
+   "high": 0.97,
+   "unit": "fraction",
+   "evidence_class": "speculation anchored on XTJ (0.94 at 1e14, 0.88-0.90 at 5e14 e/cm2) and Si HJT (0.71 at 1e15)",
+   "source": "XTJ Prime datasheet; j.ioffe.ru 56689; memory study SEP spectra"
+  },
+  {
+   "metric": "PV power retained after 10 yr at 0.92 AU (SEP displacement damage + UV; scale damage ~ r^-2)",
+   "year": 2070,
+   "low": 0.88,
+   "mid": 0.94,
+   "high": 0.98,
+   "unit": "fraction",
+   "evidence_class": "speculation anchored on XTJ (0.94 at 1e14, 0.88-0.90 at 5e14 e/cm2) and Si HJT (0.71 at 1e15)",
+   "source": "XTJ Prime datasheet; j.ioffe.ru 56689; memory study SEP spectra"
+  },
+  {
+   "metric": "PV power retained after 10 yr at 0.92 AU (SEP displacement damage + UV; scale damage ~ r^-2)",
+   "year": 2100,
+   "low": 0.88,
+   "mid": 0.94,
+   "high": 0.98,
+   "unit": "fraction",
+   "evidence_class": "speculation anchored on XTJ (0.94 at 1e14, 0.88-0.90 at 5e14 e/cm2) and Si HJT (0.71 at 1e15)",
+   "source": "XTJ Prime datasheet; j.ioffe.ru 56689; memory study SEP spectra"
+  },
+  {
+   "metric": "max T of dense on-chip NVM (MRAM/RRAM; high = AlScN ferro-diode, Sc-limited, no density yet)",
+   "year": 2026,
+   "low": 150,
+   "mid": 150,
+   "high": 600,
+   "unit": "C",
+   "evidence_class": "demonstrated (150 C MRAM; 600 C AlScN) + speculation",
+   "source": "memory study; Penn AlScN 2024"
+  },
+  {
+   "metric": "max T of dense on-chip NVM (MRAM/RRAM; high = AlScN ferro-diode, Sc-limited, no density yet)",
+   "year": 2040,
+   "low": 150,
+   "mid": 175,
+   "high": 600,
+   "unit": "C",
+   "evidence_class": "demonstrated (150 C MRAM; 600 C AlScN) + speculation",
+   "source": "memory study; Penn AlScN 2024"
+  },
+  {
+   "metric": "max T of dense on-chip NVM (MRAM/RRAM; high = AlScN ferro-diode, Sc-limited, no density yet)",
+   "year": 2070,
+   "low": 150,
+   "mid": 200,
+   "high": 600,
+   "unit": "C",
+   "evidence_class": "demonstrated (150 C MRAM; 600 C AlScN) + speculation",
+   "source": "memory study; Penn AlScN 2024"
+  },
+  {
+   "metric": "max T of dense on-chip NVM (MRAM/RRAM; high = AlScN ferro-diode, Sc-limited, no density yet)",
+   "year": 2100,
+   "low": 175,
+   "mid": 225,
+   "high": 600,
+   "unit": "C",
+   "evidence_class": "demonstrated (150 C MRAM; 600 C AlScN) + speculation",
+   "source": "memory study; Penn AlScN 2024"
+  }
+ ],
+ "physical_floors": [
+  {
+   "floor": "Boltzmann subthreshold swing ln10 kT/q (all thermionic FETs: Si, SiC, GaN, Ga2O3, diamond)",
+   "value": {
+    "25C": 59.2,
+    "85C": 71.1,
+    "105C": 75.0,
+    "125C": 79.0,
+    "150C": 84.0,
+    "175C": 88.9,
+    "200C": 93.9,
+    "250C": 103.8,
+    "300C": 113.7,
+    "400C": 133.6,
+    "500C": 153.4,
+    "600C": 173.3
+   },
+   "unit": "mV/decade",
+   "evidence_class": "physics floor",
+   "source": "hot_logic.json"
+  },
+  {
+   "floor": "switching energy at fixed on/off ratio ~ T^2 (relative to 85 C)",
+   "value": {
+    "25C": 0.693,
+    "85C": 1.0,
+    "105C": 1.115,
+    "125C": 1.236,
+    "150C": 1.396,
+    "175C": 1.566,
+    "200C": 1.745,
+    "250C": 2.134,
+    "300C": 2.561,
+    "400C": 3.533,
+    "500C": 4.66,
+    "600C": 5.944
+   },
+   "unit": "x",
+   "evidence_class": "physics floor",
+   "source": "hot_logic.json (0.56 %/K at 358 K = study-1 2100+ slope)"
+  },
+  {
+   "floor": "intrinsic carrier density; T at which a material leaks like Si at 85 C",
+   "value": {
+    "Si": 85,
+    "4H-SiC": 634,
+    "GaN": 659,
+    "beta-Ga2O3": 907,
+    "diamond": 1225
+   },
+   "unit": "C",
+   "evidence_class": "physics floor",
+   "source": "hot_logic.json (ni = sqrt(NcNv) exp(-Eg/2kT)); Si ni ratio vs 85 C: {\"105C\": 3.1, \"125C\": 8.4, \"150C\": 26.2, \"175C\": 72.7, \"200C\": 181.9, \"250C\": 891.1, \"300C\": 3370.9}"
+  },
+  {
+   "floor": "electromigration (Black, n=2): allowed current density at fixed life vs 105 C, Cu Ea 0.9 eV",
+   "value": {
+    "85C": 2.1623,
+    "105C": 1.0,
+    "125C": 0.4997,
+    "150C": 0.2303,
+    "200C": 0.0625,
+    "300C": 0.0091,
+    "500C": 0.0009
+   },
+   "unit": "x",
+   "evidence_class": "physics law (Ea is data)",
+   "source": "hot_logic.json; research_hotsi.json (Ea 0.7-1.2 eV)"
+  },
+  {
+   "floor": "AM0 Shockley-Queisser single-junction limit vs cell temperature (best Eg)",
+   "value": {
+    "250K": [
+     0.3231,
+     1.2
+    ],
+    "301K": [
+     0.302,
+     1.25
+    ],
+    "348K": [
+     0.2832,
+     1.3
+    ],
+    "373K": [
+     0.2735,
+     1.3
+    ],
+    "398K": [
+     0.2639,
+     1.3
+    ],
+    "423K": [
+     0.2546,
+     1.35
+    ],
+    "448K": [
+     0.2455,
+     1.35
+    ],
+    "473K": [
+     0.2365,
+     1.4
+    ],
+    "523K": [
+     0.2194,
+     1.45
+    ],
+    "573K": [
+     0.2032,
+     1.5
+    ],
+    "673K": [
+     0.1727,
+     1.55
+    ],
+    "773K": [
+     0.1453,
+     1.65
+    ],
+    "873K": [
+     0.1208,
+     1.75
+    ]
+   },
+   "unit": "[eta, Eg eV]",
+   "evidence_class": "physics floor",
+   "source": "pv_db.json; Shockley & Queisser 1961 https://doi.org/10.1063/1.1736034 ; ASTM E-490 https://www.nlr.gov/grid/solar-resource/spectra-astm-e490"
+  },
+  {
+   "floor": "AM0 SQ limit for Si (Eg(T)) and for a 2J tandem on Si",
+   "value": {
+    "250K": [
+     0.3216,
+     0.4297,
+     1.8
+    ],
+    "301K": [
+     0.2984,
+     0.4049,
+     1.8
+    ],
+    "348K": [
+     0.2767,
+     0.3849,
+     1.75
+    ],
+    "373K": [
+     0.265,
+     0.3739,
+     1.75
+    ],
+    "398K": [
+     0.2533,
+     0.3624,
+     1.75
+    ],
+    "423K": [
+     0.2415,
+     0.3506,
+     1.75
+    ],
+    "448K": [
+     0.2297,
+     0.3385,
+     1.75
+    ],
+    "473K": [
+     0.2178,
+     0.3263,
+     1.75
+    ],
+    "523K": [
+     0.1938,
+     0.3017,
+     1.75
+    ],
+    "573K": [
+     0.1697,
+     0.2769,
+     1.75
+    ],
+    "673K": [
+     0.1217,
+     0.2278,
+     1.75
+    ],
+    "773K": [
+     0.076,
+     0.1802,
+     1.75
+    ],
+    "873K": [
+     0.0383,
+     0.1383,
+     1.8
+    ]
+   },
+   "unit": "[Si, 2J/Si, top Eg]",
+   "evidence_class": "physics floor",
+   "source": "pv_db.json"
+  },
+  {
+   "floor": "AM0 power below the absorber gap (absorbed as pure heat unless reflected)",
+   "value": {
+    "1.12eV": 0.2545,
+    "1.42eV": 0.3855,
+    "1.70eV": 0.5046,
+    "1.90eV": 0.5858,
+    "2.20eV": 0.6988
+   },
+   "unit": "fraction of 1361 W/m2",
+   "evidence_class": "physics floor",
+   "source": "pv_db.json (E-490)"
+  },
+  {
+   "floor": "film energy balance: T_film^4 = alpha_eff S / (sigma k(f)); independent of PV efficiency because chips dissipate the electricity in the film",
+   "value": [
+    {
+     "eta0": 0.2,
+     "T_film_K": 347.9690068029739
+    },
+    {
+     "eta0": 0.3,
+     "T_film_K": 347.9690068029739
+    },
+    {
+     "eta0": 0.35,
+     "T_film_K": 347.9690068029739
+    }
+   ],
+   "unit": "K",
+   "evidence_class": "physics floor",
+   "source": "model.js sheetTemp; placement.json"
+  },
+  {
+   "floor": "closed-shell (f=1) cavity floor r = sqrt(L/(4 pi eps_b sigma T^4))",
+   "value": {
+    "Tj 85 C": 1.361,
+    "Tj 105 C": 1.218,
+    "Tj 125 C": 1.096,
+    "Tj 200 C": 0.764,
+    "Tj 300 C": 0.521,
+    "Tj 500 C": 0.273
+   },
+   "unit": "AU",
+   "evidence_class": "physics floor",
+   "source": "placement.json"
+  },
+  {
+   "floor": "sunlight ceiling of swarm compute = L_sun x eta_PV(T) x share / E_op(T): both factors worsen with T, so a sunlight-limited swarm always prefers cold",
+   "value": {
+    "ideal hot film Tj 85 C": 6.47e+40,
+    "ideal hot film Tj 125 C": 4.95e+40,
+    "ideal hot film Tj 200 C": 3.14e+40,
+    "ideal hot film Tj 300 C": 1.84e+40,
+    "ideal hot film Tj 500 C": 7.24e+39
+   },
+   "unit": "FLOP/s (2100+ J/op, SQ PV, Boltzmann logic)",
+   "evidence_class": "physics floor + study-1 J/op",
+   "source": "placement.json ideal_hot_film_bound"
+  },
+  {
+   "floor": "Carnot + radiator: heat-engine conversion needs radiator area (1-eta)/eta / (2 eps sigma Tc^4) per W_e (optimum Tc/Th 0.6-0.75)",
+   "value": {
+    "Brayton_DIPS_heritage (7-9 W/kg conversion only)": 125.242,
+    "future_Brayton/Stirling 1 kg/kWe, Th 1150 K, 55 % of Carnot": 1.242,
+    "heroic 0.2 kg/kWe engine, Th 1500 K, 65 % of Carnot": 0.311
+   },
+   "unit": "g/W_e (before chip cooling)",
+   "evidence_class": "physics floor + data",
+   "source": "alt_power.json"
+  },
+  {
+   "floor": "Hertz-Knudsen sublimation of a bare 13 um Mg spreader: 1 % loss in 10 yr at 380 K; Al to 826 K",
+   "value": {
+    "Mg_13um_bare_1pct_in_10yr_K": 380,
+    "Al_13um_bare_1pct_in_10yr_K": 826,
+    "Ca_13um_bare_1pct_in_10yr_K": 460,
+    "note": "Encapsulated under 15 um enamel the vapour is trapped, but every meteoroid perforation and edge exposes bare metal; Mg also creeps above ~150-200 C. Hot films (> ~420-450 K) should use Al or Si as the spreader."
+   },
+   "unit": "K",
+   "evidence_class": "physics (vapour pressure is data, Alcock 1984)",
+   "source": "https://en.wikipedia.org/wiki/Vapor_pressures_of_the_elements ; https://mmrc.caltech.edu/PVD/manuals/Metals%20Vapor%20pressure.pdf"
+  },
+  {
+   "floor": "Si thermal conductivity falls as T^-1.3 (149 W/m/K at 300 K, 77 at 500 K): film spreading gets worse when hot",
+   "value": {
+    "300K": 149,
+    "400K": 101,
+    "500K": 77,
+    "600K": 62
+   },
+   "unit": "W/m/K",
+   "evidence_class": "physics (measured fit)",
+   "source": "https://arxiv.org/pdf/0801.0824"
+  }
+ ],
+ "model_parameters": [
+  {
+   "param": "pvEta0",
+   "unit": "AM0 efficiency at pvT0 = 301 K (Mercury-buildable film)",
+   "y2026": 0.2,
+   "y2040": 0.225,
+   "y2070": 0.24,
+   "y2100plus": 0.25,
+   "notes": "2100+ range 0.24 (c-Si at the Auger limit) - 0.30 (all-Si tandem: Si-nanocrystal/SiO2 top cell, speculative). Perovskite/Si (0.30) and III-V (0.307-0.35) only for pods/seed craft: not Mercury-scale (I, Pb, In, Ge, As).",
+   "evidence_class": "demonstrated (2026) / roadmap / speculation"
+  },
+  {
+   "param": "pvTempCo",
+   "unit": "1/K (linear, valid to ~420 K)",
+   "y2026": -0.0034,
+   "y2040": -0.0029,
+   "y2070": -0.0026,
+   "y2100plus": -0.0026,
+   "notes": "Current model -0.0042 matches a legacy Voc 0.60 V cell (one-diode check: -0.447 %/K). A 30 um IBC film at 20 % AM0 has Voc ~0.685 V -> -0.34 %/K. Above ~420 K use the curve in pv_db.json (c-Si eta reaches 0 near 575-600 K; the linear -0.42 %/K form hits 0 at 539 K).",
+   "evidence_class": "physics + demonstrated"
+  },
+  {
+   "param": "pvModel (new)",
+   "unit": "enum",
+   "y2026": "linear OK (Tj <= 125 C)",
+   "y2040": "one-diode curve",
+   "y2070": "one-diode curve",
+   "y2100plus": "one-diode / tandem curve",
+   "notes": "pv_db.json models[*].eta on T_grid_K 250-900 K: cSi_2026, cSi_2040, cSi_2070, SiQD_Si_2T_25/30, perovskite_Si_2T, IIIV_3J_XTJ, hotPV_1.6/1.9/2.2eV.",
+   "evidence_class": "model"
+  },
+  {
+   "param": "filmAreal",
+   "unit": "kg/m2",
+   "y2026": 0.172,
+   "y2040": 0.155,
+   "y2070": 0.14,
+   "y2100plus": 0.135,
+   "notes": "Si 30 -> 20 um with photonic light trapping (-0.023), Mg 13 -> 10 um as pitch shrinks (-0.005), enamel 15 -> 10 um with a better IR emitter (-0.012); +0.0126 if the spreader must be Al (film > 400 K). Design spec stack is 0.19-0.207; keep the 20 um cover (low-energy protons) or thicken it inside ~0.7 AU.",
+   "evidence_class": "speculation"
+  },
+  {
+   "param": "FIXED.film.alpha",
+   "unit": "",
+   "y2026": 0.9,
+   "y2040": 0.85,
+   "y2070": 0.8,
+   "y2100plus": 0.8,
+   "notes": "25.5 % of AM0 lies below the Si gap and is pure heat. A sub-bandgap-reflecting stack (low-doped Si, back reflector inside the cell, SiO2/TiO2 multilayer - Mercury-native) lowers alpha; at fixed film T the sail moves in by sqrt(alpha) and gains 1/alpha in W/m2 at no logic cost. Worth more than hot logic.",
+   "evidence_class": "physics + demonstrated (IRR coverglass, photonic cooling)"
+  },
+  {
+   "param": "FIXED.film.epsFront / epsBack",
+   "unit": "",
+   "y2026": "0.85 / 0.90",
+   "y2040": "0.85 / 0.92",
+   "y2070": "0.86 / 0.93",
+   "y2100plus": "0.86 / 0.93",
+   "notes": "Hot films (> ~500 K) emit at 4-6 um where thin silica is semi-transparent: expect eps to fall unless the emitter is redesigned (not modelled).",
+   "evidence_class": "speculation"
+  },
+  {
+   "param": "FIXED.film.packing",
+   "unit": "",
+   "y2026": 0.9,
+   "y2040": 0.92,
+   "y2070": 0.93,
+   "y2100plus": 0.93,
+   "notes": "Cell area / film area (chiplets, hinges).",
+   "evidence_class": "speculation"
+  },
+  {
+   "param": "tjFilmC",
+   "unit": "C",
+   "y2026": 85,
+   "y2040": 85,
+   "y2070": 95,
+   "y2100plus": 105,
+   "notes": "FLOP/s/kg optimum (f <= 0.1): 85 C (2026, 2040), 110-125 C (2070), 120-135 C (2100+) but within 2-6 % of 85 C; FLOP per J of sunlight falls 17 %/31 % at 105/125 C. Sunlight-limited (f -> 1) swarms want 60-85 C. Only an Earth-interior swarm needs >= 116-141 C.",
+   "evidence_class": "model output"
+  },
+  {
+   "param": "E_REL extension (energyPenalty above 200 C)",
+   "unit": "x vs 85 C",
+   "y2026": "200 C 4.09, 225 C ~640 (legacy SOI), 300 C ~8e5 (SiC)",
+   "y2040": "200 C 5.8, 250 C 8.3, 300 C 2.6e3, 500 C 4.7e3",
+   "y2070": "200 C 2.0, 250 C 4.1, 300 C 77, 500 C 140",
+   "y2100plus": "200 C 1.9, 250 C 3.1, 300 C 4.3, 500 C 23",
+   "notes": "hot_logic.json energy_penalty_curves (low/mid/high). Branches: hot Si -> thin-body SOI -> SiC/GaN CMOS = maturity gap x (T/358)^2.",
+   "evidence_class": "physics floor x speculation"
+  },
+  {
+   "param": "filmSpreadDT",
+   "unit": "K",
+   "y2026": 10,
+   "y2040": 9.8,
+   "y2070": 9.5,
+   "y2100plus": 9.0,
+   "notes": "Radial-fin model (k_Si ~ T^-1.3, Mg 156 W/m/K, 1 mm die radius, +1 K die) reproduces 10.3 K at 25.4 mm; denser pitch lowers it.",
+   "evidence_class": "model"
+  },
+  {
+   "param": "chipPower / pitch",
+   "unit": "W / mm",
+   "y2026": "0.15 / 26.79",
+   "y2040": "0.15 / 23.3",
+   "y2070": "0.15 / 21.54",
+   "y2100plus": "0.15 / 19.13 (16.6 at Tj 125)",
+   "notes": "Keep 0.15 W chiplets and shrink the pitch as W/m2 rises; holding 25.4 mm would push chips to 0.25-0.35 W and the spreader penalty grows ~P. Film area per W falls from 4785 to 1840-2440 mm2/W: adiabatic logic at 611-2050 mm2/W (study 1) no longer fits at Tj 125 C.",
+   "evidence_class": "model output"
+  },
+  {
+   "param": "spreaderMaterial (new)",
+   "unit": "enum",
+   "y2026": "Mg (film <= 400 K)",
+   "y2040": "Mg",
+   "y2070": "Mg",
+   "y2100plus": "Mg; Al or thick Si if film > 400 K",
+   "notes": "Bare Mg loses 1 % of 13 um in 10 yr at 380 K, all of it in 9.5 yr at 423 K and in 6 weeks at 473 K (Hertz-Knudsen, Alcock 1984); Mg alloys also creep above ~150 C. Al survives to 826 K.",
+   "evidence_class": "physics"
+  },
+  {
+   "param": "pvDegradation10yr (new)",
+   "unit": "fraction retained at 0.92 AU; damage ~ r^-2",
+   "y2026": 0.92,
+   "y2040": 0.93,
+   "y2070": 0.94,
+   "y2100plus": 0.94,
+   "notes": "Lifetime-average factor exp(-0.5 D0 (0.92/r)^2), D0 0.08 c-Si, 0.06 III-V/wide-gap, halved above 450 K (annealing, speculative). The 20 um cover stops only protons < ~1.3 MeV: 1.5-3 MeV SEP protons stop inside the 30 um cell.",
+   "evidence_class": "speculation anchored on data"
+  },
+  {
+   "param": "meteoroidAttrition (new)",
+   "unit": "per yr",
+   "y2026": "0.0013 x (r/0.92)^-2.3",
+   "y2040": "same",
+   "y2070": "same",
+   "y2100plus": "same",
+   "notes": "Flux ~ r^-1.8 (architecture.md) x crater growth with speed ~ r^-0.5; range 0.0002-0.012 at 0.92 AU. Overbuild = 0.087 + 10 yr x attrition (0.10 at 0.92 AU, 0.12 at 0.69 AU, 0.33 at 0.35 AU).",
+   "evidence_class": "scaling assumption"
+  },
+  {
+   "param": "podRadC",
+   "unit": "C",
+   "y2026": 80,
+   "y2040": 80,
+   "y2070": 100,
+   "y2100plus": 125,
+   "notes": "Hot pods (Tj 150 C, Na loops) cut radiators from 1.45 to 0.71 g/W but J/op x1.4-1.8: pod FLOP/s/kg flat 85-150 C. Raise only if pods become memory-light (studies 2-3).",
+   "evidence_class": "model output"
+  },
+  {
+   "param": "wingAreal / podKgPerKW",
+   "unit": "kg/m2 / kg/kW",
+   "y2026": "0.15 / 2.1",
+   "y2040": "0.135 / 1.5",
+   "y2070": "0.125 / 1.2",
+   "y2100plus": "0.12 / 1.0",
+   "notes": "Pods keep fixed mass that PV does not shrink, so each 1 % of power in pods adds ~3.4 % (2026) -> ~7 % (2100+) to swarm mass.",
+   "evidence_class": "speculation"
+  },
+  {
+   "param": "film FLOP/s per kg / swarm FLOP per J_sun (outputs, f=0.01)",
+   "unit": "FLOP/s/kg ; FLOP/J",
+   "y2026": "1.39e+16 ; 1650000000000.0",
+   "y2040": "1.54e+17 ; 15600000000000.0",
+   "y2070": "7.85e+17 ; 67600000000000.0",
+   "y2100plus": "1.88e+18 ; 157000000000000.0",
+   "notes": "placement.json combined (study-1 J/op mid, x0.6 clock).",
+   "evidence_class": "model output"
+  }
+ ],
+ "placement_vs_Tj": [
+  {
+   "Tj_C": 85,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.9202,
+   "T_film_K": 347.9,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1514,
+   "S_W_m2": 1607,
+   "chip_W_m2": 219,
+   "pitch_mm_at_0.15W": 26.17,
+   "chip_rise_K": 10.22,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.1,
+   "g_per_W": 0.8841,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 1.45e+16,
+   "flops_per_kg_2100plus": 8.13e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 1750000000000.0,
+   "flops_per_Jsun_2100plus": 97900000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.8237,
+   "T_film_K": 367.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1377,
+   "S_W_m2": 2006,
+   "chip_W_m2": 248.6,
+   "pitch_mm_at_0.15W": 24.56,
+   "chip_rise_K": 10.39,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.104,
+   "g_per_W": 0.7837,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 1.36e+16,
+   "flops_per_kg_2100plus": 8.2e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.94,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.009,
+   "flops_per_Jsun_2026": 1320000000000.0,
+   "flops_per_Jsun_2100plus": 79600000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.813,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.7416,
+   "T_film_K": 387.6,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1239,
+   "S_W_m2": 2475,
+   "chip_W_m2": 276,
+   "pitch_mm_at_0.15W": 23.31,
+   "chip_rise_K": 10.57,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.108,
+   "g_per_W": 0.7106,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 1.26e+16,
+   "flops_per_kg_2100plus": 8.08e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.87,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.994,
+   "flops_per_Jsun_2026": 1000000000000.0,
+   "flops_per_Jsun_2100plus": 64000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.654,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.518,
+   "T_film_K": 463.7,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0754,
+   "S_W_m2": 5072,
+   "chip_W_m2": 344,
+   "pitch_mm_at_0.15W": 20.88,
+   "chip_rise_K": 9.43,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.136,
+   "g_per_W": 0.6294,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 4980000000000000.0,
+   "flops_per_kg_2100plus": 5.99e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.343,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.738,
+   "flops_per_Jsun_2026": 213000000000.0,
+   "flops_per_Jsun_2100plus": 25600000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.261,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.3533,
+   "T_film_K": 561.5,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0199,
+   "S_W_m2": 10902,
+   "chip_W_m2": 195,
+   "pitch_mm_at_0.15W": 27.74,
+   "chip_rise_K": 11.67,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.204,
+   "g_per_W": 1.1602,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 14400000000.0,
+   "flops_per_kg_2100plus": 1.43e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.176,
+   "flops_per_Jsun_2026": 298000.0,
+   "flops_per_Jsun_2100plus": 2970000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.03,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.1864,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 39195,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.599,
+   "g_per_W": null,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 1.361,
+   "T_film_K": 346.4,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1556,
+   "S_W_m2": 735,
+   "chip_W_m2": 102.9,
+   "pitch_mm_at_0.15W": 38.17,
+   "chip_rise_K": 11.74,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.092,
+   "g_per_W": 1.8452,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 6950000000000000.0,
+   "flops_per_kg_2100plus": 3.89e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 1800000000000.0,
+   "flops_per_Jsun_2100plus": 101000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 1.218,
+   "T_film_K": 366.2,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1424,
+   "S_W_m2": 918,
+   "chip_W_m2": 117.6,
+   "pitch_mm_at_0.15W": 35.71,
+   "chip_rise_K": 11.97,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.094,
+   "g_per_W": 1.6194,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 6600000000000000.0,
+   "flops_per_kg_2100plus": 3.97e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.95,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.019,
+   "flops_per_Jsun_2026": 1370000000000.0,
+   "flops_per_Jsun_2100plus": 82300000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.818,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 1.0964,
+   "T_film_K": 386,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1292,
+   "S_W_m2": 1132,
+   "chip_W_m2": 131.6,
+   "pitch_mm_at_0.15W": 33.76,
+   "chip_rise_K": 12.2,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.096,
+   "g_per_W": 1.4518,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 6180000000000000.0,
+   "flops_per_kg_2100plus": 3.96e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.889,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.016,
+   "flops_per_Jsun_2026": 1040000000000.0,
+   "flops_per_Jsun_2100plus": 66700000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.663,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.7644,
+   "T_film_K": 462.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0789,
+   "S_W_m2": 2329,
+   "chip_W_m2": 165.4,
+   "pitch_mm_at_0.15W": 30.11,
+   "chip_rise_K": 10.93,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.107,
+   "g_per_W": 1.2552,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 2500000000000000.0,
+   "flops_per_kg_2100plus": 3.01e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.359,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.772,
+   "flops_per_Jsun_2026": 223000000000.0,
+   "flops_per_Jsun_2100plus": 26800000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.266,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.5209,
+   "T_film_K": 559.9,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0221,
+   "S_W_m2": 5017,
+   "chip_W_m2": 99.7,
+   "pitch_mm_at_0.15W": 38.79,
+   "chip_rise_K": 13.21,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.135,
+   "g_per_W": 2.122,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 7860000000.0,
+   "flops_per_kg_2100plus": 7.82e+16,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.201,
+   "flops_per_Jsun_2026": 332000.0,
+   "flops_per_Jsun_2100plus": 3300000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.033,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2026 (20 % AM0, one-diode, -0.34 %/K) - Mercury-buildable",
+   "r_AU": 0.2732,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 18235,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.299,
+   "g_per_W": null,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.9179,
+   "T_film_K": 348.4,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1879,
+   "S_W_m2": 1616,
+   "chip_W_m2": 273.1,
+   "pitch_mm_at_0.15W": 23.43,
+   "chip_rise_K": 9.78,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.1,
+   "g_per_W": 0.7127,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 1.8e+16,
+   "flops_per_kg_2100plus": 1.01e+18,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 2170000000000.0,
+   "flops_per_Jsun_2100plus": 121000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.8214,
+   "T_film_K": 368.3,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1746,
+   "S_W_m2": 2018,
+   "chip_W_m2": 317,
+   "pitch_mm_at_0.15W": 21.75,
+   "chip_rise_K": 9.88,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.104,
+   "g_per_W": 0.6189,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 1.73e+16,
+   "flops_per_kg_2100plus": 1.04e+18,
+   "rel_flops_per_kg_vs_85C_2026": 0.96,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.03,
+   "flops_per_Jsun_2026": 1680000000000.0,
+   "flops_per_Jsun_2100plus": 101000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.831,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.7393,
+   "T_film_K": 388.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1612,
+   "S_W_m2": 2490,
+   "chip_W_m2": 361.2,
+   "pitch_mm_at_0.15W": 20.38,
+   "chip_rise_K": 9.99,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.108,
+   "g_per_W": 0.5479,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 1.64e+16,
+   "flops_per_kg_2100plus": 1.05e+18,
+   "rel_flops_per_kg_vs_85C_2026": 0.91,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.04,
+   "flops_per_Jsun_2026": 1300000000000.0,
+   "flops_per_Jsun_2100plus": 83300000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.686,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.5161,
+   "T_film_K": 464.6,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.114,
+   "S_W_m2": 5110,
+   "chip_W_m2": 524.4,
+   "pitch_mm_at_0.15W": 16.91,
+   "chip_rise_K": 8.57,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.136,
+   "g_per_W": 0.42,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 7460000000000000.0,
+   "flops_per_kg_2100plus": 8.98e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.415,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.891,
+   "flops_per_Jsun_2026": 322000000000.0,
+   "flops_per_Jsun_2100plus": 38700000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.319,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.3505,
+   "T_film_K": 563.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0534,
+   "S_W_m2": 11081,
+   "chip_W_m2": 532.9,
+   "pitch_mm_at_0.15W": 16.78,
+   "chip_rise_K": 9.38,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.207,
+   "g_per_W": 0.438,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 38100000000.0,
+   "flops_per_kg_2100plus": 3.79e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.376,
+   "flops_per_Jsun_2026": 802000.0,
+   "flops_per_Jsun_2100plus": 7980000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.066,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 0.01,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.1864,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 39195,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.599,
+   "g_per_W": null,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 1.3575,
+   "T_film_K": 346.9,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1929,
+   "S_W_m2": 739,
+   "chip_W_m2": 128.2,
+   "pitch_mm_at_0.15W": 34.2,
+   "chip_rise_K": 11.3,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.092,
+   "g_per_W": 1.4852,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 8630000000000000.0,
+   "flops_per_kg_2100plus": 4.84e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 2230000000000.0,
+   "flops_per_Jsun_2100plus": 125000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 1.2146,
+   "T_film_K": 366.7,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1803,
+   "S_W_m2": 923,
+   "chip_W_m2": 149.8,
+   "pitch_mm_at_0.15W": 31.65,
+   "chip_rise_K": 11.46,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.094,
+   "g_per_W": 1.2763,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 8370000000000000.0,
+   "flops_per_kg_2100plus": 5.03e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.97,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.04,
+   "flops_per_Jsun_2026": 1730000000000.0,
+   "flops_per_Jsun_2100plus": 104000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.836,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 1.0931,
+   "T_film_K": 386.5,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1676,
+   "S_W_m2": 1139,
+   "chip_W_m2": 171.9,
+   "pitch_mm_at_0.15W": 29.54,
+   "chip_rise_K": 11.61,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.096,
+   "g_per_W": 1.1165,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 8030000000000000.0,
+   "flops_per_kg_2100plus": 5.14e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.93,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.063,
+   "flops_per_Jsun_2026": 1350000000000.0,
+   "flops_per_Jsun_2100plus": 86600000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.695,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.7616,
+   "T_film_K": 463.1,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1189,
+   "S_W_m2": 2347,
+   "chip_W_m2": 251.1,
+   "pitch_mm_at_0.15W": 24.44,
+   "chip_rise_K": 10.07,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.107,
+   "g_per_W": 0.8338,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 3760000000000000.0,
+   "flops_per_kg_2100plus": 4.53e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.436,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.936,
+   "flops_per_Jsun_2026": 335000000000.0,
+   "flops_per_Jsun_2100plus": 40400000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.324,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.5167,
+   "T_film_K": 562.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0584,
+   "S_W_m2": 5099,
+   "chip_W_m2": 268,
+   "pitch_mm_at_0.15W": 23.66,
+   "chip_rise_K": 10.94,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.136,
+   "g_per_W": 0.8023,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 20800000000.0,
+   "flops_per_kg_2100plus": 2.07e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.428,
+   "flops_per_Jsun_2026": 877000.0,
+   "flops_per_Jsun_2100plus": 8730000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.07,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 1.0,
+   "pv": "c-Si 2070+ (24 % AM0, -0.26 %/K) - Mercury-buildable",
+   "r_AU": 0.2732,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 18235,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.299,
+   "g_per_W": null,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 0.01,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.9207,
+   "T_film_K": 347.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1446,
+   "S_W_m2": 1606,
+   "chip_W_m2": 209,
+   "pitch_mm_at_0.15W": 26.79,
+   "chip_rise_K": 10.32,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.1,
+   "g_per_W": 0.9254,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 1.39e+16,
+   "flops_per_kg_2100plus": 7.76e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 1670000000000.0,
+   "flops_per_Jsun_2100plus": 93500000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 0.01,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.8243,
+   "T_film_K": 367.6,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1284,
+   "S_W_m2": 2003,
+   "chip_W_m2": 231.4,
+   "pitch_mm_at_0.15W": 25.46,
+   "chip_rise_K": 10.54,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.104,
+   "g_per_W": 0.8403,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 1.27e+16,
+   "flops_per_kg_2100plus": 7.64e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.918,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.985,
+   "flops_per_Jsun_2026": 1230000000000.0,
+   "flops_per_Jsun_2100plus": 74200000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.794,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 0.01,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.7424,
+   "T_film_K": 387.4,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1123,
+   "S_W_m2": 2470,
+   "chip_W_m2": 249.6,
+   "pitch_mm_at_0.15W": 24.52,
+   "chip_rise_K": 10.8,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.108,
+   "g_per_W": 0.7839,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 1.14e+16,
+   "flops_per_kg_2100plus": 7.33e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.826,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.944,
+   "flops_per_Jsun_2026": 906000000000.0,
+   "flops_per_Jsun_2100plus": 58000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.621,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 0.01,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.5195,
+   "T_film_K": 463.1,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0551,
+   "S_W_m2": 5044,
+   "chip_W_m2": 250,
+   "pitch_mm_at_0.15W": 24.5,
+   "chip_rise_K": 10.08,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.135,
+   "g_per_W": 0.8584,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 3650000000000000.0,
+   "flops_per_kg_2100plus": 4.4e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.264,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.566,
+   "flops_per_Jsun_2026": 155000000000.0,
+   "flops_per_Jsun_2100plus": 18700000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.2,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 0.01,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.3391,
+   "T_film_K": 573.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 11837,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.216,
+   "g_per_W": null,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 0.01,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.1864,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 39195,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.599,
+   "g_per_W": null,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 1.0,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 1.3617,
+   "T_film_K": 346.3,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1489,
+   "S_W_m2": 734,
+   "chip_W_m2": 98.4,
+   "pitch_mm_at_0.15W": 39.04,
+   "chip_rise_K": 11.83,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.092,
+   "g_per_W": 1.9291,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 6650000000000000.0,
+   "flops_per_kg_2100plus": 3.72e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 1720000000000.0,
+   "flops_per_Jsun_2100plus": 96300000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 1.0,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 1.2189,
+   "T_film_K": 366,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1331,
+   "S_W_m2": 916,
+   "chip_W_m2": 109.7,
+   "pitch_mm_at_0.15W": 36.97,
+   "chip_rise_K": 12.11,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.094,
+   "g_per_W": 1.7343,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.118,
+   "flops_per_kg_2026": 6160000000000000.0,
+   "flops_per_kg_2100plus": 3.7e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.927,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.995,
+   "flops_per_Jsun_2026": 1280000000000.0,
+   "flops_per_Jsun_2100plus": 76900000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.799,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 1.0,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 1.0976,
+   "T_film_K": 385.7,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1173,
+   "S_W_m2": 1130,
+   "chip_W_m2": 119.3,
+   "pitch_mm_at_0.15W": 35.46,
+   "chip_rise_K": 12.42,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.096,
+   "g_per_W": 1.5996,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 5600000000000000.0,
+   "flops_per_kg_2100plus": 3.59e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.843,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.964,
+   "flops_per_Jsun_2026": 947000000000.0,
+   "flops_per_Jsun_2100plus": 60600000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.63,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 1.0,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.7666,
+   "T_film_K": 461.6,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0581,
+   "S_W_m2": 2316,
+   "chip_W_m2": 121.1,
+   "pitch_mm_at_0.15W": 35.19,
+   "chip_rise_K": 11.58,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.107,
+   "g_per_W": 1.707,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 1840000000000000.0,
+   "flops_per_kg_2100plus": 2.21e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.276,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.594,
+   "flops_per_Jsun_2026": 164000000000.0,
+   "flops_per_Jsun_2100plus": 19700000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.205,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 1.0,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.4972,
+   "T_film_K": 573.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 5507,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.141,
+   "g_per_W": null,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 1.0,
+   "pv": "project linear model (20 %, -0.42 %/K)",
+   "r_AU": 0.2732,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0,
+   "S_W_m2": 18235,
+   "chip_W_m2": 0,
+   "pitch_mm_at_0.15W": null,
+   "chip_rise_K": 0,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.299,
+   "g_per_W": null,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 0,
+   "flops_per_kg_2100plus": 0,
+   "rel_flops_per_kg_vs_85C_2026": 0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0,
+   "flops_per_Jsun_2026": 0,
+   "flops_per_Jsun_2100plus": 0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 0.01,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.9209,
+   "T_film_K": 347.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1423,
+   "S_W_m2": 1605,
+   "chip_W_m2": 205.6,
+   "pitch_mm_at_0.15W": 27.01,
+   "chip_rise_K": 10.35,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.1,
+   "g_per_W": 0.9403,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 1.36e+16,
+   "flops_per_kg_2100plus": 7.64e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 1640000000000.0,
+   "flops_per_Jsun_2100plus": 92000000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 0.01,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.8237,
+   "T_film_K": 367.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1373,
+   "S_W_m2": 2006,
+   "chip_W_m2": 247.8,
+   "pitch_mm_at_0.15W": 24.6,
+   "chip_rise_K": 10.4,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.104,
+   "g_per_W": 0.786,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 1.36e+16,
+   "flops_per_kg_2100plus": 8.17e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.997,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.07,
+   "flops_per_Jsun_2026": 1320000000000.0,
+   "flops_per_Jsun_2100plus": 79300000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.862,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 0.01,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.741,
+   "T_film_K": 387.7,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.132,
+   "S_W_m2": 2479,
+   "chip_W_m2": 294.5,
+   "pitch_mm_at_0.15W": 22.57,
+   "chip_rise_K": 10.43,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.108,
+   "g_per_W": 0.6673,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 1.34e+16,
+   "flops_per_kg_2100plus": 8.6e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.985,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.126,
+   "flops_per_Jsun_2026": 1070000000000.0,
+   "flops_per_Jsun_2100plus": 68200000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.741,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 0.01,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.5161,
+   "T_film_K": 464.6,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1137,
+   "S_W_m2": 5110,
+   "chip_W_m2": 523.1,
+   "pitch_mm_at_0.15W": 16.93,
+   "chip_rise_K": 8.58,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.136,
+   "g_per_W": 0.421,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 7450000000000000.0,
+   "flops_per_kg_2100plus": 8.96e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.546,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.173,
+   "flops_per_Jsun_2026": 321000000000.0,
+   "flops_per_Jsun_2100plus": 38600000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.42,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 0.01,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.3491,
+   "T_film_K": 564.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0859,
+   "S_W_m2": 11166,
+   "chip_W_m2": 863.5,
+   "pitch_mm_at_0.15W": 13.18,
+   "chip_rise_K": 8.3,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.208,
+   "g_per_W": 0.2782,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 60000000000.0,
+   "flops_per_kg_2100plus": 5.97e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.781,
+   "flops_per_Jsun_2026": 1290000.0,
+   "flops_per_Jsun_2100plus": 12800000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.139,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 0.01,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.1907,
+   "T_film_K": 764.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0307,
+   "S_W_m2": 37420,
+   "chip_W_m2": 1033.4,
+   "pitch_mm_at_0.15W": 12.05,
+   "chip_rise_K": 8.9,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.572,
+   "g_per_W": 0.3008,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 30500000000.0,
+   "flops_per_kg_2100plus": 1.02e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.134,
+   "flops_per_Jsun_2026": 253000.0,
+   "flops_per_Jsun_2100plus": 851000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.009,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 1.0,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 1.3621,
+   "T_film_K": 346.3,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.145,
+   "S_W_m2": 734,
+   "chip_W_m2": 95.7,
+   "pitch_mm_at_0.15W": 39.59,
+   "chip_rise_K": 11.89,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.092,
+   "g_per_W": 1.9828,
+   "E_rel_2026_logic": 1,
+   "E_rel_2100plus_logic": 1,
+   "flops_per_kg_2026": 6470000000000000.0,
+   "flops_per_kg_2100plus": 3.62e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.0,
+   "flops_per_Jsun_2026": 1670000000000.0,
+   "flops_per_Jsun_2100plus": 93700000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 1.0,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 1.0,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 1.2182,
+   "T_film_K": 366.2,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1404,
+   "S_W_m2": 917,
+   "chip_W_m2": 115.9,
+   "pitch_mm_at_0.15W": 35.97,
+   "chip_rise_K": 12,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.094,
+   "g_per_W": 1.6431,
+   "E_rel_2026_logic": 1.2,
+   "E_rel_2100plus_logic": 1.119,
+   "flops_per_kg_2026": 6500000000000000.0,
+   "flops_per_kg_2100plus": 3.91e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.006,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.079,
+   "flops_per_Jsun_2026": 1350000000000.0,
+   "flops_per_Jsun_2100plus": 81200000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.866,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 1.0,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 1.0958,
+   "T_film_K": 386.1,
+   "inside_earth_orbit": false,
+   "eta_eff_incl_packing": 0.1357,
+   "S_W_m2": 1134,
+   "chip_W_m2": 138.5,
+   "pitch_mm_at_0.15W": 32.91,
+   "chip_rise_K": 12.09,
+   "spreader": "Mg",
+   "overbuild_meteoroids": 0.096,
+   "g_per_W": 1.381,
+   "E_rel_2026_logic": 1.43,
+   "E_rel_2100plus_logic": 1.251,
+   "flops_per_kg_2026": 6490000000000000.0,
+   "flops_per_kg_2100plus": 4.16e+17,
+   "rel_flops_per_kg_vs_85C_2026": 1.004,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.148,
+   "flops_per_Jsun_2026": 1100000000000.0,
+   "flops_per_Jsun_2100plus": 70100000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.748,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 1.0,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.7617,
+   "T_film_K": 463,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.1171,
+   "S_W_m2": 2346,
+   "chip_W_m2": 247.1,
+   "pitch_mm_at_0.15W": 24.64,
+   "chip_rise_K": 10.11,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.107,
+   "g_per_W": 0.8469,
+   "E_rel_2026_logic": 4.09,
+   "E_rel_2100plus_logic": 1.904,
+   "flops_per_kg_2026": 3700000000000000.0,
+   "flops_per_kg_2100plus": 4.45e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.572,
+   "rel_flops_per_kg_vs_85C_2100plus": 1.23,
+   "flops_per_Jsun_2026": 330000000000.0,
+   "flops_per_Jsun_2100plus": 39700000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.424,
+   "logic_tech": "hot-designed Si (FinFET/GAA/FD-SOI)"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 1.0,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.5148,
+   "T_film_K": 563.2,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0913,
+   "S_W_m2": 5136,
+   "chip_W_m2": 421.9,
+   "pitch_mm_at_0.15W": 18.86,
+   "chip_rise_K": 9.91,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.136,
+   "g_per_W": 0.5172,
+   "E_rel_2026_logic": 768294.877,
+   "E_rel_2100plus_logic": 4.328,
+   "flops_per_kg_2026": 32300000000.0,
+   "flops_per_kg_2100plus": 3.21e+17,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.886,
+   "flops_per_Jsun_2026": 1370000.0,
+   "flops_per_Jsun_2100plus": 13600000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.145,
+   "logic_tech": "Si SOI (thin body)"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 1.0,
+   "pv": "1.9 eV hot-PV cell (GaInP-class; NOT Mercury-buildable; speculative ERE 1e-3)",
+   "r_AU": 0.2807,
+   "T_film_K": 762.8,
+   "inside_earth_orbit": true,
+   "eta_eff_incl_packing": 0.0374,
+   "S_W_m2": 17276,
+   "chip_W_m2": 580.8,
+   "pitch_mm_at_0.15W": 16.07,
+   "chip_rise_K": 10.37,
+   "spreader": "Al",
+   "overbuild_meteoroids": 0.286,
+   "g_per_W": 0.4289,
+   "E_rel_2026_logic": 1398037.64,
+   "E_rel_2100plus_logic": 23.301,
+   "flops_per_kg_2026": 21400000000.0,
+   "flops_per_kg_2100plus": 7.19e+16,
+   "rel_flops_per_kg_vs_85C_2026": 0.0,
+   "rel_flops_per_kg_vs_85C_2100plus": 0.198,
+   "flops_per_Jsun_2026": 308000.0,
+   "flops_per_Jsun_2100plus": 1040000000000.0,
+   "rel_flops_per_Jsun_vs_85C_2100plus": 0.011,
+   "logic_tech": "wide-bandgap CMOS (SiC/GaN)"
+  },
+  {
+   "Tj_C": 85,
+   "coverage_f": 1.0,
+   "pv": "closed-shell cavity floor (any PV; eps_b 0.90)",
+   "r_AU": 1.361,
+   "T_film_K": 346.4,
+   "inside_earth_orbit": false,
+   "note": "r = sqrt(L / (4 pi eps_b sigma T^4)); physics floor"
+  },
+  {
+   "Tj_C": 105,
+   "coverage_f": 1.0,
+   "pv": "closed-shell cavity floor (any PV; eps_b 0.90)",
+   "r_AU": 1.218,
+   "T_film_K": 366.2,
+   "inside_earth_orbit": false,
+   "note": "r = sqrt(L / (4 pi eps_b sigma T^4)); physics floor"
+  },
+  {
+   "Tj_C": 125,
+   "coverage_f": 1.0,
+   "pv": "closed-shell cavity floor (any PV; eps_b 0.90)",
+   "r_AU": 1.096,
+   "T_film_K": 386,
+   "inside_earth_orbit": false,
+   "note": "r = sqrt(L / (4 pi eps_b sigma T^4)); physics floor"
+  },
+  {
+   "Tj_C": 200,
+   "coverage_f": 1.0,
+   "pv": "closed-shell cavity floor (any PV; eps_b 0.90)",
+   "r_AU": 0.764,
+   "T_film_K": 462.2,
+   "inside_earth_orbit": true,
+   "note": "r = sqrt(L / (4 pi eps_b sigma T^4)); physics floor"
+  },
+  {
+   "Tj_C": 300,
+   "coverage_f": 1.0,
+   "pv": "closed-shell cavity floor (any PV; eps_b 0.90)",
+   "r_AU": 0.521,
+   "T_film_K": 559.9,
+   "inside_earth_orbit": true,
+   "note": "r = sqrt(L / (4 pi eps_b sigma T^4)); physics floor"
+  },
+  {
+   "Tj_C": 500,
+   "coverage_f": 1.0,
+   "pv": "closed-shell cavity floor (any PV; eps_b 0.90)",
+   "r_AU": 0.273,
+   "T_film_K": 773.2,
+   "inside_earth_orbit": true,
+   "note": "r = sqrt(L / (4 pi eps_b sigma T^4)); physics floor"
+  }
+ ],
+ "obsolete_by_era": [
+  {
+   "param": "pvTempCo -0.42 %/K applied to the thin IBC film",
+   "obsolete_by": "now (2026)",
+   "replacement": "-0.34 %/K (2026) -> -0.26 %/K (2070+); a T-curve above ~420 K",
+   "why": "Voc-dependent physics; -0.42 %/K is a Voc 0.60 V legacy cell. The linear form also goes negative at 539 K."
+  },
+  {
+   "param": "pvEta0 = 0.20 AM0",
+   "obsolete_by": "2035-2045",
+   "replacement": "0.225 (2040), 0.24 (2070), 0.25-0.30 (2100+, only with an all-Si tandem)",
+   "why": "HIBC c-Si is at 28.29 % AM1.5 (96 % of its limit) in 2026; thin-cell light trapping closes the rest."
+  },
+  {
+   "param": "alpha = 0.90 black film",
+   "obsolete_by": "2040",
+   "replacement": "0.85 (2040) -> 0.80 (2070+)",
+   "why": "25.5 % of AM0 is below the Si gap; reflecting it is free cooling."
+  },
+  {
+   "param": "energyPenalty table capped at x4.09 for all T >= 200 C",
+   "obsolete_by": "now, for any hot scenario",
+   "replacement": "era table: hot Si -> SOI -> SiC/GaN (hot_logic.json)",
+   "why": "Above 200-300 C Si is intrinsic (ni x900-3400); WBG logic carries a 5-1e5 x maturity gap times (T/358)^2."
+  },
+  {
+   "param": "III-V or perovskite PV for the swarm",
+   "obsolete_by": "never valid at swarm scale",
+   "replacement": "thin c-Si / all-Si tandem; III-V only for pods, seeds, relays",
+   "why": "I-limited perovskite f <= 1e-5; In/Ge-limited III-V f <= 3e-6 (3e-3 at 1000x concentration)."
+  },
+  {
+   "param": "Mg spreader for any film above ~400 K",
+   "obsolete_by": "whenever Tj > ~135 C",
+   "replacement": "Al (+0.0126 kg/m2) or thick Si",
+   "why": "Mg sublimation and creep."
+  },
+  {
+   "param": "0.15 W chiplets at a fixed 25.4 mm pitch",
+   "obsolete_by": "2040",
+   "replacement": "0.15 W at 23.3 mm (2040) -> 19.13 mm (2100+)",
+   "why": "Chip W/m2 rises with eta and with closer orbits; pitch must shrink to keep the chiplet rise ~10 K."
+  }
+ ],
+ "architecture_implications": [
+  {
+   "question": "How hot can dense compute run (Part 1)?",
+   "answer": "Dense, efficient logic stays at Tj 85-125 C in every era. Si is qualified to 150-175 C and SOI to 225 C (300 C excursions), but intrinsic leakage (ni x180 at 200 C, x3400 at 300 C vs 85 C) and electromigration (1/16 of the current at 200 C) stop leading-edge density there. SiC/GaN/Ga2O3/diamond and vacuum/NEMS devices run at 300-800 C, but today at 1e4-1e7 x the energy per op and 1e-5-1e-7 of the density; even at maturity the Boltzmann floor adds x2.6 at 300 C and x4.7 at 500 C. Dense NVM stops near 150 C; AlScN ferro-diodes (600 C) are the only hot-memory candidate and need Sc.",
+   "numbers": "E_rel(2100+): 1.12 @105, 1.25 @125, 1.9 @200, 4.3 @300 (thin-body SOI), 23 @500 C (WBG, gap 5x). 2026: 4.09 @200, ~640 @225 (legacy SOI), ~8e5 @300 C (SiC CMOS).",
+   "evidence_class": "physics floor + demonstrated + speculation"
+  },
+  {
+   "question": "What would hot compute do to the swarm (Part 2)?",
+   "answer": "It lets sails sit closer (Tj 85/105/125/200/300/500 C -> 0.92/0.82/0.74/0.52/0.35/0.19 AU at f=0.01) and moves the full-shell cavity floor from 1.36 to 1.10 (125 C), 0.76 (200 C), 0.52 (300 C) AU. But c-Si loses efficiency, the Mg spreader fails above ~400 K, meteoroid overbuild rises (0.10 -> 0.33 at 0.35 AU) and logic pays T^2. Net FLOP/s/kg at 105/125 C is -6/-13 % (2026 logic) or flat within 4 % (2100+ logic) and drops beyond ~150 C; FLOP per joule of sunlight falls monotonically. Even the ideal hot film (SQ PV + Boltzmann-floor logic) is only 1.3-1.6x better per kg at 200-300 C and 2-4x worse per joule of sunlight.",
+   "numbers": "{\"Tj 85\": {\"r\": 0.9179, \"rel_FLOPs_per_kg_2100\": 1.0}, \"Tj 105\": {\"r\": 0.8214, \"rel_FLOPs_per_kg_2100\": 1.03}, \"Tj 125\": {\"r\": 0.7393, \"rel_FLOPs_per_kg_2100\": 1.04}, \"Tj 200\": {\"r\": 0.5161, \"rel_FLOPs_per_kg_2100\": 0.89}, \"Tj 300\": {\"r\": 0.3505, \"rel_FLOPs_per_kg_2100\": 0.38}}",
+   "evidence_class": "model output (project physics extended)"
+  },
+  {
+   "question": "Does hot logic favour concentration or distribution?",
+   "answer": "Distribution, still. A pod decouples its PV wing (kept at ~350 K) from hot chips, and hot radiators shrink as T^4 (1.45 g/W at 85 C -> 0.71 at 150 C -> 0.20 at 300 C), but the wing (0.38-0.66 g/W) and module/loops/shield (1.0-2.1 g/W) do not shrink and the chips pay the same T^2 energy. Best-credible pods stay 4.7x (2026) to 8.4x (2100+) worse per kg than the film; lite 1 kg/kW pods 3.1-5.6x. The pod optimum Tj is flat 85-150 C. Better PV widens the gap, because it lightens the film (whose mass is PV) but not the pod module: each 1 % of power moved to pods costs ~3.4 % of swarm mass in 2026 and ~7 % in 2100+.",
+   "numbers": "{\"2026\": {\"pod_gW\": 4.201, \"film_gW\": 0.884, \"film_over_pod\": 4.75}, \"2040\": {\"pod_gW\": 4.087, \"film_gW\": 0.638, \"film_over_pod\": 6.41}, \"2070\": {\"pod_gW\": 4.023, \"film_gW\": 0.497, \"film_over_pod\": 8.09}, \"2100plus\": {\"pod_gW\": 4.023, \"film_gW\": 0.48, \"film_over_pod\": 8.38}}",
+   "evidence_class": "model output"
+  },
+  {
+   "question": "Does it change where the swarm is (inside or outside Earth orbit)?",
+   "answer": "Only if we pay for it. With Mercury rock (4e22 kg delivered) the best swarm is cold and sits OUTSIDE Earth at 1.11-1.24 AU with f 0.49-0.73; a whole-planet swarm closes the sky (f=1) at 1.33-1.58 AU. Pulling it inside 1 AU needs Tj 116-130 C (rock) or 137-141 C (closed shell) and costs 16-20 % (rock) or 50-63 % (closed shell, vs a 60 C shell) of the swarm compute. Hot logic therefore makes an Earth-interior swarm possible at a known price; it is a policy choice, not a free gain.",
+   "numbers": "{\"2026 M=4e+22\": {\"Tj_for_1AU\": 115.8, \"cost\": 0.195, \"cold_r\": 1.237, \"cold_f\": 0.4871}, \"2026 M=2e+23\": {\"Tj_for_1AU\": 141.3, \"cost\": 0.631, \"cold_r\": 1.578, \"cold_f\": 1}, \"2040 M=4e+22\": {\"Tj_for_1AU\": 119.5, \"cost\": 0.183, \"cold_r\": 1.233, \"cold_f\": 0.5417}, \"2040 M=2e+23\": {\"Tj_for_1AU\": 138.6, \"cost\": 0.577, \"cold_r\": 1.558, \"cold_f\": 1}, \"2070 M=4e+22\": {\"Tj_for_1AU\": 126.4, \"cost\": 0.158, \"cold_r\": 1.236, \"cold_f\": 0.5947}, \"2070 M=2e+23\": {\"Tj_for_1AU\": 137.3, \"cost\": 0.507, \"cold_r\": 1.548, \"cold_f\": 1}, \"2100plus M=4e+22\": {\"Tj_for_1AU\": 130.4, \"cost\": 0.164, \"cold_r\": 1.244, \"cold_f\": 0.6086}, \"2100plus M=2e+23\": {\"Tj_for_1AU\": 137.3, \"cost\": 0.496, \"cold_r\": 1.548, \"cold_f\": 1}}",
+   "evidence_class": "model output"
+  },
+  {
+   "question": "PV and power conversion (Part 3)",
+   "answer": "Silicon is the only Mercury-scale absorber: thin c-Si 20 % -> 22.5 % (2040) -> 24 % (2070) AM0; 25-30 % needs a Mercury-native wide-gap top cell (Si nanocrystals in SiO2 are the only candidate made of Si and O, and are at Voc <= 0.37-0.5 V today). Perovskites (Pb, I, Br, Cs, organics, ITO In) are capped at f <= 1e-5 by iodine; III-V by In/Ge/As (f <= 3e-6, or 3e-3 at 1000x concentration with actively cooled cells). Hot PV: the AM0 SQ limit is 23.7 % at 200 C and 14.5 % at 500 C; no Mercury-native wide-gap cell exists. Heat engines (best 2-3 g/W with chip cooling) and solar TPV (>= 1.6 g/W_e before chips, 6.8 % demonstrated) lose to the 0.88 g/W film. The cheapest gain is optical: reflect the 25.5 % of AM0 below the Si gap (alpha 0.90 -> 0.80).",
+   "numbers": "{\"thin c-Si 30 um (IBC, Al/Mg contacts)\": [\"7.14e-01\", \"7.85e-01\"], \"Si-QD/SiO2 top cell 1 um on c-Si\": [\"7.05e-01\", \"7.76e-01\"], \"perovskite 0.5 um (FA/MA/Cs Pb I3) + 100 nm ITO\": [\"5.68e-07\", \"8.12e-06\"], \"perovskite 0.5 um with Zn/Al-oxide TCO (no In)\": [\"5.68e-07\", \"8.12e-06\"], \"III-V 3J thin (IMM, ~5 um GaAs-equivalent)\": [\"2.48e-07\", \"2.93e-06\"], \"III-V 3J on Ge (XTJ, 140 um Ge)\": [\"4.96e-08\", \"5.41e-07\"], \"III-V 3J thin at 1000x concentration (per m2 aperture)\": [\"2.48e-04\", \"2.93e-03\"], \"CdTe 2 um\": [\"4.44e-08\", \"6.65e-07\"], \"CIGS 2 um\": [\"1.06e-07\", \"1.26e-06\"], \"BaZrS3 chalcogenide perovskite 0.5 um\": [\"2.43e-03\", \"4.85e-03\"], \"FeS2 pyrite 1 um\": [\"3.13e-01\", \"1.00e+00\"], \"Ag screen-print contacts (terrestrial c-Si, ~10 mg/W)\": [\"5.64e-08\", \"1.13e-06\"]}",
+   "evidence_class": "physics floor + demonstrated + speculation"
+  },
+  {
+   "question": "Combined (Part 4): PV 25-35 % plus hot-tolerant logic",
+   "answer": "Higher PV efficiency does NOT cool the film: the chips re-dissipate the extra electricity in the same sheet, so T and orbit are unchanged at fixed alpha/eps/f (checked: 347.97 K at eta 20, 30, 35 %). It raises chip W/m2 in proportion, so pitch shrinks (0.15 W chiplets: 26.8 -> 19.1 mm) and g/W falls. A pod wing does run cooler with higher eta, because its electricity leaves the wing. Combined 2100+ (30 % all-Si tandem, alpha 0.80, 0.135 kg/m2): f=0.01 orbit 0.85 AU at Tj 85 C or 0.69 AU at 125 C; 410-545 W/m2; film 0.30-0.38 g/W; swarm 1.8-1.9e18 FLOP/s/kg; 1.1-1.6e14 FLOP/J of sunlight. Full shell: 1.33 AU (85 C) or 1.07 AU (125 C). Sail/pod balance stays set by memory and interconnect roles (pods 0.3-1 %).",
+   "numbers": "{\"2026 baseline (project model)\": {\"f\": 1, \"r\": 1.362, \"W_m2\": 98.4, \"pitch_mm\": 39.04, \"film_gW\": 1.929, \"swarm_FLOPs_kg\": 5030000000000000.0, \"FLOP_Jsun\": 1700000000000.0}, \"2026 film, physics c-Si\": {\"f\": 1, \"r\": 1.361, \"W_m2\": 102.9, \"pitch_mm\": 38.17, \"film_gW\": 1.845, \"swarm_FLOPs_kg\": 5180000000000000.0, \"FLOP_Jsun\": 1760000000000.0}, \"2040 c-Si 22.5 %\": {\"f\": 1, \"r\": 1.343, \"W_m2\": 124.2, \"pitch_mm\": 34.76, \"film_gW\": 1.384, \"swarm_FLOPs_kg\": 6.25e+16, \"FLOP_Jsun\": 16000000000000.0}, \"2040 c-Si 22.5 %, Tj 105\": {\"f\": 1, \"r\": 1.202, \"W_m2\": 143.8, \"pitch_mm\": 32.29, \"film_gW\": 1.199, \"swarm_FLOPs_kg\": 5.96e+16, \"FLOP_Jsun\": 12800000000000.0}, \"2070 c-Si 24 %\": {\"f\": 1, \"r\": 1.334, \"W_m2\": 137, \"pitch_mm\": 33.09, \"film_gW\": 1.137, \"swarm_FLOPs_kg\": 3.33e+17, \"FLOP_Jsun\": 69900000000000.0}, \"2070 c-Si 24 %, Tj 105\": {\"f\": 1, \"r\": 1.194, \"W_m2\": 160, \"pitch_mm\": 30.62, \"film_gW\": 0.978, \"swarm_FLOPs_kg\": 3.4e+17, \"FLOP_Jsun\": 58000000000000.0}, \"2070 all-Si tandem 25 %\": {\"f\": 1, \"r\": 1.334, \"W_m2\": 144.2, \"pitch_mm\": 32.25, \"film_gW\": 1.08, \"swarm_FLOPs_kg\": 3.49e+17, \"FLOP_Jsun\": 73400000000000.0}, \"2100+ all-Si tandem 30 %\": {\"f\": 1, \"r\": 1.331, \"W_m2\": 173.6, \"pitch_mm\": 29.39, \"film_gW\": 0.869, \"swarm_FLOPs_kg\": 8.15e+17, \"FLOP_Jsun\": 162000000000000.0}, \"2100+ all-Si tandem 30 %, Tj 105\": {\"f\": 1, \"r\": 1.191, \"W_m2\": 203.4, \"pitch_mm\": 27.15, \"film_gW\": 0.746, \"swarm_FLOPs_kg\": 8.46e+17, \"FLOP_Jsun\": 136000000000000.0}, \"2100+ all-Si tandem 30 %, Tj 125\": {\"f\": 1, \"r\": 1.072, \"W_m2\": 234.5, \"pitch_mm\": 25.29, \"film_gW\": 0.651, \"swarm_FLOPs_kg\": 8.6e+17, \"FLOP_Jsun\": 114000000000000.0}, \"2100+ perovskite/Si 30 % (not Mercury-scale)\": {\"f\": 1, \"r\": 1.331, \"W_m2\": 172.6, \"pitch_mm\": 29.48, \"film_gW\": 0.875, \"swarm_FLOPs_kg\": 8.1e+17, \"FLOP_Jsun\": 161000000000000.0}, \"2100+ III-V 3J 30.7 % (not Mercury-scale)\": {\"f\": 1, \"r\": 1.33, \"W_m2\": 179.2, \"pitch_mm\": 28.93, \"film_gW\": 0.843, \"swarm_FLOPs_kg\": 8.4e+17, \"FLOP_Jsun\": 167000000000000.0}, \"2100+ hot film: 1.9 eV PV + thin-body SOI logic at 300 C (speculative)\": {\"f\": 1, \"r\": 0.506, \"W_m2\": 450.1, \"pitch_mm\": 18.26, \"film_gW\": 0.393, \"swarm_FLOPs_kg\": 4.22e+17, \"FLOP_Jsun\": 14100000000000.0}, \"2100+ hot film: 1.9 eV PV + SiC/GaN at 500 C (speculative)\": {\"f\": 1, \"r\": 0.276, \"W_m2\": 616.7, \"pitch_mm\": 15.6, \"film_gW\": 0.33, \"swarm_FLOPs_kg\": 9.35e+16, \"FLOP_Jsun\": 1060000000000.0}}",
+   "evidence_class": "model output"
+  },
+  {
+   "question": "Interactions with studies 1-3",
+   "answer": "Higher W/m2 shrinks the film area available per W (4785 -> 1840-2440 mm2/W), which collides with adiabatic logic's 611-2050 mm2/W (study 1) in 2100+, especially if hotter/closer. Memory (study 2) also caps Tj near 150 C. Interconnect (study 3) is unaffected by temperature, but denser chiplets help mesh hop energy. Closer orbits raise chip dose ~r^-2 (x1.8 at 0.69 AU, x7 at 0.35 AU) on top of 150-470 krad per 10 yr at 0.92 AU.",
+   "numbers": "",
+   "evidence_class": "model output + cross-study"
+  }
+ ],
+ "render_implications": [
+  {
+   "era": "all",
+   "element": "sail orbit",
+   "change": "Low-coverage sails creep inward as PV and alpha improve, not because chips run hotter.",
+   "numbers": "f=0.01: 0.921 (2026) -> 0.887 (2040) -> 0.854 (2070) -> 0.852 AU (2100+, Tj 85); 0.686 AU if Tj 125 C. Full shell 1.33-1.36 AU unless Tj >= 140 C."
+  },
+  {
+   "era": "2040+",
+   "element": "film front face",
+   "change": "Sub-bandgap reflecting stack: unchanged navy-black in visible light; brighter in near-IR (1.1-2.5 um) images.",
+   "numbers": "alpha 0.90 -> 0.85 -> 0.80; NIR reflectance ~0.6-0.8 above 1.1 um."
+  },
+  {
+   "era": "2040+",
+   "element": "chiplet grid on the back",
+   "change": "Denser grid of the same 0.15 W chiplets.",
+   "numbers": "pitch 25.4 -> 23.3 -> 21.54 -> 19.13 mm (down to 16.6 mm at Tj 125 C)."
+  },
+  {
+   "era": "any (if hot pods)",
+   "element": "pod radiators",
+   "change": "Hot-logic pods would show much smaller knife-edge blades.",
+   "numbers": "radiator planform per W: 1/q = 0.9 m2/kW at 80 C radiator -> 0.42 at 125 C -> 0.15 at 275 C."
+  },
+  {
+   "era": "wildcard",
+   "element": "hot film at 0.18-0.35 AU",
+   "change": "A 500 C film inside Mercury's orbit would glow dull red on its shaded side (Draper point ~798 K) and need an Al spreader; not recommended.",
+   "numbers": "T_film 563-765 K."
+  }
+ ],
+ "wildcards": [
+  {
+   "wildcard": "Mercury-native wide-gap top cell works (Si nanocrystals in SiO2, or a Ca/Mg/Ti/S compound) -> all-Si tandem at 30-35 % AM0",
+   "effect": "FLOP/s per kg x1.25-1.45 and per joule of sunlight x1.25-1.45 vs c-Si at 24 %; orbit unchanged.",
+   "probability_by_2100": "0.2-0.35 (speculation)",
+   "source": "https://www.coecxs.org/downloads/Publications/2007/12.%20Silicon%20quantum%20dots%20in%20a%20dielectric%20matrix%20for%20all-silicon%20tandem%20solar%20cells.pdf ; https://iris.unimore.it/bitstream/11380/1063223/1/Loeper_EUPVSEC_2012_Frankfurt_Abstract_final.pdf"
+  },
+  {
+   "wildcard": "Steep-slope, temperature-insensitive switch (field-emission vacuum nano-transistor, NEMS, TFET) at <= 3x Si energy",
+   "effect": "Breaks the T^2 law: hot pods with cold PV wings and 300-500 C radiators become ~1.5-2x lighter (radiators 0.06-0.2 g/W), narrowing film/pod to ~2-3x; the film is still PV-limited.",
+   "probability_by_2100": "0.1-0.2 (speculation)",
+   "source": "https://physicsworld.com/a/vacuum-technology-comeback-immunizes-nanoelectronics-from-radiation/ ; https://spectrum.ieee.org/semiconductors/devices/silicon-carbide-nanomechanical-switches-built-to-last"
+  },
+  {
+   "wildcard": "Hot-carrier, thermoradiative or intermediate-band cells beyond the SQ limit",
+   "effect": "A cell that gains from heat would flip the Part-2 trade; none has shown net gain.",
+   "probability_by_2100": "0.05-0.1 (speculation)",
+   "source": "pv_db.json floors (SQ); https://arxiv.org/pdf/2310.19430"
+  },
+  {
+   "wildcard": "Self-annealing hot PV (displacement damage anneals at 150-300 C)",
+   "effect": "Lets wide-gap cells sit at 0.3-0.5 AU without radiation loss; only useful if logic also runs hot.",
+   "probability_by_2070": "0.3 (speculation)",
+   "source": "placement.mjs pvD0 assumption"
+  },
+  {
+   "wildcard": "Ga/Ge from Mercury's core (siderophile enrichment) enables III-V concentrator pods at f ~ 1e-3-1e-2",
+   "effect": "A 30-35 % pod wing class; does not change the film.",
+   "probability_by_2100": "0.2 (speculation)",
+   "source": "alt_power.json inventories (primitive-mantle x Mercury factor)"
+  },
+  {
+   "wildcard": "Earth-interior swarm mandated (sunlight corridor to Earth)",
+   "effect": "Forces Tj 116-141 C and costs 16-63 % of compute; hot logic becomes worth developing for this reason alone.",
+   "probability_by_2100": "policy",
+   "source": "placement.json earth_crossing"
+  }
+ ],
+ "technologies_hot": [
+  {
+   "tech": "Si FinFET/GAA (hot-designed, leading edge)",
+   "max_Tj_C_2026": 150,
+   "max_Tj_C_2040": 175,
+   "max_Tj_C_2070": 200,
+   "max_Tj_C_2100plus": 225,
+   "E_ratio_vs_Si85": "x1.20 @105, x1.43 @125, x1.76 @150, x2.31 @175 (2026); floor (T/358)^2: x1.12/1.24/1.40/1.58",
+   "density_vs_Si": 1.0,
+   "limit": "subthreshold + GIDL leakage, SRAM retention, Cu EM (x0.03 allowed J at 200 C)",
+   "evidence_class": "demonstrated (AEC-Q100 Grade 1 TSMC 16FFC to 150 C; AURIX 165 C; X-FAB 175 C)",
+   "source": "research2/research_hotsi.json; https://news.synopsys.com/2016-09-21-Synopsys-Foundation-IP-Meets-Stringent-Automotive-AEC-Q100-Grade-1-Temperature-Requirements-for-TSMC-16FFC-and-28HPC-Processes"
+  },
+  {
+   "tech": "Si SOI (HT-SOI, thin body)",
+   "max_Tj_C_2026": 225,
+   "max_Tj_C_2040": 250,
+   "max_Tj_C_2070": 275,
+   "max_Tj_C_2100plus": 300,
+   "E_ratio_vs_Si85": "2026: legacy 0.18-0.8 um nodes at 5 V -> CV^2 x333-3401; 2070+: leading-edge thin-body SOI/GAA at 250-300 C ~ floor x2.2-2.6 x (1.3-2) leakage/EM",
+   "density_vs_Si": "1e-3 (2026 legacy node) -> 0.3-1 (2070+)",
+   "limit": "Si ni at 300 C is x3371 its 85 C value; junction isolation fails near ni ~ doping",
+   "evidence_class": "demonstrated (Honeywell >=5 yr at 225 C, 300 C excursions; 300 C 8-kbit SRAM, JSSC 2014)",
+   "source": "https://aerospace.honeywell.com/us/en/products-and-services/product/hardware-and-systems/sensors/silicon-on-insulator-cmos-technology ; https://militaryaerospace.com/power/article/16709945/honeywell-develops-high-temp-sram"
+  },
+  {
+   "tech": "SiC JFET-R ICs (NASA Glenn)",
+   "max_Tj_C_2026": 500,
+   "max_Tj_C_2040": 500,
+   "max_Tj_C_2070": 600,
+   "max_Tj_C_2100plus": 600,
+   "E_ratio_vs_Si85": "derived: 6 um features, +25/-10 V supplies -> CV^2 x2.3e+05 plus static resistor-load power (x1e5-1e7 total)",
+   "density_vs_Si": "~1e-7 (175-195 transistors per chip; Gen 12 aims ~3000)",
+   "limit": "normally-on JFET + resistor logic, no CMOS; TaSi2/Pt/Ir/Pt metallisation",
+   "evidence_class": "demonstrated (>1 yr at 500 C in air; 60 days Venus surface 460 C 9.3 MPa; -190 to +812 C; 7 Mrad)",
+   "source": "https://ntrs.nasa.gov/citations/20180003391 ; https://ntrs.nasa.gov/citations/20240013278"
+  },
+  {
+   "tech": "SiC CMOS (Raytheon HiTSiC, Fraunhofer, Arkansas)",
+   "max_Tj_C_2026": 300,
+   "max_Tj_C_2040": 400,
+   "max_Tj_C_2070": 450,
+   "max_Tj_C_2100plus": 500,
+   "E_ratio_vs_Si85": "2026: 15 V, ~1-2 um -> CV^2 x4.6e+04; 2040: 0.35 um, 5 V -> x1488; 2070: 0.1 um, 2.5 V -> x106; 2100+: 30 nm, 1.5 V (at 500 C, Boltzmann) -> x11",
+   "density_vs_Si": "1e-4 (2026) -> 1e-2 (2070) -> 0.1 (2100+)",
+   "limit": "SiO2/SiC interface traps (low channel mobility, Vt drift), PMOS weak, refractory wiring",
+   "evidence_class": "demonstrated (300 C ICs, >1500 h at 300 C; 400 C transistors) + roadmap/speculation for scaling",
+   "source": "https://newelectronics.co.uk/content/features/the-quest-for-high-temperature-analogue-and-mixed-signal-electronics-is-taking-advantage-of-silicon-carbide-s-properties ; https://eepower.com/technical-articles/de-risking-the-route-to-silicon-carbide/"
+  },
+  {
+   "tech": "GaN HEMT / GaN CMOS logic",
+   "max_Tj_C_2026": 500,
+   "max_Tj_C_2040": 500,
+   "max_Tj_C_2070": 600,
+   "max_Tj_C_2100plus": 600,
+   "E_ratio_vs_Si85": "2026: VDD 5 V, LG 1-3.6 um, E/D-mode (static current) -> CV^2 x8.5e+03, x1e4-1e5 with static power; 800 C single devices (on/off 770, ~1 h)",
+   "density_vs_Si": "1e-5 (2026: >350-transistor ROM/SRAM at 300 C)",
+   "limit": "p-channel mobility ~10-30 cm2/Vs (no good CMOS), gate leakage, Ga/N supply on Mercury",
+   "evidence_class": "demonstrated (MIT: ring oscillators/flip-flops/ROM/SRAM to 300-500 C; Illinois: 800 C transistor, 2025)",
+   "source": "https://dspace.mit.edu/handle/1721.1/147361 ; https://www.mtl.mit.edu/sites/default/files/media/documents/2024/palacios_talk-extreme-environment-electronics_palaciospublications.pdf ; https://ece.illinois.edu/news/record-setting-gallium-nitride-transistor"
+  },
+  {
+   "tech": "beta-Ga2O3 FETs",
+   "max_Tj_C_2026": 500,
+   "max_Tj_C_2040": 500,
+   "max_Tj_C_2070": 500,
+   "max_Tj_C_2100plus": 600,
+   "E_ratio_vs_Si85": "single transistors only; no p-type -> no CMOS; logic energy undefined (>= GaN E/D-mode)",
+   "density_vs_Si": "n/a",
+   "limit": "no p-type doping, thermal conductivity 10-27 W/mK (self-heating)",
+   "evidence_class": "demonstrated lab result (MESFET and Al2O3-gated MOSFET stable at 500 C, ~20 h)",
+   "source": "https://impact.ornl.gov/en/publications/500-c-operation-of-%CE%B2-gasub2subosub3subfield-effect-transistors/"
+  },
+  {
+   "tech": "diamond (H-terminated) FETs",
+   "max_Tj_C_2026": 300,
+   "max_Tj_C_2040": 400,
+   "max_Tj_C_2070": 500,
+   "max_Tj_C_2100plus": 600,
+   "E_ratio_vs_Si85": "NOR gate of two MOSFETs at 300 C (fails at 400 C); CMOS only simulated",
+   "density_vs_Si": "n/a",
+   "limit": "surface-transfer doping unstable at high T; n-type doping deep; C scarce on Mercury except LRM graphite",
+   "evidence_class": "demonstrated lab result (300 C logic gate) + simulation (500 C CMOS inverter)",
+   "source": "https://publishing.aip.org/publications/latest-content/diamond-based-circuits-can-take-the-heat-for-advanced-applications/"
+  },
+  {
+   "tech": "nanoscale vacuum channel transistors (field emission)",
+   "max_Tj_C_2026": 500,
+   "max_Tj_C_2040": 600,
+   "max_Tj_C_2070": 700,
+   "max_Tj_C_2100plus": 800,
+   "E_ratio_vs_Si85": "single devices, ~2 V drive at 50 nm gaps; FN swing ~0.5-1 V/decade -> CV^2 x10-100 at equal C; weakly T-dependent (no Boltzmann tyranny); no circuits",
+   "density_vs_Si": "<1e-6 (devices only)",
+   "limit": "emitter wear/work-function drift, FN swing, tip uniformity; space vacuum is free (no package)",
+   "evidence_class": "demonstrated lab result (NASA Ames 2012; SiC 150 mm wafers, Nature Electronics 2019) + speculation for logic",
+   "source": "https://science.nasa.gov/technology/technology-highlights/nanoscale-vacuum-electronics-back-to-the-future ; https://physicsworld.com/a/vacuum-technology-comeback-immunizes-nanoelectronics-from-radiation/"
+  },
+  {
+   "tech": "SiC NEMS relays",
+   "max_Tj_C_2026": 500,
+   "max_Tj_C_2040": 500,
+   "max_Tj_C_2070": 600,
+   "max_Tj_C_2100plus": 600,
+   "E_ratio_vs_Si85": "zero off-current, +/-6 V at 500 kHz (2010 NOT gate at 500 C); 1e6-1e7 cycles -> endurance far below logic needs (1e16+ in 10 yr)",
+   "density_vs_Si": "<1e-6",
+   "limit": "contact wear/stiction; endurance",
+   "evidence_class": "demonstrated lab result",
+   "source": "https://physicsworld.com/a/logic-circuit-takes-the-heat/ ; https://spectrum.ieee.org/semiconductors/devices/silicon-carbide-nanomechanical-switches-built-to-last"
+  }
+ ],
+ "memory_hot": [
+  {
+   "memory": "SRAM (Si)",
+   "max_T_C": "125-150 (leakage; retention ok)",
+   "survives_150_300C": "150 yes (AEC Grade 1 IP); 300 C only on HT-SOI (8 kbit, 2014)",
+   "evidence_class": "demonstrated"
+  },
+  {
+   "memory": "MRAM (STT/SOT)",
+   "max_T_C": "150 (20 yr retention, TSMC 16/22 nm)",
+   "survives_150_300C": "150 yes; 200-260 needs Delta >= 80-100 (thicker free layer, more write energy)",
+   "evidence_class": "demonstrated to 150 C; speculation above"
+  },
+  {
+   "memory": "RRAM (HfOx/TaOx/SiOx)",
+   "max_T_C": "125-150",
+   "survives_150_300C": "150 yes; 200-300 C retention falls (oxygen-vacancy diffusion)",
+   "evidence_class": "demonstrated to 150 C"
+  },
+  {
+   "memory": "HZO FeRAM/FeFET",
+   "max_T_C": "85-125",
+   "survives_150_300C": "no (depolarisation/imprint); ZrO2 similar",
+   "evidence_class": "demonstrated"
+  },
+  {
+   "memory": "PCM (Ge-rich GST)",
+   "max_T_C": "165",
+   "survives_150_300C": "150 yes; 300 no; Te/Ge scarce on Mercury",
+   "evidence_class": "demonstrated"
+  },
+  {
+   "memory": "AlScN ferroelectric diode",
+   "max_T_C": "600 (>60 h, 1e6 reads)",
+   "survives_150_300C": "yes - best hot NVM; Sc scarce (16.5 ppm mantle); Pt/Ni electrodes",
+   "evidence_class": "demonstrated lab result (Nature Electronics 2024)"
+  },
+  {
+   "memory": "SiC JFET 6T SRAM (NASA) / GaN SRAM (MIT)",
+   "max_T_C": "500 / 300",
+   "survives_150_300C": "yes, but 16 bits (NASA 195-transistor RAM) - no density",
+   "evidence_class": "demonstrated lab result"
+  },
+  {
+   "memory": "fused-silica optical archive",
+   "max_T_C": ">290 (ageing test)",
+   "survives_150_300C": "yes (write-once archive)",
+   "evidence_class": "demonstrated (Project Silica)"
+  },
+  {
+   "memory": "DRAM/HBM, 3D NAND",
+   "max_T_C": "85-105 (refresh x2 per ~10 K); NAND retention 85",
+   "survives_150_300C": "no",
+   "evidence_class": "demonstrated"
+  }
+ ],
+ "pv_models_summary": {
+  "cSi_legacy_Voc060": {
+   "desc": "legacy space Si (BSF, Voc 0.60 V): reproduces the project -0.42 %/K (one-diode: Voc0 0.6 V, Jsc0 50.0 mA/cm2 AM0, n 1.0, rs 0.035)",
+   "eta_301K": 0.1759,
+   "tempco_301K_per_K": -0.00447,
+   "eta_348K": 0.1388,
+   "eta_423K": 0.0791,
+   "eta_473K": 0.0412,
+   "eta_573K": 0.0,
+   "eta_773K": 0.0,
+   "evidence_class": "demonstrated (typical space Si) + physics"
+  },
+  "cSi_2026": {
+   "desc": "2026 thin (30 um) IBC c-Si film, 20 % AM0 (one-diode: Voc0 0.685 V, Jsc0 47.5 mA/cm2 AM0, n 1.0, rs 0.008)",
+   "eta_301K": 0.2,
+   "tempco_301K_per_K": -0.00336,
+   "eta_348K": 0.1681,
+   "eta_423K": 0.1159,
+   "eta_473K": 0.081,
+   "eta_573K": 0.019,
+   "eta_773K": 0.0,
+   "evidence_class": "demonstrated lab result (thin IBC/HJT Voc 0.68-0.72 V) + physics (diode law)"
+  },
+  "cSi_2040": {
+   "desc": "2040 thin IBC/HJT c-Si film (one-diode: Voc0 0.73 V, Jsc0 50.5 mA/cm2 AM0, n 1.0, rs 0.025)",
+   "eta_301K": 0.2245,
+   "tempco_301K_per_K": -0.00289,
+   "eta_348K": 0.1938,
+   "eta_423K": 0.1429,
+   "eta_473K": 0.1085,
+   "eta_573K": 0.0426,
+   "eta_773K": 0.0,
+   "evidence_class": "roadmap claim (HIBC 28.29 % AM1.5 in 2026 -> thin-film AM0 ~22.5 %)"
+  },
+  "cSi_2070": {
+   "desc": "2070+ c-Si near the Auger limit (29.4 % AM1.5) (one-diode: Voc0 0.76 V, Jsc0 51.0 mA/cm2 AM0, n 1.0, rs 0.020)",
+   "eta_301K": 0.2385,
+   "tempco_301K_per_K": -0.00261,
+   "eta_348K": 0.209,
+   "eta_423K": 0.1601,
+   "eta_473K": 0.1267,
+   "eta_573K": 0.061,
+   "eta_773K": 0.0,
+   "evidence_class": "speculation (approaches a physics floor)"
+  },
+  "cSi_project_linear": {
+   "desc": "project linear model 0.20 x (1 - 0.0042 (T - 301))",
+   "eta_301K": 0.2,
+   "tempco_301K_per_K": -0.0042,
+   "eta_348K": 0.1605,
+   "eta_423K": 0.0975,
+   "eta_473K": 0.0555,
+   "eta_573K": -0.0285,
+   "eta_773K": -0.1965,
+   "evidence_class": "model assumption (architecture.md)"
+  },
+  "IIIV_3J_XTJ": {
+   "desc": "GaInP/GaAs/Ge 3J, XTJ Prime class, tempco matched to datasheet (pods / early swarm only: In, Ga, As, Ge-limited)",
+   "eta_301K": 0.307,
+   "tempco_301K_per_K": -0.00232,
+   "eta_348K": 0.2737,
+   "eta_423K": 0.2214,
+   "eta_473K": 0.1883,
+   "eta_573K": 0.1385,
+   "eta_773K": 0.052,
+   "evidence_class": "demonstrated (30.7 % AM0, datasheet) + physics extrapolation above 125 C"
+  },
+  "perovskite_Si_2T": {
+   "desc": "perovskite/Si 2T tandem scaled to 30 % AM0 at 301 K, tempco matched to -0.26 %/K (Aydin 2020); not Mercury-buildable at scale (Pb, I, Br, Cs, C, N, H)",
+   "eta_301K": 0.3,
+   "tempco_301K_per_K": -0.00257,
+   "eta_348K": 0.2637,
+   "eta_423K": 0.2053,
+   "eta_473K": 0.1663,
+   "eta_573K": 0.0975,
+   "eta_773K": 0.0298,
+   "evidence_class": "demonstrated lab result (35.5 % AM1.5, 2026) + physics extrapolation; perovskite decomposes above ~150-200 C"
+  },
+  "SiQD_Si_2T_25": {
+   "desc": "all-Si tandem (Si nanocrystal/SiO2 top ~1.7 eV on thin c-Si), scaled to 25 % AM0 at 301 K",
+   "eta_301K": 0.25,
+   "tempco_301K_per_K": -0.00256,
+   "eta_348K": 0.2199,
+   "eta_423K": 0.1721,
+   "eta_473K": 0.1403,
+   "eta_573K": 0.0828,
+   "eta_773K": 0.0153,
+   "evidence_class": "speculation (Si-QD cells today reach only a few %; Voc <= 0.37-0.5 V)"
+  },
+  "SiQD_Si_2T_30": {
+   "desc": "all-Si tandem (Si nanocrystal/SiO2 top ~1.7 eV on thin c-Si), scaled to 30 % AM0 at 301 K",
+   "eta_301K": 0.3,
+   "tempco_301K_per_K": -0.00256,
+   "eta_348K": 0.2639,
+   "eta_423K": 0.2065,
+   "eta_473K": 0.1683,
+   "eta_573K": 0.0994,
+   "eta_773K": 0.0184,
+   "evidence_class": "speculation (Si-QD cells today reach only a few %; Voc <= 0.37-0.5 V)"
+  },
+  "hotPV_1.9eV": {
+   "desc": "GaInP-class 1.9 eV single junction, ERE 0.001, cf 0.85 (no Mercury-native candidate)",
+   "eta_301K": 0.1684,
+   "tempco_301K_per_K": -0.00128,
+   "eta_348K": 0.1581,
+   "eta_423K": 0.1408,
+   "eta_473K": 0.1285,
+   "eta_573K": 0.1022,
+   "eta_773K": 0.0451,
+   "evidence_class": "speculation (physics extrapolation; InGaN EQE 80 % at 450 C demonstrated, no >400 C power-efficiency record)"
+  },
+  "hotPV_2.2eV": {
+   "desc": "AlGaInP/InGaN-class 2.2 eV single junction, ERE 0.001, cf 0.85 (no Mercury-native candidate)",
+   "eta_301K": 0.1354,
+   "tempco_301K_per_K": -0.00092,
+   "eta_348K": 0.1294,
+   "eta_423K": 0.1191,
+   "eta_473K": 0.1116,
+   "eta_573K": 0.0949,
+   "eta_773K": 0.0564,
+   "evidence_class": "speculation (physics extrapolation; InGaN EQE 80 % at 450 C demonstrated, no >400 C power-efficiency record)"
+  },
+  "hotPV_1.6eV": {
+   "desc": "hypothetical 1.6 eV hot absorber single junction, ERE 0.001, cf 0.85 (no Mercury-native candidate)",
+   "eta_301K": 0.1899,
+   "tempco_301K_per_K": -0.00174,
+   "eta_348K": 0.1742,
+   "eta_423K": 0.148,
+   "eta_473K": 0.1297,
+   "eta_573K": 0.0919,
+   "eta_773K": 0.0197,
+   "evidence_class": "speculation (physics extrapolation; InGaN EQE 80 % at 450 C demonstrated, no >400 C power-efficiency record)"
+  }
+ },
+ "absorber_budgets": [
+  {
+   "absorber": "thin c-Si 30 um (IBC, Al/Mg contacts)",
+   "limiting_element": "Si",
+   "area_m2_low_high": [
+    "1.70e+23",
+    "1.87e+23"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "7.14e-01",
+    "7.85e-01"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "3.74e+25",
+    "4.11e+25"
+   ],
+   "verdict": "Mercury-native"
+  },
+  {
+   "absorber": "Si-QD/SiO2 top cell 1 um on c-Si",
+   "limiting_element": "Si",
+   "area_m2_low_high": [
+    "1.68e+23",
+    "1.85e+23"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "7.05e-01",
+    "7.76e-01"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "3.69e+25",
+    "4.06e+25"
+   ],
+   "verdict": "Mercury-native (speculative performance)"
+  },
+  {
+   "absorber": "perovskite 0.5 um (FA/MA/Cs Pb I3) + 100 nm ITO",
+   "limiting_element": "I",
+   "area_m2_low_high": [
+    "1.35e+17",
+    "1.93e+18"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "5.68e-07",
+    "8.12e-06"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "2.98e+19",
+    "4.25e+20"
+   ],
+   "verdict": "not Mercury-scale"
+  },
+  {
+   "absorber": "perovskite 0.5 um with Zn/Al-oxide TCO (no In)",
+   "limiting_element": "I",
+   "area_m2_low_high": [
+    "1.35e+17",
+    "1.93e+18"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "5.68e-07",
+    "8.12e-06"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "2.98e+19",
+    "4.25e+20"
+   ],
+   "verdict": "not Mercury-scale (Pb, I)"
+  },
+  {
+   "absorber": "III-V 3J thin (IMM, ~5 um GaAs-equivalent)",
+   "limiting_element": "In",
+   "area_m2_low_high": [
+    "5.90e+16",
+    "6.98e+17"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "2.48e-07",
+    "2.93e-06"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "1.30e+19",
+    "1.53e+20"
+   ],
+   "verdict": "not Mercury-scale"
+  },
+  {
+   "absorber": "III-V 3J on Ge (XTJ, 140 um Ge)",
+   "limiting_element": "Ge",
+   "area_m2_low_high": [
+    "1.18e+16",
+    "1.29e+17"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "4.96e-08",
+    "5.41e-07"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "2.60e+18",
+    "2.83e+19"
+   ],
+   "verdict": "not Mercury-scale"
+  },
+  {
+   "absorber": "III-V 3J thin at 1000x concentration (per m2 aperture)",
+   "limiting_element": "In",
+   "area_m2_low_high": [
+    "5.90e+19",
+    "6.98e+20"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "2.48e-04",
+    "2.93e-03"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "1.30e+22",
+    "1.53e+23"
+   ],
+   "verdict": "needs cooled cells (pod-like)"
+  },
+  {
+   "absorber": "CdTe 2 um",
+   "limiting_element": "Te",
+   "area_m2_low_high": [
+    "1.06e+16",
+    "1.58e+17"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "4.44e-08",
+    "6.65e-07"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "2.32e+18",
+    "3.48e+19"
+   ],
+   "verdict": "not Mercury-scale"
+  },
+  {
+   "absorber": "CIGS 2 um",
+   "limiting_element": "In",
+   "area_m2_low_high": [
+    "2.53e+16",
+    "2.99e+17"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "1.06e-07",
+    "1.26e-06"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "5.57e+18",
+    "6.58e+19"
+   ],
+   "verdict": "not Mercury-scale"
+  },
+  {
+   "absorber": "BaZrS3 chalcogenide perovskite 0.5 um",
+   "limiting_element": "Ba",
+   "area_m2_low_high": [
+    "5.78e+20",
+    "1.16e+21"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "2.43e-03",
+    "4.85e-03"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "1.27e+23",
+    "2.54e+23"
+   ],
+   "verdict": "Ba/Zr-limited"
+  },
+  {
+   "absorber": "FeS2 pyrite 1 um",
+   "limiting_element": "S",
+   "area_m2_low_high": [
+    "7.45e+22",
+    "7.45e+23"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "3.13e-01",
+    "1.00e+00"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "1.64e+25",
+    "1.64e+26"
+   ],
+   "verdict": "Mercury-native (poor performance)"
+  },
+  {
+   "absorber": "Ag screen-print contacts (terrestrial c-Si, ~10 mg/W)",
+   "limiting_element": "Ag",
+   "area_m2_low_high": [
+    "1.34e+16",
+    "2.68e+17"
+   ],
+   "max_coverage_at_0.92AU_low_high": [
+    "5.64e-08",
+    "1.13e-06"
+   ],
+   "chip_W_low_high_at_220Wm2": [
+    "2.95e+18",
+    "5.90e+19"
+   ],
+   "verdict": "not Mercury-scale: use Al/Mg"
+  }
+ ],
+ "alternatives_g_per_W": {
+  "heat_engines": {
+   "Brayton_DIPS_heritage (7-9 W/kg conversion only)": {
+    "Th_K": 1150,
+    "Tc_K": 788,
+    "Tc_over_Th": 0.685,
+    "eta_sys": 0.147,
+    "g_per_We": 125.242,
+    "radiator_g_per_We": 0.158,
+    "mirror_g_per_We": 0.084,
+    "engine_g_per_We": 125.0,
+    "plus_chip_cooling_g_per_W": 140.86
+   },
+   "future_Brayton/Stirling 1 kg/kWe, Th 1150 K, 55 % of Carnot": {
+    "Th_K": 1150,
+    "Tc_K": 788,
+    "Tc_over_Th": 0.685,
+    "eta_sys": 0.147,
+    "g_per_We": 1.242,
+    "radiator_g_per_We": 0.158,
+    "mirror_g_per_We": 0.084,
+    "engine_g_per_We": 1.0,
+    "plus_chip_cooling_g_per_W": 3.08
+   },
+   "heroic 0.2 kg/kWe engine, Th 1500 K, 65 % of Carnot": {
+    "Th_K": 1500,
+    "Tc_K": 908,
+    "Tc_over_Th": 0.605,
+    "eta_sys": 0.218,
+    "g_per_We": 0.311,
+    "radiator_g_per_We": 0.054,
+    "mirror_g_per_We": 0.057,
+    "engine_g_per_We": 0.2,
+    "plus_chip_cooling_g_per_W": 2.05
+   }
+  },
+  "solar_tpv": {
+   "ideal_STPV_41pct_cell_70pct_absorber": {
+    "eta_sys": 0.287,
+    "g_per_We": 1.631,
+    "items_g_per_We": {
+     "mirror": 0.043,
+     "cell": 0.042,
+     "cell_radiator": 1.546
+    },
+    "note": "cells (InGaAs/GaAs class) are In/Ga/As-limited; cells at 2.4 W/cm2 need pumped cooling"
+   },
+   "demonstrated_STPV_6.8pct": {
+    "eta_sys": 0.068
+   }
+  },
+  "film_reference_g_per_W": 0.884
+ },
+ "earth_crossing": [
+  {
+   "era": "2026",
+   "M_kg": 4e+22,
+   "pv": "cSi_2026",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.237,
+    "f": 0.4871,
+    "flops": 4.1192411500488164e+38
+   },
+   "Tj_C_for_r_1AU": 115.8,
+   "at_crossing": {
+    "f": 0.7397,
+    "rAU": 1.001,
+    "flops": 3.3153848581956127e+38
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.195
+  },
+  {
+   "era": "2026",
+   "M_kg": 1.6e+23,
+   "pv": "cSi_2026",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.578,
+    "f": 1,
+    "flops": 8.557255694177151e+38
+   },
+   "Tj_C_for_r_1AU": 141.3,
+   "at_crossing": {
+    "f": 1,
+    "rAU": 1.001,
+    "flops": 3.156125536302353e+38
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.631
+  },
+  {
+   "era": "2040",
+   "M_kg": 4e+22,
+   "pv": "cSi_2040",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.233,
+    "f": 0.5417,
+    "flops": 4.060812561745741e+39
+   },
+   "Tj_C_for_r_1AU": 119.5,
+   "at_crossing": {
+    "f": 0.8165,
+    "rAU": 1,
+    "flops": 3.319708671518944e+39
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.183
+  },
+  {
+   "era": "2040",
+   "M_kg": 1.6e+23,
+   "pv": "cSi_2040",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.558,
+    "f": 1,
+    "flops": 7.578694501961163e+39
+   },
+   "Tj_C_for_r_1AU": 138.6,
+   "at_crossing": {
+    "f": 1,
+    "rAU": 1,
+    "flops": 3.2058757253916954e+39
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.577
+  },
+  {
+   "era": "2070",
+   "M_kg": 4e+22,
+   "pv": "cSi_2070",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.236,
+    "f": 0.5947,
+    "flops": 1.9179783102225567e+40
+   },
+   "Tj_C_for_r_1AU": 126.4,
+   "at_crossing": {
+    "f": 0.9,
+    "rAU": 1.001,
+    "flops": 1.61551542200729e+40
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.158
+  },
+  {
+   "era": "2070",
+   "M_kg": 1.6e+23,
+   "pv": "cSi_2070",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.548,
+    "f": 1,
+    "flops": 3.2584879097818966e+40
+   },
+   "Tj_C_for_r_1AU": 137.3,
+   "at_crossing": {
+    "f": 1,
+    "rAU": 1,
+    "flops": 1.607094627472341e+40
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.507
+  },
+  {
+   "era": "2100plus",
+   "M_kg": 4e+22,
+   "pv": "cSi_2070",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.244,
+    "f": 0.6086,
+    "flops": 3.6137711713743795e+40
+   },
+   "Tj_C_for_r_1AU": 130.4,
+   "at_crossing": {
+    "f": 0.9328,
+    "rAU": 1,
+    "flops": 3.021716957314601e+40
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.164
+  },
+  {
+   "era": "2100plus",
+   "M_kg": 1.6e+23,
+   "pv": "cSi_2070",
+   "best_cold": {
+    "Tj_C": 60,
+    "rAU": 1.548,
+    "f": 1,
+    "flops": 5.997303178779612e+40
+   },
+   "Tj_C_for_r_1AU": 137.3,
+   "at_crossing": {
+    "f": 1,
+    "rAU": 1,
+    "flops": 3.020318214973591e+40
+   },
+   "flops_cost_of_staying_inside_earth_orbit": 0.496
+  }
+ ],
+ "ideal_hot_film_bound": [
+  {
+   "Tj_C": 85,
+   "f": 0.01,
+   "rAU": 0.833,
+   "eta_SQ": 0.262,
+   "chip_W_m2": 462,
+   "g_per_W": 0.323,
+   "flops_per_kg": 2226410372729279000,
+   "flops_per_Jsun": 169084703017241.4,
+   "sun_limited_max_flops": 6.472562431500001e+40
+  },
+  {
+   "Tj_C": 85,
+   "f": 1,
+   "rAU": 1.288,
+   "eta_SQ": 0.262,
+   "chip_W_m2": 193,
+   "g_per_W": 0.764,
+   "flops_per_kg": 939906188015681200,
+   "flops_per_Jsun": 169084703017241.4,
+   "sun_limited_max_flops": 6.472562431500001e+40
+  },
+  {
+   "Tj_C": 125,
+   "f": 0.01,
+   "rAU": 0.672,
+   "eta_SQ": 0.247,
+   "chip_W_m2": 670,
+   "g_per_W": 0.224,
+   "flops_per_kg": 2590775697847108000,
+   "flops_per_Jsun": 129305271546904.23,
+   "sun_limited_max_flops": 4.949805794815494e+40
+  },
+  {
+   "Tj_C": 125,
+   "f": 1,
+   "rAU": 1.039,
+   "eta_SQ": 0.247,
+   "chip_W_m2": 280,
+   "g_per_W": 0.528,
+   "flops_per_kg": 1100210021311377200,
+   "flops_per_Jsun": 129305271546904.22,
+   "sun_limited_max_flops": 4.949805794815493e+40
+  },
+  {
+   "Tj_C": 200,
+   "f": 0.01,
+   "rAU": 0.474,
+   "eta_SQ": 0.222,
+   "chip_W_m2": 1208,
+   "g_per_W": 0.14,
+   "flops_per_kg": 2937236167995153400,
+   "flops_per_Jsun": 82081269105438.7,
+   "sun_limited_max_flops": 3.1420709813561933e+40
+  },
+  {
+   "Tj_C": 200,
+   "f": 1,
+   "rAU": 0.733,
+   "eta_SQ": 0.222,
+   "chip_W_m2": 505,
+   "g_per_W": 0.324,
+   "flops_per_kg": 1270259192272221400,
+   "flops_per_Jsun": 82081269105438.69,
+   "sun_limited_max_flops": 3.1420709813561933e+40
+  },
+  {
+   "Tj_C": 300,
+   "f": 0.01,
+   "rAU": 0.322,
+   "eta_SQ": 0.19,
+   "chip_W_m2": 2252,
+   "g_per_W": 0.081,
+   "flops_per_kg": 3472292841731686400,
+   "flops_per_Jsun": 48078270850392.65,
+   "sun_limited_max_flops": 1.8404362081530304e+40
+  },
+  {
+   "Tj_C": 300,
+   "f": 1,
+   "rAU": 0.498,
+   "eta_SQ": 0.19,
+   "chip_W_m2": 942,
+   "g_per_W": 0.179,
+   "flops_per_kg": 1569457036576577800,
+   "flops_per_Jsun": 48078270850392.65,
+   "sun_limited_max_flops": 1.8404362081530304e+40
+  },
+  {
+   "Tj_C": 500,
+   "f": 0.01,
+   "rAU": 0.176,
+   "eta_SQ": 0.136,
+   "chip_W_m2": 5388,
+   "g_per_W": 0.046,
+   "flops_per_kg": 3370126187870080000,
+   "flops_per_Jsun": 18919436179815.562,
+   "sun_limited_max_flops": 7.242360169633397e+39
+  },
+  {
+   "Tj_C": 500,
+   "f": 1,
+   "rAU": 0.272,
+   "eta_SQ": 0.136,
+   "chip_W_m2": 2253,
+   "g_per_W": 0.085,
+   "flops_per_kg": 1809139206542934500,
+   "flops_per_Jsun": 18919436179815.56,
+   "sun_limited_max_flops": 7.242360169633396e+39
+  }
+ ],
+ "baseline_check": {
+  "project_r": 0.9190436854321097,
+  "project_T": 348.15,
+  "project_gPerW": 0.9236683354712195,
+  "project_tj": 85,
+  "copy_gPerW_linearPV": 0.9237691819080237,
+  "copy_T": 348.15,
+  "copy_chip_rise_K": 10.321620062003305,
+  "copy_tj": 85.32162006200332
+ },
+ "sources": [
+  {
+   "key": "architecture_md",
+   "ref": "/home/user/dyson/docs/architecture.md"
+  },
+  {
+   "key": "hybrid_js",
+   "ref": "/home/user/dyson/src/model/hybrid.js, model.js, sat2.js (imported unmodified by placement.mjs)"
+  },
+  {
+   "key": "design_result",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research4/design/result.json"
+  },
+  {
+   "key": "hotsi",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research2/research_hotsi.json"
+  },
+  {
+   "key": "thermal_mass",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research3/thermal_mass/result.json"
+  },
+  {
+   "key": "study1_logic",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/logic/result.json"
+  },
+  {
+   "key": "study2_memory",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/memory/result.json"
+  },
+  {
+   "key": "study3_interconnect",
+   "ref": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/interconnect/result.json"
+  },
+  {
+   "key": "neudeck2018",
+   "ref": "Neudeck et al., Yearlong 500 C operational demonstration of up-scaled 4H-SiC JFET ICs (HiTEC 2018): https://ntrs.nasa.gov/citations/20180003391"
+  },
+  {
+   "key": "nasa_sic_2024",
+   "ref": "NASA GRC SiC JFET-R ICs: 1 yr 500 C, 60 d Venus, -190..812 C, 7 Mrad: https://ntrs.nasa.gov/citations/20240013278"
+  },
+  {
+   "key": "palacios2024",
+   "ref": "Palacios, extreme-environment GaN electronics talk (2024): https://www.mtl.mit.edu/sites/default/files/media/documents/2024/palacios_talk-extreme-environment-electronics_palaciospublications.pdf"
+  },
+  {
+   "key": "yuan_thesis",
+   "ref": "Yuan, GaN electronics for high temperature (MIT 2022): https://dspace.mit.edu/handle/1721.1/147361"
+  },
+  {
+   "key": "xie_thesis",
+   "ref": "Xie, GaN CMOS on GaN-on-Si (MIT 2024): https://dspace.mit.edu/handle/1721.1/153863"
+  },
+  {
+   "key": "illinois800",
+   "ref": "GaN transistor at 800 C (Illinois, IEEE EDL 2025): https://ece.illinois.edu/news/record-setting-gallium-nitride-transistor"
+  },
+  {
+   "key": "hitsic",
+   "ref": "Raytheon HiTSiC CMOS: https://newelectronics.co.uk/content/features/the-quest-for-high-temperature-analogue-and-mixed-signal-electronics-is-taking-advantage-of-silicon-carbide-s-properties ; https://eepower.com/technical-articles/de-risking-the-route-to-silicon-carbide/ ; https://durham-repository.worktribe.com/OutputFile/1318312"
+  },
+  {
+   "key": "ga2o3",
+   "ref": "500 C operation of beta-Ga2O3 FETs (AFRL): https://impact.ornl.gov/en/publications/500-c-operation-of-%CE%B2-gasub2subosub3subfield-effect-transistors/"
+  },
+  {
+   "key": "diamond",
+   "ref": "NIMS diamond NOR at 300 C: https://publishing.aip.org/publications/latest-content/diamond-based-circuits-can-take-the-heat-for-advanced-applications/"
+  },
+  {
+   "key": "honeywell",
+   "ref": "Honeywell SOI CMOS (225 C continuous, 300 C excursions): https://aerospace.honeywell.com/us/en/products-and-services/product/hardware-and-systems/sensors/silicon-on-insulator-cmos-technology ; HT SRAM: https://militaryaerospace.com/power/article/16709945/honeywell-develops-high-temp-sram"
+  },
+  {
+   "key": "alscn",
+   "ref": "Pradhan et al., Nature Electronics 2024, ferroelectric NVM at 600 C: https://www.engineering.upenn.edu/stories/turning-up-the-heat-on-data-storage/ ; https://archive.aps.org/smt/2025/mar-t20/12"
+  },
+  {
+   "key": "nvct",
+   "ref": "NASA Ames nanoscale vacuum channel transistor: https://science.nasa.gov/technology/technology-highlights/nanoscale-vacuum-electronics-back-to-the-future ; https://www.techbriefs.com/component/content/article/22187-arc-17130-1 ; https://physicsworld.com/a/vacuum-technology-comeback-immunizes-nanoelectronics-from-radiation/"
+  },
+  {
+   "key": "nems",
+   "ref": "SiC NEMS logic at 500 C: https://physicsworld.com/a/logic-circuit-takes-the-heat/ ; https://spectrum.ieee.org/semiconductors/devices/silicon-carbide-nanomechanical-switches-built-to-last"
+  },
+  {
+   "key": "longi_hibc",
+   "ref": "LONGi HIBC 28.29 % (ISFH, 2026): https://taiyangnews.info/technology/longi-raises-single-junction-silicon-cell-world-record-to-2829"
+  },
+  {
+   "key": "longi_tandem",
+   "ref": "LONGi perovskite/Si 35.5 % (ESTI, July 2026): https://www.pv-magazine.com/2026/07/15/longi-sets-new-world-record-with-35-5-efficient-perovskite-silicon-tandem-cell/"
+  },
+  {
+   "key": "xtj",
+   "ref": "Spectrolab XTJ Prime datasheet: https://www.spectrolab.com/photovoltaics/XTJ-Prime_Data_Sheet.pdf"
+  },
+  {
+   "key": "azur",
+   "ref": "AZUR SPACE 4J 32 % BOL / 28.7 % EOL (2017): https://www.azurspace.com/en/about-us/milestones-achievements/"
+  },
+  {
+   "key": "aydin2020",
+   "ref": "Aydin et al., Nature Energy 2020, tandem tempco -0.26 %/K: https://kpv.kaust.edu.sa/publications/detail/outdoor-performance-of-perovskite-silicon-tandem-solar-cells"
+  },
+  {
+   "key": "tempco_modules",
+   "ref": "IBC -0.27..-0.29 %/K and HJT -0.24 %/K: https://www.choice.com.au/products/home-improvement/energy-saving/solar/sunpower-maxeon-5-spr-max5-400-e3-ac-solar-panel ; https://www.ohmsnap.com/solar-panels/maxeon-7-440"
+  },
+  {
+   "key": "dupre2015",
+   "ref": "Dupre, Vaillon & Green, Physics of the temperature coefficients of solar cells (SEMSC 2015): https://www.researchgate.net/profile/Olivier-Dupre-2/publication/274071417_Physics_of_the_temperature_coefficients_of_solar_cells/links/59f0c8deaca272cdc7cdfecf/Physics-of-the-temperature-coefficients-of-solar-cells.pdf"
+  },
+  {
+   "key": "sq1961",
+   "ref": "Shockley & Queisser, J. Appl. Phys. 32, 510 (1961): https://doi.org/10.1063/1.1736034"
+  },
+  {
+   "key": "astm_e490",
+   "ref": "ASTM E-490 AM0 spectrum (NREL/NLR): https://www.nlr.gov/grid/solar-resource/spectra-astm-e490"
+  },
+  {
+   "key": "lang2020",
+   "ref": "Lang et al., Proton radiation hardness of perovskite tandem PV (Joule 2020): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7238692/"
+  },
+  {
+   "key": "hetSi_rad",
+   "ref": "Si heterojunction cells under 1 MeV electrons (19.2 -> 13.6 %): https://j.ioffe.ru/articles/viewPDF/56689"
+  },
+  {
+   "key": "thin_si_rad_patent",
+   "ref": "Thinner Si substrates retain more output after 1e15 e/cm2: https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6229084"
+  },
+  {
+   "key": "perovskite_vacuum",
+   "ref": "Perovskite decomposition under vacuum + illumination: https://arxiv.org/pdf/2310.19430 ; NASA 75 C vacuum tests: https://ntrs.nasa.gov/api/citations/20230009325/downloads/07.05.2023.pdf"
+  },
+  {
+   "key": "ppw",
+   "ref": "Perovskite specific power 23-44 W/g: https://spectrum.ieee.org/ultrathin-solar-cells-for-lightweight-and-flexible-applications- ; https://infoscience.epfl.ch/record/310297 ; https://research.jku.at/en/activities/high-specific-power-perovskite-solar-cells-for-healthcare-devices/"
+  },
+  {
+   "key": "cigs_am0",
+   "ref": "Ascent Solar CIGS 15.7 % AM0 (2025): https://www.nasdaq.com/press-release/ascent-solar-technologies-achieves-record-new-efficiency-157-production-scale-its"
+  },
+  {
+   "key": "bepi",
+   "ref": "BepiColombo MMO array ~230 C: https://jaxa.repo.nii.ac.jp/records/7956/export/json ; UV+heat losses: https://www.solardaily.com/reports/Hot_stuff_the_making_of_BepiColombo_999.html"
+  },
+  {
+   "key": "ingan_hot",
+   "ref": "InGaN cells RT-450 C, EQE 81 % at 450 C: https://labs.engineering.asu.edu/zhao/wp-content/uploads/sites/30/2014/08/acsphotonics.9b00655.pdf ; NASA goal: https://www.nasa.gov/directorates/stmd/space-tech-research-grants/high-temperature-ingan-based-solar-cells ; Landis & Haag Venus PV: https://ntrs.nasa.gov/api/citations/20150016298/downloads/20150016298.pdf"
+  },
+  {
+   "key": "tpv",
+   "ref": "LaPotin et al., TPV efficiency of 40 % (Nature 2022): https://arxiv.org/pdf/2108.09613 ; Bierman et al. STPV 6.8 % (Nature Energy 2016): https://ideas.repec.org/a/nat/natene/v1y2016i6d10.1038_nenergy.2016.68.html"
+  },
+  {
+   "key": "brayton",
+   "ref": "NASA Glenn Brayton unit masses (DIPS 2.5 kWe/352 kg, 6 kWe/675 kg): https://ntrs.nasa.gov/api/citations/20230006422/downloads/MIT%20Gas%20Turbine%20Workshop_Mason_final.pdf"
+  },
+  {
+   "key": "germ",
+   "ref": "Primitive-mantle abundances (McDonough & Sun 1995; Palme & O'Neill 2004) via GERM: Pb 150-185 ppb, I 7-10 ppb, In 11-13 ppb, Ga 3-4 ppm, As 50-66 ppb, Br 50-75 ppb, C 100-120 ppm, N 2 ppm, H 0.012 wt%, Cu 20-30 ppm, Ge 1.1-1.2 ppm: https://earthref.org/GERMRD/30/"
+  },
+  {
+   "key": "mercury_carbon",
+   "ref": "Peplowski et al. 2016, graphite up to a few wt% in Mercury low-reflectance material: https://news.climate.columbia.edu/2016/03/07/messenger-data-reveals-evidence-of-an-ancient-carbon-rich-crust-on-mercury"
+  },
+  {
+   "key": "mercury_volatiles",
+   "ref": "Peplowski et al. 2011, K 1150 ppm, volatile-rich Mercury: https://messenger.jhuapl.edu/Resources/Science-Highlights/highlights122011.html"
+  },
+  {
+   "key": "vapour_pressure",
+   "ref": "Alcock, Itkin & Horrigan 1984 equations: https://en.wikipedia.org/wiki/Vapor_pressures_of_the_elements ; https://mmrc.caltech.edu/PVD/manuals/Metals%20Vapor%20pressure.pdf"
+  },
+  {
+   "key": "kSi",
+   "ref": "k_Si = 2.475e5 T^-1.3 W/m/K fit: https://arxiv.org/pdf/0801.0824"
+  },
+  {
+   "key": "subgap_cooling",
+   "ref": "Comprehensive photonic approach for solar cell cooling (ACS Photonics 2017): https://pure.psu.edu/en/publications/a-comprehensive-photonic-approach-for-solar-cell-cooling/ ; IR/blue-red reflecting coverglass for Si cells: https://www.cjss.ac.cn/cn/article/doi/10.11728/cjss2012.01.136"
+  },
+  {
+   "key": "siqd",
+   "ref": "All-Si tandem with Si QDs in dielectric: https://www.coecxs.org/downloads/Publications/2007/12.%20Silicon%20quantum%20dots%20in%20a%20dielectric%20matrix%20for%20all-silicon%20tandem%20solar%20cells.pdf ; Si-NC p-i-n Voc 370 mV: https://iris.unimore.it/bitstream/11380/1063223/1/Loeper_EUPVSEC_2012_Frankfurt_Abstract_final.pdf"
+  },
+  {
+   "key": "thin_si",
+   "ref": "Thin c-Si efficiency vs thickness: arXiv:1505.03985 (architecture.md)"
+  }
+ ],
+ "files": [
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/alt_power.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/alt_power.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/build_result.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/hot_logic.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/hot_logic.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/log_alt_power.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/log_build_result.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/log_hot_logic.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/log_placement.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/log_pv_db.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/placement.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/placement.mjs",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/pv_db.json",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/pv_db.py",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/data/am0_e490.txt",
+  "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research5/future/hot_power/result.json"
+ ]
+}

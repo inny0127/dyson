@@ -1,0 +1,2568 @@
+{
+ "angle": "ADVERSARIAL REVIEW (ML systems + spacecraft physics) of the hybrid compute-sail + pod verdict",
+ "scripts_dir": "/tmp/claude-0/-home-user-dyson/ad00b444-ce7a-5a35-9f3b-10c4981fd7d3/scratchpad/research3/skeptic/",
+ "files": {
+  "film_locality.py/.json": "film decode with weight-stationary expert and per-sequence KV locality, no striping (fill levels optimised)",
+  "film_striped.py/.json": "same plus the best striping the film can do (expert tensor-parallel, KV striping, dense under-fill) with mesh byte-hops charged; 60 model/scenario rows vs the GPU island of inference.py",
+  "large_batch.py/.json": "batch concurrency 2k-32k sequences, TPOT 20 and 100 ms",
+  "checks.py/.json": "spreading FV check, SRAM area/leakage, pod memory capacity, best-credible pod mass, hybrid mass vs pod fraction, 2D tensor-parallel and layer-local MoE cost on the mesh, SEU, shadowing, swarm scale",
+  "table_inference_tpot20.json, table_large_batch.json": "representative rows"
+ },
+ "refuted": "partly",
+ "one_line": "The direction survives: mostly film, a small concentrated fraction. The film still wins on mass per watt, by about 3-9x rather than \"10x\". Many supporting claims are wrong or unproven. Frontier models do not fit in 3-10 m patches. The evidence's film-inference numbers ignore memory locality. SRAM wafer-scale pods cannot hold training state. Tensor parallelism is not the reason pods are needed. SRAM leakage at 85 C is under-budgeted. The design omits storage, CPU/DRAM sandboxes, volatility, and the differential radiation pressure between film and pods.",
+ "confirmed": [
+  "Film lateral spreading: 0.15 W chiplet at 2.54 cm pitch, 30 um c-Si + 13 um Mg: die-to-mean dT 9.1-10.3 K (1.5 mm2 die, k_Si 148-120), 6.5-7.4 K (6 mm2 die). The 10 K claim holds. The c-Si absorber carries ~2/3 of the heat; Mg alone would give ~27 K.",
+  "Film areal density 0.172 kg/m2 sums correctly from its items (c-Si 0.070, glass 0.050+0.0125, Mg 0.0225, structure 0.012, grid 0.004). Film 0.89 g/W (0.47-1.98) is plausible.",
+  "Concentrated A at 7.2 g/W is internally consistent and lighter than SpaceX AI1 (~13 g/W at 75 kW/t). The heat-transport tax is structural, so a better pod narrows the gap but does not close it.",
+  "MoE expert all-to-all at 31-47 % of energy reproduces for patch-wide routing over 68-137 hops (1.4e-4 B/FLOP x 3.7 pJ/B-hop). With layer-local expert placement it falls to ~8-12 %.",
+  "Cross-island bandwidth for DiLoCo/SparseLoCo-class sync is small (training.json), and Earth I/O is energetically negligible."
+ ],
+ "errors": [
+  {
+   "id": 1,
+   "severity": "critical (evidence) / major (verdict)",
+   "claim": "Film runs SRAM-resident dataflow inference efficiently. inference.json shows the film 9-160x better than HBM GPUs in tokens/s per kg.",
+   "problem": "inference.py sets each layer stage to b*FLOP/(n_chips*F*U), i.e. every chip in a layer region shares every token at no cost. Weight-stationary SRAM cannot do that: a routed expert runs only on the chips holding it, and attention runs only where that sequence's KV sits. Recomputed with locality and no striping, film utilisation is 1-5 % and the per-kg advantage 1-8x. Striping fixes this but costs mesh bandwidth. Expert tensor-parallel over 8-64 chips, KV striped over 16-2048 chips and dense chips under-filled 4-128x use 20-29 % of chip power on the mesh, i.e. the whole 30 % IO budget.",
+   "correct_value": "Frontier MoE (0.67-10T), film/HBM-pod tokens/s per kg at mid masses. Low-to-medium concurrency (64-2048 sequences): 6-90x with overlapped stages, 3-30x without. Batch concurrency (8k-32k sequences), the regime of synthetic data and RL rollouts: 1.8-6x overlapped, 0.8-2x non-overlapped, 0.2-1.7x at pessimistic masses. Film J/token is 0.1-0.7x the GPU's at low concurrency and 1.3-9x at high concurrency. With the best-credible pod (3.9 g/W) instead of 7.2, divide all ratios by ~1.9. Film utilisation 1-44 %."
+  },
+  {
+   "id": 2,
+   "severity": "major",
+   "claim": "Frontier models served from 3-10 m patches.",
+   "problem": "Weights plus KV for 4T-10T models at 16 MB per 0.15 W chiplet and 2.5 cm pitch do not fit. The evidence's own inference.json gives 17-33 m. The interconnect study recommended patches of 1 m2 or less.",
+   "correct_value": "4T-10T: 17-30 m sides at 2k concurrency or less, 30-100 m at 8k-32k. 0.67-1T models: 8-18 m. Only models of about 0.5T or less, at modest concurrency, fit in 10 m. Sides grow 1.4-2x if leakage limits a 0.15 W chiplet to 4-8 MB."
+  },
+  {
+   "id": 3,
+   "severity": "major",
+   "claim": "Pods are wafer-scale SRAM modules for tightly coupled training islands.",
+   "problem": "Wafer SRAM holds ~1.8 MB/W (Cerebras WSE-3: 44 GB at ~25 kW), against 115 MB/W for HBM (Rubin) and 107 MB/W for the film. A 1e26-1e28-FLOP MoE replica holds 115-1154 TB of state (16 B/param x1.25).",
+   "correct_value": "At ~1.8 MB/W, SRAM-wafer pods need 64-641 MW per replica; HBM pods need 1.2-12 MW and film 1.3-13.5 MW. Training pods must be HBM/DRAM and shielded. Google Suncatcher saw HBM irregularities at ~2 krad, so ~5 g/cm2 of shielding is required."
+  },
+  {
+   "id": 4,
+   "severity": "major",
+   "claim": "The film cannot do tensor or expert parallelism, so pods are needed for TP/EP training islands. interconnect_final puts Megatron TP on a film group at 53-96 % of energy.",
+   "problem": "That figure uses a 1D Megatron layout. A 2D (SUMMA-style) weight-stationary layout on the mesh costs ~2.5/sqrt(params per chip) byte-hops per FLOP, independent of d.",
+   "correct_value": "2D TP: 1.4-3.5 % of energy for inference, 3.6-13 % for training (16-40 B/param). Layer-local expert all-to-all in 1e27-1e29 MoE training: 15-31 % (10-22 m layer regions, 3-6 us). The film can host dense training and, at a cost, MoE training. Pods are justified mainly by DRAM-capacity CPU work, storage, switching and MoE-heavy or hedge training."
+  },
+  {
+   "id": 5,
+   "severity": "major",
+   "claim": "~10x more FLOP/s per kg of Mercury (0.9 vs 7.2 g/W).",
+   "problem": "(a) This is peak FLOP/s; film decode utilisation is 1-44 % against ~50 % assumed for GPUs. (b) It applies to pure film: the recommended hybrid with 3-10 % pods is only 4.7-6.6x. (c) The pod is not the best concentrated design. A pod with a 353 K radiator at 1.3 kg/m2, short two-phase SO2 loops and a 0.8 kg/kW module reaches 3.9 g/W (2.2-6.6).",
+   "correct_value": "Peak FLOP/s per kg, film over best-credible pod: ~4.8x (2.9-8.9x), including the pod's +12-20 % J/FLOP at Tj 105-120 C. Hybrid at 15 % pods: 1.85 g/W, 3.9x over pure thermal_mass pods (2.9x over best pods). Each 1 % of power moved into pods adds ~7.2 % to total mass."
+  },
+  {
+   "id": 6,
+   "severity": "major",
+   "claim": "SRAM-only chiplets at 0.15 W and Tj 85 C, with SRAM leakage plus control at ~15 % of chip power (workloads/common.py).",
+   "problem": "The film is memory-heavy: 16 MB per 0.15 W is 107 MB/W, ~60x Cerebras and ~100x Groq. The 3-nm ISSCC low-leakage figure (27.5 uW/Mb at 25 C) times the project's own 25-85 C factor of 4-24 gives 15-89 mW. With 100 pA/cell active leakage it gives 40-240 mW.",
+   "correct_value": "SRAM leakage is 10-59 % of chip power (retention basis) or 27-160 % (100 pA/cell). The film then holds 2-4x less SRAM per chip (wider patches) or loses 1.3-2x compute per W. Mitigations: non-volatile MRAM/RRAM for read-mostly weights (no standby power, SEU-immune, survives brownouts), or Tj 60-70 C at ~1.0-1.07 AU, which conflicts with staying inside Earth's orbit at higher coverage."
+  },
+  {
+   "id": 7,
+   "severity": "major",
+   "claim": "Manufacturing: the same die area per MW as modules, 47 x 300 mm wafers per MW (0.75-1.5 mm2 dies).",
+   "problem": "A 16 MB SRAM chiplet as used by the workload model is ~6 mm2 (5.0 mm2 SRAM at 35.5 Mb/mm2 with 25 % periphery, plus logic). That is ~40 mm2/W of leading-edge logic silicon, against ~5 mm2/W for an HBM GPU (and the HBM's DRAM uses a different, denser process).",
+   "correct_value": "~640 leading-edge 300 mm wafers per MW, 13x the claim. Mass is negligible, but fab throughput, not Mercury mass, is the likely build-rate limit, and it favours HBM pods per W."
+  },
+  {
+   "id": 8,
+   "severity": "major",
+   "claim": "DiLoCo-class low-communication methods between islands, for 1e27-1e29 FLOP runs.",
+   "problem": "Largest public low-communication pretraining: Covenant-72B (SparseLoCo, 72B params, ~1.1T tokens), about 4.7e23 FLOP by 6ND (my estimate; the paper gives no FLOP total). INTELLECT-1 is ~6e22 FLOP. DiLoCo scaling laws go to ~10B params, and quality degrades with replica count (+1.1 % loss at M=8, 2.4B). Frontier runs are ~3e26-1e27 FLOP. At the Earth-safe swarm (3.2e36 FLOP/s) a 1e29 run is 3e-8 s of swarm time, and 1 % of the swarm for a year is 1e42 FLOP.",
+   "correct_value": "The claim is unproven by 3-6 orders of magnitude. Swarm-scale training would mean millions to billions of islands, for which no method exists. Training throughput per model is capped by algorithms, not by the pod fraction."
+  },
+  {
+   "id": 9,
+   "severity": "minor",
+   "claim": "Inference dominates future compute.",
+   "problem": "Epoch AI puts OpenAI compute at ~5:2 R&D to inference in 2024 ($5B vs $2B) and roughly even in 2025. It holds only if RL rollouts (inference-like, but counted as R&D) are included.",
+   "correct_value": "Not established. Plausible as a trend. Do not make the architecture hinge on it; the film's ability to train (error 4) reduces the dependence."
+  },
+  {
+   "id": 10,
+   "severity": "minor",
+   "claim": "One energy-per-FLOP basis across the evidence.",
+   "problem": "thermal_mass uses 7.8e-14 J/FLOP (system, 85 C, under-clocked). workloads uses 0.15 pJ / 0.55 = 2.7e-13 J/FLOP for film chips and 1.43e-13 for the Rubin all-in.",
+   "correct_value": "Absolute swarm FLOP/s differ 3.5x depending on the source file. Pick one basis for the visualization."
+  },
+  {
+   "id": 11,
+   "severity": "minor",
+   "claim": "Assumed frontier configs (workloads/common.py).",
+   "problem": "Frontier-2028 4T has 405B of non-routed (every-token) params but 120B active (3.8x inconsistent); Kimi-K2 class 1.42x. This penalises the film model, which touches the dense bytes, but not the GPU model, which uses 2*Na.",
+   "correct_value": "Corrected in film_striped.py by capping dense bytes at Na minus active routed."
+  },
+  {
+   "id": 12,
+   "severity": "minor",
+   "claim": "Thin c-Si film: AM0 20 % at 30 um; 20 um glass cover made from Mercury materials.",
+   "problem": "20 % AM0 at 30 um is about 5-10 % optimistic. A soda-lime-type glass (~9 ppm/K) on Si (2.6 ppm/K) leaves ~100 MPa tension in a 20 um cover after processing, so it must be a SiO2-rich Mg-aluminosilicate or fused silica (0.5-4 ppm/K).",
+   "correct_value": "Design detail. It does not change the mass."
+  }
+ ],
+ "missing_considerations": [
+  "Differential radiation pressure: film beta ~0.005 vs pods ~0.0005 gives da ~3e-5 m/s2 at 0.92 AU, ~1 km/s per year (110 km of drift per day from rest; 70 m/s along-track for co-radial circular orbits). Film and pods cannot hold km-scale formations without ~2.5 %/yr EP propellant or matching sails (~+0.5 g/W on pods). Sail-to-pod links are long-range handover links, so only pod-only clusters can be Suncatcher-class.",
+  "Shadowing and volatility: the umbra is ~99x the occulter size at 0.92 AU, so a 100 m pod or radiator shades ~10 km downstream. Any brownout wipes SRAM weights and KV. Formation rules must keep pods off film sun-lines, and the film needs a backing store and a reload path.",
+  "Storage and CPU/DRAM: agentic RL needs environments, tool sandboxes (1-16 GB DRAM each; 4 GB = 312 film chiplets), datasets, checkpoints and weight stores. None is film-hostable, and DRAM/NAND need shielding. Estimate 3-15 % of power in shielded CPU/DRAM/flash pods, absent from the verdict.",
+  "Soft errors: an unshielded 16 MB chip sees ~0.1-13 upsets/day quiet and ~1e3-1e5 in large SEPs (low-energy proton direct ionisation through ~1-12 mg/cm2). SECDED (+12.5 % bits) with 1-100 Hz scrubbing keeps uncorrectables at or below 5e-4 per chip-day except in extreme events. Logic silent data corruption needs ABFT/residue checks (~2-5 %); pause during big SEPs.",
+  "Fault tolerance: at 0.13 %/yr (0.007-1.2 %) a 30 m frontier patch (1.4M chips) loses ~5 chips/day (0.3-46), plus ~0.1 % dead at bonding. Each loss stalls the layer pipeline until remap, so it needs spare chips, detour routing and a weight backing store. Film training replicas (1e7-1e8 chips) lose a chip every 0.5-80 min. Recovery from DiLoCo sibling replicas, not checkpoints, is needed.",
+  "Pipeline occupancy: decode needs 61-128 or more concurrent sequences (one per layer stage) to fill the layer pipeline. Single-agent long-context streams use ~1/L of a patch.",
+  "Location: Earth is 200-1200 s away, so the film's strongest advantage (low-batch, latency-bound decode) only benefits in-swarm agents. For batch work the advantage shrinks to ~1-6x per kg.",
+  "RL across heterogeneous hardware: rollouts on film chiplets and training in pods worsen the inference/training numerical mismatch, requiring importance-sampling corrections. A 10 TB policy every ~10 min is 133 Gbps sustained per frontier replica, i.e. one Starlink-class terminal per patch plus delta compression.",
+  "Attitude: a 1 % reflectivity asymmetry on a 1-km film gives ~11 N.m of torque. About 0.5 % of the area as vanes handles it. Minor."
+ ],
+ "recommendation": {
+  "summary": "Keep a hybrid with the film as the majority, but re-scope it: ~80-90 % of power on compute sails and ~10-20 % in concentrated pods (baseline 15 %). Pods should be shielded HBM/DRAM/flash modules, not wafer-scale SRAM. Their job is CPU/DRAM agent and RL environments, storage, weight and checkpoint stores, optical switching and gateways, and MoE-heavy or hedge training islands. The film serves frontier inference in 15-40 m patches (30-100 m at batch concurrency), smaller models in 3-10 m patches, and dense or 2D-TP training replicas joined by DiLoCo-class sync. Keep pod power as low as demand allows: each 1 % moved into pods costs ~7 % of total mass.",
+  "split": {
+   "film_frac": "0.80-0.90 (baseline 0.85)",
+   "pods_frac": "0.10-0.20 (baseline 0.15)",
+   "pods_breakdown": "5-10 % shielded CPU+DRAM/flash (sandboxes, RL envs, storage, weight stores, gateways/switches 0.7-2.9 %) + 5-10 % HBM training/capacity islands",
+   "why": "Physics favours the film by ~3-9x in mass per watt, and by 6-90x (low concurrency) or ~1-6x (batch) in useful inference per kg. 2D TP and layer-local EP make film training feasible at 4-31 % comm overhead. What the film cannot host is DRAM-capacity CPU work, non-volatile storage, global shuffles and switching. Those set the pod floor (~5-10 %), plus a training hedge."
+  },
+  "key_numbers": {
+   "film_g_per_W": "0.89 (0.47-1.98)",
+   "pod_g_per_W": "7.2 thermal_mass (4.4-15.1); best-credible 3.9 (2.2-6.6)",
+   "hybrid_g_per_W_at_15pct": "1.85 (thermal_mass pods) / 1.34 (best pods)",
+   "FLOPs_per_kg_film_over_pod": "~4.8x (2.9-8.9x) peak; useful inference per kg 6-90x at low concurrency, 1.8-6x at batch concurrency (0.8-2x non-overlapped)",
+   "chiplet": "0.15 W at 2.5 cm, dT 7-10 K confirmed. Memory: 4-8 MB SRAM for KV/activations plus non-volatile MRAM/RRAM weights, or Tj 60-70 C if SRAM-only.",
+   "patch_sides": "<=0.5T: 3-10 m; 0.67-1T: 8-18 m; 4-10T: 17-30 m (<=2k seq), 30-100 m (8-32k seq)",
+   "mesh_IO_budget": "20-30 % of chip power for striped layouts",
+   "placement": "film ~0.92 AU (sheet 348 K), pods ~0.86-0.9 AU; pod clusters co-orbit with each other, not with film (beta mismatch)",
+   "links": "Starlink-class 0.1-0.4 Tbps handover links between sails and pods (one per frontier patch); Suncatcher-class formations only among pods; DiLoCo/SparseLoCo between islands (unproven above ~5e23 FLOP)"
+  }
+ },
+ "sources": [
+  "Epoch AI, AI Chip Users explorer (OpenAI 2025 compute ~even R&D vs inference): https://epoch.ai/latest/introducing-the-ai-chip-users-explorer",
+  "OpenAI 2024 compute $5B R&D vs $2B inference (Epoch via summary): https://www.longtermwiki.com/wiki/ai-compute-scaling-metrics",
+  "Covenant-72B / SparseLoCo, ~1.1T tokens, >146x compression: https://arxiv.org/abs/2603.08163",
+  "DiLoCo scaling laws (Charles et al., NeurIPS 2025): https://arxiv.org/abs/2503.09799",
+  "Frontier training compute ~10^26.5-10^27 FLOP (Epoch estimates via tracker): https://ai2027-tracker.com/predictions/training-compute/",
+  "Google Suncatcher (HBM most radiation-sensitive; UECC ~44 rad/event; irregularities ~2 krad): https://arxiv.org/pdf/2511.19468",
+  "Llama 3 run: 419 unexpected interruptions in 54 days on 16,384 H100s (HBM3 17 %): https://datacenterdynamics.com/en/news/meta-report-details-hundreds-of-gpu-and-hbm3-related-interruptions-to-llama-3-training-run",
+  "Cerebras CS-3: 44 GB on-chip SRAM, up to ~27 kW: https://flopper.io/system/cerebras-cs-3",
+  "Low-energy proton direct-ionisation SEU in 65-16 nm SRAM (IEEE TNS 2024): https://jyx.jyu.fi/handle/123456789/100368",
+  "3-nm dual-rail SRAM 27.5 uW/Mbit low-leakage mode (ISSCC-class; temperature unstated): https://sscs.ieee.org/tag/bit-density/",
+  "Project evidence: research3/interconnect_final.json, research3/workloads/*.json, research3/thermal_mass/result.json, research2/research_ai1.json, research2/research_hotsi.json"
+ ],
+ "checks": {
+  "spreading": {
+   "R_cell_cm": 1.4327348933476909,
+   "pitch_cm": 2.5394564790408185,
+   "analytic_dT_K_Si130_Mg13_die1p5": 9.189275428397698,
+   "rows": [
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 0.75,
+     "dT_K": 14.71
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 1.5,
+     "dT_K": 12.87
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 6.0,
+     "dT_K": 9.19
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 0.75,
+     "dT_K": 10.33
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 1.5,
+     "dT_K": 9.06
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 6.0,
+     "dT_K": 6.53
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 0.75,
+     "dT_K": 8.12
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 1.5,
+     "dT_K": 7.14
+    },
+    {
+     "k_Si": 148.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 6.0,
+     "dT_K": 5.17
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 0.75,
+     "dT_K": 16.62
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 1.5,
+     "dT_K": 14.52
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 6.0,
+     "dT_K": 10.34
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 0.75,
+     "dT_K": 11.21
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 1.5,
+     "dT_K": 9.83
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 6.0,
+     "dT_K": 7.07
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 0.75,
+     "dT_K": 8.66
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 1.5,
+     "dT_K": 7.6
+    },
+    {
+     "k_Si": 130.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 6.0,
+     "dT_K": 5.5
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 0.75,
+     "dT_K": 17.91
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 1.5,
+     "dT_K": 15.64
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 0.0,
+     "die_mm2": 6.0,
+     "dT_K": 11.11
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 0.75,
+     "dT_K": 11.77
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 1.5,
+     "dT_K": 10.32
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 13.0,
+     "die_mm2": 6.0,
+     "dT_K": 7.41
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 0.75,
+     "dT_K": 8.98
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 1.5,
+     "dT_K": 7.89
+    },
+    {
+     "k_Si": 120.0,
+     "t_Mg_um": 25.0,
+     "die_mm2": 6.0,
+     "dT_K": 5.7
+    }
+   ],
+   "note": "dT = die centre minus mean sheet temperature; Si absorber carries ~2/3 of the heat; Mg-only would give ~27 K"
+  },
+  "sram_chiplet": {
+   "rows": [
+    {
+     "MB": 2,
+     "sram_mm2": 0.63,
+     "leak_model": "retention",
+     "hot": "lo",
+     "leak_W": 0.0018,
+     "leak_share_of_0p15W": 0.012
+    },
+    {
+     "MB": 2,
+     "sram_mm2": 0.63,
+     "leak_model": "retention",
+     "hot": "mid",
+     "leak_W": 0.0032,
+     "leak_share_of_0p15W": 0.022
+    },
+    {
+     "MB": 2,
+     "sram_mm2": 0.63,
+     "leak_model": "retention",
+     "hot": "hi",
+     "leak_W": 0.0111,
+     "leak_share_of_0p15W": 0.074
+    },
+    {
+     "MB": 2,
+     "sram_mm2": 0.63,
+     "leak_model": "active_100pA",
+     "hot": "lo",
+     "leak_W": 0.005,
+     "leak_share_of_0p15W": 0.034
+    },
+    {
+     "MB": 2,
+     "sram_mm2": 0.63,
+     "leak_model": "active_100pA",
+     "hot": "mid",
+     "leak_W": 0.0088,
+     "leak_share_of_0p15W": 0.059
+    },
+    {
+     "MB": 2,
+     "sram_mm2": 0.63,
+     "leak_model": "active_100pA",
+     "hot": "hi",
+     "leak_W": 0.0302,
+     "leak_share_of_0p15W": 0.201
+    },
+    {
+     "MB": 4,
+     "sram_mm2": 1.26,
+     "leak_model": "retention",
+     "hot": "lo",
+     "leak_W": 0.0037,
+     "leak_share_of_0p15W": 0.025
+    },
+    {
+     "MB": 4,
+     "sram_mm2": 1.26,
+     "leak_model": "retention",
+     "hot": "mid",
+     "leak_W": 0.0065,
+     "leak_share_of_0p15W": 0.043
+    },
+    {
+     "MB": 4,
+     "sram_mm2": 1.26,
+     "leak_model": "retention",
+     "hot": "hi",
+     "leak_W": 0.0221,
+     "leak_share_of_0p15W": 0.148
+    },
+    {
+     "MB": 4,
+     "sram_mm2": 1.26,
+     "leak_model": "active_100pA",
+     "hot": "lo",
+     "leak_W": 0.0101,
+     "leak_share_of_0p15W": 0.067
+    },
+    {
+     "MB": 4,
+     "sram_mm2": 1.26,
+     "leak_model": "active_100pA",
+     "hot": "mid",
+     "leak_W": 0.0176,
+     "leak_share_of_0p15W": 0.117
+    },
+    {
+     "MB": 4,
+     "sram_mm2": 1.26,
+     "leak_model": "active_100pA",
+     "hot": "hi",
+     "leak_W": 0.0604,
+     "leak_share_of_0p15W": 0.403
+    },
+    {
+     "MB": 8,
+     "sram_mm2": 2.52,
+     "leak_model": "retention",
+     "hot": "lo",
+     "leak_W": 0.0074,
+     "leak_share_of_0p15W": 0.049
+    },
+    {
+     "MB": 8,
+     "sram_mm2": 2.52,
+     "leak_model": "retention",
+     "hot": "mid",
+     "leak_W": 0.0129,
+     "leak_share_of_0p15W": 0.086
+    },
+    {
+     "MB": 8,
+     "sram_mm2": 2.52,
+     "leak_model": "retention",
+     "hot": "hi",
+     "leak_W": 0.0443,
+     "leak_share_of_0p15W": 0.295
+    },
+    {
+     "MB": 8,
+     "sram_mm2": 2.52,
+     "leak_model": "active_100pA",
+     "hot": "lo",
+     "leak_W": 0.0201,
+     "leak_share_of_0p15W": 0.134
+    },
+    {
+     "MB": 8,
+     "sram_mm2": 2.52,
+     "leak_model": "active_100pA",
+     "hot": "mid",
+     "leak_W": 0.0352,
+     "leak_share_of_0p15W": 0.235
+    },
+    {
+     "MB": 8,
+     "sram_mm2": 2.52,
+     "leak_model": "active_100pA",
+     "hot": "hi",
+     "leak_W": 0.1208,
+     "leak_share_of_0p15W": 0.805
+    },
+    {
+     "MB": 16,
+     "sram_mm2": 5.04,
+     "leak_model": "retention",
+     "hot": "lo",
+     "leak_W": 0.0148,
+     "leak_share_of_0p15W": 0.098
+    },
+    {
+     "MB": 16,
+     "sram_mm2": 5.04,
+     "leak_model": "retention",
+     "hot": "mid",
+     "leak_W": 0.0258,
+     "leak_share_of_0p15W": 0.172
+    },
+    {
+     "MB": 16,
+     "sram_mm2": 5.04,
+     "leak_model": "retention",
+     "hot": "hi",
+     "leak_W": 0.0886,
+     "leak_share_of_0p15W": 0.591
+    },
+    {
+     "MB": 16,
+     "sram_mm2": 5.04,
+     "leak_model": "active_100pA",
+     "hot": "lo",
+     "leak_W": 0.0403,
+     "leak_share_of_0p15W": 0.268
+    },
+    {
+     "MB": 16,
+     "sram_mm2": 5.04,
+     "leak_model": "active_100pA",
+     "hot": "mid",
+     "leak_W": 0.0705,
+     "leak_share_of_0p15W": 0.47
+    },
+    {
+     "MB": 16,
+     "sram_mm2": 5.04,
+     "leak_model": "active_100pA",
+     "hot": "hi",
+     "leak_W": 0.2416,
+     "leak_share_of_0p15W": 1.611
+    },
+    {
+     "MB": 32,
+     "sram_mm2": 10.08,
+     "leak_model": "retention",
+     "hot": "lo",
+     "leak_W": 0.0295,
+     "leak_share_of_0p15W": 0.197
+    },
+    {
+     "MB": 32,
+     "sram_mm2": 10.08,
+     "leak_model": "retention",
+     "hot": "mid",
+     "leak_W": 0.0517,
+     "leak_share_of_0p15W": 0.344
+    },
+    {
+     "MB": 32,
+     "sram_mm2": 10.08,
+     "leak_model": "retention",
+     "hot": "hi",
+     "leak_W": 0.1772,
+     "leak_share_of_0p15W": 1.181
+    },
+    {
+     "MB": 32,
+     "sram_mm2": 10.08,
+     "leak_model": "active_100pA",
+     "hot": "lo",
+     "leak_W": 0.0805,
+     "leak_share_of_0p15W": 0.537
+    },
+    {
+     "MB": 32,
+     "sram_mm2": 10.08,
+     "leak_model": "active_100pA",
+     "hot": "mid",
+     "leak_W": 0.1409,
+     "leak_share_of_0p15W": 0.94
+    },
+    {
+     "MB": 32,
+     "sram_mm2": 10.08,
+     "leak_model": "active_100pA",
+     "hot": "hi",
+     "leak_W": 0.4832,
+     "leak_share_of_0p15W": 3.221
+    }
+   ],
+   "die_mm2_16MB": 6.097197641314553,
+   "mm2_per_W_16MB_at_0p15W": 40.64798427543035,
+   "wafers_300mm_per_MW_16MB": 638.9459381882838,
+   "wafers_per_MW_claimed_thermal_mass": 47.2,
+   "film_MB_per_W": 106.66666666666667,
+   "rubin_HBM_MB_per_W": 115.2,
+   "cerebras_wse3_MB_per_W": 1.76,
+   "groq_MB_per_W": 0.92
+  },
+  "pod_capacity": {
+   "rows": [
+    {
+     "run": "1e26 MoE (5.8T)",
+     "state_TB": 115.4,
+     "MW_wafer_SRAM_1p8MB_per_W": 64.11111111111111,
+     "MW_HBM_115MB_per_W": 1.1805626598465473,
+     "MW_film_107MB_per_W": 1.3481308411214954
+    },
+    {
+     "run": "1e27 MoE (18T)",
+     "state_TB": 366.0,
+     "MW_wafer_SRAM_1p8MB_per_W": 203.33333333333334,
+     "MW_HBM_115MB_per_W": 3.7442455242966752,
+     "MW_film_107MB_per_W": 4.275700934579439
+    },
+    {
+     "run": "1e28 MoE (58T)",
+     "state_TB": 1154.0,
+     "MW_wafer_SRAM_1p8MB_per_W": 641.1111111111112,
+     "MW_HBM_115MB_per_W": 11.805626598465473,
+     "MW_film_107MB_per_W": 13.48130841121495
+    },
+    {
+     "run": "1e29 dense (29T)",
+     "state_TB": 578.0,
+     "MW_wafer_SRAM_1p8MB_per_W": 321.1111111111111,
+     "MW_HBM_115MB_per_W": 5.91304347826087,
+     "MW_film_107MB_per_W": 6.752336448598131
+    }
+   ],
+   "note": "Cerebras-class wafer SRAM ~44 GB per 23-27 kW = 1.6-1.9 MB/W; a 0.3-1 MW SRAM pod holds 0.5-1.9 TB."
+  },
+  "best_pod": {
+   "opt": {
+    "g_per_W": 2.169107395961724,
+    "items_g_per_W": {
+     "wing": 0.4967474866942637,
+     "radiator": 0.6223599092674603,
+     "loops": 0.25,
+     "module": 0.4,
+     "conversion": 0.1,
+     "shielding": 0.1,
+     "misc": 0.2
+    },
+    "T_rad_K": 363.0,
+    "q_rad_W_m2": 1446.1085725449957,
+    "FLOP_per_kg_ratio_film_over_pod": 2.8662337371050777
+   },
+   "mid": {
+    "g_per_W": 3.856067763399568,
+    "items_g_per_W": {
+     "wing": 0.6167947959787109,
+     "radiator": 1.139272967420857,
+     "loops": 0.6,
+     "module": 0.8,
+     "conversion": 0.2,
+     "shielding": 0.2,
+     "misc": 0.3
+    },
+    "T_rad_K": 353.0,
+    "q_rad_W_m2": 1141.0785976454836,
+    "FLOP_per_kg_ratio_film_over_pod": 4.83627759799274
+   },
+   "pess": {
+    "g_per_W": 6.6364347908456764,
+    "items_g_per_W": {
+     "wing": 0.8279124778237731,
+     "radiator": 2.058522313021903,
+     "loops": 1.2,
+     "module": 1.5,
+     "conversion": 0.3,
+     "shielding": 0.3,
+     "misc": 0.45
+    },
+    "T_rad_K": 341.0,
+    "q_rad_W_m2": 874.4136454647444,
+    "FLOP_per_kg_ratio_film_over_pod": 8.917941488258467
+   }
+  },
+  "hybrid": [
+   {
+    "pod_frac": 0.0,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 0.893,
+    "mass_vs_pure_film": 1.0,
+    "advantage_vs_pure_conc": 8.04
+   },
+   {
+    "pod_frac": 0.0,
+    "pod": "best-credible pod",
+    "g_per_W": 0.893,
+    "mass_vs_pure_film": 1.0,
+    "advantage_vs_pure_conc": 8.04
+   },
+   {
+    "pod_frac": 0.03,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 1.085,
+    "mass_vs_pure_film": 1.22,
+    "advantage_vs_pure_conc": 6.62
+   },
+   {
+    "pod_frac": 0.03,
+    "pod": "best-credible pod",
+    "g_per_W": 0.982,
+    "mass_vs_pure_film": 1.1,
+    "advantage_vs_pure_conc": 7.31
+   },
+   {
+    "pod_frac": 0.05,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 1.213,
+    "mass_vs_pure_film": 1.36,
+    "advantage_vs_pure_conc": 5.92
+   },
+   {
+    "pod_frac": 0.05,
+    "pod": "best-credible pod",
+    "g_per_W": 1.041,
+    "mass_vs_pure_film": 1.17,
+    "advantage_vs_pure_conc": 6.9
+   },
+   {
+    "pod_frac": 0.1,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 1.534,
+    "mass_vs_pure_film": 1.72,
+    "advantage_vs_pure_conc": 4.68
+   },
+   {
+    "pod_frac": 0.1,
+    "pod": "best-credible pod",
+    "g_per_W": 1.189,
+    "mass_vs_pure_film": 1.33,
+    "advantage_vs_pure_conc": 6.04
+   },
+   {
+    "pod_frac": 0.15,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 1.854,
+    "mass_vs_pure_film": 2.08,
+    "advantage_vs_pure_conc": 3.87
+   },
+   {
+    "pod_frac": 0.15,
+    "pod": "best-credible pod",
+    "g_per_W": 1.337,
+    "mass_vs_pure_film": 1.5,
+    "advantage_vs_pure_conc": 5.37
+   },
+   {
+    "pod_frac": 0.2,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 2.174,
+    "mass_vs_pure_film": 2.43,
+    "advantage_vs_pure_conc": 3.3
+   },
+   {
+    "pod_frac": 0.2,
+    "pod": "best-credible pod",
+    "g_per_W": 1.486,
+    "mass_vs_pure_film": 1.66,
+    "advantage_vs_pure_conc": 4.83
+   },
+   {
+    "pod_frac": 0.3,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 2.815,
+    "mass_vs_pure_film": 3.15,
+    "advantage_vs_pure_conc": 2.55
+   },
+   {
+    "pod_frac": 0.3,
+    "pod": "best-credible pod",
+    "g_per_W": 1.782,
+    "mass_vs_pure_film": 2.0,
+    "advantage_vs_pure_conc": 4.03
+   },
+   {
+    "pod_frac": 0.5,
+    "pod": "thermal_mass pod 7.30",
+    "g_per_W": 4.096,
+    "mass_vs_pure_film": 4.59,
+    "advantage_vs_pure_conc": 1.75
+   },
+   {
+    "pod_frac": 0.5,
+    "pod": "best-credible pod",
+    "g_per_W": 2.375,
+    "mass_vs_pure_film": 2.66,
+    "advantage_vs_pure_conc": 3.02
+   }
+  ],
+  "tensor_parallel_2D": {
+   "rows": [
+    {
+     "case": "inference FP8 weights",
+     "params_per_chip": 12800000.0,
+     "byte_hops_per_FLOP": 0.0006987712429686843,
+     "comm_J_per_FLOP": 2.795084971874737e-15,
+     "E_FLOP": 7.8e-14,
+     "comm_share": 0.03459474017321379
+    },
+    {
+     "case": "inference FP8 weights",
+     "params_per_chip": 12800000.0,
+     "byte_hops_per_FLOP": 0.0006987712429686843,
+     "comm_J_per_FLOP": 2.795084971874737e-15,
+     "E_FLOP": 2e-13,
+     "comm_share": 0.013782804313341133
+    },
+    {
+     "case": "training 16 B/param state",
+     "params_per_chip": 800000.0,
+     "byte_hops_per_FLOP": 0.0018633899812498247,
+     "comm_J_per_FLOP": 7.453559924999299e-15,
+     "E_FLOP": 7.8e-14,
+     "comm_share": 0.08722351569134305
+    },
+    {
+     "case": "training 16 B/param state",
+     "params_per_chip": 800000.0,
+     "byte_hops_per_FLOP": 0.0018633899812498247,
+     "comm_J_per_FLOP": 7.453559924999299e-15,
+     "E_FLOP": 2e-13,
+     "comm_share": 0.03592881186369607
+    },
+    {
+     "case": "training 20 B/param + activations x2",
+     "params_per_chip": 320000.0,
+     "byte_hops_per_FLOP": 0.002946278254943948,
+     "comm_J_per_FLOP": 1.1785113019775792e-14,
+     "E_FLOP": 7.8e-14,
+     "comm_share": 0.13125909879046474
+    },
+    {
+     "case": "training 20 B/param + activations x2",
+     "params_per_chip": 320000.0,
+     "byte_hops_per_FLOP": 0.002946278254943948,
+     "comm_J_per_FLOP": 1.1785113019775792e-14,
+     "E_FLOP": 2e-13,
+     "comm_share": 0.05564656009922349
+    }
+   ],
+   "contrast": "interconnect_final: Megatron 1D TP on a 16 kW film group costs 53-96 %"
+  },
+  "moe_training_layer_local": [
+   {
+    "run": "1e27 MoE",
+    "chips_per_layer": 170200.89285714284,
+    "layer_side_m": 10.313852725132072,
+    "mean_hops": 275.03607267018856,
+    "E_FLOP": 7.8e-14,
+    "comm_share": 0.30885543132335747,
+    "latency_us": 2.750360726701886
+   },
+   {
+    "run": "1e27 MoE",
+    "chips_per_layer": 170200.89285714284,
+    "layer_side_m": 10.313852725132072,
+    "mean_hops": 275.03607267018856,
+    "E_FLOP": 2e-13,
+    "comm_share": 0.1484153367533664,
+    "latency_us": 2.750360726701886
+   },
+   {
+    "run": "1e28 MoE",
+    "chips_per_layer": 365005.06072874495,
+    "layer_side_m": 15.103912173853026,
+    "mean_hops": 402.7709913027473,
+    "E_FLOP": 7.8e-14,
+    "comm_share": 0.3085131678162257,
+    "latency_us": 4.027709913027473
+   },
+   {
+    "run": "1e28 MoE",
+    "chips_per_layer": 365005.06072874495,
+    "layer_side_m": 15.103912173853026,
+    "mean_hops": 402.7709913027473,
+    "E_FLOP": 2e-13,
+    "comm_share": 0.14821274052288635,
+    "latency_us": 4.027709913027473
+   },
+   {
+    "run": "1e29 MoE",
+    "chips_per_layer": 789882.5966850829,
+    "layer_side_m": 22.21883486882642,
+    "mean_hops": 592.5022631687045,
+    "E_FLOP": 7.8e-14,
+    "comm_share": 0.3088767146566079,
+    "latency_us": 5.925022631687046
+   },
+   {
+    "run": "1e29 MoE",
+    "chips_per_layer": 789882.5966850829,
+    "layer_side_m": 22.21883486882642,
+    "mean_hops": 592.5022631687045,
+    "E_FLOP": 2e-13,
+    "comm_share": 0.1484279384512414,
+    "latency_us": 5.925022631687046
+   }
+  ],
+  "seu": {
+   "bits_per_chip": 134217728.0,
+   "cases": {
+    "quiet GCR, low (1e-9 /bit/day)": {
+     "upsets_per_chip_per_day": 0.134217728,
+     "upsets_per_s_per_1e6_chips": 1.5534459259259261,
+     "SECDED_uncorrectable_per_chip_day": {
+      "T=1s": 4.971026962962964e-14,
+      "T=0.01s": 4.971026962962964e-16
+     }
+    },
+    "quiet GCR, high (1e-7 /bit/day)": {
+     "upsets_per_chip_per_day": 13.4217728,
+     "upsets_per_s_per_1e6_chips": 155.3445925925926,
+     "SECDED_uncorrectable_per_chip_day": {
+      "T=1s": 4.971026962962962e-10,
+      "T=0.01s": 4.971026962962962e-12
+     }
+    },
+    "large SEP peak, thin shield, low-E proton DI (1e-5 /bit/day)": {
+     "upsets_per_chip_per_day": 1342.17728,
+     "upsets_per_s_per_1e6_chips": 15534.45925925926,
+     "SECDED_uncorrectable_per_chip_day": {
+      "T=1s": 4.9710269629629635e-06,
+      "T=0.01s": 4.971026962962964e-08
+     }
+    },
+    "extreme (1e-3 /bit/day)": {
+     "upsets_per_chip_per_day": 134217.728,
+     "upsets_per_s_per_1e6_chips": 1553445.9259259258,
+     "SECDED_uncorrectable_per_chip_day": {
+      "T=1s": 0.04971026962962963,
+      "T=0.01s": 0.0004971026962962963
+     }
+    }
+   },
+   "mitigation": "SECDED (+12.5 % bits) + scrub 1-100 Hz (~0.01-1 % chip power) + ABFT/residue checks on matmuls (~2-5 %); pause on large SEPs"
+  },
+  "shadowing": {
+   "sun_angular_diam_rad": 0.010109711436874256,
+   "umbra_length_per_m_of_object": 98.91479160845192,
+   "note": "a 100 m pod/radiator casts a ~10 km umbra; penumbral dimming browns out film cells -> volatile SRAM loses weights/KV"
+  },
+  "scale": {
+   "earth_safe_P_chip_W": 2.5e+23,
+   "FLOP_per_s": 3.2051282051282054e+36,
+   "seconds_for_1e29": 3.1199999999999995e-08,
+   "FLOP_per_year_1pct": 1.0115384615384616e+42,
+   "largest_public_low_comm_pretrain_FLOP": 4.752e+23,
+   "frontier_2026_FLOP": "~3e26-1e27"
+  }
+ },
+ "tables": {
+  "inference_tpot20": [
+   {
+    "model": "gpt-oss-120b class (0.06 TB @MXFP4)",
+    "scenario": "chat 8k x256",
+    "gpu_J_tok": 0.0773,
+    "original_per_kg_ratio": 80.2,
+    "original_side_m": 3.1,
+    "film_overlapped": {
+     "tpot_ms": 0.69,
+     "side_m": 3.5,
+     "util": 0.388,
+     "J_tok": 0.0079,
+     "J_ratio_vs_gpu": 0.1,
+     "per_kg_ratio_mid": 78.53,
+     "per_kg_ratio_range": [
+      21.7,
+      313.8
+     ],
+     "mesh_share": 0.2
+    },
+    "film_sequential": {
+     "tpot_ms": 2.61,
+     "side_m": 3.0,
+     "util": 0.135,
+     "J_tok": 0.0227,
+     "J_ratio_vs_gpu": 0.29,
+     "per_kg_ratio_mid": 27.35,
+     "per_kg_ratio_range": [
+      7.56,
+      109.3
+     ],
+     "mesh_share": 0.04
+    }
+   },
+   {
+    "model": "gpt-oss-120b class (0.06 TB @MXFP4)",
+    "scenario": "chat 8k x2048",
+    "gpu_J_tok": 0.0491,
+    "original_per_kg_ratio": 45.2,
+    "original_side_m": 6.8,
+    "film_overlapped": {
+     "tpot_ms": 2.17,
+     "side_m": 6.9,
+     "util": 0.256,
+     "J_tok": 0.012,
+     "J_ratio_vs_gpu": 0.24,
+     "per_kg_ratio_mid": 32.9,
+     "per_kg_ratio_range": [
+      9.09,
+      131.5
+     ],
+     "mesh_share": 0.26
+    },
+    "film_sequential": {
+     "tpot_ms": 4.3,
+     "side_m": 7.7,
+     "util": 0.103,
+     "J_tok": 0.0298,
+     "J_ratio_vs_gpu": 0.61,
+     "per_kg_ratio_mid": 13.25,
+     "per_kg_ratio_range": [
+      3.66,
+      52.9
+     ],
+     "mesh_share": 0.04
+    }
+   },
+   {
+    "model": "gpt-oss-120b class (0.06 TB @MXFP4)",
+    "scenario": "chat 32k x256",
+    "gpu_J_tok": 0.2134,
+    "original_per_kg_ratio": 112.0,
+    "original_side_m": 5.0,
+    "film_overlapped": {
+     "tpot_ms": 0.46,
+     "side_m": 5.4,
+     "util": 0.468,
+     "J_tok": 0.0129,
+     "J_ratio_vs_gpu": 0.06,
+     "per_kg_ratio_mid": 133.19,
+     "per_kg_ratio_range": [
+      36.81,
+      532.2
+     ],
+     "mesh_share": 0.14
+    },
+    "film_sequential": {
+     "tpot_ms": 1.35,
+     "side_m": 5.7,
+     "util": 0.148,
+     "J_tok": 0.0407,
+     "J_ratio_vs_gpu": 0.19,
+     "per_kg_ratio_mid": 42.12,
+     "per_kg_ratio_range": [
+      11.64,
+      168.3
+     ],
+     "mesh_share": 0.05
+    }
+   },
+   {
+    "model": "gpt-oss-120b class (0.06 TB @MXFP4)",
+    "scenario": "long 128k x64",
+    "gpu_J_tok": 0.8348,
+    "original_per_kg_ratio": 153.8,
+    "original_side_m": 5.0,
+    "film_overlapped": {
+     "tpot_ms": 0.46,
+     "side_m": 4.3,
+     "util": 0.548,
+     "J_tok": 0.0326,
+     "J_ratio_vs_gpu": 0.04,
+     "per_kg_ratio_mid": 205.73,
+     "per_kg_ratio_range": [
+      56.86,
+      822.1
+     ],
+     "mesh_share": 0.05
+    },
+    "film_sequential": {
+     "tpot_ms": 0.94,
+     "side_m": 4.9,
+     "util": 0.214,
+     "J_tok": 0.0835,
+     "J_ratio_vs_gpu": 0.1,
+     "per_kg_ratio_mid": 80.39,
+     "per_kg_ratio_range": [
+      22.22,
+      321.2
+     ],
+     "mesh_share": 0.03
+    }
+   },
+   {
+    "model": "gpt-oss-120b class (0.06 TB @MXFP4)",
+    "scenario": "agent 1M x8",
+    "gpu_J_tok": 5.9802,
+    "original_per_kg_ratio": 36.6,
+    "original_side_m": 5.0,
+    "film_overlapped": {
+     "tpot_ms": 0.17,
+     "side_m": 15.7,
+     "util": 0.102,
+     "J_tok": 1.2639,
+     "J_ratio_vs_gpu": 0.21,
+     "per_kg_ratio_mid": 38.04,
+     "per_kg_ratio_range": [
+      10.51,
+      152.0
+     ],
+     "mesh_share": 0.03
+    },
+    "film_sequential": {
+     "tpot_ms": 3.2,
+     "side_m": 4.4,
+     "util": 0.069,
+     "J_tok": 1.8588,
+     "J_ratio_vs_gpu": 0.31,
+     "per_kg_ratio_mid": 25.87,
+     "per_kg_ratio_range": [
+      7.15,
+      103.4
+     ],
+     "mesh_share": 0.0
+    }
+   },
+   {
+    "model": "Llama-3.1-405B (dense)",
+    "scenario": "chat 8k x256",
+    "gpu_J_tok": 0.6086,
+    "original_per_kg_ratio": 11.1,
+    "original_side_m": 8.0,
+    "film_overlapped": {
+     "tpot_ms": 1.86,
+     "side_m": 13.6,
+     "util": 0.557,
+     "J_tok": 0.3218,
+     "J_ratio_vs_gpu": 0.53,
+     "per_kg_ratio_mid": 15.2,
+     "per_kg_ratio_range": [
+      4.2,
+      60.8
+     ],
+     "mesh_share": 0.17
+    },
+    "film_sequential": {
+     "tpot_ms": 5.84,
+     "side_m": 10.3,
+     "util": 0.31,
+     "J_tok": 0.5777,
+     "J_ratio_vs_gpu": 0.95,
+     "per_kg_ratio_mid": 8.47,
+     "per_kg_ratio_range": [
+      2.34,
+      33.8
+     ],
+     "mesh_share": 0.06
+    }
+   },
+   {
+    "model": "Llama-3.1-405B (dense)",
+    "scenario": "chat 8k x2048",
+    "gpu_J_tok": 0.6811,
+    "original_per_kg_ratio": 11.3,
+    "original_side_m": 18.0,
+    "film_overlapped": {
+     "tpot_ms": 7.44,
+     "side_m": 23.0,
+     "util": 0.39,
+     "J_tok": 0.46,
+     "J_ratio_vs_gpu": 0.68,
+     "per_kg_ratio_mid": 11.9,
+     "per_kg_ratio_range": [
+      3.29,
+      47.6
+     ],
+     "mesh_share": 0.22
+    },
+    "film_sequential": {
+     "tpot_ms": 14.4,
+     "side_m": 23.0,
+     "util": 0.201,
+     "J_tok": 0.8905,
+     "J_ratio_vs_gpu": 1.31,
+     "per_kg_ratio_mid": 6.15,
+     "per_kg_ratio_range": [
+      1.7,
+      24.6
+     ],
+     "mesh_share": 0.12
+    }
+   },
+   {
+    "model": "Llama-3.1-405B (dense)",
+    "scenario": "chat 32k x256",
+    "gpu_J_tok": 1.6759,
+    "original_per_kg_ratio": 22.8,
+    "original_side_m": 13.3,
+    "film_overlapped": {
+     "tpot_ms": 1.86,
+     "side_m": 16.2,
+     "util": 0.48,
+     "J_tok": 0.46,
+     "J_ratio_vs_gpu": 0.27,
+     "per_kg_ratio_mid": 29.29,
+     "per_kg_ratio_range": [
+      8.1,
+      117.0
+     ],
+     "mesh_share": 0.14
+    },
+    "film_sequential": {
+     "tpot_ms": 4.0,
+     "side_m": 16.2,
+     "util": 0.223,
+     "J_tok": 0.9891,
+     "J_ratio_vs_gpu": 0.59,
+     "per_kg_ratio_mid": 13.62,
+     "per_kg_ratio_range": [
+      3.76,
+      54.4
+     ],
+     "mesh_share": 0.08
+    }
+   },
+   {
+    "model": "Llama-3.1-405B (dense)",
+    "scenario": "long 128k x64",
+    "gpu_J_tok": 6.3594,
+    "original_per_kg_ratio": 25.7,
+    "original_side_m": 13.3,
+    "film_overlapped": {
+     "tpot_ms": 2.4,
+     "side_m": 13.6,
+     "util": 0.233,
+     "J_tok": 1.6626,
+     "J_ratio_vs_gpu": 0.26,
+     "per_kg_ratio_mid": 30.75,
+     "per_kg_ratio_range": [
+      8.5,
+      122.9
+     ],
+     "mesh_share": 0.03
+    },
+    "film_sequential": {
+     "tpot_ms": 4.87,
+     "side_m": 13.6,
+     "util": 0.115,
+     "J_tok": 3.3742,
+     "J_ratio_vs_gpu": 0.53,
+     "per_kg_ratio_mid": 15.15,
+     "per_kg_ratio_range": [
+      4.19,
+      60.6
+     ],
+     "mesh_share": 0.02
+    }
+   },
+   {
+    "model": "Llama-3.1-405B (dense)",
+    "scenario": "agent 1M x8",
+    "gpu_J_tok": 50.0721,
+    "original_per_kg_ratio": 5.7,
+    "original_side_m": 13.3,
+    "film_overlapped": {
+     "tpot_ms": 9.6,
+     "side_m": 15.2,
+     "util": 0.029,
+     "J_tok": 66.5527,
+     "J_ratio_vs_gpu": 1.33,
+     "per_kg_ratio_mid": 6.05,
+     "per_kg_ratio_range": [
+      1.67,
+      24.2
+     ],
+     "mesh_share": 0.0
+    },
+    "film_sequential": {
+     "tpot_ms": 13.89,
+     "side_m": 15.8,
+     "util": 0.019,
+     "J_tok": 104.5332,
+     "J_ratio_vs_gpu": 2.09,
+     "per_kg_ratio_mid": 3.85,
+     "per_kg_ratio_range": [
+      1.06,
+      15.4
+     ],
+     "mesh_share": 0.0
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "scenario": "chat 8k x256",
+    "gpu_J_tok": 0.4194,
+    "original_per_kg_ratio": 51.3,
+    "original_side_m": 7.1,
+    "film_overlapped": {
+     "tpot_ms": 1.1,
+     "side_m": 7.9,
+     "util": 0.372,
+     "J_tok": 0.0642,
+     "J_ratio_vs_gpu": 0.15,
+     "per_kg_ratio_mid": 52.56,
+     "per_kg_ratio_range": [
+      14.53,
+      210.0
+     ],
+     "mesh_share": 0.28
+    },
+    "film_sequential": {
+     "tpot_ms": 3.92,
+     "side_m": 7.9,
+     "util": 0.104,
+     "J_tok": 0.2295,
+     "J_ratio_vs_gpu": 0.55,
+     "per_kg_ratio_mid": 14.69,
+     "per_kg_ratio_range": [
+      4.06,
+      58.7
+     ],
+     "mesh_share": 0.08
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "scenario": "chat 8k x2048",
+    "gpu_J_tok": 0.0759,
+    "original_per_kg_ratio": 9.1,
+    "original_side_m": 9.3,
+    "film_overlapped": {
+     "tpot_ms": 3.72,
+     "side_m": 11.2,
+     "util": 0.439,
+     "J_tok": 0.0545,
+     "J_ratio_vs_gpu": 0.72,
+     "per_kg_ratio_mid": 11.2,
+     "per_kg_ratio_range": [
+      3.1,
+      44.8
+     ],
+     "mesh_share": 0.21
+    },
+    "film_sequential": {
+     "tpot_ms": 16.35,
+     "side_m": 9.6,
+     "util": 0.134,
+     "J_tok": 0.1782,
+     "J_ratio_vs_gpu": 2.35,
+     "per_kg_ratio_mid": 3.42,
+     "per_kg_ratio_range": [
+      0.95,
+      13.7
+     ],
+     "mesh_share": 0.06
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "scenario": "chat 32k x256",
+    "gpu_J_tok": 0.4466,
+    "original_per_kg_ratio": 45.2,
+    "original_side_m": 8.1,
+    "film_overlapped": {
+     "tpot_ms": 1.39,
+     "side_m": 7.9,
+     "util": 0.354,
+     "J_tok": 0.0817,
+     "J_ratio_vs_gpu": 0.18,
+     "per_kg_ratio_mid": 43.96,
+     "per_kg_ratio_range": [
+      12.15,
+      175.6
+     ],
+     "mesh_share": 0.17
+    },
+    "film_sequential": {
+     "tpot_ms": 4.42,
+     "side_m": 7.9,
+     "util": 0.112,
+     "J_tok": 0.2592,
+     "J_ratio_vs_gpu": 0.58,
+     "per_kg_ratio_mid": 13.85,
+     "per_kg_ratio_range": [
+      3.83,
+      55.4
+     ],
+     "mesh_share": 0.07
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "scenario": "long 128k x64",
+    "gpu_J_tok": 1.5504,
+    "original_per_kg_ratio": 92.5,
+    "original_side_m": 8.1,
+    "film_overlapped": {
+     "tpot_ms": 0.74,
+     "side_m": 8.6,
+     "util": 0.241,
+     "J_tok": 0.2029,
+     "J_ratio_vs_gpu": 0.13,
+     "per_kg_ratio_mid": 61.45,
+     "per_kg_ratio_range": [
+      16.98,
+      245.5
+     ],
+     "mesh_share": 0.16
+    },
+    "film_sequential": {
+     "tpot_ms": 1.88,
+     "side_m": 8.9,
+     "util": 0.087,
+     "J_tok": 0.5631,
+     "J_ratio_vs_gpu": 0.36,
+     "per_kg_ratio_mid": 22.14,
+     "per_kg_ratio_range": [
+      6.12,
+      88.5
+     ],
+     "mesh_share": 0.08
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "scenario": "agent 1M x8",
+    "gpu_J_tok": 4.8111,
+    "original_per_kg_ratio": 9.2,
+    "original_side_m": 8.1,
+    "film_overlapped": {
+     "tpot_ms": 1.2,
+     "side_m": 13.3,
+     "util": 0.037,
+     "J_tok": 6.333,
+     "J_ratio_vs_gpu": 1.32,
+     "per_kg_ratio_mid": 6.11,
+     "per_kg_ratio_range": [
+      1.69,
+      24.4
+     ],
+     "mesh_share": 0.02
+    },
+    "film_sequential": {
+     "tpot_ms": 3.55,
+     "side_m": 10.7,
+     "util": 0.019,
+     "J_tok": 12.2754,
+     "J_ratio_vs_gpu": 2.55,
+     "per_kg_ratio_mid": 3.15,
+     "per_kg_ratio_range": [
+      0.87,
+      12.6
+     ],
+     "mesh_share": 0.01
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "scenario": "chat 8k x256",
+    "gpu_J_tok": 0.6288,
+    "original_per_kg_ratio": 87.2,
+    "original_side_m": 8.7,
+    "film_overlapped": {
+     "tpot_ms": 0.81,
+     "side_m": 9.3,
+     "util": 0.283,
+     "J_tok": 0.0655,
+     "J_ratio_vs_gpu": 0.1,
+     "per_kg_ratio_mid": 77.23,
+     "per_kg_ratio_range": [
+      21.34,
+      308.6
+     ],
+     "mesh_share": 0.25
+    },
+    "film_sequential": {
+     "tpot_ms": 2.55,
+     "side_m": 9.3,
+     "util": 0.09,
+     "J_tok": 0.2052,
+     "J_ratio_vs_gpu": 0.33,
+     "per_kg_ratio_mid": 24.64,
+     "per_kg_ratio_range": [
+      6.81,
+      98.5
+     ],
+     "mesh_share": 0.08
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "scenario": "chat 8k x2048",
+    "gpu_J_tok": 0.1027,
+    "original_per_kg_ratio": 14.4,
+    "original_side_m": 10.6,
+    "film_overlapped": {
+     "tpot_ms": 3.8,
+     "side_m": 10.2,
+     "util": 0.403,
+     "J_tok": 0.046,
+     "J_ratio_vs_gpu": 0.45,
+     "per_kg_ratio_mid": 17.96,
+     "per_kg_ratio_range": [
+      4.96,
+      71.8
+     ],
+     "mesh_share": 0.29
+    },
+    "film_sequential": {
+     "tpot_ms": 12.81,
+     "side_m": 10.2,
+     "util": 0.12,
+     "J_tok": 0.1551,
+     "J_ratio_vs_gpu": 1.51,
+     "per_kg_ratio_mid": 5.32,
+     "per_kg_ratio_range": [
+      1.47,
+      21.3
+     ],
+     "mesh_share": 0.06
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "scenario": "chat 32k x256",
+    "gpu_J_tok": 0.6622,
+    "original_per_kg_ratio": 74.2,
+    "original_side_m": 9.6,
+    "film_overlapped": {
+     "tpot_ms": 1.04,
+     "side_m": 8.8,
+     "util": 0.316,
+     "J_tok": 0.0745,
+     "J_ratio_vs_gpu": 0.11,
+     "per_kg_ratio_mid": 71.45,
+     "per_kg_ratio_range": [
+      19.75,
+      285.5
+     ],
+     "mesh_share": 0.2
+    },
+    "film_sequential": {
+     "tpot_ms": 3.06,
+     "side_m": 9.3,
+     "util": 0.096,
+     "J_tok": 0.246,
+     "J_ratio_vs_gpu": 0.37,
+     "per_kg_ratio_mid": 21.65,
+     "per_kg_ratio_range": [
+      5.98,
+      86.5
+     ],
+     "mesh_share": 0.07
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "scenario": "long 128k x64",
+    "gpu_J_tok": 2.0251,
+    "original_per_kg_ratio": 121.8,
+    "original_side_m": 9.6,
+    "film_overlapped": {
+     "tpot_ms": 0.37,
+     "side_m": 11.4,
+     "util": 0.246,
+     "J_tok": 0.1774,
+     "J_ratio_vs_gpu": 0.09,
+     "per_kg_ratio_mid": 91.81,
+     "per_kg_ratio_range": [
+      25.37,
+      366.9
+     ],
+     "mesh_share": 0.21
+    },
+    "film_sequential": {
+     "tpot_ms": 1.56,
+     "side_m": 9.7,
+     "util": 0.079,
+     "J_tok": 0.5502,
+     "J_ratio_vs_gpu": 0.27,
+     "per_kg_ratio_mid": 29.59,
+     "per_kg_ratio_range": [
+      8.18,
+      118.2
+     ],
+     "mesh_share": 0.06
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "scenario": "agent 1M x8",
+    "gpu_J_tok": 5.5463,
+    "original_per_kg_ratio": 10.6,
+    "original_side_m": 9.6,
+    "film_overlapped": {
+     "tpot_ms": 0.59,
+     "side_m": 18.3,
+     "util": 0.039,
+     "J_tok": 5.9535,
+     "J_ratio_vs_gpu": 1.07,
+     "per_kg_ratio_mid": 7.49,
+     "per_kg_ratio_range": [
+      2.07,
+      29.9
+     ],
+     "mesh_share": 0.02
+    },
+    "film_sequential": {
+     "tpot_ms": 1.97,
+     "side_m": 14.5,
+     "util": 0.019,
+     "J_tok": 12.3298,
+     "J_ratio_vs_gpu": 2.22,
+     "per_kg_ratio_mid": 3.62,
+     "per_kg_ratio_range": [
+      1.0,
+      14.5
+     ],
+     "mesh_share": 0.01
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "scenario": "chat 8k x256",
+    "gpu_J_tok": 2.4102,
+    "original_per_kg_ratio": 75.8,
+    "original_side_m": 17.0,
+    "film_overlapped": {
+     "tpot_ms": 1.18,
+     "side_m": 17.0,
+     "util": 0.229,
+     "J_tok": 0.3209,
+     "J_ratio_vs_gpu": 0.13,
+     "per_kg_ratio_mid": 60.39,
+     "per_kg_ratio_range": [
+      16.69,
+      241.3
+     ],
+     "mesh_share": 0.24
+    },
+    "film_sequential": {
+     "tpot_ms": 4.21,
+     "side_m": 17.0,
+     "util": 0.064,
+     "J_tok": 1.1449,
+     "J_ratio_vs_gpu": 0.48,
+     "per_kg_ratio_mid": 16.93,
+     "per_kg_ratio_range": [
+      4.68,
+      67.6
+     ],
+     "mesh_share": 0.09
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "scenario": "chat 8k x2048",
+    "gpu_J_tok": 0.3676,
+    "original_per_kg_ratio": 12.8,
+    "original_side_m": 19.8,
+    "film_overlapped": {
+     "tpot_ms": 4.63,
+     "side_m": 19.7,
+     "util": 0.349,
+     "J_tok": 0.2102,
+     "J_ratio_vs_gpu": 0.57,
+     "per_kg_ratio_mid": 14.06,
+     "per_kg_ratio_range": [
+      3.89,
+      56.2
+     ],
+     "mesh_share": 0.29
+    },
+    "film_sequential": {
+     "tpot_ms": 16.64,
+     "side_m": 19.7,
+     "util": 0.097,
+     "J_tok": 0.7557,
+     "J_ratio_vs_gpu": 2.06,
+     "per_kg_ratio_mid": 3.91,
+     "per_kg_ratio_range": [
+      1.08,
+      15.6
+     ],
+     "mesh_share": 0.08
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "scenario": "chat 32k x256",
+    "gpu_J_tok": 2.4714,
+    "original_per_kg_ratio": 69.2,
+    "original_side_m": 18.3,
+    "film_overlapped": {
+     "tpot_ms": 1.4,
+     "side_m": 17.0,
+     "util": 0.214,
+     "J_tok": 0.3803,
+     "J_ratio_vs_gpu": 0.15,
+     "per_kg_ratio_mid": 52.25,
+     "per_kg_ratio_range": [
+      14.44,
+      208.8
+     ],
+     "mesh_share": 0.2
+    },
+    "film_sequential": {
+     "tpot_ms": 4.56,
+     "side_m": 17.0,
+     "util": 0.066,
+     "J_tok": 1.2381,
+     "J_ratio_vs_gpu": 0.5,
+     "per_kg_ratio_mid": 16.05,
+     "per_kg_ratio_range": [
+      4.44,
+      64.1
+     ],
+     "mesh_share": 0.08
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "scenario": "long 128k x64",
+    "gpu_J_tok": 6.9695,
+    "original_per_kg_ratio": 84.6,
+    "original_side_m": 18.3,
+    "film_overlapped": {
+     "tpot_ms": 0.99,
+     "side_m": 17.7,
+     "util": 0.098,
+     "J_tok": 1.1572,
+     "J_ratio_vs_gpu": 0.17,
+     "per_kg_ratio_mid": 48.42,
+     "per_kg_ratio_range": [
+      13.38,
+      193.5
+     ],
+     "mesh_share": 0.16
+    },
+    "film_sequential": {
+     "tpot_ms": 2.6,
+     "side_m": 18.4,
+     "util": 0.034,
+     "J_tok": 3.2868,
+     "J_ratio_vs_gpu": 0.47,
+     "per_kg_ratio_mid": 17.05,
+     "per_kg_ratio_range": [
+      4.71,
+      68.1
+     ],
+     "mesh_share": 0.07
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "scenario": "agent 1M x8",
+    "gpu_J_tok": 22.44,
+    "original_per_kg_ratio": 13.7,
+    "original_side_m": 18.3,
+    "film_overlapped": {
+     "tpot_ms": 1.95,
+     "side_m": 19.9,
+     "util": 0.018,
+     "J_tok": 23.1108,
+     "J_ratio_vs_gpu": 1.03,
+     "per_kg_ratio_mid": 7.81,
+     "per_kg_ratio_range": [
+      2.16,
+      31.2
+     ],
+     "mesh_share": 0.01
+    },
+    "film_sequential": {
+     "tpot_ms": 4.15,
+     "side_m": 20.8,
+     "util": 0.008,
+     "J_tok": 53.9462,
+     "J_ratio_vs_gpu": 2.4,
+     "per_kg_ratio_mid": 3.34,
+     "per_kg_ratio_range": [
+      0.92,
+      13.4
+     ],
+     "mesh_share": 0.01
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "scenario": "chat 8k x256",
+    "gpu_J_tok": 6.1237,
+    "original_per_kg_ratio": 62.2,
+    "original_side_m": 26.7,
+    "film_overlapped": {
+     "tpot_ms": 1.93,
+     "side_m": 24.2,
+     "util": 0.16,
+     "J_tok": 1.0578,
+     "J_ratio_vs_gpu": 0.17,
+     "per_kg_ratio_mid": 46.54,
+     "per_kg_ratio_range": [
+      12.86,
+      186.0
+     ],
+     "mesh_share": 0.26
+    },
+    "film_sequential": {
+     "tpot_ms": 5.16,
+     "side_m": 26.2,
+     "util": 0.051,
+     "J_tok": 3.3284,
+     "J_ratio_vs_gpu": 0.54,
+     "per_kg_ratio_mid": 14.79,
+     "per_kg_ratio_range": [
+      4.09,
+      59.1
+     ],
+     "mesh_share": 0.11
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "scenario": "chat 8k x2048",
+    "gpu_J_tok": 0.9232,
+    "original_per_kg_ratio": 11.0,
+    "original_side_m": 30.3,
+    "film_overlapped": {
+     "tpot_ms": 6.05,
+     "side_m": 29.9,
+     "util": 0.266,
+     "J_tok": 0.6345,
+     "J_ratio_vs_gpu": 0.69,
+     "per_kg_ratio_mid": 11.7,
+     "per_kg_ratio_range": [
+      3.23,
+      46.7
+     ],
+     "mesh_share": 0.28
+    },
+    "film_sequential": {
+     "tpot_ms": 19.58,
+     "side_m": 29.9,
+     "util": 0.082,
+     "J_tok": 2.0539,
+     "J_ratio_vs_gpu": 2.22,
+     "per_kg_ratio_mid": 3.61,
+     "per_kg_ratio_range": [
+      1.0,
+      14.4
+     ],
+     "mesh_share": 0.1
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "scenario": "chat 32k x256",
+    "gpu_J_tok": 6.2421,
+    "original_per_kg_ratio": 58.1,
+    "original_side_m": 28.3,
+    "film_overlapped": {
+     "tpot_ms": 1.86,
+     "side_m": 25.1,
+     "util": 0.164,
+     "J_tok": 1.0979,
+     "J_ratio_vs_gpu": 0.18,
+     "per_kg_ratio_mid": 45.71,
+     "per_kg_ratio_range": [
+      12.63,
+      182.7
+     ],
+     "mesh_share": 0.25
+    },
+    "film_sequential": {
+     "tpot_ms": 5.39,
+     "side_m": 26.2,
+     "util": 0.052,
+     "J_tok": 3.4758,
+     "J_ratio_vs_gpu": 0.56,
+     "per_kg_ratio_mid": 14.44,
+     "per_kg_ratio_range": [
+      3.99,
+      57.7
+     ],
+     "mesh_share": 0.11
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "scenario": "long 128k x64",
+    "gpu_J_tok": 17.1415,
+    "original_per_kg_ratio": 58.6,
+    "original_side_m": 28.3,
+    "film_overlapped": {
+     "tpot_ms": 1.5,
+     "side_m": 25.1,
+     "util": 0.063,
+     "J_tok": 3.5386,
+     "J_ratio_vs_gpu": 0.21,
+     "per_kg_ratio_mid": 38.95,
+     "per_kg_ratio_range": [
+      10.76,
+      155.6
+     ],
+     "mesh_share": 0.12
+    },
+    "film_sequential": {
+     "tpot_ms": 3.92,
+     "side_m": 26.2,
+     "util": 0.022,
+     "J_tok": 10.1184,
+     "J_ratio_vs_gpu": 0.59,
+     "per_kg_ratio_mid": 13.62,
+     "per_kg_ratio_range": [
+      3.76,
+      54.4
+     ],
+     "mesh_share": 0.05
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "scenario": "agent 1M x8",
+    "gpu_J_tok": 47.5995,
+    "original_per_kg_ratio": 11.7,
+    "original_side_m": 28.3,
+    "film_overlapped": {
+     "tpot_ms": 2.67,
+     "side_m": 26.3,
+     "util": 0.011,
+     "J_tok": 55.3831,
+     "J_ratio_vs_gpu": 1.16,
+     "per_kg_ratio_mid": 6.91,
+     "per_kg_ratio_range": [
+      1.91,
+      27.6
+     ],
+     "mesh_share": 0.01
+    },
+    "film_sequential": {
+     "tpot_ms": 6.1,
+     "side_m": 27.9,
+     "util": 0.004,
+     "J_tok": 142.4292,
+     "J_ratio_vs_gpu": 2.99,
+     "per_kg_ratio_mid": 2.69,
+     "per_kg_ratio_range": [
+      0.74,
+      10.7
+     ],
+     "mesh_share": 0.01
+    }
+   }
+  ],
+  "large_batch": [
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0759,
+    "film": {
+     "J_tok": 0.054,
+     "util": 0.439,
+     "side_m": 11.179,
+     "tpot_ms": 3.719,
+     "mesh": 0.205,
+     "J_ratio": 0.718,
+     "kg_ratio_mid": 11.2,
+     "kg_ratio_pess": 3.096
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0759,
+    "film": {
+     "J_tok": 0.178,
+     "util": 0.134,
+     "side_m": 9.645,
+     "tpot_ms": 16.346,
+     "mesh": 0.061,
+     "J_ratio": 2.348,
+     "kg_ratio_mid": 3.424,
+     "kg_ratio_pess": 0.946
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0421,
+    "film": {
+     "J_tok": 0.07,
+     "util": 0.342,
+     "side_m": 17.897,
+     "tpot_ms": 7.438,
+     "mesh": 0.183,
+     "J_ratio": 1.657,
+     "kg_ratio_mid": 4.852,
+     "kg_ratio_pess": 1.341
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0421,
+    "film": {
+     "J_tok": 0.24,
+     "util": 0.099,
+     "side_m": 22.358,
+     "tpot_ms": 16.417,
+     "mesh": 0.098,
+     "J_ratio": 5.708,
+     "kg_ratio_mid": 1.409,
+     "kg_ratio_pess": 0.389
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.042,
+    "film": {
+     "J_tok": 0.1,
+     "util": 0.238,
+     "side_m": 30.365,
+     "tpot_ms": 14.876,
+     "mesh": 0.202,
+     "J_ratio": 2.389,
+     "kg_ratio_mid": 3.365,
+     "kg_ratio_pess": 0.93
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.042,
+    "film": null
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0421,
+    "film": {
+     "J_tok": 0.07,
+     "util": 0.342,
+     "side_m": 17.897,
+     "tpot_ms": 7.438,
+     "mesh": 0.183,
+     "J_ratio": 1.657,
+     "kg_ratio_mid": 4.852,
+     "kg_ratio_pess": 1.341
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0421,
+    "film": {
+     "J_tok": 0.213,
+     "util": 0.112,
+     "side_m": 17.897,
+     "tpot_ms": 22.658,
+     "mesh": 0.074,
+     "J_ratio": 5.048,
+     "kg_ratio_mid": 1.593,
+     "kg_ratio_pess": 0.44
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.042,
+    "film": {
+     "J_tok": 0.1,
+     "util": 0.238,
+     "side_m": 30.365,
+     "tpot_ms": 14.876,
+     "mesh": 0.202,
+     "J_ratio": 2.389,
+     "kg_ratio_mid": 3.365,
+     "kg_ratio_pess": 0.93
+    }
+   },
+   {
+    "model": "DeepSeek-V3/R1 (671B, 37B active)",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.042,
+    "film": {
+     "J_tok": 0.281,
+     "util": 0.085,
+     "side_m": 30.365,
+     "tpot_ms": 41.608,
+     "mesh": 0.088,
+     "J_ratio": 6.683,
+     "kg_ratio_mid": 1.203,
+     "kg_ratio_pess": 0.333
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.1027,
+    "film": {
+     "J_tok": 0.046,
+     "util": 0.403,
+     "side_m": 10.164,
+     "tpot_ms": 3.798,
+     "mesh": 0.294,
+     "J_ratio": 0.448,
+     "kg_ratio_mid": 17.958,
+     "kg_ratio_pess": 4.963
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.1027,
+    "film": {
+     "J_tok": 0.155,
+     "util": 0.12,
+     "side_m": 10.164,
+     "tpot_ms": 12.814,
+     "mesh": 0.06,
+     "J_ratio": 1.51,
+     "kg_ratio_mid": 5.323,
+     "kg_ratio_pess": 1.471
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0466,
+    "film": {
+     "J_tok": 0.06,
+     "util": 0.307,
+     "side_m": 16.643,
+     "tpot_ms": 7.438,
+     "mesh": 0.278,
+     "J_ratio": 1.296,
+     "kg_ratio_mid": 6.203,
+     "kg_ratio_pess": 1.714
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0466,
+    "film": {
+     "J_tok": 0.189,
+     "util": 0.098,
+     "side_m": 20.328,
+     "tpot_ms": 15.602,
+     "mesh": 0.097,
+     "J_ratio": 4.057,
+     "kg_ratio_mid": 1.982,
+     "kg_ratio_pess": 0.548
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0349,
+    "film": {
+     "J_tok": 0.091,
+     "util": 0.204,
+     "side_m": 28.903,
+     "tpot_ms": 14.876,
+     "mesh": 0.209,
+     "J_ratio": 2.607,
+     "kg_ratio_mid": 3.084,
+     "kg_ratio_pess": 0.852
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0349,
+    "film": null
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0466,
+    "film": {
+     "J_tok": 0.06,
+     "util": 0.307,
+     "side_m": 16.643,
+     "tpot_ms": 7.438,
+     "mesh": 0.278,
+     "J_ratio": 1.296,
+     "kg_ratio_mid": 6.203,
+     "kg_ratio_pess": 1.714
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0466,
+    "film": {
+     "J_tok": 0.183,
+     "util": 0.101,
+     "side_m": 16.643,
+     "tpot_ms": 22.596,
+     "mesh": 0.07,
+     "J_ratio": 3.938,
+     "kg_ratio_mid": 2.042,
+     "kg_ratio_pess": 0.564
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.0349,
+    "film": {
+     "J_tok": 0.091,
+     "util": 0.204,
+     "side_m": 28.903,
+     "tpot_ms": 14.876,
+     "mesh": 0.209,
+     "J_ratio": 2.607,
+     "kg_ratio_mid": 3.084,
+     "kg_ratio_pess": 0.852
+    }
+   },
+   {
+    "model": "Kimi-K2 class (1.04T, 32B active)",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.0349,
+    "film": {
+     "J_tok": 0.257,
+     "util": 0.072,
+     "side_m": 28.903,
+     "tpot_ms": 41.972,
+     "mesh": 0.077,
+     "J_ratio": 7.357,
+     "kg_ratio_mid": 1.093,
+     "kg_ratio_pess": 0.302
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.3676,
+    "film": {
+     "J_tok": 0.21,
+     "util": 0.349,
+     "side_m": 19.687,
+     "tpot_ms": 4.629,
+     "mesh": 0.288,
+     "J_ratio": 0.572,
+     "kg_ratio_mid": 14.059,
+     "kg_ratio_pess": 3.886
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.3676,
+    "film": {
+     "J_tok": 0.756,
+     "util": 0.097,
+     "side_m": 19.687,
+     "tpot_ms": 16.64,
+     "mesh": 0.08,
+     "J_ratio": 2.056,
+     "kg_ratio_mid": 3.911,
+     "kg_ratio_pess": 1.081
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.1454,
+    "film": {
+     "J_tok": 0.25,
+     "util": 0.293,
+     "side_m": 31.087,
+     "tpot_ms": 8.835,
+     "mesh": 0.29,
+     "J_ratio": 1.72,
+     "kg_ratio_mid": 4.675,
+     "kg_ratio_pess": 1.292
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.1454,
+    "film": {
+     "J_tok": 1.095,
+     "util": 0.067,
+     "side_m": 43.963,
+     "tpot_ms": 19.347,
+     "mesh": 0.136,
+     "J_ratio": 7.532,
+     "kg_ratio_mid": 1.067,
+     "kg_ratio_pess": 0.295
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.1308,
+    "film": {
+     "J_tok": 0.427,
+     "util": 0.172,
+     "side_m": 58.878,
+     "tpot_ms": 16.799,
+     "mesh": 0.29,
+     "J_ratio": 3.26,
+     "kg_ratio_mid": 2.466,
+     "kg_ratio_pess": 0.682
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.1308,
+    "film": null
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.1454,
+    "film": {
+     "J_tok": 0.25,
+     "util": 0.293,
+     "side_m": 31.087,
+     "tpot_ms": 8.835,
+     "mesh": 0.29,
+     "J_ratio": 1.72,
+     "kg_ratio_mid": 4.675,
+     "kg_ratio_pess": 1.292
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.1454,
+    "film": {
+     "J_tok": 0.817,
+     "util": 0.09,
+     "side_m": 25.97,
+     "tpot_ms": 41.346,
+     "mesh": 0.077,
+     "J_ratio": 5.617,
+     "kg_ratio_mid": 1.431,
+     "kg_ratio_pess": 0.396
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.1308,
+    "film": {
+     "J_tok": 0.406,
+     "util": 0.181,
+     "side_m": 51.94,
+     "tpot_ms": 20.556,
+     "mesh": 0.293,
+     "J_ratio": 3.105,
+     "kg_ratio_mid": 2.59,
+     "kg_ratio_pess": 0.716
+    }
+   },
+   {
+    "model": "Frontier-2028 MoE (4T, 120B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.1308,
+    "film": {
+     "J_tok": 1.095,
+     "util": 0.067,
+     "side_m": 51.94,
+     "tpot_ms": 55.424,
+     "mesh": 0.13,
+     "J_ratio": 8.371,
+     "kg_ratio_mid": 0.96,
+     "kg_ratio_pess": 0.265
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.9232,
+    "film": {
+     "J_tok": 0.634,
+     "util": 0.266,
+     "side_m": 29.917,
+     "tpot_ms": 6.049,
+     "mesh": 0.281,
+     "J_ratio": 0.687,
+     "kg_ratio_mid": 11.699,
+     "kg_ratio_pess": 3.233
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 2048,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.9232,
+    "film": {
+     "J_tok": 2.054,
+     "util": 0.082,
+     "side_m": 29.917,
+     "tpot_ms": 19.582,
+     "mesh": 0.105,
+     "J_ratio": 2.225,
+     "kg_ratio_mid": 3.614,
+     "kg_ratio_pess": 0.999
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.3566,
+    "film": {
+     "J_tok": 0.629,
+     "util": 0.269,
+     "side_m": 37.929,
+     "tpot_ms": 14.934,
+     "mesh": 0.265,
+     "J_ratio": 1.765,
+     "kg_ratio_mid": 4.555,
+     "kg_ratio_pess": 1.259
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.3566,
+    "film": {
+     "J_tok": 3.56,
+     "util": 0.047,
+     "side_m": 78.923,
+     "tpot_ms": 19.507,
+     "mesh": 0.147,
+     "J_ratio": 9.982,
+     "kg_ratio_mid": 0.805,
+     "kg_ratio_pess": 0.223
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": true,
+    "gpu_J_tok": 0.3298,
+    "film": {
+     "J_tok": 1.491,
+     "util": 0.113,
+     "side_m": 102.847,
+     "tpot_ms": 19.252,
+     "mesh": 0.283,
+     "J_ratio": 4.522,
+     "kg_ratio_mid": 1.778,
+     "kg_ratio_pess": 0.491
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 20.0,
+    "overlap": false,
+    "gpu_J_tok": 0.3298,
+    "film": null
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.3566,
+    "film": {
+     "J_tok": 0.629,
+     "util": 0.269,
+     "side_m": 37.929,
+     "tpot_ms": 14.934,
+     "mesh": 0.265,
+     "J_ratio": 1.765,
+     "kg_ratio_mid": 4.555,
+     "kg_ratio_pess": 1.259
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 8192,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.3566,
+    "film": {
+     "J_tok": 2.065,
+     "util": 0.082,
+     "side_m": 37.929,
+     "tpot_ms": 48.991,
+     "mesh": 0.09,
+     "J_ratio": 5.79,
+     "kg_ratio_mid": 1.389,
+     "kg_ratio_pess": 0.384
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": true,
+    "gpu_J_tok": 0.3298,
+    "film": {
+     "J_tok": 0.943,
+     "util": 0.179,
+     "side_m": 65.778,
+     "tpot_ms": 29.751,
+     "mesh": 0.273,
+     "J_ratio": 2.858,
+     "kg_ratio_mid": 2.813,
+     "kg_ratio_pess": 0.777
+    }
+   },
+   {
+    "model": "Frontier-2032 MoE (10T, 300B active) ASSUMED",
+    "B": 32768,
+    "tpot_target_ms": 100.0,
+    "overlap": false,
+    "gpu_J_tok": 0.3298,
+    "film": {
+     "J_tok": 2.859,
+     "util": 0.059,
+     "side_m": 65.778,
+     "tpot_ms": 90.231,
+     "mesh": 0.1,
+     "J_ratio": 8.669,
+     "kg_ratio_mid": 0.927,
+     "kg_ratio_pess": 0.256
+    }
+   }
+  ]
+ }
+}
