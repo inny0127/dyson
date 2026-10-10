@@ -1,5 +1,7 @@
-"""Parametric AI-compute satellite (AI1-class): sun-facing PV wings, one concentrated compute
-module, knife-edge double-sided liquid radiators, laser terminals, truss. Built in metres.
+"""Parametric swarm satellite, our own design: sun-facing PV wings, one concentrated compute
+module (synchronous chips), knife-edge double-sided liquid radiators, laser terminals, truss.
+Dimensions come from the design spec (render/numbers.json); the defaults below are placeholders
+only. Built in metres.
 
 Frame: the Sun is along +Z (light travels -Z). PV wings lie in the XY plane facing +Z and span X.
 Radiators lie in the YZ plane (normal +-X): edge-on to the Sun, so they never see sunlight and
@@ -10,12 +12,12 @@ import bmesh
 import math
 from mathutils import Vector, Matrix
 
-DEFAULT = {
-    'wing_span': 70.0,            # tip to tip (m)
-    'wing_height': 9.0,           # chord of each wing (m)
+DEFAULT = {                       # placeholders until the design spec is loaded
+    'wing_span': 60.0,            # tip to tip (m)
+    'wing_height': 10.0,          # chord of each wing (m)
     'wing_gap': 6.0,              # gap between wing roots (m)
     'wing_panels': 8,             # hinged panels per wing (accordion fold lines)
-    'radiator_area': 110.0,       # planform m^2 (both faces radiate)
+    'radiator_area': 100.0,       # planform m^2 (both faces radiate)
     'radiator_panels': 2,         # one above, one below the bus
     'radiator_depth': 5.0,        # along the Sun line (Z), m
     'bus': (3.0, 3.0, 3.2),       # compute module x, y, z (m)
