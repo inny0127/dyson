@@ -333,8 +333,8 @@ def render(sc, w, h, steps, chunk=60000):
     D = sc.camera(w, h).reshape(-1, 3)
     N = len(D)
     out = np.zeros((N, 3))
-    maps = {'day': load_lin('earth_day_8k.jpg'), 'water': load_data('earth_water_mask_4k.png'),
-            'cloud': load_data('earth_clouds_8k.jpg'), 'lights': load_lin('earth_night_lights_8k.jpg', 'L'),
+    maps = {'day': load_lin(sc.a.day_map), 'water': load_data('earth_water_mask_4k.png'),
+            'cloud': load_data(sc.a.cloud_map), 'lights': load_lin('earth_night_lights_8k.jpg', 'L'),
             'moon': load_lin('moon_albedo_2k.jpg'),
             # (map, lon0, lon1, lat0, lat1, scale to the global map's mean)
             'lights_patches': [(load_lin('earth_night_lights_mideast_1km.jpg', 'L'), 20.0, 65.0, 5.0, 50.0, 0.855),
@@ -477,6 +477,8 @@ def main(argv):
     ap.add_argument('--steps', type=int, default=48)
     ap.add_argument('--aim-moon', action='store_true', help='point at the Moon (az/el become offsets in deg)')
     ap.add_argument('--aim-sun', action='store_true', help='point at the Sun (az/el become offsets in deg)')
+    ap.add_argument('--day-map', default='earth_day_8k.jpg', help='day colour map (render/med_earth.py makes a Mediterranean one)')
+    ap.add_argument('--cloud-map', default='earth_clouds_8k.jpg')
     ap.add_argument('--lights-scale', type=float, default=3.8e-3, help='repo radiance of map value 1')
     ap.add_argument('--lights-K', type=float, default=3500.0)
     a = ap.parse_args(argv)
@@ -504,7 +506,7 @@ def main(argv):
     print(json.dumps(info), flush=True)
     img = render(sc, w, h, a.steps)
     glare.write(a.out, img)
-    info['exposure_for_disc'] = math.log2(0.30 / info['disc_radiance'])
+    info['exposure_for_disc'] = math.log2(0.30 / info['disc_radiance']) if info['disc_radiance'] > 0 else None
     print(json.dumps(info))
     print('WROTE', a.out)
 

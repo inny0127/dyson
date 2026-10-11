@@ -338,6 +338,17 @@ function renderSummary() {
   $('summary-list').innerHTML = items.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
 }
 
+/** Why the near-uniform swarm flies at 0.95 AU: the same rock at other radii (h.orbitChoice). */
+function orbitBox(p) {
+  const rows = h.orbitChoice(p, state.earth);
+  const r0 = h.FIXED.uniformR;
+  const tr = rows.map(r => `<tr><td>${r.r === r0 ? '<b>' : ''}${r.r.toFixed(2)} AU${r.r === r0 ? '</b>' : ''}</td><td class="v">${Math.round(r.chipC)} °C</td><td class="v">${r.perWatt.toFixed(2)}×</td><td class="v">${r.filmPerW.toFixed(2)}×</td><td class="v">${Math.round(r.cone)}°</td><td class="v">${pct(r.f, 0)}${r.roomBound ? ', room full' : ''}</td><td class="v">${sci(r.flops, 2)}</td><td class="v">${Math.round(r.heat)} W/m²</td></tr>`).join('');
+  return `<p>A sail with an infrared-dark front could fly anywhere from about 0.9 AU out to Earth's own orbit. Three things change with the distance. Nearer the Sun each square metre catches more sunlight, so the same rock catches more of the Sun. But the film runs hotter, as one over the square root of the distance, and hot chips and hot cells compute less per watt. And the gap round the line to Earth has to be wider, because from nearer the Sun more of the swarm would show Earth its hot back, so there is less room.</p>
+    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Orbit</th><th>Chips</th><th>Computing per watt</th><th>Film per watt</th><th>Gap round Earth</th><th>Share of the Sun</th><th>FLOP/s</th><th>Heat on Earth</th></tr></thead><tbody>${tr}</tbody></table></div>
+    <p>From 0.95 AU outward the two effects cancel almost exactly: each step out needs more film for every watt and gets it back from cooler chips, so the finished swarm computes the same. Nearer in, the swarm runs out of room before it runs out of rock and computes less. So 0.95 AU is the innermost orbit on that flat top. It catches the most sunlight for the same computing, keeps the nearest sails ${num('0.39 AU')} from Earth rather than 0.24 AU at Earth's own orbit, and holds the chips at about ${num('115 °C')}, under the 125 °C that dense, efficient logic is built for.</p>
+    <p class="note">Computing per watt and film per watt are relative to 0.95 AU. The same rock is spread over film whose area per watt grows as the square of the distance; the share of the Sun is that, or the room left by the gap, whichever is smaller.</p>`;
+}
+
 function renderSail() {
   const p = state.params;
   const f = sailFacts(p);
@@ -352,7 +363,8 @@ function renderSail() {
       ? `<p>${f.uniform
           ? `It flies at ${num('0.95 AU')}, just inside Earth's orbit, in one of several hundred nested bands that wrap the Sun without ever crossing. Its cover glass carries a fine aluminium mesh that makes its front dark in the infrared, so it sheds its heat from its back, away from the Sun.`
           : `It flies on Earth's own orbit, but on the far side of the Sun, between a quarter and three quarters of a turn away from Earth. From there a sail never passes between Earth and the Sun, and it can turn its warm back away from Earth.`}</p>
-        ${deep('Why every sail gives up a third of its computing', `<p>From almost anywhere round the Sun, Earth sits on a sail's sunny side, so Earth sees its front. A glass front would glow at Earth in the infrared almost as brightly as the back. So the cover glass carries an aluminium mesh, finer than the wavelength of heat, that is dark in the infrared: the film can barely radiate forward and pushes its heat out of the back instead. With one face doing all the radiating, the film runs hotter, and the chips run at about ${num('110 °C')}. Hot transistors need more energy per operation and hot solar cells convert less, so each watt of sunlight computes about a third less.</p><p>It is worth it. With glass fronts the swarm would send Earth about four times as much heat for each watt it catches, and the shade would have to take away most of Earth's sunlight.</p>`)}`
+        ${deep(f.uniform ? 'Why every sail gives up 40% of its computing' : 'Why every sail gives up a third of its computing', `<p>From almost anywhere round the Sun, Earth sits on a sail's sunny side, so Earth sees its front. A glass front would glow at Earth in the infrared almost as brightly as the back. So the cover glass carries an aluminium mesh, finer than the wavelength of heat, that is dark in the infrared: the film can barely radiate forward and pushes its heat out of the back instead. With one face doing all the radiating, the film runs hotter, and the chips run at about ${num(f.uniform ? '115 °C' : '106 °C')}. The mesh also blocks a fifth of the light the cells could use, hot transistors need more energy per operation, and hot cells convert less, so each watt of sunlight computes ${f.uniform ? 'about 40%' : 'about a third'} less.</p><p>It is worth it. With glass fronts the swarm would send Earth about four times as much heat for each watt it catches, and the shade would have to take away most of Earth's sunlight.</p>`)}
+        ${f.uniform ? deep('How the distance from the Sun was chosen', orbitBox(p)) : ''}`
       : `<p>The sail orbits at ${num(`${f.s.rSail.toFixed(3)} AU`)}, just inside Earth's orbit, in sunlight of ${num(`${Math.round(f.s.sail.S)} W/m²`)}. You might expect a solar computer to crowd in toward the Sun for more power, but the chips decide where it flies: the film settles at ${num(kelvin(f.s.sail.T))}, the chips run at their ${num(`${p.tjFilmC} °C`)} limit, and any closer in they would overheat.</p>`}
     <p>The photograph at the top was taken by a simulated camera a kilometre away. The film reflects about 0.2% of visible light, so it comes out nearly black, which is what a good solar cell should look like: light it reflects is power it didn't collect. The bright line is the Sun's reflection in the cover glass, broken into segments where each 1.6 m fold panel curls slightly beside its hinge.</p>`;
   sailAnatomy($('anatomy'), {
@@ -443,6 +455,44 @@ function readout(a) {
   return items.map(([k, v, over]) => `<div><span>${k}</span><b class="${over ? 'over' : ''}">${v}</b></div>`).join('');
 }
 
+/** How long a sail lasts, and how the model counts replacements. */
+function refreshBox(p, d, E) {
+  const g = d.growth, L = p.serviceLife, rho = p.recycleFrac, Td = g.doublingYearsEff;
+  if (!(L > 0)) return '';
+  const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
+  const grow = 2 ** (-L / Td);
+  const decay = (1 - rho) / L;
+  const Bss = g.capToSails * YEAR * L / Math.max(1e-9, 1 - rho);
+  return deep('How long a sail lasts, and how replacements are counted', `
+    <p>A sail is replaced for two reasons. It wears out: protons slowly darken its cells, which keep about ${num('92%')} of their output after ten years; its chips' memory takes 140–470 krad of radiation a decade; and dust punches holes through the film. On their own those would allow 20 to 30 years. It also falls behind, because newer chips do more per joule. Replacing a sail early pays when what the new chips gain beats what recycling loses, which happens at an age of ln(1/ρ) ÷ ln(1 + g), where ρ is the share of the old sail recycled and g the yearly gain in computing per joule. With ${num(pct(rho, 0))} recycled and the slow gains of a mature technology, a few tenths of a per cent a year, that comes to about ${num(`${L} years`)}.</p>
+    <p>The refresh itself is a swap. A depot craft brings new film rolls, chips already in them, and fits them onto the sail's existing hub, booms and vanes; the old film is rolled up and recycled in orbit.</p>
+    <p>The model counts it like this. Every kilogram exported retires ${num(`${L} years`)} later, and ${num(pct(rho, 0))} of it goes back into production. While industry doubles every ${num(`${Td.toFixed(2)} years`)}, the sails retiring were built when industry was 2<sup>${L}/${Td.toFixed(2)}</sup> times smaller, so replacements take only ${num(pct(grow, grow < 0.01 ? 2 : 0))} of the output. After the heat wall, exports stop growing and replacements catch up, passing half of the output within one service life. Left alone, the fleet would level off where retirements balance exports, at export × life ÷ (1 − ρ) = ${num(kg(Bss))}. That is more than Mercury's rock can supply, so the rock runs out first. From then on every refresh loses ${num(pct(1 - rho, 0))} of a sail, and the fleet shrinks by ${num(pct(decay, 1))} a year, halving every ${num(`${Math.round(Math.LN2 / decay)} years`)}.</p>`);
+}
+
+/** After Mercury's rock: what could keep the swarm repaired. */
+function afterRockBox(p, d, E) {
+  const L = p.serviceLife, rho = p.recycleFrac;
+  if (!(L > 0) || d.growth.tRockOut == null) return '';
+  const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
+  const lossKg = E.mass * (1 - rho) / L;                 // spacecraft lost per year at the finished size
+  const siYr = (lossKg / p.yieldDelivered) * 0.25;        // silicon to replace it (Mercury's rock is ~25 % Si)
+  const yrs = si => { const y = si / siYr; return y < 20 ? `${y.toFixed(0)} years` : `${words(Math.round(Number(y.toPrecision(2))))} years`; };
+  const src = [
+    ['The whole asteroid belt', '2.4×10²¹ kg', 2.4e21 * 0.12, 'almost none'],
+    ["Mercury's iron core", '2.5×10²³ kg', 1.5e22, '4.3 km/s'],
+    ['The Moon', '7.3×10²² kg', 1.5e22, '2.4 km/s'],
+    ['Mars', '6.4×10²³ kg', 1.0e23, '5.0 km/s'],
+    ['Venus', '4.9×10²⁴ kg', 7e23, '10.4 km/s, under 90 bar of CO₂'],
+  ];
+  const rows = src.map(([n, m, si, v]) => `<tr><td>${n}</td><td class="v">${m}</td><td class="v">${sci(si, 2)} kg</td><td class="v">${v}</td><td class="v">${yrs(si)}</td></tr>`).join('');
+  return deep('After the rock: could asteroids keep the swarm going?', `
+    <p>Once Mercury's rock is gone, the swarm wears down. At its finished size, refreshes lose about ${num(`${sci(lossKg, 2)} kg`)} of spacecraft a year, and replacing that takes about ${num(`${sci(siYr, 2)} kg`)} of silicon a year.</p>
+    <p>Asteroids look like the obvious top-up. There is no gravity well to climb, mining spread over thousands of small bodies has no heat wall, and the trip to the swarm, about 11 km/s, is easy for a solar sail. But the whole main belt weighs only 2.4×10²¹ kg, about 3% of Mercury's rock. Ceres alone is 39% of it, and most of it is carbon-rich rock and ice with only 10–15% silicon. It would cover the swarm's repairs for a few years.</p>
+    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Source</th><th>Mass</th><th>Silicon</th><th>Escape speed</th><th>Repairs it covers</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p>What asteroids do offer is what Mercury lacks: hydrogen, carbon and nitrogen. Mercury has only about 5×10¹³ kg of hydrogen, which forces every factory to run on dry chemistry; Ceres alone probably holds around 10²⁰ kg of water. For bulk silicon, the next sources are Mercury's own core, then the Moon and Mars, each climbed out of with beamed power. Better recycling stretches all of them: at 99% instead of ${pct(rho, 0)}, the losses fall ${Math.round((1 - rho) / 0.01)}-fold.</p>
+    <p class="note">Silicon: the core at ~6%, the Moon, Mars and Venus at ~20% of their rocky part, the belt at ~12%. Belt mass from Pitjeva and Pitjev 2018. Years at the finished swarm's loss rate.</p>`);
+}
+
 function renderBuild() {
   const p = state.params, d = state.d, g = d.growth, E = state.earth;
   const y1 = d.yearsToCoverage(0.01), y10 = d.yearsToCoverage(0.1), yCap = d.yearsToCoverage(E.cap);
@@ -463,7 +513,7 @@ function renderBuild() {
   const earthLine = E.binding === 'rock' ? '' : Number.isFinite(yCap)
     ? `${LIMIT[E.binding]}, the blue line, is reached in ${num(yr(p.seedYear + yCap))}.`
     : `It never reaches ${LIMIT[E.binding].toLowerCase()}, the blue line.`;
-  $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} Then it tops out at ${num(pct(ceil, 1))}. ${upkeep} ${earthLine}</p>`;
+  $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} Then it tops out at ${num(pct(ceil, 1))}. ${upkeep} ${earthLine}</p>${refreshBox(p, d, E)}${afterRockBox(p, d, E)}`;
   const a = h.atYear(p, d, state.t);
   const markers = [
     { t: g.tCap, f: fForMass(state.table, g.builtAtYear(g.tCap)), label: `heat wall, ${yr(p.seedYear + g.tCap)}` },
@@ -589,7 +639,8 @@ function renderFuture() {
   const p26 = h.eraParams('2026');
   const right = state.era === '2026' ? h.eraParams('mid') : state.params;
   const rightLabel = state.era === '2026' ? h.ERAS.mid.label : (h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions');
-  const a = h.swarmAt(p26, 0.01), b = h.swarmAt(right, 0.01);
+  // the hardware itself, on its thermal orbit (the swarm's layout then adds its own costs)
+  const a = h.swarmAt({ ...p26, earthPlacement: 'shell' }, 0.01), b = h.swarmAt({ ...right, earthPlacement: 'shell' }, 0.01);
   const f1 = x => `${(x * 100).toFixed(1)}%`;
   $('future-prose').innerHTML = `
     <p>Industry needs most of a century to reach the heat wall, and sails get new film every 10 to 20 years, so nearly every sail that ever flies carries hardware built after 2095. Today's memory chips, today's processors and the small lasers they would use to talk are long gone before the swarm is big enough to see.</p>
@@ -605,6 +656,18 @@ function renderFuture() {
     ['Computing per watt of sunlight', `${sci(a.flops / a.intercepted, 2)} FLOP/J`, `${sci(b.flops / b.intercepted, 2)} FLOP/J`],
   ];
   $('future-table').innerHTML = `<thead><tr><th></th><th>2026 hardware</th><th>${rightLabel}</th></tr></thead><tbody>${rows.map(([k, x, y]) => `<tr><td>${k}</td><td class="v">${x}</td><td class="v">${y}</td></tr>`).join('')}</tbody>`;
+  const cpw = s => s.chipPower / s.intercepted;
+  const notes = [
+    ['Energy per operation', `<p>The 2026 figure, ${num(`${sci(a.sail.jPerFlop, 2)} J`)}, is what today's AI accelerators spend per 8-bit operation, memory and links included, slowed to 60% of full clock speed where they are most efficient, at 85 °C. The mature figure follows each part of that energy forward. Transistors keep shrinking for another decade or two, but their supply voltage is stuck near 0.6 V, so each switch saves only a few times more. 4-bit arithmetic halves the work per operation. Memory stacked directly on the logic removes most of the energy spent moving data. By 2100 that reaches about ${num('1.4×10⁻¹⁵ J')}, twice the practical floor for ordinary logic at 85 °C (about 7×10⁻¹⁶ J, still 400 times the thermodynamic minimum per switch). Going further needs reversible logic, which costs chip area the film doesn't have; the optimistic era assumes some of it.</p>`],
+    ['Memory per chiplet', `<p>A chiplet in the film has no shielding and takes 140–470 krad of radiation in ten years. DRAM fails at 2–100 krad, so the 2026 design had to use SRAM: 16 MB, which at 85 °C leaks 10–59% of the chip's power. Non-volatile memories shrug the dose off (magnetic RAM above 1 Mrad, resistive RAM 5–20 Mrad, ferroelectric RAM 10 Mrad) and can be stacked in layers on top of the logic. By about 2040 that gives 1–2 GB per 0.15 W chiplet, kept to the useful minimum because every gigabyte costs fab area. It holds its contents with no power, so the leakage disappears.</p>`],
+    ['Memory in pods', `<p>Pods are shielded, 5 g/cm² for 0.4–3.3 krad a decade, so they can keep dense volatile memory. HBM, today's stacked DRAM beside the processor, carries about 0.115 GB per watt, and its last generation is expected around 2038. After that, memory is bonded directly onto the logic, about 10 GB per watt.</p>`],
+    ['Laser terminals', `<p>Each terminal's data rate is set by optical bandwidth and how many bits each hertz carries, not by photons: about 50 Tbps by 2040, 200 by 2070 and 400 by 2100. A 10 cm telescope reaches every neighbouring sail, within about 330 km; a 30 cm one reaches 3,000–5,000 km. So a mature sail needs about a dozen terminals instead of 64, under 3% of its mass.</p>`],
+    ['Solar cell efficiency', `<p>Silicon is the only solar cell Mercury's rock can make in bulk: perovskites need iodine, and III-V cells indium and germanium, enough for a millionth of the swarm. Today's thin space silicon converts ${num(pct(p26.pvEta0, 0))} of sunlight above the atmosphere. Made without hydrogen, which Mercury lacks, mature cells reach about ${num('21.5%')}, against a theoretical 30%. The optimistic ${pct(h.eraParams('high').pvEta0, 0)} needs a top cell of silicon nanocrystals in glass, which works only in the lab so far. Thinner, better cells also lose less in the heat: 0.34% per kelvin instead of 0.42%.</p>`],
+    ['Orbit at 1% coverage', `<p>A sail flies where its chips reach their 85 °C limit. Its temperature depends on how much sunlight it absorbs and how well it radiates, not on how efficient its cells are, because the chips turn all the electricity back into heat in the same sheet. Mature cells reflect the infrared that silicon can't use, so the film absorbs ${pct(right.alpha, 0)} of the sunlight instead of ${pct(p26.alpha, 0)}, runs cooler, and can fly nearer the Sun: ${b.rSail.toFixed(3)} AU instead of ${a.rSail.toFixed(3)}.</p>`],
+    ['Swarm mass per watt', `<p>The film's weight per square metre, divided by the chip power each square metre carries, plus the pods' share. Nearer the Sun each square metre collects more, mature cells convert a little more, and pods shrink from ${pct(a.q, 0)} of the chip power to ${pct(b.q, 0)} as memory moves onto the film. Together that takes the swarm from ${(a.kgPerW * 1e3).toFixed(2)} to ${(b.kgPerW * 1e3).toFixed(2)} g/W${(right.filmThin ?? 1) < 1 ? `, with the film thinned to ${pct(right.filmThin, 0)} of the design spec` : ''}.</p>`],
+    ['Computing per watt of sunlight', `<p>The end-to-end figure. Of each watt of sunlight, about ${num(pct(cpw(a), 0))} becomes chip power in 2026 and ${num(pct(cpw(b), 0))} in the mature era, after the cells, the packing of the film and the power the sail keeps for itself. Each joule of chip power then does one operation per ${sci(a.sail.jPerFlop, 2)} J in 2026 and per ${sci(b.sail.jPerFlop, 2)} J later. Multiplied out, that is ${sci(a.flops / a.intercepted, 2)} and ${sci(b.flops / b.intercepted, 2)} operations per joule of sunlight, ${Math.round((b.flops / b.intercepted) / (a.flops / a.intercepted))} times more, almost all of it from cheaper operations. These are for the hardware on its own; the near-uniform swarm then gives about 40% back for its infrared-dark fronts and its hotter orbit.</p>`],
+  ];
+  $('future-notes').innerHTML = `<p class="notes-title">How these figures were obtained</p>${notes.map(([k, v]) => `<details class="deep"><summary>${k}</summary>${v}</details>`).join('')}`;
 }
 
 const SOURCES = [

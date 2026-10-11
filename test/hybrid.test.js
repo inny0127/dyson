@@ -97,14 +97,26 @@ test('timeline (central, near-uniform): heat wall ~2143, 10 % ~2147, half the Su
   assert.ok(g.peakMass < 0.6 * g.steadyMass, 'the rock runs out before refresh balances export');
 });
 
-test('far side and near-uniform: the same hardware needs (r_orbit / r)² more film per watt and computes 0.66 as much', () => {
+test('far side and near-uniform: the same hardware needs (r_orbit / r)² more film per watt; dark fronts cost computing', () => {
   const a = h.swarmAt(pMid, 0.01), b = h.swarmAt({ ...pMid, earthPlacement: 'farside' }, 0.01);
   near(b.mass / a.mass, 1 / a.rSail ** 2, 1e-9, 'mass');
   near(b.flops / a.flops, 0.66, 1e-9, 'FLOP/s');
   assert.equal(b.rOrbit, 1);
   const c = h.swarmAt({ ...pMid, earthPlacement: 'uniform' }, 0.5), a5 = h.swarmAt(pMid, 0.01);
   near(c.mass / (50 * a5.mass), (0.95 / a5.rSail) ** 2, 1e-9, 'uniform: no cavity retreat, linear in coverage');
-  near(c.flops / (50 * a5.flops), 0.66, 1e-9, 'uniform FLOP/s');
+  near(c.flops / (50 * a5.flops), h.darkFrontFactor(pMid, 0.95), 1e-9, 'uniform FLOP/s');
+});
+
+test('dark fronts: ×0.66 at 1 AU (the study), ~0.60 at 0.95 AU where the film runs ~10 K hotter', () => {
+  near(h.darkFrontFactor(pMid, 1), 0.66, 1e-12, 'far side');
+  near(h.darkFrontFactor(pMid, 0.95), 0.60, 0.01, 'near-uniform');
+  // 0.95 AU: the innermost radius where the rock, not the room, sets the size; farther out the
+  // same computing, nearer in less
+  const rows = h.orbitChoice(pU, h.earthLimits(pU, dU));
+  const at = r => rows.find(x => x.r === r);
+  assert.ok(!at(0.95).roomBound && at(0.92).roomBound, 'room binds inside 0.95');
+  assert.ok(at(0.92).flops < 0.96 * at(0.95).flops, 'less computing nearer in');
+  near(at(1.0).flops / at(0.95).flops, 1, 0.02, 'about the same farther out');
 });
 
 test('thin film: 0.52 of the design-spec mass, cells 4.8 % less efficient', () => {

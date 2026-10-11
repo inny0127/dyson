@@ -1,4 +1,4 @@
-# Mercury Swarm Ledger
+# A Dyson Swarm, Made Real
 
 A Dyson swarm built the way the numbers say it has to be built. Solar sails that are also computers
 are made from Mercury's rock and flown around the Sun. Every photograph, temperature, date and
@@ -44,7 +44,7 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   leaves ~0.1 MJ/kg on the planet (0.3 at 95 %, ~2 for a full surface launch).
 - **Mercury's silicon sets the size.** The default swarm is everything Mercury can build: a
   near-uniform swarm at 0.95 AU with a film thinned to half the design spec, finished around 2198 at
-  **83 % of the Sun's light** and 2.1×10⁴⁰ FLOP/s, just short of the 85 % its layout has room for.
+  **83 % of the Sun's light** and 1.9×10⁴⁰ FLOP/s, just short of the 85 % its layout has room for.
   With the design-spec film the rock runs out at ~41 %. The iron core is left: the film needs
   silicon, and the core has little (`docs/full-swarm.md`).
 - **Earth keeps its temperature behind a shade.** Every sail carries an infrared-dark front and none

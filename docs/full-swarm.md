@@ -102,9 +102,49 @@ limits and what each costs. The model (`src/model/hybrid.js`, placement `uniform
 
 - **How the last row was computed.** It is the integral of cos θ / D² over the visible fronts,
   scaled to the far side's 0.42 W/m² per 1 % ([earth.md](earth.md)).
-- **The mesh fronts cost compute.** Every sail runs its chips at about 110 °C and computes 34 % less
-  per watt. The near-uniform swarm at 83 % still does 2.1×10⁴⁰ FLOP/s, 1.7 times the far-side-plus-spill
-  layout at 39 %.
+- **The mesh fronts cost compute.** At 1 AU a sail with them runs its chips at about 106 °C and
+  computes 34 % less per watt; at 0.95 AU the film is ~10 K hotter, the chips ~115 °C, and the loss
+  40 % (`darkFrontFactor`). The near-uniform swarm at 83 % still does 1.9×10⁴⁰ FLOP/s, 1.6 times the
+  far-side-plus-spill layout at 39 %.
+
+## Why 0.95 AU
+
+- **Nearer the Sun** each square metre catches more, so the same rock catches more of the Sun (film
+  per watt ∝ r²). But the film runs hotter (∝ r^−½), costing cells and logic, and the gap round the
+  Sun–Earth line must widen (acos r), leaving less room.
+- **The result** (`orbitChoice`, central case): from 0.95 to 1 AU the finished swarm computes the
+  same, ~1.9×10⁴⁰ FLOP/s, because the cooler chips pay for the extra film. Inside 0.95 AU the room
+  runs out before the rock and computing falls: 1.8×10⁴⁰ at 0.92 AU, 1.7×10⁴⁰ at 0.90 AU, with chips
+  at 122–126 °C.
+- **0.95 AU is the innermost orbit on the flat top.** It catches the most sunlight for the same
+  computing, keeps the nearest sails 0.39 AU from Earth (0.24 AU at 1 AU), and holds the chips at
+  ~115 °C, under the 125 °C ceiling for dense, efficient logic (`docs/data/future/hot_power.json`).
+
+## Service life and replacement
+
+- **Physical life:** 20–30 years. Cells keep ~92 % of their output after 10 years; film chiplets take
+  140–470 krad a decade; micrometeoroids hole the film.
+- **Economic life:** refresh when the new chips' gain beats the recycling loss,
+  a* = ln(1/ρ) / ln(1 + g). With ρ = 0.94 and g of a few tenths of a per cent a year (mature logic near
+  its floor), ~15 years (`docs/data/future/manufacturing.json`).
+- **In the model:** exports retire L years later and ρ returns to production. During growth,
+  replacement is 2^(−L/T_d) of output (0.36 % here); after the heat wall it passes half within one
+  life; the unbounded fleet would level off at export × L / (1 − ρ) = 1.5×10²³ kg, so the rock runs out
+  first, after which the fleet shrinks by (1 − ρ)/L = 0.4 % a year (half-life ~170 years).
+
+## Asteroids and other sources after the rock
+
+- **Need:** at the finished size refreshes lose ~1.2×10²⁰ kg of spacecraft a year, ~7×10¹⁹ kg of
+  silicon.
+- **The main belt** is 2.39×10²¹ kg (±20 %), 39 % of it Ceres
+  ([Pitjeva and Pitjev 2018](https://arxiv.org/pdf/1811.05191)), mostly carbonaceous rock and ice at
+  ~10–15 % silicon: ~3×10²⁰ kg of silicon, about four years of repairs. No gravity well and no heat
+  wall, ~11 km/s to reach 0.95 AU, easy for a sail.
+- **What asteroids are good for** is volatiles: Mercury has ~5×10¹³ kg of hydrogen; Ceres probably
+  holds ~10²⁰ kg of water.
+- **Bulk silicon after Mercury's rock:** Mercury's core (~1.5×10²² kg Si, ~200 years), the Moon
+  (~1.5×10²², ~200 years, escape 2.4 km/s), Mars (~10²³, ~1,400 years, 5.0 km/s), Venus (~7×10²³,
+  ~9,500 years, 10.4 km/s under 90 bar). Recycling at 99 % instead of 94 % cuts the need six-fold.
 
 ## Holding Earth's temperature
 

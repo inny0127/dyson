@@ -163,6 +163,9 @@ export const FIXED = {
   // 0.9. Earth sees only infrared-dark fronts: the far side's 0.42 W/m² per 1 % scaled by the
   // integral of cos θ / D² over the region, 0.563 per 1 %.
   uniformR: 0.95, uniformShare: 0.943, uniformRoom: 0.849, uniformIRPerF: 56.3,
+  // the same layout at other radii (sails spread ±0.03 AU, cone acos(r − 0.03); at 1 AU a 14°
+  // cone keeps them off Earth's doorstep): [r, cone°, sky share, IR W/m² per unit coverage]
+  uniformByR: [[0.90, 29.5, 0.918, 53.1], [0.92, 27.1, 0.928, 54.2], [0.95, 23.1, 0.943, 56.3], [0.98, 18.2, 0.958, 59.9], [1.00, 14.0, 0.968, 64.2]],
   keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
   rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)
   polarPerW: 0.23,         // extra polar heating per W/m² swapped
@@ -180,6 +183,34 @@ const interp = (tab, x) => {
 /** Share of the Sun's light the far side can hold, and the IR it sends Earth per unit coverage. */
 export const farsideRoom = p => interp(FIXED.farsideRoom, p.farsideLat ?? 30);
 export const farsideIRPerF = p => FIXED.farsideIRPerF * interp(FIXED.farsideIRLat, p.farsideLat ?? 30);
+/**
+ * Computing per watt of sunlight of a sail with the infrared-dark mesh front at rOrbit AU, relative
+ * to the same hardware on its thermal orbit. The study's point: at 1 AU the film runs at ~370 K and
+ * the chips ~9 K above it, and the sail computes ×0.66 (21 % of the cell current lost to the mesh,
+ * hot cells, hot logic). Nearer the Sun the film runs hotter as r^−½, costing cells and logic more.
+ */
+export function darkFrontFactor(p, rOrbit) {
+  const T1 = 370, T = T1 / Math.sqrt(rOrbit), dt = p.filmSpreadDT ?? 9, t0 = FIXED.film.pvT0;
+  const logic = energyPenalty(T1 + dt - 273.15, p.hotLogicSlope) / energyPenalty(T + dt - 273.15, p.hotLogicSlope);
+  const cells = (1 + p.pvTempCo * (T - t0)) / (1 + p.pvTempCo * (T1 - t0));
+  return FIXED.farsideFlopFactor * logic * cells;
+}
+
+/**
+ * Why 0.95 AU: the near-uniform swarm at other radii, with Mercury's rock spread over film ∝ r²
+ * (the rock-limited coverage scales as (0.95 / r)²), capped by the room the layout leaves.
+ */
+export function orbitChoice(p, E) {
+  const k0 = darkFrontFactor(p, FIXED.uniformR);
+  return FIXED.uniformByR.map(([r, cone, share, irPerF]) => {
+    const k = darkFrontFactor(p, r);
+    const room = 0.9 * share;
+    const f = Math.min(room, E.rock * (FIXED.uniformR / r) ** 2);
+    return { r, cone, chipC: 370 / Math.sqrt(r) + (p.filmSpreadDT ?? 9) - 273.15, perWatt: k / k0, filmPerW: (r / FIXED.uniformR) ** 2,
+      room, f, roomBound: f >= room - 1e-9, flops: E.flops * (f / E.cap) * (k / k0), heat: f * irPerF };
+  });
+}
+
 /** Coverage on the far side and inside Earth's orbit, for total coverage f. */
 export function farsideSplit(p, f) {
   if (p.earthPlacement !== 'farside') return { fFar: 0, fIn: f };
@@ -298,7 +329,7 @@ export function swarmAt(p, fIn) {
     const fr = Math.min(f, 0.01), k = f / fr;
     const a = swarmCore(p, fr);
     const rOrbit = Math.max(FIXED.uniformR, a.rSail);
-    const kM = (rOrbit / a.rSail) ** 2, kF = FIXED.farsideFlopFactor;
+    const kM = (rOrbit / a.rSail) ** 2, kF = darkFrontFactor(p, rOrbit);
     const chipPower = a.chipPower * k, massSails = a.massSails * k * kM, massPods = a.massPods * k * kM;
     return {
       ...a, f, farside: false, uniform: true, rOrbit, areaFactor: kM, fFar: 0, fIn: 0,
