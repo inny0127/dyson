@@ -52,6 +52,10 @@ python3 render/post.py "$RAW/leo_U_tele.png" "$OUT/leo-swarm-tele.jpg" --fov 12 
 for x in europe_today europe_med; do dev "$RAW/$x.exr" "$RAW/$x.png" -7.1; done
 python3 render/post.py "$RAW/europe_today.png" "$OUT/europe-today.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/europe_med.png" "$OUT/europe-mediterranean.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
+# North America's Pacific coast, cloud-free, today and Mediterranean, one exposure
+for x in na_today na_med; do dev "$RAW/$x.exr" "$RAW/$x.png" -7.1; done
+python3 render/post.py "$RAW/na_today.png" "$OUT/pacific-today.jpg" --fov 54 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/na_med.png" "$OUT/pacific-mediterranean.jpg" --fov 54 --noise 0.6 --width 2400 --quality 88
 # Mercury at the heat wall (render/mercury.py writes an AgX PNG at the pristine globe's exposure)
 python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=88)" \
   "$RAW/mercury_heatwall.png" "$OUT/mercury-heatwall.jpg"

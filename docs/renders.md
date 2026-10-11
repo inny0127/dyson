@@ -138,6 +138,18 @@ directly rather than path-traced.
 - **Not a climate-model result:** no model has run shading aimed this way; the picture shows one
   plausible outcome of the mechanism.
 
+## North America's Pacific coast, today and Mediterranean (`med_earth.py`, `leo_view.py`)
+
+- **Camera:** 4,000 km above 43.5° N, 120° W, looking down with a 35 mm lens, 15 July at 20:00 UTC
+  (local noon). Cloud-free in both frames (the cloud composite is not a July map, and it put a storm
+  over exactly the coast that changes).
+- **Mediterranean:** the coast's dry-summer belt already reaches Seattle, so instead of one palette
+  each 1° band of the coastal strip (within ~4° of the westernmost land, fading out by 7°, east of the
+  Cascades and the Sierra) takes the July colour distribution of the strip 5° further south, from
+  32 to 58° N, blended between bands. Land above ~1,500 m keeps its colours. About 0.7 million km²
+  changes.
+- **Sunlight:** the L1 shade takes 19.6 %; one exposure for both frames.
+
 ## Mercury today and at the heat wall (`mercury.py`)
 
 - **Globe:** MESSENGER MDIS albedo (mean 0.080) and the USGS 665 m DEM as true displacement, lit by
