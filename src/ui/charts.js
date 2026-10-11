@@ -112,7 +112,7 @@ export function buildChart(el, { main, others, markers, limit, cursor, xOf, tOf,
 }
 
 /** Extra energy absorbed by Earth (W/m², log) against share of sunlight captured (log). */
-export function earthChart(el, { pts, refs, marks }) {
+export function earthChart(el, { pts, pts2, refs, marks }) {
   const W = 1100, H = 340, L = 64, R = 24, T = 18, B = 40;
   const xMin = -5, xMax = 0, yMin = -3, yMax = 3;
   const X = f => L + ((Math.log10(f) - xMin) / (xMax - xMin)) * (W - L - R);
@@ -128,6 +128,10 @@ export function earthChart(el, { pts, refs, marks }) {
   }
   const area = pts.filter(([f]) => f >= 10 ** xMin);
   s += `<path d="${area.map(([f, v], i) => `${i ? 'L' : 'M'}${X(f).toFixed(1)},${Y(v).toFixed(1)}`).join('')}" style="fill:none;stroke:var(--heat);stroke-width:2.25;stroke-linejoin:round"/>`;
+  if (pts2) {
+    const b = pts2.filter(([f]) => f >= 10 ** xMin);
+    s += `<path d="${b.map(([f, v], i) => `${i ? 'L' : 'M'}${X(f).toFixed(1)},${Y(v).toFixed(1)}`).join('')}" style="fill:none;stroke:var(--heat);stroke-width:2;stroke-dasharray:7 5;stroke-linejoin:round"/>`;
+  }
   for (const m of marks) {
     const x = X(m.f);
     s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" style="stroke:${m.color};stroke-width:1.5"/>`;

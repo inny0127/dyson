@@ -92,13 +92,11 @@ export const PARAMS = [
     help: 'Thermal: as close to the Sun as the chiplet limit allows, given how much of the sky the swarm already fills.' },
   { key: 'rManual', group: 'Swarm', label: 'Manual sail orbit radius', unit: 'AU', min: 0.5, max: 2, step: 0.01, value: 0.92 },
   // Earth (docs/earth.md)
-  { key: 'skyLimitLux', group: 'Earth', label: 'Brightest night sky allowed', unit: 'lux', min: 0.001, max: 3, log: true, value: 0.25,
-    help: 'Ground illuminance from the swarm after astronomical twilight. Full Moon ≈ 0.25 lux; natural night sky ≈ 0.001.' },
   { key: 'rhoVis', group: 'Earth', label: 'Visible reflectance of a sail, all hardware', unit: '', min: 0.001, max: 0.02, step: 0.0005, value: 0.004,
     help: 'Film 0.002 plus hinge strips, scribes, hems and vanes: 0.0024–0.0056 for the design spec.' },
   { key: 'forcingLimit', group: 'Earth', label: 'Extra heat allowed on Earth', unit: 'W/m²', min: 0.05, max: 10, log: true, value: 1 },
-  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['shell', 'farside'], value: 'shell',
-    help: 'shell: evenly round the Sun inside Earth’s orbit (debris-safe). farside: on Earth’s orbit beyond the Sun, infrared-dark fronts, with an L1 shade.' },
+  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['farside', 'shell'], value: 'farside',
+    help: 'farside: on Earth’s orbit beyond the Sun, infrared-dark fronts, with an L1 shade. shell: evenly round the Sun inside Earth’s orbit (no shade, nothing drifts toward Earth).' },
   { key: 'thermostatCredit', group: 'Earth', label: 'L1 shade may cancel up to', unit: '× the budget', min: 1, max: 2.5, step: 0.1, value: 1.5,
     help: 'Trading sunlight for infrared changes rainfall and polar heating, so a shade can offset only part of the heat: 1.5–2× the budget (far-side placement only).' },
   // industry
@@ -114,9 +112,10 @@ export const PARAMS = [
     help: '0 = never retired. Sails are re-skinned on their frames every 10–20 years.' },
   { key: 'recycleFrac', group: 'Industry', label: 'Mass recycled in orbit at refresh', unit: '', min: 0, max: 0.99, step: 0.01, value: 0.94,
     help: 'The standing fleet levels off at export × life / (1 − recycled). Without recycling a 10-year fleet stalls near 1 % coverage.' },
-  { key: 'heatPerKg', group: 'Industry', label: 'Waste heat left on Mercury per kg mined', unit: 'MJ/kg', min: 0.05, max: 20, log: true, value: 2,
-    help: 'Holds only if refineries and fabs move off the surface before the heat wall.' },
-  { key: 'mercuryHeatLimit', group: 'Industry', label: 'Heat Mercury’s surface can shed', unit: 'W', min: 1e17, max: 1e22, log: true, value: 5e18 },
+  { key: 'heatPerKg', group: 'Industry', label: 'Waste heat left on Mercury per kg mined', unit: 'MJ/kg', min: 0.05, max: 20, log: true, value: 0.3,
+    help: 'Digging (~0.05) plus a surface launch only to low orbit, 3 km/s at 95 %; catapults in orbit add the rest and shed their losses to space. Refining on the surface and a full-speed launch: ~2–5.' },
+  { key: 'mercuryHeatLimit', group: 'Industry', label: 'Heat Mercury’s surface can shed', unit: 'W', min: 1e17, max: 1e22, log: true, value: 5e18,
+    help: 'The whole planet paved with radiators heat-pumped to ~1,650 K. Unpumped at 500 K it sheds only 2×10¹⁷; at 2,000 K about 10¹⁹, near the end of what refractories allow.' },
   { key: 'energyPerKg', group: 'Industry', label: 'Energy to make 1 kg of spacecraft', unit: 'MJ/kg', min: 100, max: 20000, log: true, value: 1150,
     help: 'Dry chlorine/oxygen process in vacuum; chips are 80–95 % of it. Still only 3–5 % of swarm output.' },
   { key: 'seedYear', group: 'Industry', label: 'Year of the first launch', unit: '', min: 2030, max: 2200, step: 1, value: 2050 },
@@ -138,12 +137,14 @@ export const FIXED = {
   // Earth-safe studies (docs/data/earth_safe*.json): far-side cloud ground illuminance after
   // astronomical twilight per unit coverage per unit visible reflectance (0.31 lux per 1 % at
   // rho 0.003; the shell is computed by skyLux); far-side cloud with Mercury-native Al/Mg mesh
-  // low-e fronts: 0.396 W/m² of IR per 1 %, FLOP/J ×0.66 vs the shell.
+  // low-e fronts: 0.396 W/m² of IR per 1 %, FLOP/J ×0.66 vs the shell (chips at 110 °C), and at
+  // most 0.9 of its patch of sky (Earth's orbit, 90–270° from Earth, ±30°): 21 %.
   skyLuxPerFRho: 0.31 / (0.01 * 0.003),
   skyDepression: 18,       // deg: the sky rule is set at the end of astronomical twilight
   lumensPerW: 93,          // sunlight reflected off the sails
   farsideIRPerF: 39.6,
   farsideFlopFactor: 0.66,
+  farsideGeomCap: 0.21,
   horizon: 6000,           // yr simulated
 };
 
@@ -227,13 +228,18 @@ export function swarmAt(p, fIn) {
   const chipPower = feasible && perWsun > 0 ? intercepted / perWsun : 0;
   const sailPower = (1 - q) * chipPower;
   const podPower = q * chipPower;
-  const massSails = sailPower > 0 ? sailPower * sail.kgPerW : 0;
-  const massPods = podPower > 0 ? podPower * pod.kgPerW : 0;
+  // Far side: the same hardware on Earth's orbit at 1 AU, where sunlight is weaker, so each watt
+  // intercepted takes (1 AU / rSail)² more of it; infrared-dark fronts run the chips hotter.
+  const farside = p.earthPlacement === 'farside';
+  const kM = farside ? Math.max(1, 1 / rSail ** 2) : 1;
+  const kF = farside ? FIXED.farsideFlopFactor : 1;
+  const massSails = sailPower > 0 ? sailPower * sail.kgPerW * kM : 0;
+  const massPods = podPower > 0 ? podPower * pod.kgPerW * kM : 0;
   const mass = massSails + massPods;
-  const flopsSails = sailPower > 0 ? sailPower / sail.jPerFlop : 0;
-  const flopsPods = podPower > 0 ? podPower / pod.jPerFlop : 0;
+  const flopsSails = sailPower > 0 ? (kF * sailPower) / sail.jPerFlop : 0;
+  const flopsPods = podPower > 0 ? (kF * podPower) / pod.jPerFlop : 0;
   return {
-    f, q, feasible, rThermal, rSail, rPod, sail, pod,
+    f, q, feasible, rThermal, rSail, rPod, sail, pod, farside, rOrbit: farside ? 1 : rSail,
     intercepted, chipPower, sailPower, podPower, massSails, massPods, mass,
     kgPerW: chipPower > 0 ? mass / chipPower : Infinity,
     flopsSails, flopsPods, flops: flopsSails + flopsPods,
@@ -379,7 +385,7 @@ export function compute(p) {
     if (done) break;
   }
   const kgPerW = sB.kgPerW;
-  const lnSail = launchFromMercury(sB.rSail, true);
+  const lnSail = launchFromMercury(sB.rOrbit, true);
   const lnPod = launchFromMercury(sB.rPod, true);
   const reachableMass = Math.min(mass, growth.peakMass);
   const reachableCoverage = coverageForMass(p, reachableMass);
@@ -471,35 +477,34 @@ export function skyLux(p, f) {
   return L * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
 }
 
-/** Largest coverage whose glow stays within p.skyLimitLux for the chosen placement. */
-export function skyCap(p) {
-  if (p.earthPlacement === 'farside') return Math.min(1, p.skyLimitLux / (FIXED.skyLuxPerFRho * p.rhoVis));
-  // the glow rises as f(1 − f): search the rising side; past half cover it never binds first
-  if (skyLux(p, 0.5) <= p.skyLimitLux) return 1;
-  let lo = -8, hi = Math.log10(0.5);
-  for (let i = 0; i < 40; i++) {
-    const mid = (lo + hi) / 2;
-    if (skyLux(p, 10 ** mid) <= p.skyLimitLux) lo = mid; else hi = mid;
+/**
+ * What Earth allows: its climate budget. The shell's cap uses earthImpact (infrared minus its own
+ * shade); the far-side cloud sends only infrared, which an L1 shade may cancel up to
+ * thermostatCredit × the budget, and it cannot cover more than its patch of sky. The night-sky glow
+ * is reported, not limited.
+ */
+/**
+ * Extra heat Earth absorbs at coverage f (W/m²). Shell: earthImpact. Far side: the cloud's
+ * infrared, less what the L1 shade cancels (sized as needed, up to (thermostatCredit − 1) × budget).
+ */
+export function earthForcing(p, f) {
+  if (p.earthPlacement !== 'farside') {
+    const s = swarmAt({ ...p, earthPlacement: 'shell' }, f);
+    const e = earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S);
+    return { gross: e.forcing, shade: 0, net: e.forcing };
   }
-  return 10 ** lo;
+  const gross = f * FIXED.farsideIRPerF;
+  const shade = Math.min(Math.max(0, gross - p.forcingLimit), (p.thermostatCredit - 1) * p.forcingLimit);
+  return { gross, shade, net: gross - shade };
 }
 
-/**
- * What Earth allows. Three caps on coverage: the night-sky glow for the chosen placement, and its
- * climate budget. The shell's climate cap uses earthImpact (infrared minus its own shade); the
- * far-side cloud sends only infrared, which an L1 shade may cancel up to thermostatCredit × the
- * budget.
- */
 export function earthLimits(p) {
-  const sky = skyCap(p);
-  const shell = earthSafeCoverage({ ...p, placement: 'thermal' }, p.forcingLimit);
-  const farside = (p.forcingLimit * p.thermostatCredit) / FIXED.farsideIRPerF;
-  const climate = p.earthPlacement === 'farside' ? farside : shell;
-  const cap = Math.min(1, sky, climate);
+  const shell = earthSafeCoverage({ ...p, placement: 'thermal', earthPlacement: 'shell' }, p.forcingLimit);
+  const farside = Math.min(FIXED.farsideGeomCap, (p.forcingLimit * p.thermostatCredit) / FIXED.farsideIRPerF);
+  const cap = Math.min(1, p.earthPlacement === 'farside' ? farside : shell);
   const s = swarmAt(p, cap);
-  const flops = s.flops * (p.earthPlacement === 'farside' ? FIXED.farsideFlopFactor : 1);
-  return { sky, shell, farside, climate, cap, binding: sky <= climate ? 'night sky' : 'climate', flops,
-    skyLuxAtCap: skyLux(p, cap) };
+  return { shell, farside, cap, flops: s.flops, mass: s.mass, skyLuxAtCap: skyLux(p, cap),
+    shadeCancels: p.earthPlacement === 'farside' ? Math.max(0, cap * FIXED.farsideIRPerF - p.forcingLimit) : 0 };
 }
 
 /** Satellite mass standing in the swarm by a given year after the first launch. */
@@ -536,6 +541,7 @@ export function atYear(p, d, year) {
     heatOnMercury: exportRate * d.minedPerDelivered * p.heatPerKg * 1e6,
     heatLimited: year > g.tCap && exportRate > 0.98 * g.capToSails,
     earth: earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S),
+    forcing: earthForcing(p, f),
   };
 }
 

@@ -27,6 +27,7 @@ const state = { era: 'mid', baseEra: 'mid', params: { ...h.eraParams('mid') }, t
 
 // --------------------------------------------------------------------------------- model glue
 
+/** Extra heat on Earth for sails spread inside Earth's orbit (the shell), W/m². */
 function forcingAt(p, f) {
   const s = h.swarmAt(p, f);
   return earthImpact(h.filmOptics(p), s.rSail, s.f, s.sail.T, s.sail.S).forcing;
@@ -67,8 +68,12 @@ function curveFor(d, table) {
 function sailFacts(p) {
   const s = h.swarmAt(p, 0.01);
   const side = SAIL_SIDE * Math.sqrt(p.sailArea / 69543);
-  const W = s.sail.chipWm2 * p.sailArea;
-  return { s, side, diag: side * Math.SQRT2, MW: W / 1e6, chips: W / p.chipPower, flops: W / s.sail.jPerFlop, mass: p.sailArea * p.filmAreal };
+  // on the far side the same sail flies at 1 AU: less sunlight, and hotter chips (FIXED.farsideFlopFactor)
+  const kS = s.farside ? s.rSail ** 2 : 1;
+  const W = s.sail.chipWm2 * p.sailArea * kS;
+  const flops = (W / s.sail.jPerFlop) * (s.farside ? h.FIXED.farsideFlopFactor : 1);
+  return { s, side, diag: side * Math.SQRT2, MW: W / 1e6, chips: W / p.chipPower, flops, mass: p.sailArea * p.filmAreal,
+    farside: s.farside, S: s.sail.S * kS, pitch: s.sail.chipPitch / Math.sqrt(kS) };
 }
 
 function recompute() {
@@ -76,6 +81,7 @@ function recompute() {
   state.d = h.compute(p);
   state.earth = h.earthLimits(p);
   state.far = h.earthLimits({ ...p, earthPlacement: 'farside' });
+  state.shellE = h.earthLimits({ ...p, earthPlacement: 'shell' });
   state.table = coverageTable(p);
   state.curve = curveFor(state.d, state.table);
   for (const era of ['2026', 'low', 'mid', 'high']) {
@@ -117,10 +123,12 @@ function renderSail() {
   $('sail-prose').innerHTML = `
     <p>Each satellite is a square of solar film ${num(`${Math.round(f.side)} m`)} on a side, flown corner-first as a diamond ${num(`${Math.round(f.diag)} m`)} from tip to tip. The film is ${num('80 µm')} thick, a little thinner than office paper, which makes the sail ${num(sci(f.side / FILM_THICKNESS, 2))} times wider than it is thick. Shrink it to the width of a room and it would be about as thick as the wall of a soap bubble. It weighs ${num(kg(f.mass))}. That works only because, out there, nothing pushes on it except sunlight.</p>
     <p>Behind the cells sit ${num(sci(f.chips, 2))} chiplets, one every ${num(length(f.s.sail.chipPitch))}. Together they draw ${num(`${f.MW.toFixed(1)} MW`)} and compute ${num(`${sci(f.flops, 2)} FLOP/s`)}, ${num(`${(f.flops / WORLD_AI_FLOPS_2025).toFixed(2)}×`)} all the AI hardware on Earth in 2025. That is one sail. The swarm Earth allows has about ${num(sci(nSails, 1))} of them.</p>
-    <p>The sail orbits at ${num(`${f.s.rSail.toFixed(3)} AU`)}, just inside Earth's orbit, in sunlight of ${num(`${Math.round(f.s.sail.S)} W/m²`)}. You might expect a solar computer to crowd in toward the Sun for more power, but the chips decide where it flies. The film settles at ${num(kelvin(f.s.sail.T))}, the chiplets run ${num(`${p.filmSpreadDT} K`)} hotter at their ${num(`${p.tjFilmC} °C`)} limit, and any closer in they would overheat.</p>
+    ${f.farside
+      ? `<p>It flies on Earth's own orbit, 1 AU from the Sun, but between a quarter and three quarters of a turn away from Earth, on the far side of the Sun. That spot is chosen for Earth's sake, not the chips'. Sunlight there is ${num(`${Math.round(f.S)} W/m²`)}, and from out there Earth always sits within 45° of the Sun, in front of the sail. So the cover glass carries a fine aluminium mesh that is dark in the infrared: the film can barely radiate forward, toward Earth, and pushes its heat out of the back. That runs the chiplets at about ${num('110 °C')} and costs a third of the computing per watt. The same sail spread evenly inside Earth's orbit would settle at ${num(`${f.s.rSail.toFixed(3)} AU`)}, where its chips sit at their ${num(`${p.tjFilmC} °C`)} limit and it computes more, but Earth would then let the swarm be only ${num(`1/${Math.round(state.earth.cap / state.earth.shell)}`)} as large.</p>`
+      : `<p>The sail orbits at ${num(`${f.s.rSail.toFixed(3)} AU`)}, just inside Earth's orbit, in sunlight of ${num(`${Math.round(f.s.sail.S)} W/m²`)}. You might expect a solar computer to crowd in toward the Sun for more power, but the chips decide where it flies. The film settles at ${num(kelvin(f.s.sail.T))}, the chiplets run ${num(`${p.filmSpreadDT} K`)} hotter at their ${num(`${p.tjFilmC} °C`)} limit, and any closer in they would overheat.</p>`}
     <p>The photograph at the top was taken by a simulated camera a kilometre away, exposed for sunlit grey. The film reflects about 0.2% of visible light, so it comes out nearly black, which is what a good solar cell should look like. Light it reflects is power it didn't collect. The bright line is the Sun's reflection in the cover glass, broken into segments where each 1.6 m fold panel curls slightly beside its hinge.</p>`;
   sailAnatomy($('anatomy'), {
-    side: f.side, diag: f.diag, pitchMm: f.s.sail.chipPitch * 1e3, chipW: p.chipPower, mw: f.MW, chips: f.chips,
+    side: f.side, diag: f.diag, pitchMm: f.pitch * 1e3, chipW: p.chipPower, mw: f.MW, chips: f.chips,
     lanes: state.era !== '2026',
   });
 }
@@ -134,11 +142,11 @@ function renderComputer() {
   const params = 1e13 * Math.sqrt(f.flops / 5.7e21);
   const optical = state.era !== '2026';
   $('computer-prose').innerHTML = `
-    <p>The chips are spread through the film because a thin sheet can't move heat sideways. The metal you would need to spread a chip's heat grows with the square of its power, from ${num('0.09 g/W')} at 0.1 W per chip to ${num('9.4 g/W')} at 10 W. At ${num(`${p.chipPower} W`)} each, the heat doesn't have to go anywhere. The film right around each chip radiates it. Both faces together shed all the sunlight the film absorbs, about ${num(`${Math.round(p.alpha * f.s.sail.S)} W/m²`)}, and ${num(`${Math.round(f.s.sail.chipWm2)} W/m²`)} of that happens to pass through the chips on its way out. Thermally, the computing is almost free. The sail would have to get rid of that heat whether the chips were there or not.</p>
+    <p>The chips are spread through the film because a thin sheet can't move heat sideways. The metal you would need to spread a chip's heat grows with the square of its power, from ${num('0.09 g/W')} at 0.1 W per chip to ${num('9.4 g/W')} at 10 W. At ${num(`${p.chipPower} W`)} each, the heat doesn't have to go anywhere. The film right around each chip radiates it. ${f.farside ? 'The film' : 'Both faces together'} shed${f.farside ? 's' : ''} all the sunlight the film absorbs, about ${num(`${Math.round(p.alpha * f.S)} W/m²`)}, and ${num(`${Math.round(f.s.sail.chipWm2 * f.S / f.s.sail.S)} W/m²`)} of that happens to pass through the chips on its way out. Thermally, the computing is almost free. The sail would have to get rid of that heat whether the chips were there or not.</p>
     <p>${optical
       ? 'Optical lanes laid in the film, fibre or waveguides, make each sail one tightly coupled machine. A bit crosses the whole sail in about two microseconds.'
       : 'With 2026 hardware the chiplets talk over an electrical mesh, hop by hop, so a sail works as many loosely linked patches. Optical lanes in the film, expected from about 2050, turn it into one tightly coupled machine.'}
-      Neighbouring sails are hundreds of kilometres apart, a millisecond away by light, so the sail is the unit that computes in lockstep. A sail like this one could serve roughly ${num(sci(agents, 1))} AI agents at once, or train a model with about ${num(sci(params, 1))} active parameters in a year.</p>`;
+      Neighbouring sails are tens to hundreds of kilometres apart, up to a millisecond away by light, so the sail is the unit that computes in lockstep. A sail like this one could serve roughly ${num(sci(agents, 1))} AI agents at once, or train a model with about ${num(sci(params, 1))} active parameters in a year.</p>`;
 }
 
 function renderWhy() {
@@ -162,18 +170,34 @@ function renderWhy() {
   $('why-table').innerHTML = `<thead><tr><th></th><th>Compute sail</th><th>Concentrated pod</th></tr></thead><tbody>${rows.map(([k, a, b]) => `<tr><td>${k}</td><td class="v">${a}</td><td class="v">${b}</td></tr>`).join('')}</tbody>`;
 }
 
+/** Radiator temperature at which Mercury's paved surface sheds `Q` W of 500 K waste heat through
+ * heat pumps at half of Carnot (ε 0.9); the pumps' own work is radiated too. */
+function radiatorTemp(Q) {
+  const A = 4 * Math.PI * MERCURY.R ** 2, Tc = 500;
+  const shed = T => { const cop = (0.5 * Tc) / (T - Tc); return 0.9 * PHYS.SIGMA * T ** 4 * A * cop / (1 + cop); };
+  if (Q <= 0.9 * PHYS.SIGMA * Tc ** 4 * A) return Tc;
+  let lo = Tc + 1, hi = 6000;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (shed(m) < Q) lo = m; else hi = m; }
+  return lo;
+}
+
 function renderMercury() {
-  const p = state.params, d = state.d, g = d.growth;
+  const p = state.params, d = state.d, g = d.growth, E = state.earth;
   const now = h.atYear(p, d, state.t);
   const rockOut = g.tRockOut != null ? Math.round(p.seedYear + g.tRockOut) : null;
+  const Tr = radiatorTemp(p.mercuryHeatLimit);
+  const bare = 0.9 * PHYS.SIGMA * 500 ** 4 * 4 * Math.PI * MERCURY.R ** 2;
+  const rockUsed = E.mass * d.minedPerDelivered / MERCURY.M_SHELL;
   $('mercury-prose').innerHTML = `
-    <p>Mercury is mostly iron. Its crust and mantle, the part worth mining, are ${num(pct(MERCURY.M_SHELL / MERCURY.M, 0))} of its mass. Factories reduce the rock to silicon, magnesium, aluminium and glass. About ${num(pct(p.yieldDelivered, 0))} of each kilogram ends up in spacecraft, and the oxygen becomes ion-thruster propellant. Mass drivers throw it off the surface at ${num(`${(d.logistics.sail.vLaunch / 1e3).toFixed(1)} km/s`)}, first as folded sails and later, once the chip fabs have moved into orbit, as refined feedstock for them.</p>
-    <p>Industry copies itself every ${num(`${g.doublingYearsEff.toFixed(2)} years`)}, held back by the chip fabs it has to build. In ${num(yr(p.seedYear + g.tCap))} it hits the <em>heat wall</em>, where Mercury can't get rid of the waste heat of mining any faster, and exports stop growing at ${num(`${sci(g.capToSails * YEAR, 2)} kg`)} a year. By ${num(Math.round(now.calendarYear))}, ${num(pct(now.mercuryRemoved, 2))} of the planet has been taken apart${rockOut ? `, and at full build its rock runs out around ${num(rockOut)}` : ''}. Rock is never what runs short. Heat is.</p>`;
+    <p>Mercury is mostly iron. Its crust and mantle, the part worth mining, are ${num(pct(MERCURY.M_SHELL / MERCURY.M, 0))} of its mass. Surprisingly little happens on the surface. Machines dig the rock, and electromagnetic launchers throw it, unrefined, into low orbit at about ${num('3 km/s')}. Everything else happens up there. Catapults in orbit add the rest of the ${num(`${(d.logistics.sail.vLaunch / 1e3).toFixed(1)} km/s`)} the sails need, and factories reduce the rock to silicon, magnesium, aluminium and glass. About ${num(pct(p.yieldDelivered, 0))} of each kilogram ends up in spacecraft, and the oxygen becomes ion-thruster propellant.</p>
+    <p>The reason is heat. Energy is not scarce here, since the swarm can beam down as much as anyone wants. What is scarce is a way to get rid of it. Bare ground at ${num('500 K')} radiates only ${num(`${sci(bare, 1)} W`)} from the whole planet. So the planet is paved with radiators, and heat pumps lift the waste heat to about ${num(`${Math.round(Tr / 10) * 10} K`)}, where they shed ${num(`${sci(p.mercuryHeatLimit, 1)} W`)}. Hotter radiators help only a little: at ${num('2,000 K')}, about as hot as one can be built, the same planet sheds under ${num('10¹⁹ W')}. What can still be changed is how much heat each kilogram leaves behind. Digging and the first ${num('3 km/s')} leave about ${num(`${p.heatPerKg} MJ`)}. Launching all the way from the ground would leave ${num('1.8 MJ')}, and refining on the ground tens of MJ.</p>
+    <p>Industry copies itself every ${num(`${g.doublingYearsEff.toFixed(2)} years`)}, held back by the chip fabs it has to build. In ${num(yr(p.seedYear + g.tCap))} it hits the <em>heat wall</em>, and exports stop growing at ${num(`${sci(g.capToSails * YEAR, 2)} kg`)} a year. By ${num(Math.round(now.calendarYear))}, ${num(pct(now.mercuryRemoved, 2))} of the planet has been taken apart. The swarm Earth allows takes ${num(pct(rockUsed, rockUsed < 0.1 ? 1 : 0))} of Mercury's rock${rockOut ? `. Left alone, industry would dig out all of it by ${num(rockOut)}` : ''}.</p>`;
 }
 
 function readout(a) {
   const p = state.params;
   const lux = h.skyLux(p, a.f);
+  const fc = a.forcing;
   const items = [
     ['Year', `${Math.round(a.calendarYear)}`],
     ['Sunlight captured', pct(a.f, 2)],
@@ -181,8 +205,8 @@ function readout(a) {
     ['Sails flying', sci(a.nSails, 2)],
     ['Mercury removed', pct(a.mercuryRemoved, 2)],
     ['Output replacing old sails', pct(a.replacementShare, 0)],
-    ['Extra heat on Earth', `+${sci(a.earth.forcing, 2)} W/m²`, a.earth.forcing > p.forcingLimit],
-    ['Night sky after dusk', `${sci(lux, 2)} lux`, lux > p.skyLimitLux],
+    [fc.shade > 0 ? 'Extra heat on Earth, after the shade' : 'Extra heat on Earth', `+${sci(fc.net, 2)} W/m²`, fc.net > p.forcingLimit * 1.001],
+    ['Night sky after dusk', `${sci(lux, 2)} lux`],
   ];
   return items.map(([k, v, over]) => `<div><span>${k}</span><b class="${over ? 'over' : ''}">${v}</b></div>`).join('');
 }
@@ -199,13 +223,15 @@ function renderBuild() {
     : `Growth is exponential until the heat wall, but the swarm never reaches ${num('1%')} of the Sun's light.`;
   const upkeep = g.reachedTarget && p.coverage < 1
     ? `It stops there because that is the target you set.`
+    : g.tRockOut != null && g.tRockOut <= g.tPeak + 1
+    ? `What stops it is Mercury itself. By ${num(yr(p.seedYear + g.tRockOut))} all of its rock has been dug out, and from then on the fleet slowly wears away.`
     : p.serviceLife > 0
     ? `The ceiling is set by upkeep, not by Mercury: sails wear out after ${num(`${p.serviceLife} years`)}, ${num(pct(p.recycleFrac, 0))} of each is recycled in orbit, and new exports only replace the rest.`
     : `With sails that never wear out, the swarm keeps growing at the heat-limited rate until it reaches its target or Mercury's rock runs out.`;
   const earthLine = Number.isFinite(yCap)
     ? `Earth's limit, the blue line, is crossed in ${num(yr(p.seedYear + yCap))}.`
     : `It never reaches Earth's limit, the blue line.`;
-  $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} Then it levels off at ${num(pct(ceil, 1))}. ${upkeep} ${earthLine}</p>`;
+  $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} Then it tops out at ${num(pct(ceil, 1))}. ${upkeep} ${earthLine}</p>`;
   const a = h.atYear(p, d, state.t);
   const markers = [
     { t: g.tCap, f: fForMass(state.table, g.builtAtYear(g.tCap)), label: `heat wall, ${yr(p.seedYear + g.tCap)}` },
@@ -236,56 +262,67 @@ function updateYear(a) {
 }
 
 function renderEarth() {
-  const p = state.params, d = state.d, E = state.earth, far = state.far;
+  const p = state.params, d = state.d, E = state.earth, far = state.far, sh = state.shellE;
+  const F = h.FIXED;
   const ceil = d.reachableCoverage;
-  const fc = forcingAt(p, ceil);
+  const farside = p.earthPlacement === 'farside';
+  const fc = farside ? h.earthForcing(p, ceil).gross : forcingAt(p, ceil);
   const runaway = EARTH.runawayAbsorbedLimit - EARTH.absorbedSolar;
   const yCap = d.yearsToCoverage(E.cap);
-  const farside = p.earthPlacement === 'farside';
   const over = ceil > E.cap * 1.02;
+  const co2 = p.forcingLimit / EARTH.co2DoublingForcing;
   const consequence = fc > runaway
     ? `, past the ${num(`${Math.round(runaway)} W/m²`)} that tips Earth into a runaway greenhouse`
     : `, ${(fc / EARTH.co2DoublingForcing).toFixed(1)} times the effect of doubling CO₂`;
+  const perPct = farside
+    ? `Even parked on the far side of the Sun with their fronts dark in the infrared, the sails send Earth ${num(`${(F.farsideIRPerF / 100).toFixed(2)} W/m²`)} for every 1% of sunlight they capture.`
+    : `Spread evenly inside Earth's orbit, the sails add about ${num(`${forcingAt(p, 0.01).toFixed(1)} W/m²`)} for every 1% of sunlight they capture, even after you subtract the sunlight they block.`;
   const p1 = over
-    ? `Left alone, industry would take this swarm to ${num(pct(ceil, 1))} of the Sun's light, and Earth can't live with that. Every watt a sail intercepts comes back out as infrared, and Earth absorbs its share. Spread evenly inside Earth's orbit, the sails add about ${num(`${forcingAt(p, 0.01).toFixed(1)} W/m²`)} of heat for every 1% of sunlight they capture, even after you subtract the sunlight they block. At the ceiling that is ${num(`${fc.toFixed(0)} W/m²`)}${consequence}.`
-    : `With these assumptions industry stops at ${num(pct(ceil, 2))} of the Sun's light, within what Earth allows. Every watt the sails intercept still leaves them as infrared, and Earth absorbs its share: about ${num(`${forcingAt(p, 0.01).toFixed(1)} W/m²`)} for every 1% captured by sails spread evenly inside Earth's orbit.`;
-  const skyFirst = E.sky <= E.climate;
-  const climateText = farside
-    ? `with sails on the far side of the Sun and a shade at L1, keeping Earth's extra heat under ${num(`${p.forcingLimit} W/m²`)} allows ${num(pct(E.climate, 2))}`
-    : `keeping Earth's extra heat under ${num(`${p.forcingLimit} W/m²`)} allows ${num(pct(E.climate, 2))}`;
-  const skyText = `film and hardware together reflect ${num(pct(p.rhoVis, 1))} of visible light, enough to light the ground like ${p.skyLimitLux >= 0.2 && p.skyLimitLux <= 0.3 ? 'a full Moon' : `${p.skyLimitLux} lux`} once the swarm captures ${num(pct(E.sky, 2))}`;
-  const p2 = `Two limits arrive at nearly the same point, and the one that bites first is not the one most people would guess. The sails on the far side of the Sun show Earth their sunlit faces through the gaps in the near side, so after dusk a glow comes up where the Sun went down. The ${skyText}. Meanwhile ${climateText}. ${skyFirst ? `The night sky runs out first. A swarm of nearly black sails that lets ${pct(1 - E.cap, 1)} of the light straight through is stopped by light pollution before it is stopped by heat.` : 'The climate gives out first.'}`;
+    ? `Left alone, industry would take this swarm to ${num(pct(ceil, 1))} of the Sun's light${farside && ceil > F.farsideGeomCap ? ', more than the far side even has room for' : ''}, and Earth can't live with that. Every watt a sail intercepts comes back out as infrared, and some of it lands on Earth. ${perPct} At the ceiling that is ${num(`${fc.toFixed(0)} W/m²`)}${consequence}.`
+    : `With these assumptions industry stops at ${num(pct(ceil, 2))} of the Sun's light, within what Earth allows. Every watt the sails intercept still leaves them as infrared, and some of it lands on Earth. ${perPct}`;
+  const shadeW = (p.thermostatCredit - 1) * p.forcingLimit;
+  const p2 = farside
+    ? `So the limit is the climate. The budget used here is ${num(`${p.forcingLimit} W/m²`)} of extra heat, ${co2 < 0.45 ? `about ${pct(co2, 0)}` : `${co2.toFixed(1)} times`} what doubling CO₂ does. There is one more trick: a thin cloud of ordinary sails at L1, 1.6 million km sunward of Earth, can take a little sunlight off Earth to make room for more infrared. It is not a clean swap. Sunlight drives evaporation and infrared mostly doesn't, so every W/m² traded this way costs about ${num('0.76%')} of the world's rainfall. Letting the shade cancel ${num(`${shadeW.toFixed(1)} W/m²`)}, Earth allows ${num(pct(E.cap, 2))} of the Sun. The same sails spread evenly inside Earth's orbit, where they surround Earth on every side, would be allowed ${num(pct(E.shell, 2))}.`
+    : `So the limit is the climate. The budget used here is ${num(`${p.forcingLimit} W/m²`)} of extra heat, ${co2 < 0.45 ? `about ${pct(co2, 0)}` : `${co2.toFixed(1)} times`} what doubling CO₂ does, and with the sails spread evenly inside Earth's orbit it allows ${num(pct(E.cap, 2))} of the Sun.`;
   const p3 = `So the swarm Earth allows captures about ${num(pct(E.cap, 2))} of the Sun, ${num(`${sci(E.flops, 2)} FLOP/s`)}. That is about ${num(sci(E.flops / WORLD_AI_FLOPS_2025, 1))} times all the AI hardware on Earth in 2025, or ${num(sci(E.flops / BRAIN_FLOPS, 1))} human brains at 10¹⁵ FLOP/s each. ${Number.isFinite(yCap) ? `It is reached around ${num(yr(p.seedYear + yCap))}.` : 'With these assumptions industry never gets there.'}`;
-  $('earth-prose').innerHTML = `<p>${p1}</p><p>${p2}</p><p>${p3}</p>`;
-  $('earth-prose-2').innerHTML = farside
-    ? `<p>The far-side placement is selected. Sails share Earth's own orbit beyond the Sun, where they never pass in front of it. Each one always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass makes that face dark in the infrared and pushes the heat out of the back, away from Earth, and a small cloud of sails at L1 shades away part of the rest. It costs about a third of the computing per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth. The night sky still limits it to ${num(pct(E.sky, 2))}.</p>`
-    : `<p>There is another way to fly more sails under the same sky. They can share Earth's own orbit on the far side of the Sun, where they never pass in front of it, and their glow then stays in two wings along the ecliptic within 45° of the Sun. The night sky allows ${num(pct(far.sky, 2))}. Every sail out there always has both the Sun and Earth in front of it, so a fine aluminium mesh in the cover glass can make that face dark in the infrared and push the heat out of the back, away from Earth. A small cloud of ordinary sails at L1, 1.6 million km sunward of Earth, can shade away part of what is left. Within ${num(`${p.forcingLimit} W/m²`)} the climate alone would then allow ${num(pct(far.farside, 1))}, ${(far.farside / E.climate).toFixed(0)} times the shell. The mesh costs about a third of the computing per watt, so under the same night sky the far side runs ${num(`${sci(far.flops, 2)} FLOP/s`)}, ${farVsShell(far.flops / E.flops)} the shell. It also needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth.</p>`;
+  const lux = E.skyLuxAtCap;
+  const moons = lux / 0.25;
+  const p4 = farside
+    ? `What it does to the night sky is a side effect, and not a small one. The sails reflect ${num(pct(p.rhoVis, 1))} of visible light, and from Earth the cloud lies in two wings along the ecliptic, reaching 45° from the Sun on either side. At the end of twilight they light the ground at ${num(`${lux.toFixed(1)} lux`)}, ${moons >= 1.5 ? `${Math.round(moons)} times` : 'about'} a full Moon. Near the equator, where the Sun sinks far enough, the wings set about three hours after it and the rest of the night is dark. At mid-latitudes in summer the Sun never gets far enough below the horizon, and a glow of a few tenths of a lux stays up all night.`
+    : `What it does to the night sky is a side effect, and not a small one. The sails beyond the Sun show Earth their sunlit faces through the gaps in the near ones, so a disc of light about 60° in radius stays up round the set Sun. At the end of twilight it lights the ground at ${num(`${lux.toFixed(2)} lux`)}, ${moons >= 1.5 ? `${Math.round(moons)} times` : 'about'} a full Moon.`;
+  $('earth-prose').innerHTML = `<p>${p1}</p><p>${p2}</p><p>${p3}</p><p>${p4}</p>`;
+
+  // How far the far side could go: 20 % of the Sun
+  const q = { ...p, earthPlacement: 'farside' };
+  const f20 = 0.2, gross20 = f20 * F.farsideIRPerF, credit = 2.5;
+  const budget20 = gross20 / credit, rain20 = (gross20 - budget20) * 0.76;
+  const flops20 = h.swarmAt(q, f20).flops;
+  const y20 = h.compute({ ...q, coverage: 1 }).yearsToCoverage(f20);
+  $('earth-prose-2').innerHTML = `<p>How far could this go? Four things decide it: the heat budget, how much the shade may cancel, room on the far side, and rock. Room runs out first. Sails on the far side can't fill more than about ${num(pct(F.farsideGeomCap, 0))} of the sky round the Sun, the slice of Earth's orbit from a quarter to three quarters of a turn away, within 30° of its plane. To hold ${num('20%')}, Earth would take ${num(`${gross20.toFixed(1)} W/m²`)} of infrared. Even if the shade cancelled ${num(pct(1 - 1 / credit, 0))} of that, Earth would be left with ${num(`${budget20.toFixed(1)} W/m²`)}, ${(budget20 / EARTH.co2DoublingForcing).toFixed(1)} times doubling CO₂, and the shade alone would cut the world's rainfall by about ${num(`${rain20.toFixed(0)}%`)}. Packed that densely the sails would also start to shade one another, so the real figure is lower still. That swarm would compute ${num(`${sci(flops20, 1)} FLOP/s`)}, ${(flops20 / far.flops).toFixed(0)} times the one above, and ${Number.isFinite(y20) ? `Mercury could supply it by ${num(yr(p.seedYear + y20))}` : 'Mercury could not supply it'}. Below is what its sky would look like.</p>
+    <p>The far side has one more cost. A cloud this dense needs collision-free orbit lanes and the capture of every derelict, because anything lost there drifts back toward Earth.</p>`;
   orbitMap($('orbit-map'), {
-    shellR: Math.min(0.96, h.swarmAt(p, E.cap).rSail),
-    shellLabel: farside ? `inside Earth's orbit: ${pct(E.shell, 2)} within ${p.forcingLimit} W/m²` : `allowed now: ${pct(E.cap, 2)}, spread inside Earth's orbit`,
-    cloudLabel: farside ? `selected: on Earth's orbit, ${pct(E.cap, 2)}` : `option: ${pct(far.cap, 2)} on Earth's orbit`,
+    shellR: Math.min(0.96, h.swarmAt({ ...p, earthPlacement: 'shell' }, sh.cap).rSail),
+    shellLabel: farside ? `alternative, inside Earth's orbit: ${pct(sh.cap, 2)}` : `allowed: ${pct(E.cap, 2)}, spread inside Earth's orbit`,
+    cloudLabel: farside ? `allowed: ${pct(E.cap, 2)}, on Earth's orbit` : `alternative: ${pct(far.cap, 2)} on Earth's orbit`,
   });
   let kink = null;
   for (const r of state.table) if (h.swarmAt(p, r.f).rSail > 1) { kink = r.f; break; }
+  const farPts = state.table.map(r => [r.f, r.f * F.farsideIRPerF]);
   earthChart($('earth-chart'), {
     pts: state.table.map(r => [r.f, r.forcing]),
+    pts2: farPts,
     refs: [
       { v: p.forcingLimit, label: `${p.forcingLimit} W/m², the budget used here` },
       { v: EARTH.co2DoublingForcing, label: `${EARTH.co2DoublingForcing} W/m², doubling CO₂` },
       { v: runaway, label: `${Math.round(runaway)} W/m², runaway greenhouse` },
     ],
     marks: [
-      { f: E.shell, label: `within budget, ${pct(E.shell, 2)}`, color: 'var(--earth)', left: E.shell < E.sky },
-      ...(farside ? [] : [{ f: E.sky, label: `night-sky limit, ${pct(E.sky, 2)}`, color: 'var(--swarm)', left: E.sky <= E.shell }]),
+      { f: sh.cap, label: `inside Earth's orbit, ${pct(sh.cap, 2)}`, color: 'var(--earth)', left: true },
+      { f: far.cap, label: `far side + shade, ${pct(far.cap, 2)}`, color: 'var(--swarm)' },
       { f: ceil, label: `industry's ceiling, ${pct(ceil, 1)}`, color: 'var(--ink)', top: true, left: true },
     ],
   });
-  $('earth-caption').innerHTML = `<b>Extra energy absorbed by Earth, against the share of sunlight captured</b>, for sails spread evenly inside Earth's orbit: their infrared minus the sunlight they block.${kink ? ` The kink near ${pct(kink, 0)} is where a dense swarm has to retreat outside Earth's orbit to stay cool.` : ''}`;
-}
-
-function farVsShell(r) {
-  if (r > 0.85 && r < 1.18) return 'about the same as';
-  return r > 1 ? `${r.toFixed(1)} times as much as` : `${(1 / r).toFixed(1)} times less than`;
+  $('earth-caption').innerHTML = `<b>Extra energy absorbed by Earth, against the share of sunlight captured.</b> Solid: sails spread evenly inside Earth's orbit, their infrared minus the sunlight they block.${kink ? ` The kink near ${pct(kink, 0)} is where a dense swarm has to retreat outside Earth's orbit to stay cool.` : ''} Dashed: sails on the far side with infrared-dark fronts, before the L1 shade takes off up to ${shadeW.toFixed(1)} W/m².`;
 }
 
 function renderStar() {

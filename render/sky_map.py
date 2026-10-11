@@ -37,6 +37,9 @@ REPO = os.path.dirname(HERE)
 ASSETS = os.path.join(REPO, 'assets')
 LM = 93.0
 S0 = 1361.0
+FARSIDE_LAT = 30.0                 # deg, the cloud's half-height in heliocentric latitude
+FARSIDE_PATCH = 0.25               # its share of the sphere seen from the Sun: (180/360) sin 30
+FARSIDE_EDGE_DEG = 3.0
 S10 = 2.74e-8 * 10 ** (-0.4 * 10) * (180 / math.pi) ** 2      # one V=10 star per deg^2, W/m^2/sr
 # glow colour: hardware near-neutral, ~9 % of the reflectance from the film's violet AR residual
 # (design_spec scene_facts.sail_brightness.glint_colour_linear_sRGB_rel), times sunlight
@@ -106,17 +109,28 @@ def glow_radiance(dirs, sun, g):
         edge = np.clip((R + math.radians(2.5) - ang) / math.radians(5.0), 0, 1)
         edge = edge * edge * (3 - 2 * edge)
         return L * edge
-    # far-side cloud: wings along the ecliptic
-    pole = np.asarray(g['ecliptic_pole'])
+    # Far-side cloud (docs/data/earth_safe.json, b_coorbital_L3pm90_lat30): sun-facing sails in a
+    # thin layer on Earth's orbit, 90-270 deg of heliocentric longitude from Earth and within 30 deg of
+    # the ecliptic, covering a fraction tau = f / 0.25 of that patch. A line of sight from Earth meets
+    # the 1 AU sphere once more, at P = -sun + 2 cos(angle) d (in AU, Sun at the origin); a Lambertian
+    # sail front there in full sunlight has radiance rho S / pi from any angle Earth sees it at, so
+    # the glow is tau rho S / pi wherever P lies in the patch. Orbital scatter softens the edges by a
+    # couple of degrees.
+    pole = np.asarray(g['ecliptic_pole'], dtype=float)
     f, rho = g['f'], g['rho']
-    scale = (f / 0.01) * (rho / 0.003) / LM          # study profile is cd/m^2 per 1 % at rho 0.003
-    ang = np.degrees(np.arccos(np.clip(cosang, -1, 1)))
-    lat = np.degrees(np.arcsin(np.clip(dirs @ pole, -1, 1)))
-    prof = np.interp(ang, [0, 7, 10, 20, 30, 45, 50], [0, 4.8, 4.8, 3.6, 2.2, 1.6, 0.0])
-    # apparent latitude half-width ~ atan(0.5 AU / distance): 14-20 deg, soft
-    width = np.interp(ang, [7.5, 45], [14.0, 19.5])
-    lat_w = np.clip(1 - (np.abs(lat) / width) ** 4, 0, 1)
-    return scale * prof * lat_w
+    tau = f / FARSIDE_PATCH
+    c = np.clip(cosang, 0.0, 1.0)
+    P = -sun[None, :] + 2.0 * c[:, None] * dirs
+    b = np.degrees(np.arcsin(np.clip(P @ pole, -1, 1)))
+    E = -np.asarray(sun, dtype=float)
+    psi = np.degrees(np.arctan2(np.cross(np.broadcast_to(E, P.shape), P) @ pole, P @ E))
+    w = FARSIDE_EDGE_DEG
+
+    def smooth(x):
+        x = np.clip(x, 0, 1)
+        return x * x * (3 - 2 * x)
+    inside = smooth((FARSIDE_LAT + w / 2 - np.abs(b)) / w) * smooth((np.abs(psi) - 90 + w / 2) / w)
+    return np.where(cosang > 0, tau * inside * rho * S0 / math.pi, 0.0)
 
 
 def zodiacal(dirs, sun, pole):

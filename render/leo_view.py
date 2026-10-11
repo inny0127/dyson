@@ -463,6 +463,7 @@ def main(argv):
     ap.add_argument('--disc-samples', type=int, default=24)
     ap.add_argument('--steps', type=int, default=48)
     ap.add_argument('--aim-moon', action='store_true', help='point at the Moon (az/el become offsets in deg)')
+    ap.add_argument('--aim-sun', action='store_true', help='point at the Sun (az/el become offsets in deg)')
     ap.add_argument('--lights-scale', type=float, default=3.8e-3, help='repo radiance of map value 1')
     ap.add_argument('--lights-K', type=float, default=3500.0)
     a = ap.parse_args(argv)
@@ -473,6 +474,9 @@ def main(argv):
         tm /= np.linalg.norm(tm)
         a.az += math.degrees(math.atan2(tm @ sc.east, tm @ sc.north))
         a.el += math.degrees(math.asin(tm @ sc.up))
+    if a.aim_sun:
+        a.az += math.degrees(math.atan2(sc.sun @ sc.east, sc.sun @ sc.north))
+        a.el += math.degrees(math.asin(sc.sun @ sc.up))
     sun_alt = math.degrees(math.asin(sc.sun @ sc.up))
     sun_az = math.degrees(math.atan2(sc.sun @ sc.east, sc.sun @ sc.north)) % 360
     dip = math.degrees(math.acos(RG / (RG + a.alt)))
