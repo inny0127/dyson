@@ -85,17 +85,45 @@ exposure never changes the physics.
 - **Lens glare:** `glare.py` adds a measured-like point-spread function (bloom plus power-law
   wings) that conserves energy.
 
-## The industrial base (`mercury_base.py`)
+## The planet as quarry (`mercury_stripped.py`)
 
-- **When:** after the factories move to orbit, from about 2090. The manufacturing study leaves
-  only quarries, ore processing and equatorial mass-driver tracks on Mercury.
-- **Quarry:** 2 km across, 300 m deep in 20 benches (15 m faces at 70°, 12 m berms), with a 30 m
-  haul road spiralling down at 9 %. Overburden dumps, a pellet plant, a silicon solar field, and
-  radiator fins turned to the Sun's azimuth so only their top edges are lit.
-- **Surface:** craters at three scales with random sizes. Fresh rock is ~1.6× brighter than
-  weathered regolith (MESSENGER: immature material is brighter).
-- **Scale:** the heat wall moves 7.9 × 10¹⁹ kg/yr (2.5 × 10¹² kg/s). This pit holds ~9 × 10¹¹ kg,
-  so one pit like it every 0.4 s.
+- **When:** the swarm at Earth's limit, about 2128 in the central case.
+  - Industry has dug out 0.145 % of Mercury, a 2.1 km layer if it came evenly off the planet.
+  - At the heat wall it digs 2.3 × 10¹² kg/s, 0.93 m a day planet-wide. Of that,
+    9.7 × 10¹¹ kg/s is exported (2.38 kg dug per kg in orbit).
+- **Pit:** 28 km across and 3.6 km deep, with walls at 33° overall.
+  - 3.6 km on Mercury loads rock like 1.4 km on Earth: about Bingham Canyon's depth and overall
+    slope.
+  - Catch berms every 200 m. Cohesion-limited wall height scales as 1/g, so Earth's 150–200 m
+    between ramps becomes 400–500 m.
+  - Each 200 m face is four 50 m benches, the face height a bucket-wheel excavator cuts.
+  - Bench crests wander, as blasting leaves them.
+- **Machines:**
+  - Bucket-wheel excavators of Bagger 288's class: 220 m long, 96 m tall, 21.6 m wheel with 18
+    buckets, 240,000 m³ a day (~7.5 t/s).
+  - The dig rate needs ~3.1 × 10⁸ of them, one per 0.24 km² of the planet. One every 500 m along
+    berms 308 m apart is one per 0.15 km² of wall, or one per 0.24 km² of this pit.
+  - Painted white (solar absorptance ~0.15), as anything working in sunlight at 0.39 AU would be.
+  - Belt conveyors run along every berm.
+- **Floor:**
+  - Coilgun tracks in bundles of 40, 1 km apart, 31.3 km long and straight. That is the model's
+    10 t/s per track at one per 0.77 km². Each track rises d²/2R = 200 m off the curved floor at
+    its muzzle.
+  - Half of each row between bundles is radiator lying flat at 1,500 K, the top of the model's
+    1,000–1,500 K. It emits 258 kW/m², so the model's 4.6 × 10¹⁸ W covers a quarter of the planet.
+  - Glow: 7,000 cd/m² (CIE-weighted blackbody, ε 0.9). That is three times the sunlit floor beside
+    it, and a third of the walls that face the Sun.
+  - Coolant enters each 300 m panel at a manifold and leaves 50 K cooler, which halves its glow.
+  - Heat-pump stations, and ore stockpiles at their angle of repose.
+- **Surface:**
+  - The old ground keeps its craters at equilibrium density, N(>D) = 0.08 D⁻² per m², drawn down
+    to the size the camera resolves.
+  - Weathered regolith has a Lambert albedo of ~0.08, from MESSENGER's 0.071 radiance factor at
+    30° incidence.
+  - Cut rock is brighter, in strata. The deep crust's low-reflectance material is darker and less
+    red.
+- **Light:** the Sun 7° up at 0.387 AU, from the front right; black sky. Metered on a grey card in
+  full sunlight, −0.5 EV.
 
 ## The mass driver (`mass_driver.py`)
 

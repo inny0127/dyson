@@ -31,17 +31,18 @@ python3 render/post.py "$RAW/pod_hero_lwir.png" "$OUT/pod-lwir.jpg" --fov 84 --n
 # Swarm from inside: HDR point sources need real lens glare
 for x in swarm_wide swarm_tele; do
   python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
-  dev "$RAW/${x}_g.exr" "$RAW/$x.png" "$(exposure_of $x)"
 done
+dev "$RAW/swarm_wide_g.exr" "$RAW/swarm_wide.png" "$(exposure_of swarm_wide)"
+dev "$RAW/swarm_tele_g.exr" "$RAW/swarm_tele.png" "$(python3 -c "print($(exposure_of swarm_tele) - 5)")"   # 5 stops shorter: the halo
 python3 render/post.py "$RAW/swarm_wide.png" "$OUT/swarm-inside-wide.jpg" --fov 54 --noise 0.8 --glare 0 --width 2400 --quality 88
 python3 render/post.py "$RAW/swarm_tele.png" "$OUT/swarm-inside-tele.jpg" --fov 7 --noise 0.8 --glare 0 --width 2400 --quality 88
 
 # Mercury surface scenes and the foundry (scene-linear EXR, metered in sunlight)
-for x in mass_driver mercury_base foundry; do
+for x in mass_driver mercury_stripped foundry; do
   dev "$RAW/$x.exr" "$RAW/$x.png" "$(exposure_of $x)"
 done
 python3 render/post.py "$RAW/mass_driver.png" "$OUT/mass-driver.jpg" --fov 69 --noise 0.6 --width 2400 --quality 88
-python3 render/post.py "$RAW/mercury_base.png" "$OUT/mercury-base.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/mercury_stripped.png" "$OUT/mercury-quarry.jpg" --fov 84 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/foundry.png" "$OUT/foundry-visible.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/foundry_lwir.png" "$OUT/foundry-lwir.jpg" --fov 74 --noise 0 --ca 0 --glare 0 --width 2400 --quality 90
 
