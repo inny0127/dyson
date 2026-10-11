@@ -40,16 +40,25 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 - **Heat per kilogram, not Mercury's size, sets the pace.** Mercury can shed at most ~5×10¹⁸ W,
   and only paved with radiators heat-pumped to ~1,650 K; at 2,000 K it is still under 10¹⁹. So
   almost nothing happens on the surface: rock is dug and thrown unrefined into low orbit at 3 km/s,
-  and catapults, refineries and fabs work in orbit, leaving ~0.3 MJ/kg on the planet instead of
-  ~2 for a full surface launch. Left alone, industry in the central case would then dig out all of
-  Mercury's rock by ~2285, peaking near 38 % of sunlight.
-- **Earth's climate is the binding constraint.** Sails spread evenly inside Earth's orbit add
-  about 1.9 W/m² of heat to Earth for every 1 % of sunlight they capture, so a 1 W/m² budget
-  allows 0.53 %. Moved to the far side of the Sun on Earth's own orbit, with infrared-dark front
-  faces and a small L1 shade, they allow 3.8 %: 1.0×10³⁹ FLOP/s, reached around 2133
-  (`docs/earth.md`). The night sky is a consequence, not a limit: the cloud is a band of even
-  light along the ecliptic, up to seven full Moons on the ground after twilight when the ecliptic
-  stands upright. 20 % would need a cloud twice as tall and a planet run 3.4 W/m² hotter.
+  and catapults, refineries and fabs work in orbit. With superconducting launchers at 99 % that
+  leaves ~0.1 MJ/kg on the planet (0.3 at 95 %, ~2 for a full surface launch).
+- **Mercury's silicon sets the size.** The default swarm is everything Mercury can build: a
+  near-uniform swarm at 0.95 AU with a film thinned to half the design spec, finished around 2198 at
+  **83 % of the Sun's light** and 2.1×10⁴⁰ FLOP/s, just short of the 85 % its layout has room for.
+  With the design-spec film the rock runs out at ~41 %. The iron core is left: the film needs
+  silicon, and the core has little (`docs/full-swarm.md`).
+- **Earth keeps its temperature behind a shade.** Every sail carries an infrared-dark front and none
+  flies within 23° of the Sun–Earth line, so Earth sees no hot backs: 0.56 W/m² per 1 % of the
+  Sun's light, 47 W/m² for the finished swarm. A shade near L1 cancels it by taking 20 % of Earth's
+  sunlight. The price is about 30 % less rain (extrapolated, the least certain number here) and a
+  polar residual that a shade shaped by latitude and season can reduce. With glass fronts the same
+  sunlight cost allows only 20 % of the Sun. Without a shade, a 1 W/m² budget would allow 3.8 %
+  on the far side of the Sun or 0.53 % spread inside Earth's orbit (`docs/earth.md`). The night sky
+  is a consequence, not a limit: a disc of light 72° in radius round the Sun, about 86 lux on the
+  ground at the end of twilight.
+- **Regional climate control** is physically cheap but limited by aim and by the atmosphere: L1
+  shades blur over 14,000 km, orbital mirrors at 1,000–10,000 km over 9–90 km. Temperature follows
+  placed sunlight; winter rain does not (`docs/full-swarm.md`).
 
 ## Layout
 

@@ -1,5 +1,12 @@
 # Earth: how big the swarm may get
 
+> **Superseded as the default.** The page now holds Earth's temperature with an L1 shade that
+> cancels all of the swarm's heat, puts infrared-dark fronts on every sail, and spreads them all
+> round the Sun except a 23° cone round the Sun–Earth line and 15° round L3. The swarm then stops
+> where Mercury's rock runs out, at 83 % of the Sun; see `docs/full-swarm.md`. This note remains
+> the source for the infrared and night-sky physics and the far-side cloud, and describes the
+> earlier 1 W/m² budget.
+
 **Answer.** Left alone, industry would build the swarm to about 38 % of the Sun's light (central
 case) before it runs out of Mercury's rock. Earth's climate allows **3.8 %**: 1.0×10³⁹ FLOP/s,
 reached around 2133, with the sails on Earth's own orbit beyond the Sun and a small shade at L1.
