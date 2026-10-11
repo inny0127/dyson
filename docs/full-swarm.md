@@ -122,15 +122,34 @@ limits and what each costs. The model (`src/model/hybrid.js`, placement `uniform
 
 ## Service life and replacement
 
-- **Physical life:** 20–30 years. Cells keep ~92 % of their output after 10 years; film chiplets take
-  140–470 krad a decade; micrometeoroids hole the film.
+The studies gave "physical life 20–30 years (PV keeps 92 % after 10 yr)" without a derivation. Each
+wear mechanism, for this swarm's sails (0.95 AU, film ~380 K, chips ~115 °C):
+
+| Part | Mechanism | Rate | Life |
+|---|---|---|---|
+| Cells | proton displacement damage | 8 % per decade at 0.92 AU behind 20 µm glass (`hot_power.json`), ×(0.92/0.95)² = 7.5 % | 80 % of new after ~27 years; damage slows with dose and partly anneals at 380 K |
+| Chip wiring | electromigration, Black's law, J², Ea 0.9 eV | at 115 °C 2.0× faster than at 105 °C, 9.5× faster than at 85 °C | ~5 years for a chip built for 10 years at 105 °C at full current; ~20 at the sail's 60 % clock (J ≈ ½); ~80 with wires twice as wide |
+| Memory | total dose 133–437 krad per decade, unshielded (`memory.json`, 1/r²) | MRAM fails above ~1 Mrad; HfOx/SiOx RRAM above 10–20 Mrad | MRAM 23–75 years; RRAM centuries |
+| Film, chiplets | meteoroid perforation (Grün flux, `architecture_thermal_mass.json`) | 0.007–1.2 % of area a year, depending on crack kill radius | 10 % spare area: 8 years to >1,000 |
+| Cover glass | solar-wind H saturation | within a year | one-off ~3 % if the AR layer goes |
+| Structure | no thermal cycling, no air, inorganic | negligible | many decades |
+
+- **So "20–30 years" is the cells and today's chip design.** Wider wiring and resistive memory, at some
+  chip-area cost, take the hardware past 50 years; the cells then fade slowly rather than fail. The
+  hot chips are the near-uniform layout's cost: in a shell at 85 °C the same wiring lasts ~10× longer.
+- **Rare storms:** a once-in-a-millennium solar particle event can deliver 10–100× a decade's dose in
+  days, enough to kill MRAM swarm-wide; RRAM survives it.
 - **Economic life:** refresh when the new chips' gain beats the recycling loss,
-  a* = ln(1/ρ) / ln(1 + g). With ρ = 0.94 and g of a few tenths of a per cent a year (mature logic near
-  its floor), ~15 years (`docs/data/future/manufacturing.json`).
+  a* = ln(1/ρ) / ln(1 + g). With ρ = 0.94: 6 years at g = 1 %/yr, 15 at 0.4 %, 31 at 0.2 %. The
+  model's 15 years assumes chips still improving slowly during the build (2140–2200); once they
+  plateau, wear alone decides.
+- **What a longer life does (central case):** L = 20, 30 or 50 years fills the room (85 %, 2.0×10⁴⁰
+  FLOP/s) instead of stopping at 83 %, and the post-rock half-life grows from 173 to 231, 347 or
+  578 years.
 - **In the model:** exports retire L years later and ρ returns to production. During growth,
   replacement is 2^(−L/T_d) of output (0.36 % here); after the heat wall it passes half within one
   life; the unbounded fleet would level off at export × L / (1 − ρ) = 1.5×10²³ kg, so the rock runs out
-  first, after which the fleet shrinks by (1 − ρ)/L = 0.4 % a year (half-life ~170 years).
+  first, after which the fleet shrinks by (1 − ρ)/L = 0.4 % a year.
 
 ## Asteroids and other sources after the rock
 
