@@ -6,7 +6,7 @@
 <title>Mercury Swarm Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: an editorial essay. One reading column of serif text; photographs sit on black plates
    that break wider than the text; illustrations are fine-line technical drawings in the ink colour,
@@ -27,6 +27,7 @@
   --swarm: #6250d6;
   --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
   --col: 40rem;
   --wide: 72rem;
   color-scheme: light;
@@ -164,6 +165,58 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   .drawing svg, .chart svg { min-width: 760px; }
   .drawing > div::after, .chart::after { content: 'Scroll sideways'; display: block; font: 400 0.75rem/1 var(--sans); color: var(--ink-3); padding-top: 0.4rem; position: sticky; left: 0; }
 }
+/* Reading aids, after ai-2027.com: a year dashboard that follows the story as you scroll (a sticky
+   right column on wide screens, a bar across the top on narrow ones), explainer buttons under the
+   introduction, collapsible deep dives for the technical parts, and a choice of swarms at the end. */
+.dash { font: 400 0.75rem/1.35 var(--mono); color: var(--ink-2); }
+@media (min-width: 1200px) {
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; column-gap: 2.5rem; max-width: 88rem; margin-inline: auto; padding-inline: 1.5rem; }
+  .layout > main { grid-column: 1; grid-row: 1; min-width: 0; }
+  .layout > .dash { grid-column: 2; grid-row: 1; position: sticky; top: 1.25rem; align-self: start; margin-top: 2.9rem; }
+}
+@media (max-width: 1199px) {
+  .dash { position: sticky; top: 0; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 0.45rem 1rem; display: flex; gap: 1rem; align-items: center; overflow-x: auto; white-space: nowrap; }
+  .dash .dash-chart, .dash .dash-sails, .dash .dash-what { display: none; }
+  .dash .dash-metrics { display: flex; gap: 1.1rem; margin: 0; }
+  .dash .dash-metrics > div:nth-child(n+4), .dash .dash-metrics small, .dash .gauge { display: none; }
+}
+.dash-head { display: flex; align-items: center; gap: 0.6rem; }
+.dash-year { background: var(--ink); color: var(--paper); padding: 0.22rem 0.5rem; border-radius: 4px; font-weight: 500; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.dash-chart { margin-top: 0.75rem; }
+.dash-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.dash-sails { margin-top: 0.8rem; }
+.dash-label b { color: var(--ink); font-weight: 500; }
+.dash-grid { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 0.4rem; min-height: 7px; }
+.dash-grid i { width: 7px; height: 7px; background: var(--swarm); display: block; }
+.dash-grid i.part { opacity: 0.35; }
+.dash-metrics { margin: 1rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 1rem; }
+.dash-metrics > div { display: grid; gap: 0.12rem; align-content: start; }
+.dash-metrics dt { color: var(--ink-3); font-size: 0.6875rem; }
+.dash-metrics dd { margin: 0; color: var(--ink); font-size: 0.875rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dash-metrics dd small { display: block; color: var(--ink-3); font-weight: 400; font-size: 0.6875rem; white-space: normal; }
+.dash-metrics .over dd { color: var(--heat); }
+.gauge { display: block; height: 4px; background: var(--wash); position: relative; margin-top: 0.3rem; }
+.gauge i { position: absolute; inset: 0 auto 0 0; background: var(--heat); }
+.gauge b { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
+.kicker .when { color: var(--ink); }
+.explain { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.explain button { font: 400 1rem/1 var(--serif); padding: 0.55rem 0.8rem; border: 1px solid var(--ink); background: none; color: var(--ink); border-radius: 6px; cursor: pointer; }
+.explain button[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+.explain-panel { margin-top: 1rem; padding: 1rem 1.15rem; border-left: 2px solid var(--ink); background: var(--wash); font-size: 1.0625rem; line-height: 1.55; }
+.explain-panel p { margin: 0 0 0.6rem; }
+.explain-panel p:last-child { margin: 0; }
+details.deep { border: 1px solid var(--rule); border-radius: 6px; padding: 0.7rem 1rem; margin: 0 0 1.05rem; }
+details.deep summary { cursor: pointer; font: 500 0.9375rem/1.4 var(--sans); color: var(--ink); }
+details.deep[open] summary { margin-bottom: 0.7rem; }
+details.deep p { font-size: 1.0625rem; margin: 0 0 0.8rem; }
+details.deep p:last-child { margin: 0; }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; max-width: 52rem; }
+.choices button { text-align: left; border: 1px solid var(--rule); border-radius: 8px; background: none; color: var(--ink); padding: 0.9rem 1rem; cursor: pointer; display: grid; gap: 0.4rem; align-content: start; font: 400 0.875rem/1.45 var(--sans); }
+.choices button b { font: 500 1.125rem/1.25 var(--serif); }
+.choices button span { color: var(--ink-2); }
+.choices button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.note { font: 400 0.8125rem/1.45 var(--sans); color: var(--ink-3); margin-top: 0; }
+@media (max-width: 760px) { .choices { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 </style>
 </head>
@@ -177,9 +230,23 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   <div class="credit">One compute sail, seen from a kilometre away at the Sun's true brightness. It is black because it is a good solar cell.</div>
 </header>
 
+<div class="layout">
+<aside class="dash" id="dash" aria-label="The swarm, year by year">
+  <div class="dash-head"><span class="dash-year" id="dash-year"></span><span class="dash-what" id="dash-what"></span></div>
+  <div class="dash-chart" id="dash-chart"></div>
+  <div class="dash-sails"><div class="dash-label" id="dash-sails-label"></div><div class="dash-grid" id="dash-grid"></div></div>
+  <dl class="dash-metrics" id="dash-metrics"></dl>
+</aside>
 <main>
   <div class="col standfirst">
     <p>Most pictures of a Dyson swarm show the Sun wrapped in glittering machinery. We tried to work one out properly: mine Mercury, turn it into solar panels that are also computers, and fly them around the Sun. The swarm we ended up with is made of nearly black sheets, hides on the far side of the Sun, and is stopped not by Mercury, energy or engineering but by the heat it sends back to Earth. Every photograph and figure here comes from one physics model, and if you change an assumption the whole page recomputes.</p>
+    <div class="explain" role="group" aria-label="About this page">
+      <button data-explain="what">What is this?</button>
+      <button data-explain="how">How was it worked out?</button>
+      <button data-explain="unsure">What is uncertain?</button>
+      <button data-explain="change">Can I change it?</button>
+    </div>
+    <div class="explain-panel" id="explain-panel" hidden></div>
     <div class="era" role="group" aria-label="Hardware era">
       <span>Hardware</span>
       <button data-era="2026" aria-pressed="false">2026</button>
@@ -190,7 +257,7 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   </div>
   <div class="wide figures" id="figures"></div>
 
-  <section class="chapter" id="summary">
+  <section class="chapter" id="summary" data-moment="cap">
     <div class="col"><div class="kicker">In brief</div><h2>The short version</h2></div>
     <div class="col"><dl class="summary" id="summary-list"></dl></div>
     <figure class="wide drawing">
@@ -218,8 +285,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     </div>
   </section>
 
-  <section class="chapter" id="sail">
-    <div class="col"><div class="kicker">The satellite</div><h2 id="sail-title">A sheet, not a box</h2><p class="dek">Each satellite is a huge, nearly black sheet of solar film, thinner than paper, which is also the computer.</p></div>
+  <section class="chapter" id="sail" data-moment="first">
+    <div class="col"><div class="kicker"><span class="when" data-moment="first"></span> · The first sail</div><h2 id="sail-title">A sheet, not a box</h2><p class="dek">Each satellite is a huge, nearly black sheet of solar film, thinner than paper, which is also the computer.</p></div>
     <div class="col prose" id="sail-prose"></div>
     <figure class="wide drawing" id="anatomy-fig">
       <div id="anatomy"></div>
@@ -234,8 +301,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     </figure>
   </section>
 
-  <section class="chapter" id="computer">
-    <div class="col"><div class="kicker">Thermal infrared</div><h2>The panel is the computer</h2><p class="dek">The chips are spread through the film, so the film's own surface gets rid of their heat.</p></div>
+  <section class="chapter" id="computer" data-moment="first">
+    <div class="col"><div class="kicker"><span class="when" data-moment="first"></span> · The first sail</div><h2>The panel is the computer</h2><p class="dek">The chips are spread through the film, so the film's own surface gets rid of their heat.</p></div>
     <div class="col prose" id="computer-prose"></div>
     <figure class="wide">
       <div class="pair">
@@ -247,8 +314,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     </figure>
   </section>
 
-  <section class="chapter" id="why">
-    <div class="col"><div class="kicker">Concentrated or spread out</div><h2>Why the chips are not in one box</h2><p class="dek">Gathering the chips into one box would need pumps, pipes and radiators that weigh more than the chips. Spreading them out avoids all of it.</p></div>
+  <section class="chapter" id="why" data-moment="first">
+    <div class="col"><div class="kicker"><span class="when" data-moment="first"></span> · The first sail</div><h2>Why the chips are not in one box</h2><p class="dek">Gathering the chips into one box would need pumps, pipes and radiators that weigh more than the chips. Spreading them out avoids all of it.</p></div>
     <div class="col prose" id="why-prose"></div>
     <figure class="wide drawing">
       <div id="heatpaths"></div>
@@ -265,31 +332,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     <div class="col tablewrap"><table class="compare" id="why-table"></table></div>
   </section>
 
-  <section class="chapter" id="inside">
-    <div class="col"><div class="kicker">From inside the swarm</div><h2>A sky cut in two</h2><p class="dek">Inside the swarm the sky splits in two: an even glow on one side, and on the other the rest of the swarm, seen across the empty middle of Earth's orbit.</p></div>
-    <div class="col prose">
-      <p>Out on the far side the sails sit in one thin layer on Earth's orbit, about 600,000 km thick and hundreds of millions of kilometres across, and they are packed close: neighbours are about 60 km apart. From any one of them the sky splits along the layer. Every sail farther from the Sun than you shows you its sunlit face, and together they fill the half of the sky away from the Sun with an even glow of 12 cd/m², as bright as a clear sky in early twilight.</p>
-      <p>The other half is stranger. Look sunward and you see the backs of the sails just inside you, which are dark, and through the gaps between them, across the empty middle of Earth's orbit, the rest of the cloud from the inside. Every sail over there faces the Sun, and so faces you, which makes that part of the sky nearly twice as bright: 22 cd/m². It has hard edges. The cloud stops 30° above and below Earth's orbit and leaves a gap round the point straight behind the Sun, and past those edges space is black.</p>
-    </div>
-    <figure class="wide">
-      <div class="plate"><img src="renders/inside-far-orbit.jpg" alt="A sky in bands: an even grey glow above a straight horizon line, a brighter band below it, then a black arch, with a lighter patch of sky visible through the arch and black on either side" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>Looking along Earth's orbit from a sail in the far-side swarm.</b> Above the line, the even glow of all the sails farther from the Sun. Below it, the rest of the swarm, seen across the empty middle of Earth's orbit: first its near part, then a dark arch, which is the empty gap behind the Sun, then, through the arch, the swarm's other half. Where the swarm ends, above and below Earth's orbit, space is black.<span class="how">From 120° along the orbit from Earth. The specks are sails within 3,000 km; the nearest in frame is 73 km away and only four pixels wide, and those below the line show their dark backs. The Sun is 27° below the bottom of the frame.</span></figcaption>
-    </figure>
-    <div class="col prose">
-      <p>The layout inside Earth's orbit is a different place. Its sails are spread over the whole sky round the Sun, about 300 km apart, so from any one of them the others are just points of light. Two dozen or so within 1,000 km shine like the brightest stars, and tens of thousands more fill the sky down to the limit of the eye. Added together they light the sky away from the Sun to about 0.8 cd/m². You could live inside that swarm and still see mostly empty space.</p>
-    </div>
-    <figure class="wide">
-      <div class="plate"><img src="renders/swarm-inside-wide.jpg" alt="A pale grey starry sky with a glowing violet disc of light surrounding a brilliant point" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>The other layout: looking away from the Sun from a sail spread inside Earth's orbit.</b> Every star in this picture is another sail. The bright point in the violet halo is the counter-sun, the Sun mirrored back by all the sails beyond the camera in that direction. The white point inside the halo is Earth, 18 million km away.<span class="how">0.41% of the Sun's light captured. Exposed for the sky's glow. Counter-sun magnitude SHELL_CS_MAG.</span></figcaption>
-    </figure>
-    <figure class="wide">
-      <div class="plate"><img src="renders/swarm-inside-tele.jpg" alt="Telephoto view: violet glinting points and a white Earth with a smaller Moon" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>The same sky through a 300 mm lens, next to the counter-sun.</b> Single sails glint inside the halo. Earth and the Moon are overexposed white discs, because Earth's sunlit face is 15,000 times brighter per square degree than the swarm's glow.<span class="how">3° from the counter-sun, exposed five stops darker so the halo's gradient shows. Sail glints at magnitudes SHELL_GLINT_MAGS.</span></figcaption>
-    </figure>
-  </section>
-
-  <section class="chapter" id="mercury">
-    <div class="col"><div class="kicker">The mine</div><h2>Where the rock comes from</h2><p class="dek">Mercury has rock to spare. What it runs short of is a way to get rid of the heat of digging it up and throwing it into space.</p></div>
+  <section class="chapter" id="mercury" data-moment="wall">
+    <div class="col"><div class="kicker"><span class="when" data-moment="wall"></span> · The heat wall</div><h2>Where the rock comes from</h2><p class="dek">Mercury has rock to spare. What it runs short of is a way to get rid of the heat of digging it up and throwing it into space.</p></div>
     <div class="col prose" id="mercury-prose"></div>
     <figure class="wide">
       <div class="pair">
@@ -301,8 +345,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     <div class="col prose"><p>Chip fabs set the pace, so they are the first thing to leave Mercury. In space a fab needs no building, no clean air and no water. The free vacuum alone removes about 60% of a fab's electricity and a third or more of its equipment. Mercury has almost no hydrogen, so the chemistry has to run dry, on chlorine, oxygen, zinc and magnesium.</p></div>
   </section>
 
-  <section class="chapter" id="buildout">
-    <div class="col"><div class="kicker">Timeline</div><h2>How fast it can be built, and where it stops</h2><p class="dek">For decades there is nothing to see. Then the swarm grows fast, until Mercury cannot shed heat any faster.</p></div>
+  <section class="chapter" id="buildout" data-moment="one">
+    <div class="col"><div class="kicker"><span class="when" data-moment="one"></span> · Growing</div><h2>How fast it can be built, and where it stops</h2><p class="dek">For decades there is nothing to see. Then the swarm grows fast, until Mercury cannot shed heat any faster.</p></div>
     <div class="col prose" id="build-prose"></div>
     <figure class="wide">
       <div class="chart" id="build-chart"></div>
@@ -315,8 +359,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     </figure>
   </section>
 
-  <section class="chapter" id="earth">
-    <div class="col"><div class="kicker">The binding constraint</div><h2>Earth decides how big it may get</h2><p class="dek">Every watt the sails catch ends up as heat, and some of it lands on Earth. That, not engineering, sets the size.</p></div>
+  <section class="chapter" id="earth" data-moment="cap">
+    <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Earth's limit</div><h2>Earth decides how big it may get</h2><p class="dek">Every watt the sails catch ends up as heat, and some of it lands on Earth. That, not engineering, sets the size.</p></div>
     <div class="col prose" id="earth-prose"></div>
     <figure class="wide">
       <div class="pair">
@@ -340,6 +384,47 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
       <div class="plate"><img src="renders/leo-far-tele.jpg" alt="Telephoto: a black disc with a thin bright crescent on one edge, against an even pale grey sky" width="2400" height="1600" loading="lazy"></div>
       <figcaption class="col"><b>The Moon in front of the swarm, through a 170 mm lens.</b> The Moon's dark side is black against the band, which shows the light comes from far beyond the Moon. The band is perfectly smooth: about a billion sails lie behind every pixel, each far too faint to see on its own.<span class="how">The dark side, lit only by earthshine, is about a hundredth as bright as the band. Each sail is near magnitude 27.</span></figcaption>
     </figure>
+    <figure class="wide">
+      <div class="chart" id="earth-chart"></div>
+      <figcaption class="col" id="earth-caption"></figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="inside" data-moment="cap">
+    <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Inside the swarm</div><h2>A sky cut in two</h2><p class="dek">Inside the swarm the sky splits in two: an even glow on one side, and on the other the rest of the swarm, seen across the empty middle of Earth's orbit.</p></div>
+    <div class="col prose">
+      <p>Out on the far side the sails sit in one thin layer on Earth's orbit, about 600,000 km thick and hundreds of millions of kilometres across, and they are packed close: neighbours are about 60 km apart. From any one of them the sky splits along the layer. Every sail farther from the Sun than you shows you its sunlit face, and together they fill the half of the sky away from the Sun with an even glow of 12 cd/m², as bright as a clear sky in early twilight.</p>
+      <p>The other half is stranger. Look sunward and you see the backs of the sails just inside you, which are dark, and through the gaps between them, across the empty middle of Earth's orbit, the rest of the cloud from the inside. Every sail over there faces the Sun, and so faces you, which makes that part of the sky nearly twice as bright: 22 cd/m². It has hard edges. The cloud stops 30° above and below Earth's orbit and leaves a gap round the point straight behind the Sun, and past those edges space is black.</p>
+      <details class="deep"><summary>How this sky was drawn</summary><p>The sails form one layer on Earth's orbit, 600,000 km thick, covering about 18% of their patch of sky as seen from the Sun. Each sail faces the Sun, so from any point you see a sail's lit front if it is farther from the Sun than you, and its dark back if it is nearer. Along every line of sight we add up the fronts it passes, dimmed by the backs in the way and by the sails that shade them from the Sun.</p><p>Lines of sight that dip toward the Sun leave the layer, cross the empty inside of Earth's orbit, and meet the layer again from the inside, where every sail faces you. That part of the sky is almost twice as bright. Sails within 3,000 km are drawn one by one; the nearest are only a few pixels across.</p></details>
+    </div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/inside-far-orbit.jpg" alt="A sky in bands: an even grey glow above a straight horizon line, a brighter band below it, then a black arch, with a lighter patch of sky visible through the arch and black on either side" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Looking along Earth's orbit from a sail in the far-side swarm.</b> Above the line, the even glow of all the sails farther from the Sun. Below it, the rest of the swarm, seen across the empty middle of Earth's orbit: first its near part, then a dark arch, which is the empty gap behind the Sun, then, through the arch, the swarm's other half. Where the swarm ends, above and below Earth's orbit, space is black.<span class="how">From 120° along the orbit from Earth. The specks are sails within 3,000 km; the nearest in frame is 73 km away and only four pixels wide, and those below the line show their dark backs. The Sun is 27° below the bottom of the frame.</span></figcaption>
+    </figure>
+    <div class="col prose">
+      <p>The layout inside Earth's orbit is a different place. Its sails are spread over the whole sky round the Sun, about 300 km apart, so from any one of them the others are just points of light. Two dozen or so within 1,000 km shine like the brightest stars, and tens of thousands more fill the sky down to the limit of the eye. Added together they light the sky away from the Sun to about 0.8 cd/m². You could live inside that swarm and still see mostly empty space.</p>
+    </div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/swarm-inside-wide.jpg" alt="A pale grey starry sky with a glowing violet disc of light surrounding a brilliant point" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>The other layout: looking away from the Sun from a sail spread inside Earth's orbit.</b> Every star in this picture is another sail. The bright point in the violet halo is the counter-sun, the Sun mirrored back by all the sails beyond the camera in that direction. The white point inside the halo is Earth, 18 million km away.<span class="how">0.41% of the Sun's light captured. Exposed for the sky's glow. Counter-sun magnitude SHELL_CS_MAG.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/swarm-inside-tele.jpg" alt="Telephoto view: violet glinting points and a white Earth with a smaller Moon" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>The same sky through a 300 mm lens, next to the counter-sun.</b> Single sails glint inside the halo. Earth and the Moon are overexposed white discs, because Earth's sunlit face is 15,000 times brighter per square degree than the swarm's glow.<span class="how">3° from the counter-sun, exposed five stops darker so the halo's gradient shows. Sail glints at magnitudes SHELL_GLINT_MAGS.</span></figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="star" data-moment="cap">
+    <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2><p class="dek">From light-years away the Sun would look a little dimmer, with a faint infrared glow it never had before.</p></div>
+    <div class="col prose" id="star-prose"></div>
+    <figure class="wide">
+      <div class="chart" id="sed-chart"></div>
+      <div class="legend" id="sed-legend"></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="bigger" data-moment="big">
+    <div class="col"><div class="kicker"><span class="when" data-moment="big"></span> · If Earth accepted more</div><h2>Could it be bigger?</h2><p class="dek">Yes, but not by much without changing the planet. The far side runs out of room near a fifth of the Sun, and getting there would make Earth hotter and drier.</p></div>
     <div class="col prose" id="earth-prose-2"></div>
     <figure class="wide">
       <div class="pair">
@@ -348,23 +433,17 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
       </div>
       <figcaption class="col" id="far20-caption"><b>A 20% swarm, the same two views.</b> FAR20_DETAIL</figcaption>
     </figure>
-    <figure class="wide">
-      <div class="chart" id="earth-chart"></div>
-      <figcaption class="col" id="earth-caption"></figcaption>
-    </figure>
   </section>
 
-  <section class="chapter" id="star">
-    <div class="col"><div class="kicker">Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2><p class="dek">From light-years away the Sun would look a little dimmer, with a faint infrared glow it never had before.</p></div>
-    <div class="col prose" id="star-prose"></div>
-    <figure class="wide">
-      <div class="chart" id="sed-chart"></div>
-      <div class="legend" id="sed-legend"></div>
-    </figure>
+  <section class="chapter" id="choose" data-moment="cap">
+    <div class="col"><div class="kicker">Your call</div><h2>Choose your swarm</h2><p class="dek">How big the swarm gets is not an engineering result but a choice about Earth. Pick one and the whole page, the numbers above included, recomputes for it.</p></div>
+    <div class="col choices" id="choices" role="group" aria-label="Choose a swarm"></div>
+    <div class="col tablewrap"><table class="compare" id="choose-table"></table></div>
+    <p class="col note">The photographs always show the swarm Earth allows: the far side at 1 W/m².</p>
   </section>
 
   <section class="chapter" id="future">
-    <div class="col"><div class="kicker">Built later than you think</div><h2>Today's hardware never flies</h2><p class="dek">The swarm takes a century to build and its sails are replaced every 10 to 20 years, so it is made of hardware that does not exist yet.</p></div>
+    <div class="col"><div class="kicker">After 2095 · The hardware</div><h2>Today's hardware never flies</h2><p class="dek">The swarm takes a century to build and its sails are replaced every 10 to 20 years, so it is made of hardware that does not exist yet.</p></div>
     <div class="col prose" id="future-prose"></div>
     <div class="col tablewrap"><table class="compare" id="future-table"></table></div>
   </section>
@@ -383,6 +462,7 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
     <ul id="sources-list"></ul>
   </footer>
 </main>
+</div>
 <script type="module" src="src/app.js"></script>
 </body>
 </html>
