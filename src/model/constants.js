@@ -68,7 +68,7 @@ export const EARTH = {
   absorbedSolar: S0 * (1 - 0.30) / 4,   // W/m^2 global mean, ~238
   tEff: 255,                            // K effective radiating temperature
   climateSensitivity: 0.8,              // K per W/m^2 (IPCC AR6 central ECS 3 K / 3.9 W/m^2 ~ 0.77)
-  co2DoublingForcing: 3.7,              // W/m^2 (IPCC; AR6 gives 3.93)
+  co2DoublingForcing: 3.93,             // W/m^2 (IPCC AR6 WG1 ch. 7: 3.93 ± 0.47)
   runawayAbsorbedLimit: 282,            // W/m^2 (Goldblatt et al. 2013, Nat. Geosci. 6, 661)
 };
 

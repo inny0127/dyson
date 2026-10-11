@@ -28,21 +28,23 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 - **The satellite is a sheet, not a box.** Each sail is a 279 m square of photovoltaic film, 80 µm
   thick, carrying ~10⁸ chiplets of 0.15 W. A thin film cannot carry heat sideways, so chips are
   spread through it and the film is its own radiator. That beats concentrating chips in
-  radiator-cooled modules by about 5× per kilogram, in every hardware era
+  radiator-cooled modules by 3–5× per kilogram, in every hardware era
   (`docs/architecture.md`). A few percent of chip power still goes to shielded pods.
-- **Today's hardware never flies.** Industry needs half a century to reach Mercury's heat wall, and
+- **Today's hardware never flies.** Industry needs most of a century to reach Mercury's heat wall, and
   sails are refreshed every 10–20 years, so almost everything is built with post-2095 hardware.
   HBM is gone, chiplets carry non-volatile memory, optical lanes make each sail one machine, and
   silicon stays the only solar cell Mercury can supply. Energy per operation falls ~50×
   (`docs/future-tech.md`).
 - **Fabs and recycling, not Mercury's mass, set the size.** Chip fabs slow the industrial doubling.
   The standing fleet levels off where exports plus in-orbit recycling balance retirements. In the
-  central case that is about 14 % of sunlight and 6×10³⁹ FLOP/s, reached in the 2400s.
+  central case that is about 14 % of sunlight and 6×10³⁹ FLOP/s, approached over the following centuries
+  (95 % of it by about 2800).
 - **Earth is the binding constraint.** Sails spread evenly inside Earth's orbit add about 1.9 W/m²
   of heat to Earth for every 1 % of sunlight they capture. A geometry study moves them to the far
   side of the Sun on Earth's own orbit, with infrared-dark front faces and a small L1 shade.
-  Under a 1 W/m² budget that allows roughly ten times more compute (`docs/data/earth_safe.json`).
-  The cloud's glow in Earth's night sky may limit it sooner.
+  Under a 1 W/m² budget that allows about seven times more coverage (`docs/earth.md`), but the
+  glow in Earth's night sky reaches full-moon brightness at 0.6 % either way. What Earth allows is
+  about 0.5 % of the Sun, 2×10³⁸ FLOP/s, reached around 2130.
 
 ## Layout
 
@@ -54,7 +56,7 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 | `test/` | `node --test` suites pinning the model |
 | `render/` | Blender scenes: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `mercury.py`, `earth_sky.py`, `lib.py` (physical sun, metering, materials), `post.py` (camera effects) |
 | `renders/` | finished photographs used by the page |
-| `docs/` | `architecture.md`, `future-tech.md`, and `data/` with every study's numbers and sources |
+| `docs/` | `architecture.md`, `future-tech.md`, `earth.md`, and `data/` with every study's numbers and sources |
 | `assets/` | MESSENGER, Blue Marble, star catalogue and Milky Way data with credits |
 | `scripts/` | report, numbers export, screenshot, artifact staging |
 

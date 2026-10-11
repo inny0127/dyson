@@ -1,7 +1,7 @@
 # Earth: how big the swarm may get
 
 **Answer.** Industry can build the swarm to about 14 % of the Sun's light (central case). Earth
-allows about **0.5–1 %**: roughly 2×10³⁸ FLOP/s, reached in the 2110s. Two limits arrive together:
+allows about **0.5–1 %**: roughly 2×10³⁸ FLOP/s, reached around 2130. Two limits arrive together:
 
 - **The night sky.** Sails on the far side of the Sun show Earth their sunlit faces, so a glow
   rises along the ecliptic after dusk. It lights the ground as brightly as a full Moon once the
@@ -35,7 +35,7 @@ absorbs the share that reaches it.
   - Shells outside Earth's orbit cut infrared as 1/r², but need r² more film. The fleet Mercury can
     supply then covers only 2 % at 3 AU, 0.8 % at 5 AU or 0.2 % at 10 AU, and lights the whole
     night sky.
-- **At the industry's 14 % ceiling** the shell would add about 30 W/m², eight CO₂ doublings. The
+- **At the industry's 14 % ceiling** the shell would add about 29 W/m², more than seven CO₂ doublings. The
   22 % ceiling of an earlier parameter set reaches the 282 W/m² runaway-greenhouse threshold.
 
 ## The placement that helps: Earth's own orbit, beyond the Sun

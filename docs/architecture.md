@@ -122,9 +122,10 @@ Some work does not fit that shape:
 - **Whether inference dominates future demand** is plausible but not established. Epoch AI puts
   OpenAI's 2024 compute at roughly 5:2 R&D to inference, and about even in 2025. The architecture
   does not hinge on it, because the film can also train.
-- **Energy basis.** The research files differ by up to 3.5× in J/FLOP. The visualizer uses one
+- **Energy basis.** The research files differ by up to 3.5× in J/FLOP. This decision used one
   basis: 1.3×10⁻¹³ J per dense FP8 FLOP, system level at 85 °C and full clock, ×0.6 for
-  under-clocking (7.8×10⁻¹⁴ J). It then adds +0.9 %/K above 85 °C and ~−0.45 %/K below.
+  under-clocking (7.8×10⁻¹⁴ J), +0.9 %/K above 85 °C. That is now the model's '2026 hardware'
+  preset; the default mature era uses 1.4×10⁻¹⁵ J and +0.56 %/K (`docs/future-tech.md`).
 
 ## Sources
 

@@ -26,11 +26,11 @@ the waste heat of mining (the heat wall). After that, export is capped.
 
 | | pessimistic | central | optimistic |
 |---|---|---|---|
-| heat wall | 2148 | 2109 | 2098 |
-| 1 % of sunlight captured | 2173 | 2123 | 2107 |
-| 10 % captured | never | 2382 | 2211 |
-| ceiling (coverage where refresh balances export) | 3.9 % | 14 % | 40 % |
-| compute at the ceiling | 6×10³⁷ FLOP/s | 6×10³⁹ FLOP/s | 2×10⁴¹ FLOP/s |
+| heat wall | 2202 | 2124 | 2100 |
+| 1 % of sunlight captured | 2230 | 2138 | 2109 |
+| 10 % captured | never | 2420 | 2214 |
+| ceiling (coverage where refresh balances export) | 3.4 % | 14 % | 40 % |
+| compute at the ceiling | 5×10³⁷ FLOP/s | 6×10³⁹ FLOP/s | 2×10⁴¹ FLOP/s |
 
 Refresh keeps the fleet 0–15 years old, so almost all of it carries hardware from after 2095. The
 visualizer therefore shows this **mature era** by default, with today's hardware as a comparison.
@@ -38,7 +38,7 @@ Hardware is not animated over time: it changes only while the swarm is still too
 
 ## What holds in every era
 
-- **Sails beat pods.** Per kg, sails beat concentrated pods by 4.5–7.7×. Pods carry heat metres to
+- **Sails beat pods.** Per kg, sails beat concentrated pods by 3.3–5.2×. Pods carry heat metres to
   radiators and the film does not. Falling energy per operation scales both alike.
 - **Chips stay near 85 °C.**
   - Every transistor that switches by thermal emission pays an energy cost growing with temperature
@@ -59,7 +59,7 @@ Hardware is not animated over time: it changes only while the swarm is still too
   - 10²–10⁵ sails can cooperate through low-communication training. That is unproven beyond
     ~5×10²³ FLOP today.
   - 97–99 % of the swarm syncs only on hour scales.
-- **Mercury's heat caps the export rate.** About 4×10¹⁹ kg/yr of spacecraft at 5×10¹⁸ W of surface
+- **Mercury's heat caps the export rate.** About 3.2×10¹⁹ kg/yr of spacecraft at 5×10¹⁸ W of surface
   heat and 2 MJ/kg.
 
 ## What flips
@@ -99,7 +99,7 @@ Hardware is not animated over time: it changes only while the swarm is still too
    - Today's fab equipment weighs ~250 kg per m²/yr of die it makes. Carried along, that turns a
      1-year industrial doubling into 5–18 years.
    - The central case assumes a vacuum wafer fab built in space (~40 kg per m²/yr), which gives a
-     1.3-year doubling. Only speculative large-panel imprint with inorganic self-assembly (9–15 nm)
+     1.6-year doubling. Only speculative large-panel imprint with inorganic self-assembly (9–15 nm)
      approaches 1 year.
    - Hydrogen is the one hard chemical wall: Mercury has ~5×10¹³ kg, against 10²² kg/yr for
      water-based processing. So the fab runs dry: molten-oxide or metallothermic silicon, a
@@ -112,7 +112,7 @@ Hardware is not animated over time: it changes only while the swarm is still too
    - The central case (15-year life, 94 % recycled in orbit) levels off near 14 %.
    - This ceiling is an assumption ratio, not a law of physics, and the model shows it that way.
    - By 2300, ~98 % of industrial output only replaces retired sails.
-3. **Mercury's rock runs out** around 3125–3330 if the build continues, after which the fleet
+3. **Mercury's rock runs out** around 3130–3230 if the build continues (later, or never, in the slower cases), after which the fleet
    decays. Mercury's core may hold 1–4×10²² kg of silicon, so this is conservative.
 
 ## Earth decides how big the swarm may be
@@ -121,14 +121,15 @@ At the ceiling, the sails sit inside Earth's orbit (0.86–0.91 AU).
 
 - **The infrared problem.** Every watt they intercept leaves as infrared, and Earth absorbs its
   share. A uniform shell adds about **1.9 W/m² for every 1 % of coverage**, almost independent of
-  radius. At the central ceiling Earth would absorb more than the 282 W/m² runaway-greenhouse limit.
+  radius. At the central ceiling that is about +29 W/m², more than seven CO₂ doublings.
 - **The safe limit.** Keeping the added forcing under 1 W/m² allows only ~0.5 % coverage in a
-  uniform shell. That is about 2×10³⁸ FLOP/s, reached around 2115.
+  uniform shell. That is about 2×10³⁸ FLOP/s, reached around 2130.
 - **Fixes that don't work.** A shadow-free corridor for Earth or a shell outside Earth's orbit
   both make it worse.
-- **Next.** A dedicated study is designing an Earth-safe geometry: keeping sails far from Earth,
-  co-orbital placement on the far side of the Sun, and an L1 sunshade as a thermostat. Its result
-  sets the visualizer's Earth-safe coverage.
+- **What Earth allows.** `docs/earth.md` works this out: the night-sky glow and the climate both cap
+  the swarm near 0.5–1 % of the Sun. A far-side placement with infrared-dark fronts and an L1 shade
+  raises the climate limit to ~4 %, at a cost in compute per watt, night-sky brightness and debris
+  risk.
 
 ## What the swarm computes
 
@@ -151,7 +152,7 @@ At 1 % coverage with mature hardware, the swarm runs about 4×10³⁸ FLOP/s.
   solar-wind hydrogen, which could lift the hydrogen wall.
 - Moderate adiabatic logic after the heat wall: ×1.7–2.4 per kg if fab output allows.
 - Fab productivity and in-orbit recycling fraction. These two set the ceiling.
-- The Earth-safe architecture (next study).
+- The far-side cloud's collision-free orbit lattice and derelict capture (`docs/earth.md`).
 
 ## Sources
 

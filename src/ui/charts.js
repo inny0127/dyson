@@ -86,20 +86,29 @@ export function buildChart(el, { main, others, markers, limit, cursor, xOf, tOf,
     s += `<circle cx="${x}" cy="${y}" r="4.5" style="fill:var(--sun-mark);stroke:var(--paper);stroke-width:2"/>`;
     s += `<text x="${right ? x - 8 : x + 8}" y="${ly}" ${right ? 'text-anchor="end"' : ''} style="${LB2}">${m.label}</text>`;
   }
-  if (cursor) {
-    const x = X(cursor.t);
-    s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" style="stroke:var(--ink);stroke-width:1"/>`;
-    if (cursor.f > 10 ** yMin) s += `<circle cx="${x}" cy="${Y(cursor.f)}" r="5.5" style="fill:var(--ink);stroke:var(--paper);stroke-width:2"/>`;
-  }
+  // the axis changes scale after the first 120 years: mark the break
+  const xb = X(120);
+  s += `<path d="M${xb - 5},${H - B + 5} l4,-10 M${xb + 1},${H - B + 5} l4,-10" style="stroke:var(--ink-3);stroke-width:1;fill:none"/>`;
+  s += `<text x="${L}" y="${T - 6}" style="${TK}">share of the Sun's light captured</text>`;
+  s += `<line class="cursor" y1="${T}" y2="${H - B}" style="stroke:var(--ink);stroke-width:1"/><circle class="cdot" r="5.5" style="fill:var(--ink);stroke:var(--paper);stroke-width:2"/>`;
   s += xhair(T, H - B);
   s += `</svg>`;
   el.innerHTML = s;
+  const cur = el.querySelector('.cursor'), cdot = el.querySelector('.cdot');
+  const setCursor = (t, f) => {
+    const x = X(t);
+    cur.setAttribute('x1', x); cur.setAttribute('x2', x);
+    cdot.setAttribute('cx', x); cdot.setAttribute('cy', Y(f));
+    cdot.setAttribute('visibility', f > 10 ** yMin ? 'visible' : 'hidden');
+  };
+  if (cursor) setCursor(cursor.t, cursor.f);
   hover(el, { W, L, R, T }, u => {
     const t = tOf(u);
     let f = main[0][1];
     for (const [tt, ff] of main) { if (tt > t) break; f = ff; }
     return { x: X(t), y: Y(f), html: describe(t, f) };
   }, onPick ? u => onPick(tOf(u)) : null);
+  return { setCursor };
 }
 
 /** Extra energy absorbed by Earth (W/m², log) against share of sunlight captured (log). */

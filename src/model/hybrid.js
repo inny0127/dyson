@@ -49,7 +49,7 @@ export const PARAMS = [
   { key: 'hotLogicSlope', group: 'Chips', label: 'Energy-per-op rise above 85 °C', unit: '/K', min: 0.003, max: 0.012, step: 0.0001, value: 0.0056,
     help: 'Mature logic: E ∝ T² (0.56 %/K). 2026 hot-optimised logic: the measured table (~0.9 %/K).' },
   { key: 'tjFilmC', group: 'Chips', label: 'Sail chiplet junction limit', unit: '°C', min: 60, max: 150, step: 1, value: 85,
-    help: 'Hotter chips let sails sit nearer the Sun but cost energy per op: +5–12 % FLOP/s per kg at 105–150 °C, −17 % to −43 % FLOP per joule of sunlight.' },
+    help: 'Hotter chips let sails sit nearer the Sun but cost energy per op: a few percent more FLOP/s per kg at 105–150 °C, and 17–43 % less computing per joule of sunlight.' },
   { key: 'filmSpreadDT', group: 'Chips', label: 'Chiplet rise above the film', unit: 'K', min: 3, max: 30, step: 0.5, value: 9,
     help: '0.15 W at 20.9 mm pitch: 7.1 K (finite-volume check); 9 K with margin.' },
   { key: 'tjPodC', group: 'Chips', label: 'Pod junction limit', unit: '°C', min: 85, max: 150, step: 1, value: 105 },
@@ -128,7 +128,7 @@ export function defaults() {
 
 // Fixed design values from the research passes (not sliders).
 export const FIXED = {
-  film: { pvT0: 301, reflectVis: 0.03 },
+  film: { pvT0: 301 },
   wing: { pvAlpha: 0.9, pvEpsFront: 0.85, pvEpsBack: 0.85, pvPacking: 0.9, pvT0: 301 },
   // two faces at eps 0.9, 4 % of the view blocked by the module and wings, fin efficiency 0.75
   rad: { radEps: 0.9, radFinEff: 0.96 * 0.75 },
@@ -147,7 +147,7 @@ export const FIXED = {
 /** Film optics for the radiosity model (model.js uses alpha, epsFront, epsBack, reflectVis). */
 export function filmOptics(p) {
   return { alpha: p.alpha, epsFront: p.epsFront, epsBack: p.epsBack, packing: p.packing,
-    laserKgPerW: p.laserKgPerW, ...FIXED.film };
+    laserKgPerW: p.laserKgPerW, reflectVis: p.rhoVis ?? 0.004, ...FIXED.film };
 }
 
 export const joulesPerFlop = (p, tjC) => p.jPerFlop85 * p.clockFactor * energyPenalty(tjC, p.hotLogicSlope);
@@ -207,7 +207,7 @@ export function podAt(p, rAU, f, tSail) {
 
 /** Physics of a finished swarm at coverage f (no build-out). */
 export function swarmAt(p, fIn) {
-  const f = Math.min(1, Math.max(1e-12, fIn));
+  const f = Math.min(1, Math.max(1e-20, fIn));
   const rThermal = sailThermalRadius(p, f);
   const rSail = p.placement === 'manual' ? p.rManual : rThermal;
   const sail = sailAt(p, rSail, f);
@@ -241,7 +241,7 @@ export function swarmAt(p, fIn) {
 export function coverageForMass(p, mass) {
   if (!(mass > 0)) return 0;
   if (swarmAt(p, 1).mass <= mass) return 1;
-  let lo = -14, hi = 0;
+  let lo = -20, hi = 0;
   for (let i = 0; i < 56; i++) {
     const mid = (lo + hi) / 2;
     if (swarmAt(p, 10 ** mid).mass < mass) lo = mid; else hi = mid;
@@ -275,8 +275,9 @@ export function simulateBuild(p, targetMass, rateCap, chipAreaPerKg) {
     if (t0 >= tWall) return capToSails * (t1 - t0);
     return e(t0, tWall) + capToSails * (t1 - tWall);
   };
-  const t = [0], Gc = [p.seedMass], Dc = [p.seedMass];              // cumulative gross, cumulative delivered
-  const B = [p.seedMass], R = [0];
+  // the seed is the first factory on Mercury, not spacecraft: the fleet starts empty
+  const t = [0], Gc = [0], Dc = [0];                                 // cumulative gross, cumulative delivered
+  const B = [0], R = [0];
   const GcAt = time => {                                            // cumulative gross at an earlier time
     if (time < 0) return 0;
     let lo = 0, hi = t.length - 1;
@@ -355,17 +356,28 @@ export function compute(p) {
 
   // Logistics. Mass-driver launch from Mercury's perihelion onto the transfer orbit; each spacecraft
   // circularises with its own ion engine on oxygen from the same rock.
-  const lnSail = launchFromMercury(rSail, true);
-  const lnPod = launchFromMercury(rPod, true);
   const minedPerDelivered = 1 / p.yieldDelivered;
   const minedRateCap = p.mercuryHeatLimit / (p.heatPerKg * 1e6);
   const deliveredRateCap = minedRateCap / minedPerDelivered;
 
-  // Fabs: die area per kg of finished swarm sets the doubling-time penalty.
-  const dieM2PerW = ((1 - q) * p.dieMm2PerW + q * FIXED.podDieMm2PerW) * 1e-6;
-  const kgPerW = s.kgPerW;
-  const chipAreaPerKg = Number.isFinite(kgPerW) && kgPerW > 0 ? dieM2PerW / kgPerW : 0;
-  const growth = simulateBuild(p, mass, deliveredRateCap, chipAreaPerKg);
+  // The industry's constants (die area per kg, which sets the fab penalty; the launch orbit) belong
+  // to the swarm actually built, not to the target, which may be far beyond reach (a closed shell
+  // at 1.35 AU is twice as heavy per watt as the swarm at 0.86 AU). Iterate on the reachable
+  // coverage.
+  let fBuild = Math.min(f, 0.01), sB, growth, chipAreaPerKg = 0, dieM2PerW = 0;
+  for (let i = 0; i < 6; i++) {
+    sB = swarmAt(p, fBuild);
+    dieM2PerW = ((1 - sB.q) * p.dieMm2PerW + sB.q * FIXED.podDieMm2PerW) * 1e-6;
+    chipAreaPerKg = Number.isFinite(sB.kgPerW) && sB.kgPerW > 0 ? dieM2PerW / sB.kgPerW : 0;
+    growth = simulateBuild(p, mass, deliveredRateCap, chipAreaPerKg);
+    const fNew = Math.max(1e-9, coverageForMass(p, Math.min(mass, growth.peakMass)));
+    const done = Math.abs(Math.log(fNew / fBuild)) < 0.01;
+    fBuild = fNew;
+    if (done) break;
+  }
+  const kgPerW = sB.kgPerW;
+  const lnSail = launchFromMercury(sB.rSail, true);
+  const lnPod = launchFromMercury(sB.rPod, true);
   const reachableMass = Math.min(mass, growth.peakMass);
   const reachableCoverage = coverageForMass(p, reachableMass);
   const yearsToCoverage = fc => growth.yearsForMass(swarmAt(p, fc).mass);
@@ -393,7 +405,7 @@ export function compute(p) {
     fracMercury: (mass * minedPerDelivered) / MERCURY.M,
     fracRock: (mass * minedPerDelivered) / MERCURY.M_SHELL,
     logistics: { sail: lnSail, pod: lnPod, deliveredRateCap, minedRateCap },
-    growth, reachableMass, reachableCoverage, yearsToCoverage,
+    growth, reachableMass, reachableCoverage, yearsToCoverage, buildCoverage: fBuild,
     industry,
     earth,
     earthSafeCoverage: earthSafeCoverage(p, 1.0),
@@ -449,7 +461,7 @@ export function atYear(p, d, year) {
   const g = d.growth;
   const built = builtAt(p, d, year);
   const f = coverageForMass(p, built);
-  const s = swarmAt(p, Math.max(f, 1e-12));
+  const s = swarmAt(p, f);
   const mined = g.deliveredBy(year) * d.minedPerDelivered;
   const dt = 0.25;
   const exportRate = Math.max(0, (g.deliveredBy(year + dt) - g.deliveredBy(year)) / (dt * YEAR));
@@ -458,10 +470,10 @@ export function atYear(p, d, year) {
   return {
     year, calendarYear: p.seedYear + year, built, frac: d.mass > 0 ? built / d.mass : 0, f,
     rSail: s.rSail,
-    nSails: s.sail.chipWm2 > 0 ? s.sailPower / s.sail.chipWm2 / p.sailArea : 0,
-    nPods: s.podPower / p.podPower,
-    chipPower: s.chipPower,
-    flops: s.flops,
+    nSails: f > 0 && s.sail.chipWm2 > 0 ? s.sailPower / s.sail.chipWm2 / p.sailArea : 0,
+    nPods: f > 0 ? s.podPower / p.podPower : 0,
+    chipPower: f > 0 ? s.chipPower : 0,
+    flops: f > 0 ? s.flops : 0,
     tSail: s.sail.T,
     mercuryRemoved: mined / MERCURY.M,
     mercuryRadius: mercuryRadius(mined),

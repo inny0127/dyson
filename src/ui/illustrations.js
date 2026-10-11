@@ -17,8 +17,9 @@ const arrowDefs = id => `<defs>
  * pitch, an optical lane) and the laminate cross-section (layer thicknesses to scale).
  */
 export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pitchMm = 23.5, chipW = 0.15, mw = 19, chips = 1.3e8, lanes = true }) {
-  const W = 1100, H = 700;
-  const k = 440 / diag;                       // px per metre in the main view
+  const W = 1100, H = 780;
+  const k = 440 / diag;
+  sag = sag * (side / 279.01);                  // catenary sag scales with the side                       // px per metre in the main view
   const cx = 270, cy = 330, R = (diag / 2) * k;
   const tip = [[cx + R, cy], [cx, cy - R], [cx - R, cy], [cx, cy + R]];
   // each edge bows inward by `sag`; a quadratic's midpoint sits half way to its control point
@@ -41,9 +42,10 @@ export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pit
   for (let y = cy - R; y <= cy + R; y += hingeStep) hinges += `<line x1="${cx - R}" x2="${cx + R}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
   s += `<g clip-path="url(#an-clip)" style="stroke:var(--ink-3);stroke-width:0.5;opacity:0.6">${hinges}</g>`;
   s += `<g style="stroke:currentColor;stroke-width:0.9;stroke-dasharray:5 4;fill:none;opacity:0.75">${tip.map(p => `<line x1="${cx}" y1="${cy}" x2="${cx + (p[0] - cx) * 1.012}" y2="${cy + (p[1] - cy) * 1.012}"/>`).join('')}</g>`;
-  s += `<rect x="${cx - 2.5}" y="${cy - 2.5}" width="5" height="5" style="fill:currentColor"/>`;
+  const hub = 3.4 * k;
+  s += `<rect x="${cx - hub / 2}" y="${cy - hub / 2}" width="${hub}" height="${hub}" style="fill:currentColor"/>`;
   // vanes: diamonds of 9.3 m side centred 204 m out on each axis
-  const vr = (9.32 / Math.SQRT2) * k, vd = 203.95 * k;
+  const vr = (9.32 / Math.SQRT2) * k, vd = (diag / 2 + 6.66) * k;   // vane centres 6.7 m beyond the tips
   for (const [dx, dy] of [[1, 0], [0, -1], [-1, 0], [0, 1]]) {
     const x = cx + dx * vd, y = cy + dy * vd;
     s += `<path d="M${x + vr},${y} L${x},${y - vr} L${x - vr},${y} L${x},${y + vr} Z" style="fill:var(--paper);stroke:currentColor;stroke-width:1"/>`;
@@ -107,15 +109,16 @@ export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pit
     s += t(cxs + cw + 14, y + h / 2 + 4, `${name}, ${th} µm`, F);
     y += h;
   }
-  s += `<rect x="${cxs + cw * 0.42}" y="${y}" width="${cw * 0.16}" height="${50 * um * 0.5}" style="fill:currentColor"/>`;
-  s += t(cxs + cw + 14, y + 18, 'chiplet die, 50 µm (narrower than drawn)', F2);
+  s += `<rect x="${cxs + cw * 0.42}" y="${y}" width="${cw * 0.16}" height="${50 * um}" style="fill:currentColor"/>`;
+  s += t(cxs + cw + 14, y + 18, 'chiplet die, 50 µm thick (far narrower than drawn)', F2);
   // sunlight in, heat out of both faces
   for (const x of [cxs + 50, cxs + 150, cxs + 250]) s += `<line x1="${x}" y1="${cys - 58}" x2="${x}" y2="${cys - 6}" style="stroke:var(--sun-mark);stroke-width:1.5" marker-end="url(#an-sun)"/>`;
   for (const x of [cxs + 100, cxs + 200]) s += `<line x1="${x}" y1="${cys - 8}" x2="${x}" y2="${cys - 50}" style="stroke:var(--heat);stroke-width:1.5" marker-end="url(#an-heat)"/>`;
   for (const x of [cxs + 70, cxs + 230]) s += `<line x1="${x}" y1="${y + 6}" x2="${x}" y2="${y + 52}" style="stroke:var(--heat);stroke-width:1.5" marker-end="url(#an-heat)"/>`;
+  const yDie = y + 50 * um;
   s += t(cxs, cys - 66, 'sunlight', F2);
   s += t(cxs + cw, cys - 66, 'infrared out of both faces', F2, 'end');
-  s += t(cxs, y + 74, 'Cross-section: layer thicknesses to scale, 80 µm in all', F);
+  s += t(cxs, yDie + 26, 'Cross-section: thicknesses to scale, about 80 µm with wiring and coatings', F);
   s += `</svg>`;
   el.innerHTML = s;
 }

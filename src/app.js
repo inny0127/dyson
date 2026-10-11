@@ -23,7 +23,7 @@ const SPLIT = [120, 0.55];              // the first 120 years take 55 % of the 
 const xOf = t => t <= SPLIT[0] ? (t / SPLIT[0]) * SPLIT[1] : SPLIT[1] + ((t - SPLIT[0]) / (SPAN - SPLIT[0])) * (1 - SPLIT[1]);
 const tOf = u => u <= SPLIT[1] ? (u / SPLIT[1]) * SPLIT[0] : SPLIT[0] + ((u - SPLIT[1]) / (1 - SPLIT[1])) * (SPAN - SPLIT[0]);
 
-const state = { era: 'mid', params: { ...h.eraParams('mid') }, t: 80, curves: {} };
+const state = { era: 'mid', baseEra: 'mid', params: { ...h.eraParams('mid') }, t: 95, curves: {} };
 
 // --------------------------------------------------------------------------------- model glue
 
@@ -93,11 +93,17 @@ function renderFigures() {
   const p = state.params, d = state.d, E = state.earth;
   const f = sailFacts(p);
   const ceilFlops = h.swarmAt(p, d.reachableCoverage).flops;
+  const tCap = d.yearsToCoverage(E.cap);
+  const now = new Date().getFullYear();
+  const reached = Number.isFinite(tCap)
+    ? [`${yr(p.seedYear + tCap)}`, `when it is reached, ${Math.max(0, Math.round(p.seedYear + tCap - now))} years from now`]
+    : ['never', 'industry stops short of what Earth allows'];
+  const ratio = ceilFlops / E.flops;
   const items = [
     [`${sci(E.flops, 2)} FLOP/s`, `what Earth allows, ${pct(E.cap, 2)} of the Sun`],
-    [`${yr(p.seedYear + d.yearsToCoverage(E.cap))}`, `when it is reached, ${p.seedYear - 2026 + Math.round(d.yearsToCoverage(E.cap))} years from now`],
+    reached,
     [`${f.MW.toFixed(0)} MW`, `in one sail ${Math.round(f.diag)} m across`],
-    [`${Math.round(ceilFlops / E.flops)}×`, 'more than Earth allows, if industry ran unchecked'],
+    ratio > 1.05 ? [`${Math.round(ratio)}×`, 'more than Earth allows, if industry ran unchecked'] : ['within', 'industry never outgrows what Earth allows'],
   ];
   $('figures').innerHTML = items.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
 }
@@ -120,18 +126,30 @@ function renderSail() {
 function renderComputer() {
   const p = state.params;
   const f = sailFacts(p);
+  // workloads study: a sail of 5.7e21 FLOP/s serves ~1.3e7 agents and trains ~1e13 active
+  // parameters a year; agents scale with FLOP/s, compute-optimal model size with its square root
+  const agents = 1.3e7 * (f.flops / 5.7e21);
+  const params = 1e13 * Math.sqrt(f.flops / 5.7e21);
+  const optical = state.era !== '2026';
   $('computer-prose').innerHTML = `
     <p>The chips are spread through the film because a thin sheet cannot carry heat sideways. The metal needed to spread a chip's heat grows with the square of its power: ${num('0.09 g/W')} at 0.1 W per chip, ${num('9.4 g/W')} at 10 W. At ${num(`${p.chipPower} W`)} each, the film itself is the radiator. Its two faces shed all the sunlight it absorbs, about ${num(`${Math.round(p.alpha * f.s.sail.S)} W/m²`)}, of which ${num(`${Math.round(f.s.sail.chipWm2)} W/m²`)} passes through the chips on the way.</p>
-    <p>Optical fibre laid in the film makes each sail one tightly coupled machine: a bit crosses the whole sail in about a microsecond. Neighbouring sails are hundreds of kilometres apart, a millisecond away by light, so the sail is the unit that computes in lockstep. A sail of this era can serve roughly ten million AI agents at once, or train a model with about 10¹³ active parameters in a year.</p>`;
+    <p>${optical
+      ? 'Optical lanes laid in the film, fibre or waveguides, make each sail one tightly coupled machine: a bit crosses the whole sail in about two microseconds.'
+      : 'With 2026 hardware the chiplets talk over an electrical mesh, hop by hop, so a sail works as many loosely linked patches. Optical lanes in the film, expected from about 2050, turn it into one tightly coupled machine.'}
+      Neighbouring sails are hundreds of kilometres apart, a millisecond away by light, so the sail is the unit that computes in lockstep. A sail like this one could serve roughly ${num(sci(agents, 1))} AI agents at once, or train a model with about ${num(sci(params, 1))} active parameters in a year.</p>`;
 }
 
 function renderWhy() {
   const p = state.params;
   const s = h.swarmAt(p, 0.01);
   const ratio = s.sail.flopsPerKg / s.pod.flopsPerKg;
+  const at15 = h.swarmAt({ ...p, podFrac: 0.15 }, 0.01).kgPerW / s.kgPerW;
+  const podLine = s.q >= 0.149
+    ? `Here they carry ${num(pct(s.q, 1))} of chip power, the share needed if film chiplets cannot run agent sandboxes. If every chiplet could, it would fall toward 1%.`
+    : `Here they carry ${num(pct(s.q, 1))} of chip power. If every chiplet can run a sandbox, that falls toward 1%. If none can, it rises to 15%, and the swarm gets ${num(pct(at15 - 1, 0))} heavier.`;
   $('why-prose').innerHTML = `
     <p>Putting all of a satellite's chips in one module sounds natural, because work that runs in lockstep wants short wires. Then the heat has to travel. That transport costs more mass than the chips save. Per kilogram of Mercury, spread-out sails deliver ${num(`${ratio.toFixed(1)}×`)} the computing of the best concentrated module.</p>
-    <p>Concentrated pods still have a job: memory that cannot survive radiation unshielded, very large dies, archives, and agent sandboxes the film cannot host. Here they carry ${num(pct(s.q, 1))} of chip power. If every chiplet can run a sandbox, that falls toward 1%. If none can, it rises to 15%, and the swarm gets about a quarter heavier.</p>`;
+    <p>Concentrated pods still have a job: memory that cannot survive radiation unshielded, very large dies, archives, and agent sandboxes the film cannot host. ${podLine}</p>`;
   heatPaths($('heatpaths'), { sailGW: s.sail.kgPerW * 1e3, podGW: s.pod.kgPerW * 1e3, chipW: p.chipPower });
   const rows = [
     ['Mass per watt of chips', `${(s.sail.kgPerW * 1e3).toFixed(2)} g/W`, `${(s.pod.kgPerW * 1e3).toFixed(2)} g/W`],
@@ -169,10 +187,23 @@ function readout(a) {
 
 function renderBuild() {
   const p = state.params, d = state.d, g = d.growth, E = state.earth;
-  const y1 = d.yearsToCoverage(0.01), y10 = d.yearsToCoverage(0.1);
+  const y1 = d.yearsToCoverage(0.01), y10 = d.yearsToCoverage(0.1), yCap = d.yearsToCoverage(E.cap);
   const ceil = d.reachableCoverage;
-  $('build-prose').innerHTML = `
-    <p>Nothing is visible for decades. Growth is exponential until the heat wall, reaching ${num('1%')} of the Sun's light by ${num(yr(p.seedYear + y1))}${Number.isFinite(y10) ? ` and ${num('10%')} by ${num(yr(p.seedYear + y10))}` : `; it never reaches ${num('10%')}`}. Then it levels off at ${num(pct(ceil, 1))}. The ceiling is set by upkeep, not by Mercury: sails wear out after ${num(`${p.serviceLife} years`)}, ${num(pct(p.recycleFrac, 0))} of each is recycled in orbit, and new exports only replace the rest. Earth's limit, the blue line, is crossed in ${num(yr(p.seedYear + d.yearsToCoverage(E.cap)))}.</p>`;
+  const reach = [];
+  if (Number.isFinite(y1)) reach.push(`${num('1%')} of the Sun's light by ${num(yr(p.seedYear + y1))}`);
+  if (Number.isFinite(y10)) reach.push(`${num('10%')} by ${num(yr(p.seedYear + y10))}`);
+  const growthLine = reach.length
+    ? `Growth is exponential until the heat wall, reaching ${reach.join(' and ')}.`
+    : `Growth is exponential until the heat wall, but the swarm never reaches ${num('1%')} of the Sun's light.`;
+  const upkeep = g.reachedTarget && p.coverage < 1
+    ? `It stops there because that is the target you set.`
+    : p.serviceLife > 0
+    ? `The ceiling is set by upkeep, not by Mercury: sails wear out after ${num(`${p.serviceLife} years`)}, ${num(pct(p.recycleFrac, 0))} of each is recycled in orbit, and new exports only replace the rest.`
+    : `With sails that never wear out, the swarm keeps growing at the heat-limited rate until it reaches its target or Mercury's rock runs out.`;
+  const earthLine = Number.isFinite(yCap)
+    ? `Earth's limit, the blue line, is crossed in ${num(yr(p.seedYear + yCap))}.`
+    : `It never reaches Earth's limit, the blue line.`;
+  $('build-prose').innerHTML = `<p>Nothing is visible for decades. ${growthLine} Then it levels off at ${num(pct(ceil, 1))}. ${upkeep} ${earthLine}</p>`;
   const a = h.atYear(p, d, state.t);
   const markers = [
     { t: g.tCap, f: fForMass(state.table, g.builtAtYear(g.tCap)), label: `heat wall, ${yr(p.seedYear + g.tCap)}` },
@@ -181,7 +212,7 @@ function renderBuild() {
     { t: g.tPeak, f: ceil, label: `ceiling ${pct(ceil, 1)}` },
   ];
   if (g.tRockOut != null) markers.push({ t: g.tRockOut, f: fForMass(state.table, g.builtAtYear(g.tRockOut)), label: 'rock exhausted' });
-  buildChart($('build-chart'), {
+  state.chart = buildChart($('build-chart'), {
     main: state.curve,
     others: ['2026', 'low', 'mid', 'high'].filter(e => e !== state.era).map(e => ({ pts: state.curves[e] })),
     markers, xOf, tOf, seedYear: p.seedYear, span: SPAN,
@@ -192,6 +223,12 @@ function renderBuild() {
   });
   const label = h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions';
   $('build-legend').innerHTML = `<span><i style="background:var(--sun-mark)"></i>${label}</span><span><i style="background:var(--ink-3)"></i>the other hardware presets</span><span><i style="background:var(--earth)"></i>what Earth allows</span>`;
+  updateYear(a);
+}
+
+/** The year cursor, readout and slider, without redrawing the chart. */
+function updateYear(a) {
+  state.chart?.setCursor(state.t, a.f);
   $('build-readout').innerHTML = readout(a);
   $('year').value = String(Math.round(xOf(state.t) * 1000));
 }
@@ -202,17 +239,32 @@ function renderEarth() {
   const fc = forcingAt(p, ceil);
   const runaway = EARTH.runawayAbsorbedLimit - EARTH.absorbedSolar;
   const yCap = d.yearsToCoverage(E.cap);
-  $('earth-prose').innerHTML = `
-    <p>Industry could take this swarm to ${num(pct(ceil, 1))} of the Sun's light. Earth cannot live with that. Every watt the sails intercept leaves them as infrared, and Earth absorbs its share. Spread evenly inside Earth's orbit, the sails add about ${num(`${forcingAt(p, 0.01).toFixed(1)} W/m²`)} of heat for every 1% of sunlight they capture, after subtracting the sunlight they block. At the ceiling that is ${num(`${fc.toFixed(0)} W/m²`)}${fc > runaway ? `, past the ${num(`${Math.round(runaway)} W/m²`)} that tips Earth into a runaway greenhouse` : `, ${Math.round(fc / EARTH.co2DoublingForcing)} times the effect of doubling CO₂`}.</p>
-    <p>The night sky gives out first. Sails on the far side of the Sun show Earth their sunlit faces through the gaps, so after dusk a glow rises where the Sun went down. Film and hardware together reflect ${num(pct(p.rhoVis, 1))} of visible light, enough to light the ground like a full Moon once the swarm captures ${num(pct(E.sky, 2))}. Keeping Earth's extra heat under ${num(`${p.forcingLimit} W/m²`)} gives almost the same limit: ${num(pct(E.shell, 2))}.</p>
-    <p>So the swarm Earth allows is about ${num(pct(E.cap, 2))} of the Sun, ${num(`${sci(E.flops, 2)} FLOP/s`)}. That is about ${num(sci(E.flops / WORLD_AI_FLOPS_2025, 1))} times all the AI hardware on Earth in 2025, or ${num(sci(E.flops / BRAIN_FLOPS, 1))} human brains at 10¹⁵ FLOP/s each. It is reached around ${num(yr(p.seedYear + yCap))}.</p>`;
-  $('earth-prose-2').innerHTML = `
-    <p>A better placement exists if a brighter night sky is accepted. Sails can share Earth's own orbit on the far side of the Sun, where they never pass in front of it. Each one then always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass can make that face dark in the infrared and push the heat out of the back, away from Earth. A small cloud of sails at L1, 1.6 million km sunward of Earth, can shade away part of the rest. That allows ${num(pct(far.farside, 1))} of the Sun within ${num(`${p.forcingLimit} W/m²`)}. It costs about a third of the computing per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth.</p>`;
+  const farside = p.earthPlacement === 'farside';
+  const over = ceil > E.cap * 1.02;
+  const consequence = fc > runaway
+    ? `, past the ${num(`${Math.round(runaway)} W/m²`)} that tips Earth into a runaway greenhouse`
+    : `, ${(fc / EARTH.co2DoublingForcing).toFixed(1)} times the effect of doubling CO₂`;
+  const p1 = over
+    ? `Industry could take this swarm to ${num(pct(ceil, 1))} of the Sun's light. Earth cannot live with that. Every watt the sails intercept leaves them as infrared, and Earth absorbs its share. Spread evenly inside Earth's orbit, the sails add about ${num(`${forcingAt(p, 0.01).toFixed(1)} W/m²`)} of heat for every 1% of sunlight they capture, after subtracting the sunlight they block. At the ceiling that is ${num(`${fc.toFixed(0)} W/m²`)}${consequence}.`
+    : `With these assumptions industry stops at ${num(pct(ceil, 2))} of the Sun's light, within what Earth allows. Every watt the sails intercept still leaves them as infrared, and Earth absorbs its share: about ${num(`${forcingAt(p, 0.01).toFixed(1)} W/m²`)} for every 1% captured by sails spread evenly inside Earth's orbit.`;
+  const skyFirst = E.sky <= E.climate;
+  const climateText = farside
+    ? `with sails on the far side of the Sun and a shade at L1, keeping Earth's extra heat under ${num(`${p.forcingLimit} W/m²`)} allows ${num(pct(E.climate, 2))}`
+    : `keeping Earth's extra heat under ${num(`${p.forcingLimit} W/m²`)} allows ${num(pct(E.climate, 2))}`;
+  const skyText = `film and hardware together reflect ${num(pct(p.rhoVis, 1))} of visible light, enough to light the ground like ${p.skyLimitLux >= 0.2 && p.skyLimitLux <= 0.3 ? 'a full Moon' : `${p.skyLimitLux} lux`} once the swarm captures ${num(pct(E.sky, 2))}`;
+  const p2 = `Two limits arrive almost together. Sails on the far side of the Sun show Earth their sunlit faces through the gaps, so after dusk a glow rises where the Sun went down: ${skyText}. And ${climateText}. ${skyFirst ? 'The night sky gives out first.' : 'The climate gives out first.'}`;
+  const p3 = `So the swarm Earth allows is about ${num(pct(E.cap, 2))} of the Sun, ${num(`${sci(E.flops, 2)} FLOP/s`)}. That is about ${num(sci(E.flops / WORLD_AI_FLOPS_2025, 1))} times all the AI hardware on Earth in 2025, or ${num(sci(E.flops / BRAIN_FLOPS, 1))} human brains at 10¹⁵ FLOP/s each. ${Number.isFinite(yCap) ? `It is reached around ${num(yr(p.seedYear + yCap))}.` : 'With these assumptions industry never gets there.'}`;
+  $('earth-prose').innerHTML = `<p>${p1}</p><p>${p2}</p><p>${p3}</p>`;
+  $('earth-prose-2').innerHTML = farside
+    ? `<p>The far-side placement is selected. Sails share Earth's own orbit beyond the Sun, where they never pass in front of it. Each one always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass makes that face dark in the infrared and pushes the heat out of the back, away from Earth, and a small cloud of sails at L1 shades away part of the rest. It costs about a third of the computing per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth. The night sky still limits it to ${num(pct(E.sky, 2))}.</p>`
+    : `<p>A better placement exists if a brighter night sky is accepted. Sails can share Earth's own orbit on the far side of the Sun, where they never pass in front of it. Each one then always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass can make that face dark in the infrared and push the heat out of the back, away from Earth. A small cloud of sails at L1, 1.6 million km sunward of Earth, can shade away part of the rest. That allows ${num(pct(far.farside, 1))} of the Sun within ${num(`${p.forcingLimit} W/m²`)}. It costs about a third of the computing per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth.</p>`;
   orbitMap($('orbit-map'), {
     shellR: Math.min(0.96, h.swarmAt(p, E.cap).rSail),
-    shellLabel: `allowed now: ${pct(E.cap, 2)}, spread inside Earth's orbit`,
-    cloudLabel: `option: ${pct(far.farside, 1)} on Earth's orbit`,
+    shellLabel: farside ? `inside Earth's orbit: ${pct(E.shell, 2)} within ${p.forcingLimit} W/m²` : `allowed now: ${pct(E.cap, 2)}, spread inside Earth's orbit`,
+    cloudLabel: farside ? `selected: on Earth's orbit, ${pct(E.cap, 2)}` : `option: ${pct(far.farside, 1)} on Earth's orbit`,
   });
+  let kink = null;
+  for (const r of state.table) if (h.swarmAt(p, r.f).rSail > 1) { kink = r.f; break; }
   earthChart($('earth-chart'), {
     pts: state.table.map(r => [r.f, r.forcing]),
     refs: [
@@ -221,11 +273,11 @@ function renderEarth() {
       { v: runaway, label: `${Math.round(runaway)} W/m², runaway greenhouse` },
     ],
     marks: [
-      { f: E.cap, label: `allowed, ${pct(E.cap, 2)}`, color: 'var(--earth)', left: true },
+      { f: E.shell, label: `within budget, ${pct(E.shell, 2)}`, color: 'var(--earth)', left: true },
       { f: ceil, label: `industry's ceiling, ${pct(ceil, 1)}`, color: 'var(--ink)', top: true, left: true },
     ],
   });
-  $('earth-caption').innerHTML = `<b>Extra energy absorbed by Earth, against the share of sunlight captured</b>, for sails spread evenly inside Earth's orbit: their infrared minus the sunlight they block. The kink near 45% is where a dense swarm has to retreat outside Earth's orbit to stay cool.`;
+  $('earth-caption').innerHTML = `<b>Extra energy absorbed by Earth, against the share of sunlight captured</b>, for sails spread evenly inside Earth's orbit: their infrared minus the sunlight they block.${kink ? ` The kink near ${pct(kink, 0)} is where a dense swarm has to retreat outside Earth's orbit to stay cool.` : ''}`;
 }
 
 function renderStar() {
@@ -233,28 +285,30 @@ function renderStar() {
   const a = h.atYear(p, state.d, state.t);
   sedChart($('sed-chart'), { f: a.f, T: a.tSail });
   $('sed-legend').innerHTML = `<span><i style="background:var(--sun-mark)"></i>sunlight that escapes</span><span><i style="background:var(--swarm)"></i>waste heat from the sails</span><span>energy per log-wavelength, as a share of the Sun's output, in ${Math.round(a.calendarYear)}</span>`;
+  // λL_λ of a blackbody peaks at λT = 3670 µm·K (energy per log-wavelength, as plotted)
   $('star-prose').innerHTML = `
-    <p>From another star the Sun would look ${num(pct(a.f, 2))} dimmer in ${num(Math.round(a.calendarYear))}. A second source would appear in the infrared, peaking near ${num(`${(2.897771955e-3 / a.tSail * 1e6).toFixed(1)} µm`)}: the ${num(`${Math.round(a.tSail)} K`)} glow of the sails. The two humps carry equal energy, because every watt the swarm absorbs it re-emits. This is the signature infrared surveys search for.</p>`;
+    <p>From another star the Sun would look ${num(pct(a.f, 2))} dimmer in ${num(Math.round(a.calendarYear))}. A second source would appear in the infrared, peaking near ${num(`${(3.67e-3 / a.tSail * 1e6).toFixed(1)} µm`)}: the ${num(`${Math.round(a.tSail)} K`)} glow of the sails. The infrared hump carries exactly the energy missing from the sunlight, because every watt the swarm absorbs it re-emits. That pairing, a star dimmed and a warm infrared excess, is what surveys for Dyson spheres look for.</p>`;
 }
 
 function renderFuture() {
   const p26 = h.eraParams('2026');
-  const p = state.params;
-  const a = h.swarmAt(p26, 0.01), b = h.swarmAt(p, 0.01);
+  const right = state.era === '2026' ? h.eraParams('mid') : state.params;
+  const rightLabel = state.era === '2026' ? h.ERAS.mid.label : (h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions');
+  const a = h.swarmAt(p26, 0.01), b = h.swarmAt(right, 0.01);
+  const f1 = x => `${(x * 100).toFixed(1)}%`;
   $('future-prose').innerHTML = `
-    <p>Industry needs half a century to reach the heat wall, and sails are re-skinned every 10 to 20 years, so nearly every sail ever flown carries hardware from after 2095. HBM memory, today's SRAM-heavy chips and 64 small laser terminals per sail are gone before the first launch. The architecture survives: sails still beat pods, chips still run near 85 °C, and silicon stays the only solar cell Mercury can supply in bulk. What changes is how much each kilogram does.</p>`;
-  const sel = state.era !== '2026' && h.ERAS[state.era] ? h.ERAS[state.era].label : 'Selected';
+    <p>Industry needs most of a century to reach the heat wall, and sails are re-skinned every 10 to 20 years, so nearly every sail ever flown carries hardware from after 2095. HBM memory, today's SRAM-heavy chips and 64 small laser terminals per sail are gone before the first launch. The architecture survives: sails still beat pods, chips still run near 85 °C, and silicon stays the only solar cell Mercury can supply in bulk. What changes is how much each kilogram does.</p>`;
   const rows = [
     ['Energy per operation', `${sci(a.sail.jPerFlop, 2)} J`, `${sci(b.sail.jPerFlop, 2)} J`],
     ['Memory per chiplet', '16 MB SRAM', '1–2 GB non-volatile'],
     ['Memory in pods', 'HBM stacks', 'memory bonded on logic'],
     ['Laser terminals per sail', '64 × 10 cm', '8 × 10 cm and 4 × 30 cm'],
-    ['Solar cell efficiency', pct(p26.pvEta0, 1), pct(p.pvEta0, 1)],
+    ['Solar cell efficiency', f1(p26.pvEta0), f1(right.pvEta0)],
     ['Orbit at 1% coverage', `${a.rSail.toFixed(3)} AU`, `${b.rSail.toFixed(3)} AU`],
     ['Swarm mass per watt of chips', `${(a.kgPerW * 1e3).toFixed(2)} g/W`, `${(b.kgPerW * 1e3).toFixed(2)} g/W`],
     ['Computing per watt of sunlight', `${sci(a.flops / a.intercepted, 2)} FLOP/J`, `${sci(b.flops / b.intercepted, 2)} FLOP/J`],
   ];
-  $('future-table').innerHTML = `<thead><tr><th></th><th>2026 hardware</th><th>${sel}</th></tr></thead><tbody>${rows.map(([k, x, y]) => `<tr><td>${k}</td><td class="v">${x}</td><td class="v">${y}</td></tr>`).join('')}</tbody>`;
+  $('future-table').innerHTML = `<thead><tr><th></th><th>2026 hardware</th><th>${rightLabel}</th></tr></thead><tbody>${rows.map(([k, x, y]) => `<tr><td>${k}</td><td class="v">${x}</td><td class="v">${y}</td></tr>`).join('')}</tbody>`;
 }
 
 const SOURCES = [
@@ -275,13 +329,14 @@ function renderAll() {
   renderFigures(); renderSail(); renderComputer(); renderWhy(); renderMercury(); renderBuild(); renderEarth(); renderStar(); renderFuture();
   for (const b of document.querySelectorAll('.era button')) b.setAttribute('aria-pressed', String(b.dataset.era === state.era));
 }
-function renderYear() { renderBuild(); renderStar(); renderMercury(); }
+function renderYear() { updateYear(h.atYear(state.params, state.d, state.t)); renderStar(); renderMercury(); }
 
 // --------------------------------------------------------------------------------- wiring
 
 let paramsUI;
 function setEra(era) {
   state.era = era;
+  state.baseEra = era;
   state.params = { ...h.eraParams(era) };
   paramsUI.rebind(state.params);
   recompute();
@@ -292,14 +347,16 @@ function init() {
   paramsUI = renderParams($('params'), h.PARAMS, state.params, () => { state.era = 'custom'; recompute(); });
   for (const b of document.querySelectorAll('.era button')) b.addEventListener('click', () => setEra(b.dataset.era));
   $('year').addEventListener('input', e => { state.t = tOf(Number(e.target.value) / 1000); renderYear(); });
-  let playing = false;
+  let playing = false, loop = 0;
   $('play').addEventListener('click', () => {
     playing = !playing;
     $('play').textContent = playing ? '❚❚' : '▶';
+    if (!playing) return;
+    const id = ++loop;
     let u = xOf(state.t);
     if (u >= 0.999) u = 0;
     const step = () => {
-      if (!playing) return;
+      if (!playing || id !== loop) return;
       u = Math.min(1, u + 0.0025);
       state.t = tOf(u);
       renderYear();
@@ -308,7 +365,7 @@ function init() {
     };
     requestAnimationFrame(step);
   });
-  $('reset-params').addEventListener('click', () => setEra(state.era === 'custom' ? 'mid' : state.era));
+  $('reset-params').addEventListener('click', () => setEra(state.baseEra));
   recompute();
   window.__ledger = { state, recompute, setEra, setYear: t => { state.t = t; renderYear(); } };
 }

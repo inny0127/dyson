@@ -79,6 +79,7 @@ export function renderParams(root, specs, params, onChange) {
       const v = ref.params[spec.key];
       if (spec.options) input.value = v;
       else if (v !== null && v !== undefined) input.value = String(spec.log ? Math.log10(v) : v);
+      else input.value = String(spec.key === 'hotLogicSlope' ? 0.0091 : spec.value);   // 2026: measured table, ~0.9 %/K
       out.textContent = fmt(spec, v);
     }
   }

@@ -76,12 +76,13 @@ test('film beats pods per kg in every era', () => {
 
 const dMid = h.compute({ ...pMid, coverage: 1 });
 
-test('timeline (central): heat wall ~2109, 1 % ~2123, 10 % ~2382, ceiling ~14 % set by refresh', () => {
+test('timeline (central): heat wall ~2124, 1 % ~2138, 10 % ~2420, ceiling ~14 % set by refresh', () => {
   const g = dMid.growth;
-  near(g.tCap + pMid.seedYear, 2109, 3, 'heat wall');
-  near(dMid.yearsToCoverage(0.01) + pMid.seedYear, 2123, 4, '1 % coverage');
-  near(dMid.yearsToCoverage(0.1) + pMid.seedYear, 2382, 15, '10 % coverage');
-  near(dMid.reachableCoverage, 0.142, 0.012, 'ceiling coverage');
+  near(g.tCap + pMid.seedYear, 2124, 3, 'heat wall');
+  near(dMid.yearsToCoverage(0.01) + pMid.seedYear, 2138, 4, '1 % coverage');
+  near(dMid.yearsToCoverage(0.1) + pMid.seedYear, 2420, 20, '10 % coverage');
+  near(dMid.reachableCoverage, 0.137, 0.012, 'ceiling coverage');
+  near(g.doublingYearsEff, 1.6, 0.08, 'doubling time with fabs, at the swarm actually built');
   assert.ok(g.peakMass <= g.steadyMass * 1.001 && g.peakMass >= 0.85 * g.steadyMass, 'peak ≈ export · L / (1 − ρ)');
 });
 
@@ -105,6 +106,19 @@ test('atYear coverage follows the mass standing, and its orbit is the thermal or
   near(a.f, dMid.reachableCoverage, 0.002, 'coverage at peak');
   near(a.rSail, h.sailThermalRadius(pMid, a.f), 1e-9, 'orbit');
   assert.ok(a.replacementShare <= 1);
+});
+
+test('build constants come from the swarm actually built, not from an unreachable target', () => {
+  const a = h.compute({ ...pMid, coverage: 1 }), b = h.compute({ ...pMid, coverage: 0.2 });
+  near(a.growth.doublingYearsEff, b.growth.doublingYearsEff, 0.02, 'doubling time');
+  near(a.logistics.sail.vLaunch, b.logistics.sail.vLaunch, 50, 'launch speed');
+  assert.ok(a.logistics.sail.vLaunch < 8500, `launch speed ${a.logistics.sail.vLaunch}`);
+});
+
+test('the fleet starts empty: in the first decades it is a few sails, not a floor value', () => {
+  const a = h.atYear(pMid, dMid, 5);
+  assert.ok(a.nSails < 1e3, `sails after 5 years: ${a.nSails}`);
+  assert.equal(h.atYear(pMid, dMid, 0).built, 0);
 });
 
 test('a small target is reached and then held by replacement only', () => {
