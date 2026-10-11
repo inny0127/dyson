@@ -244,6 +244,20 @@ class Scene:
         cloud = sample_map(maps['cloud'], lat, lon)
         cloud = np.clip((cloud - 0.08) / 0.85, 0, 1) ** 1.3
         lights = sample_map(maps['lights'], lat, lon)
+        # finer Black Marble crops where we have them (500 m tile, rescaled to the global map's level),
+        # blended in over half a degree at their edges
+        for img, lo0, lo1, la0, la1, k in maps['lights_patches']:
+            lo, la = np.degrees(lon), np.degrees(lat)
+            inside = (lo > lo0) & (lo < lo1) & (la > la0) & (la < la1)
+            if not inside.any():
+                continue
+            hh, ww = img.shape
+            x = (lo[inside] - lo0) / (lo1 - lo0) * ww - 0.5
+            y = (la1 - la[inside]) / (la1 - la0) * hh - 0.5
+            v = map_coordinates(img, [y, x], order=1, mode='nearest') * k
+            edge = np.minimum.reduce([lo[inside] - lo0, lo1 - lo[inside], la[inside] - la0, la1 - la[inside]])
+            wgt = np.clip(edge / 0.5, 0, 1)
+            lights[inside] = wgt * v + (1 - wgt) * lights[inside]
         # ocean: dark body plus a rough mirror of the sky (Fresnel, Cox-Munk sigma ~0.2 at 7 m/s)
         cos_i = np.clip(-(D * n).sum(1), 0, 1)
         rng = np.random.default_rng(3)
@@ -306,7 +320,10 @@ def render(sc, w, h, steps, chunk=60000):
     out = np.zeros((N, 3))
     maps = {'day': load_lin('earth_day_8k.jpg'), 'water': load_data('earth_water_mask_4k.png'),
             'cloud': load_data('earth_clouds_8k.jpg'), 'lights': load_lin('earth_night_lights_8k.jpg', 'L'),
-            'moon': load_lin('moon_albedo_2k.jpg')}
+            'moon': load_lin('moon_albedo_2k.jpg'),
+            # (map, lon0, lon1, lat0, lat1, scale to the global map's mean)
+            'lights_patches': [(load_lin('earth_night_lights_mideast_1km.jpg', 'L'), 20.0, 65.0, 5.0, 50.0, 0.855),
+                               (load_lin('earth_night_lights_gulf_500m.jpg', 'L'), 44.0, 58.0, 22.0, 38.0, 0.855)]}
     moon_mask = np.zeros(N, bool)
     for a in range(0, N, chunk):
         d = D[a:a + chunk]
@@ -384,14 +401,24 @@ def star_layer(sc, w, h, steps):
     a = np.array(rows)
     ra, dec = np.radians(a[:, 0]), np.radians(a[:, 1])
     d = (sc.eq2ecef @ np.stack([np.cos(dec) * np.cos(ra), np.cos(dec) * np.sin(ra), np.sin(dec)])).T
+    # the planets, as seen from Earth's centre (parallax from 400 km is negligible)
+    pl = ephem.planets(sc.jd)
+    d = np.vstack([d, (sc.eq2ecef @ np.array([u for _, u, _, _ in pl]).T).T])
+    a = np.vstack([a, np.array([[0, 0, V, 0.65] for _, _, V, _ in pl])])
+    Tk_pl = np.array([ephem.PLANET_K[n] for n, _, _, _ in pl])
+    self_planet = np.r_[np.zeros(len(rows), bool), np.ones(len(pl), bool)]
     x, y, front = sc.project(d, w, h)
     ok = front & (x > -1) & (x < w) & (y > -1) & (y < h)
+    for (n, _, V, _), xi, yi, oki in zip(pl, x[-len(pl):], y[-len(pl):], ok[-len(pl):]):
+        if oki:
+            print('PLANET', n, 'V %.2f' % V, 'pixel', int(xi), int(yi), flush=True)
     tg0, _, hitg = Scene.sphere(sc.P, d, RG)
     ok &= ~(hitg & (tg0 > 0))
     d, x, y = d[ok], x[ok], y[ok]
     E = 2.74e-8 * 10 ** (-0.4 * a[ok, 2])
     bv = a[ok, 3]
     Tk = 4600 * (1 / (0.92 * bv + 1.7) + 1 / (0.92 * bv + 0.62))
+    Tk = np.where(self_planet[ok], np.r_[np.zeros(len(rows)), Tk_pl][ok], Tk)
     col = blackbody_rgb(Tk)
     ta0, ta1, hita = Scene.sphere(sc.P, d, RT)
     T = np.ones((len(d), 3))

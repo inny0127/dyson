@@ -829,6 +829,7 @@ def main(argv):
     ap.add_argument('--glow', choices=['none', 'shell', 'farside'], default='none')
     ap.add_argument('--f', type=float, default=0.00411)
     ap.add_argument('--rho', type=float, default=0.004)
+    ap.add_argument('--r-out', type=float, default=0.92, help='outer radius of the shell (AU): the disc edge fades between asin(r) and asin(r_out)')
     ap.add_argument('--r', type=float, default=0.8604)
     ap.add_argument('--az', type=float, default=245.0)
     ap.add_argument('--lens', type=float, default=14.0)
@@ -846,9 +847,11 @@ def main(argv):
     y, mo, d = (int(v) for v in a.date.split('-'))
     ev = ephem.evening(y, mo, d, SITE['lat'], SITE['lon'], a.sun_alt)
     spec = {'lat': SITE['lat'], 'lst_deg': round(ev['lst_deg'], 3), 'sun_alt': round(ev['sun_alt'], 3),
-            'sun_az': round(ev['sun_az'], 3), 'width': a.sky_width, 'h_cam': 2070.0}
+            'sun_az': round(ev['sun_az'], 3), 'width': a.sky_width, 'h_cam': 2070.0, 'jd': round(ev['jd'], 6)}
     if a.glow != 'none':
         spec['glow'] = {'kind': a.glow, 'f': a.f, 'rho': a.rho, 'r_au': a.r}
+        if a.glow == 'shell':
+            spec['glow'].update(r_in=a.r, r_out=a.r_out)
     prefix, info = sky_assets(spec)
     w, h = (int(v) for v in a.res.split('x'))
     sc = lib.reset(samples=a.samples, res=(w, h))

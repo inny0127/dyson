@@ -76,6 +76,71 @@ def moon_eq(jd):
     return (x, y * math.cos(eps) - z * math.sin(eps), y * math.sin(eps) + z * math.cos(eps)), dist
 
 
+# JPL "Approximate Positions of the Planets" (E. M. Standish), Table 1: J2000 elements and rates
+# per century, a (AU), e, I, L, long. peri, long. node (deg). Within ~1 deg for Jupiter and Saturn
+# a century outside 1800-2050; better for the inner planets.
+ELEMENTS = {
+    'Mercury': ((0.38709927, 0.20563593, 7.00497902, 252.25032350, 77.45779628, 48.33076593),
+                (0.00000037, 0.00001906, -0.00594749, 149472.67411175, 0.16047689, -0.12534081)),
+    'Venus': ((0.72333566, 0.00677672, 3.39467605, 181.97909950, 131.60246718, 76.67984255),
+              (0.00000390, -0.00004107, -0.00078890, 58517.81538729, 0.00268329, -0.27769418)),
+    'EM': ((1.00000261, 0.01671123, -0.00001531, 100.46457166, 102.93768193, 0.0),
+           (0.00000562, -0.00004392, -0.01294668, 35999.37244981, 0.32327364, 0.0)),
+    'Mars': ((1.52371034, 0.09339410, 1.84969142, -4.55343205, -23.94362959, 49.55953891),
+             (0.00001847, 0.00007882, -0.00813131, 19140.30268499, 0.44441088, -0.29257343)),
+    'Jupiter': ((5.20288700, 0.04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909),
+                (-0.00011607, -0.00013253, -0.00183714, 3034.74612775, 0.21252668, 0.20469106)),
+    'Saturn': ((9.53667594, 0.05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448),
+               (-0.00125060, -0.00050991, 0.00193609, 1222.49362201, -0.41897216, -0.28867794)),
+}
+
+
+def _helio(name, T):
+    (a, e, I, L, wb, Om), (da, de, dI, dL, dwb, dOm) = ELEMENTS[name]
+    a, e, I, L, wb, Om = a + da * T, e + de * T, I + dI * T, L + dL * T, wb + dwb * T, Om + dOm * T
+    w = wb - Om
+    M = math.radians((L - wb + 180) % 360 - 180)
+    E = M + e * math.sin(M)
+    for _ in range(8):
+        E -= (E - e * math.sin(E) - M) / (1 - e * math.cos(E))
+    xp, yp = a * (math.cos(E) - e), a * math.sqrt(1 - e * e) * math.sin(E)
+    w, Om, I = math.radians(w), math.radians(Om), math.radians(I)
+    x = (math.cos(w) * math.cos(Om) - math.sin(w) * math.sin(Om) * math.cos(I)) * xp + (-math.sin(w) * math.cos(Om) - math.cos(w) * math.sin(Om) * math.cos(I)) * yp
+    y = (math.cos(w) * math.sin(Om) + math.sin(w) * math.cos(Om) * math.cos(I)) * xp + (-math.sin(w) * math.sin(Om) + math.cos(w) * math.cos(Om) * math.cos(I)) * yp
+    z = math.sin(w) * math.sin(I) * xp + math.cos(w) * math.sin(I) * yp
+    return x, y, z                                          # ecliptic J2000, AU
+
+
+def planets(jd):
+    """Geocentric planets: list of (name, equatorial unit vector, V magnitude, phase angle deg).
+    Magnitudes: Mallama & Hilton 2018 phase laws (Saturn without its rings' tilt term)."""
+    T = (jd - 2451545.0) / 36525
+    ex, ey, ez = _helio('EM', T)
+    eps = math.radians(23.4393)
+    out = []
+    for name in ('Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'):
+        px, py, pz = _helio(name, T)
+        gx, gy, gz = px - ex, py - ey, pz - ez
+        D = math.sqrt(gx * gx + gy * gy + gz * gz)
+        r = math.sqrt(px * px + py * py + pz * pz)
+        R = math.sqrt(ex * ex + ey * ey + ez * ez)
+        alpha = math.degrees(math.acos(max(-1, min(1, (r * r + D * D - R * R) / (2 * r * D)))))
+        k = 5 * math.log10(r * D)
+        V = {'Mercury': -0.613 + 6.328e-2 * alpha - 1.6336e-3 * alpha ** 2 + 3.3644e-5 * alpha ** 3
+                        - 3.4265e-7 * alpha ** 4 + 1.6893e-9 * alpha ** 5 - 3.0334e-12 * alpha ** 6,
+             'Venus': -4.384 - 1.044e-3 * alpha + 3.687e-4 * alpha ** 2 - 2.814e-6 * alpha ** 3 + 8.938e-9 * alpha ** 4,
+             'Mars': -1.601 + 2.267e-2 * alpha - 1.302e-4 * alpha ** 2,
+             'Jupiter': -9.395 - 3.7e-4 * alpha + 6.16e-4 * alpha ** 2,
+             'Saturn': -8.95 - 3.7e-4 * alpha + 6.16e-4 * alpha ** 2}[name] + k
+        ux, uy, uz = gx / D, gy / D, gz / D
+        out.append((name, (ux, uy * math.cos(eps) - uz * math.sin(eps), uy * math.sin(eps) + uz * math.cos(eps)), V, alpha))
+    return out
+
+
+# colour temperature standing in for each planet's reflected-sunlight colour (B-V 0.5-1.4)
+PLANET_K = {'Mercury': 4700.0, 'Venus': 5400.0, 'Mars': 3600.0, 'Jupiter': 5000.0, 'Saturn': 4500.0}
+
+
 if __name__ == '__main__':
     for a in (0, -6, -9, -12, -18, -20):
         e = evening(2026, 8, 22, 43.7535, -110.7195, a)

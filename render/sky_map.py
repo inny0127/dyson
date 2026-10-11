@@ -178,6 +178,15 @@ def stars(M, limit_v=8.0):
     return d_h[keep], E[keep], T[keep]
 
 
+def planets(M, jd):
+    """The naked-eye planets for julian day jd, as point sources like stars."""
+    import ephem
+    rows = [(np.array(u) @ M, 2.74e-8 * 10 ** (-0.4 * V), ephem.PLANET_K[n]) for n, u, V, _ in ephem.planets(jd)]
+    d = np.array([r[0] for r in rows])
+    keep = d[:, 2] > -0.02
+    return d[keep], np.array([r[1] for r in rows])[keep], np.array([r[2] for r in rows])[keep]
+
+
 H_AIR = 2300.0                    # mean height of the lines of sight to the terrain, m
 AEROSOL = 2.5e-6                  # extra summer valley aerosol (scattering, Mie phase), 1/m
 
@@ -269,6 +278,9 @@ def build(spec, out_prefix):
     np.save(out_prefix + '_inscatter.npy', inscatter_source(total, W, H).astype(np.float32))
     np.save(out_prefix + '_trans.npy', T.reshape(H, W, 3)[::4, ::4].astype(np.float32))
     sd, sE, sT = stars(M)
+    if 'jd' in spec:
+        pd_, pE, pT = planets(M, spec['jd'])
+        sd, sE, sT = np.concatenate([sd, pd_]), np.concatenate([sE, pE]), np.concatenate([sT, pT])
     # star extinction from the transmittance map (luminance channel)
     alt = np.arcsin(np.clip(sd[:, 2], -1, 1))
     tz = np.exp(-0.17 / np.maximum(np.sin(alt) + 0.025 * np.exp(-11 * np.sin(alt)), 1e-3))

@@ -39,5 +39,17 @@ python3 render/post.py "$RAW/swarm_tele.png" "$OUT/swarm-inside-tele.jpg" --fov 
 
 # Sail views (AgX PNGs metered in sunlight)
 python3 render/post.py "$RAW/sail_corner.png" "$OUT/sail-corner.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
-python3 render/post.py "$RAW/sail_oblique.png" "$OUT/sail-oblique.jpg" --fov 62 --noise 0.6 --width 2400 --quality 88
+# The sail against the swarm's sky (scene-linear: the counter-sun needs glare)
+python3 render/glare.py "$RAW/sail_counter_sun.exr" "$RAW/sail_counter_sun_g.exr"
+dev "$RAW/sail_counter_sun_g.exr" "$RAW/sail_counter_sun.png" "$(grep -o 'exposure [-0-9.]*' "$RAW/sail_counter_sun.log" | tail -1 | awk '{print $2}')"
+python3 render/post.py "$RAW/sail_counter_sun.png" "$OUT/sail-counter-sun.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
+
+# The swarm from low Earth orbit (render/leo_view.py output): one exposure for both, the glow at
+# ~0.15 of white
+for x in leo_wide leo_tele; do
+  python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
+  dev "$RAW/${x}_g.exr" "$RAW/$x.png" 4.0
+done
+python3 render/post.py "$RAW/leo_wide.png" "$OUT/leo-wide.jpg" --fov 84 --noise 0.8 --width 2400 --quality 88
+python3 render/post.py "$RAW/leo_tele.png" "$OUT/leo-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
 ls -la $OUT
