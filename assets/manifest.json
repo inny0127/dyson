@@ -26,7 +26,8 @@
     {"path": "milkyway_8k.jpg", "size": [8192, 4096], "bytes": 11059592, "content": "Diffuse sky background: NASA SVS Deep Star Maps 2020 'milkyway' layer (Gaia DR2 stars) plus the 'hiptyc' layer with every stars.csv star (V <= 8) masked out, so stars.csv can be drawn as point lights without double counting while Tycho-2 stars with 8 < V < 11.5 stay in the background",
      "frame": "ICRS equatorial, RA 0h at centre, RA increasing to the left, Dec +90 top (galactic centre at pixel x=6225, y=2706)",
      "scale": "Pure linear scale + sRGB transfer, no tone curve. Decoded linear d (0..1) -> SVS linear value p = d * 0.126568; only the brightest 0.05% of pixels are clipped. Calibration from SVS star photometry (V 5-8 stars, about +/-30%): p = 1 corresponds to about 0.027 cd/m^2, about 2.9e-4 W/m^2/sr in the repo convention. Background Strength for this image in render/lib.py units: about 3.7e-5 (= 0.126568 * 2.9e-4). Check: the galactic-centre 10x10 deg mean comes out at about 19.4 V mag/arcsec^2 and the all-sky mean at about 21.9.",
-     "license": "NASA SVS (public domain in the US); credit NASA/GSFC SVS and ESA/Gaia/DPAC"}
+     "license": "NASA SVS (public domain in the US); credit NASA/GSFC SVS and ESA/Gaia/DPAC"},
+    {"path": "teton_dem.png", "size": [2126, 3126], "bytes": 5904662, "content": "Terrain elevation around Jenny Lake, Grand Teton (USGS 3DEP via AWS Terrain Tiles, zoom 14), 8 m local grid", "frame": "local east/north metres from 43.7535 N, 110.7195 W; column 0 = 14 km west, row 0 = 13 km north (teton_dem.json)", "scale": "uint16 decimetres above base_m = 1900 m", "license": "Public domain (USGS 3DEP); credit Mapzen/AWS Terrain Tiles"}
   ],
   "total_bytes": 62908343
 }

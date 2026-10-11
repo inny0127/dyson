@@ -140,7 +140,7 @@ def simple_material(name, spec):
 # Film material (front + back in one, chosen by Backfacing)
 # ---------------------------------------------------------------------------------------------
 
-def film_material(spec, seed=1, pitch=None, lanes=False):
+def film_material(spec, seed=1, pitch=None, lanes=False, chips=True, hinges=True, name='SailFilm'):
     M = spec['materials']
     parts = spec['parts']
     seg = spec['sail']['segmentation']
@@ -155,7 +155,7 @@ def film_material(spec, seed=1, pitch=None, lanes=False):
     die = parts['chiplet']['dims_m'][0]
     die_h = parts['chiplet']['dims_m'][2]
 
-    m = _new_mat('SailFilm')
+    m = _new_mat(name)
     g = NT(m)
     out = g.node('ShaderNodeOutputMaterial')
     tc = g.node('ShaderNodeTexCoord')
@@ -178,6 +178,9 @@ def film_material(spec, seed=1, pitch=None, lanes=False):
     slope = g.math('MULTIPLY', g.math('MULTIPLY', g.math('EXPONENT', g.math('DIVIDE', dd, -ell)), u),
                    g.math('MULTIPLY', sgn, math.tan(curl)))
     slope = g.math('MULTIPLY', slope, inside)
+    if not hinges:                       # pod wing film: plain panels, no fold strips
+        hinge = g.math('MULTIPLY', hinge, 0.0)
+        slope = g.math('MULTIPLY', slope, 0.0)
     nvec = g.node('ShaderNodeCombineXYZ')
     g.set(nvec.inputs['X'], 0.0)
     g.L.new(g.math('MULTIPLY', slope, -1.0), nvec.inputs['Y'])
@@ -196,6 +199,8 @@ def film_material(spec, seed=1, pitch=None, lanes=False):
     cy = g.math('ABSOLUTE', g.math('MULTIPLY', g.math('SUBTRACT', g.math('FRACT', g.math('DIVIDE', y, pitch_tile)), 0.5), pitch_tile))
     chip = g.math('MULTIPLY', g.math('LESS_THAN', cx, die / 2), g.math('LESS_THAN', cy, die / 2))
     chip = g.math('MULTIPLY', chip, g.math('SUBTRACT', 1.0, hinge))
+    if not chips:                        # pod wing film: PV only, no chiplets
+        chip = g.math('MULTIPLY', chip, 0.0)
 
     # --- tile scribes on the front: lines every 25.4 mm in x and y, plus the half-cell scribe along x
     sx, _, _ = g.stripe(x, pitch_tile, 0.0, scribe_w)

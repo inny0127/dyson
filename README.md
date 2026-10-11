@@ -19,6 +19,8 @@ node scripts/report.mjs NUMBERS.md       # regenerate the written numbers
 node scripts/export-numbers.mjs          # model numbers for the Blender scenes (render/numbers.json)
 node scripts/shot.mjs buildout out.png   # headless screenshot of a page section
 blender -b --python render/sail_shot.py -- out.png --era mid --view overhead_glint
+blender -b --python render/earth_sky.py -- dusk.exr --sun-alt -9 --glow shell --exposure 7 --exr
+blender -b --python render/develop.py -- dusk.exr dusk.png --exposure 7
 ```
 
 ## What the numbers say
@@ -55,10 +57,10 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 | `src/model/` | `hybrid.js` (model v4: sails, pods, eras, build-out), `model.js` (radiosity, logistics, Mercury, Earth), `sat2.js`, `constants.js` |
 | `src/ui/` | SVG charts and the assumptions drawer |
 | `test/` | `node --test` suites pinning the model |
-| `render/` | Blender scenes: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `mercury.py`, `earth_sky.py`, `lib.py` (physical sun, metering, materials), `post.py` (camera effects) |
+| `render/` | Blender scenes, each lit only by what the model says is there: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `pod.py` (1 MW pod, visible and LWIR), `swarm_field.py` (the sky from inside the swarm: sails as stars, the counter-sun and its glint halo), `mercury.py` (globe) and `mercury_surface.py` (night side at the heat wall), `earth_sky.py` (Jenny Lake at dusk and night, tonight vs at Earth's limit). Support: `atmosphere.py` (multiple-scattering sky, Hillaire 2020) and `sky_map.py` (twilight, swarm glow, Milky Way, airglow, stars), `teton_prep.py` (lake bed, cobble beach), `ephem.py` (Sun and sidereal time), `lib.py` (physical sun, metering, materials), `develop.py` (EXR to photo: exposure, white balance, AgX), `glare.py` (lens glare), `post.py` (camera effects) |
 | `renders/` | finished photographs used by the page |
 | `docs/` | `architecture.md`, `future-tech.md`, `earth.md`, and `data/` with every study's numbers and sources |
-| `assets/` | MESSENGER, Blue Marble, star catalogue and Milky Way data with credits |
+| `assets/` | MESSENGER, Blue Marble, USGS terrain, star catalogue and Milky Way data with credits |
 | `scripts/` | report, numbers export, screenshot, artifact staging |
 
 ## How the numbers were checked

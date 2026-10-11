@@ -10,6 +10,7 @@ downloads are in `tools/` (`tools/fetch.sh` lists the exact download URLs).
 > Earth: NASA Earth Observatory (Blue Marble NG, R. Stöckli; Black Marble 2016, J. Stevens/M. Román), GEBCO.
 > Sky: NASA/Goddard Space Flight Center Scientific Visualization Studio; Gaia DR2: ESA/Gaia/DPAC.
 > Star catalogue: HYG Database v4.4 (David Nash, astronexus.com), CC BY-SA 4.0.
+> Terrain: USGS 3D Elevation Program, via Mapzen/AWS Terrain Tiles.
 
 ---
 
@@ -144,3 +145,18 @@ downloads are in `tools/` (`tools/fetch.sh` lists the exact download URLs).
   `p = srgb_to_linear(pixel) * 0.126568`. The absolute calibration is in `manifest.json`.
 - **Alternatives considered:** ESO/S. Brunier *Milky Way panorama* (eso0932a, CC BY 4.0). It is
   downloadable only at 6000 x 3000 and has no HDR source, so it was not used.
+
+## Terrain
+
+### `teton_dem.png`, `teton_dem.json`
+- **Source:** AWS Terrain Tiles (Mapzen "Terrarium" PNG encoding, Registry of Open Data on AWS),
+  zoom 14, `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/14/{x}/{y}.png`. In the United
+  States these tiles come from the USGS 3D Elevation Program (3DEP) 1/3 arc-second (~10 m) DEM.
+- **Licence:** USGS 3DEP data are US public domain. The tile set asks for attribution of its
+  sources (https://github.com/tilezen/joerd/blob/master/docs/attribution.md).
+- **Attribution:** "Terrain: USGS 3DEP, via Mapzen/AWS Terrain Tiles."
+- **Processing:** `tools/fetch_dem.py` resamples the tiles bilinearly to a local east/north grid
+  of 8 m spacing, centred on the east shore of Jenny Lake, Grand Teton National Park (43.7535 N,
+  110.7195 W). It covers 14 km west to 3 km east and 12 km south to 13 km north. Heights are stored
+  as uint16 decimetres above `base_m` (sidecar JSON). The DEM's surface over the lake is the water
+  level (2068.4 m). `render/teton_prep.py` carves a bed under it and builds the foreground beach.

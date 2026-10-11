@@ -1,0 +1,14 @@
+{
+ "source": "AWS Terrain Tiles (Terrarium), zoom 14; USGS 3DEP in the US",
+ "centre_lat": 43.7535,
+ "centre_lon": -110.7195,
+ "step_m": 8.0,
+ "x_min_m": -14000.0,
+ "y_max_m": 13000.0,
+ "cols": 2126,
+ "rows": 3126,
+ "encoding": "uint16 decimetres above base_m; row 0 = north edge, column 0 = west edge",
+ "base_m": 1900,
+ "min_m": 1956.3363279606208,
+ "max_m": 4195.066005956614
+}
