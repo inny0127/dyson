@@ -95,7 +95,8 @@ exposure never changes the physics.
     1,100 / 1,200 / 1,300 K, deep orange.
   - They light the ground and the mass driver by themselves.
 - **Ground:** Mercury's curvature (horizon 3 km from eye height) and cratered regolith (albedo
-  0.06–0.12), graded under the field. The mass driver is 3 km long (7.6 km/s at ~1,000 g).
+  0.06–0.12), graded under the field. The mass driver launches at 7.8 km/s and 100 g, so the
+  track is 31 km long; the first 3 km are modelled.
 - **Sky:**
   - Every sail shows Mercury its sunlit front: a uniform glow of 0.0096 W/m²/sr (0.9 cd/m²).
   - The counter-sun is magnified by the geometry: the 0.52° glint cone, seen from 0.39 AU at
@@ -103,6 +104,53 @@ exposure never changes the physics.
   - Its radiance is coverage × glint radiance, 103 W/m²/sr: magnitude −17, about 16 lux on the
     ground. The halo reaches 17°.
 - **Exposure:** metered for the panels, so the sky's glow does not register.
+
+## The industrial base (`mercury_base.py`)
+
+- **When:** after the factories move to orbit, from about 2090. The manufacturing study leaves
+  only quarries, ore processing and equatorial mass-driver tracks on Mercury.
+- **Quarry:** 2 km across, 300 m deep in 20 benches (15 m faces at 70°, 12 m berms), with a 30 m
+  haul road spiralling down at 9 %. Overburden dumps, a pellet plant, a silicon solar field, and
+  radiator fins turned to the Sun's azimuth so only their top edges are lit.
+- **Surface:** craters at three scales with random sizes. Fresh rock is ~1.6× brighter than
+  weathered regolith (MESSENGER: immature material is brighter).
+- **Scale:** the heat wall moves 7.9 × 10¹⁹ kg/yr (2.5 × 10¹² kg/s). This pit holds ~9 × 10¹¹ kg,
+  so one pit like it every 0.4 s.
+
+## The mass driver (`mass_driver.py`)
+
+- **Track:** the model's launch speed, 7.8 km/s (escape plus the Hohmann v∞ from perihelion), and
+  acceleration, 100 g, make a track v²/2a = 31.3 km long. Built straight on a 2,440 km planet, its
+  far end stands d²/2R = 206 m above the ground. Pylons grow from 7 m at the breech to 206 m at
+  the muzzle.
+- **Machine:** a coilgun, not a railgun: drive coils every 0.5 m, flywheel stations every 400 m,
+  busbars along the girder. Nothing slides, so nothing erodes at 10 t/s.
+- **Light:** launch at perihelion (0.307 AU, 14.4 kW/m², Sun 1.74° across). The site where
+  launching tangentially along the orbit is possible has the Sun on its horizon at that moment,
+  side-on to the track.
+- **Payload:** a canister 160 m down the track moves at √(2·a·d) = 560 m/s, blurred by a
+  1/2000 s shutter.
+
+## The chip foundry (`foundry.py`)
+
+- **Design:** a speculative space-native wafer fab from `docs/data/future/manufacturing.json`:
+  - dry vacuum tool modules under glass-cloth blankets along a maglev spine;
+  - a shared free-electron-laser EUV source (superconducting linac plus undulator) with
+    beamlines to the scanner modules;
+  - a chlorine-loop refinery (SiCl₄ distillation, Zn/Mg reduction) with radiators at 1,000 K;
+  - cryo-panels at 40–80 K under stacked multilayer shades, recapturing Cl₂, SiCl₄, O₂ and S;
+  - fab radiators at 320 K, edge-on to the Sun.
+- **Sizing:** 10⁵ m²/yr of die.
+  - Tools at 40 kg per m²/yr: 4,000 t.
+  - 0.0251 m² of die per kg of sail: 4 × 10⁶ kg/yr, ~280 sails.
+  - 1,150 MJ/kg: 146 MW.
+  - PV at 0.387 AU tilted 80° from the Sun (1.6 kW/m², cells at ~335 K instead of ~540 K face-on)
+    at 20 %: 0.46 km².
+  - Radiators at 320 K, two-sided, ε 0.9: 0.14 km².
+- **Thermal frame:** 8–14 µm brightness temperatures. The PV is 323 K, the fab radiators 312 K
+  with warmer roots, the modules ~270 K and the refinery radiators 947 K. The visible frame
+  is exposed for sunlight, so the 1,000 K glow does not register.
+- **Setting:** Mercury is 7,500 km away, lit from the same overhead Sun.
 
 ## The sails (`sail.py`, `sail_shot.py`)
 

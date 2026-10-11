@@ -10,7 +10,8 @@ Numbers:
   of the Sun's mirror direction glint at Mercury: from 0.39 AU that is a disc 1.15 deg in radius
   round the antisolar point (0.52 deg x 0.86/0.39), at the film's glint radiance x coverage: a
   violet counter-sun of about magnitude -16.6, with the curled panel edges' halo out to ~17 deg.
-- Mass driver: 7.6 km/s launch speed (model), 3 km of track at ~1,000 g.
+- Mass driver: 7.8 km/s launch speed at 100 g (model), so 31 km of track; the first 3 km are
+  modelled here, the rest is beyond the horizon.
 - Ground: Mercury's curvature (horizon 3 km from eye height), cratered regolith (albedo 0.08-0.12,
   MESSENGER mean), graded flat under the industry.
 

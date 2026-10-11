@@ -165,7 +165,7 @@ function renderMercury() {
   const now = h.atYear(p, d, state.t);
   const rockOut = g.tRockOut != null ? Math.round(p.seedYear + g.tRockOut) : null;
   $('mercury-prose').innerHTML = `
-    <p>Mercury is mostly iron. Its crust and mantle, the part worth mining, are ${num(pct(MERCURY.M_SHELL / MERCURY.M, 0))} of its mass. Factories reduce the rock to silicon, magnesium, aluminium and glass; about ${num(pct(p.yieldDelivered, 0))} of each kilogram ends up in spacecraft, and the oxygen becomes ion-thruster propellant. A mass driver fires each folded sail off the surface at ${num(`${(d.logistics.sail.vLaunch / 1e3).toFixed(1)} km/s`)}.</p>
+    <p>Mercury is mostly iron. Its crust and mantle, the part worth mining, are ${num(pct(MERCURY.M_SHELL / MERCURY.M, 0))} of its mass. Factories reduce the rock to silicon, magnesium, aluminium and glass; about ${num(pct(p.yieldDelivered, 0))} of each kilogram ends up in spacecraft, and the oxygen becomes ion-thruster propellant. Mass drivers fire it off the surface at ${num(`${(d.logistics.sail.vLaunch / 1e3).toFixed(1)} km/s`)}: at first as folded sails, and later, once the chip fabs move into orbit, as refined feedstock for the foundries there.</p>
     <p>Industry copies itself every ${num(`${g.doublingYearsEff.toFixed(2)} years`)}, slowed by the chip fabs it has to build. In ${num(yr(p.seedYear + g.tCap))} it reaches the <em>heat wall</em>: Mercury's night side cannot radiate away the waste heat of mining any faster, and exports stop growing at ${num(`${sci(g.capToSails * YEAR, 2)} kg`)} a year. By ${num(Math.round(now.calendarYear))}, ${num(pct(now.mercuryRemoved, 2))} of the planet is gone${rockOut ? `; at full build its rock runs out around ${num(rockOut)}` : ''}.</p>`;
 }
 

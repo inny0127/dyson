@@ -37,6 +37,15 @@ python3 render/post.py "$RAW/swarm_wide.png" "$OUT/swarm-inside-wide.jpg" --fov 
 python3 render/post.py "$RAW/swarm_tele.png" "$OUT/swarm-inside-tele.jpg" --fov 7 --noise 0.8 --glare 0 --width 2400 --quality 88
 python3 render/post.py "$RAW/mercury_night.png" "$OUT/mercury-night-industry.jpg" --fov 74 --noise 0.8 --glare 0 --width 2400 --quality 88
 
+# Mercury surface scenes and the foundry (scene-linear EXR, metered in sunlight)
+for x in mass_driver mercury_base foundry; do
+  dev "$RAW/$x.exr" "$RAW/$x.png" "$(exposure_of $x)"
+done
+python3 render/post.py "$RAW/mass_driver.png" "$OUT/mass-driver.jpg" --fov 69 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/mercury_base.png" "$OUT/mercury-base.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/foundry.png" "$OUT/foundry-visible.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/foundry_lwir.png" "$OUT/foundry-lwir.jpg" --fov 74 --noise 0 --ca 0 --glare 0 --width 2400 --quality 90
+
 # Sail views (AgX PNGs metered in sunlight)
 python3 render/post.py "$RAW/sail_corner.png" "$OUT/sail-corner.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/sail_oblique.png" "$OUT/sail-oblique.jpg" --fov 62 --noise 0.6 --width 2400 --quality 88
