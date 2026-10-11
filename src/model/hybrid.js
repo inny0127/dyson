@@ -135,10 +135,13 @@ export const FIXED = {
   podComputeShare: 0.9,
   podDieMm2PerW: 5.5,      // pod die (memory weighted) per W
   toolLife: 10,            // yr; fab tools are replaced like everything else
-  // Earth-safe studies (docs/data/earth_safe*.json): ground illuminance after astronomical twilight
-  // per unit coverage per unit visible reflectance (0.31 lux per 1 % at rho 0.003); far-side cloud
-  // with Mercury-native Al/Mg mesh low-e fronts: 0.396 W/m² of IR per 1 %, FLOP/J ×0.66 vs the shell.
+  // Earth-safe studies (docs/data/earth_safe*.json): far-side cloud ground illuminance after
+  // astronomical twilight per unit coverage per unit visible reflectance (0.31 lux per 1 % at
+  // rho 0.003; the shell is computed by skyLux); far-side cloud with Mercury-native Al/Mg mesh
+  // low-e fronts: 0.396 W/m² of IR per 1 %, FLOP/J ×0.66 vs the shell.
   skyLuxPerFRho: 0.31 / (0.01 * 0.003),
+  skyDepression: 18,       // deg: the sky rule is set at the end of astronomical twilight
+  lumensPerW: 93,          // sunlight reflected off the sails
   farsideIRPerF: 39.6,
   farsideFlopFactor: 0.66,
   horizon: 6000,           // yr simulated
@@ -434,13 +437,61 @@ export function earthSafeCoverage(p, limit = 1.0) {
 }
 
 /**
- * What Earth allows. Three caps on coverage: the night-sky glow (any placement), and the climate
- * budget for the chosen placement. The shell's climate cap uses earthImpact (infrared minus its own
- * shade); the far-side cloud sends only infrared, which an L1 shade may cancel up to
- * thermostatCredit × the budget.
+ * Illuminance on level ground from a sky disc of unit luminance and angular radius R (rad) whose
+ * centre sits `depressionDeg` below the horizon: ∫ sin(altitude) dΩ over the part above the
+ * horizon. No extinction, as in the Earth study (scattered light still reaches the ground).
+ */
+export function discGroundFactor(R, depressionDeg = FIXED.skyDepression) {
+  const d = (depressionDeg * Math.PI) / 180;
+  const cx = Math.cos(d), cz = -Math.sin(d), cosR = Math.cos(R);
+  const nA = 90, nZ = 180, dA = Math.PI / 2 / nA, dZ = Math.PI / nZ;
+  let sum = 0;
+  for (let i = 0; i < nA; i++) {
+    const a = (i + 0.5) * dA, ca = Math.cos(a), sa = Math.sin(a);
+    // azimuth measured from the Sun's; the disc is symmetric, so integrate one side and double
+    for (let j = 0; j < nZ; j++) {
+      const z = (j + 0.5) * dZ;
+      if (cx * ca * Math.cos(z) + cz * sa > cosR) sum += sa * ca;
+    }
+  }
+  return 2 * sum * dA * dZ;
+}
+
+/**
+ * Ground illuminance (lux) from the swarm's glow once the Sun is 18° down.
+ * Shell: through the near layer's gaps (1 − f) Earth sees the sunlit fronts of the far layer
+ * (f, radiosity ρS / (1 − fρ)): a uniform disc out to asin(r) from the Sun.
+ * Far-side cloud: the study's 0.31 lux per 1 % at ρ 0.003 (a cone along the ecliptic).
+ */
+export function skyLux(p, f) {
+  if (!(f > 0)) return 0;
+  if (p.earthPlacement === 'farside') return FIXED.skyLuxPerFRho * p.rhoVis * f;
+  const s = swarmAt(p, f);
+  const L = ((1 - f) * f * p.rhoVis * s.sail.S) / Math.PI / (1 - f * p.rhoVis) * FIXED.lumensPerW;
+  return L * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
+}
+
+/** Largest coverage whose glow stays within p.skyLimitLux for the chosen placement. */
+export function skyCap(p) {
+  if (p.earthPlacement === 'farside') return Math.min(1, p.skyLimitLux / (FIXED.skyLuxPerFRho * p.rhoVis));
+  // the glow rises as f(1 − f): search the rising side; past half cover it never binds first
+  if (skyLux(p, 0.5) <= p.skyLimitLux) return 1;
+  let lo = -8, hi = Math.log10(0.5);
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (skyLux(p, 10 ** mid) <= p.skyLimitLux) lo = mid; else hi = mid;
+  }
+  return 10 ** lo;
+}
+
+/**
+ * What Earth allows. Three caps on coverage: the night-sky glow for the chosen placement, and its
+ * climate budget. The shell's climate cap uses earthImpact (infrared minus its own shade); the
+ * far-side cloud sends only infrared, which an L1 shade may cancel up to thermostatCredit × the
+ * budget.
  */
 export function earthLimits(p) {
-  const sky = p.skyLimitLux / (FIXED.skyLuxPerFRho * p.rhoVis);
+  const sky = skyCap(p);
   const shell = earthSafeCoverage({ ...p, placement: 'thermal' }, p.forcingLimit);
   const farside = (p.forcingLimit * p.thermostatCredit) / FIXED.farsideIRPerF;
   const climate = p.earthPlacement === 'farside' ? farside : shell;
@@ -448,7 +499,7 @@ export function earthLimits(p) {
   const s = swarmAt(p, cap);
   const flops = s.flops * (p.earthPlacement === 'farside' ? FIXED.farsideFlopFactor : 1);
   return { sky, shell, farside, climate, cap, binding: sky <= climate ? 'night sky' : 'climate', flops,
-    skyLuxAtCap: FIXED.skyLuxPerFRho * p.rhoVis * cap };
+    skyLuxAtCap: skyLux(p, cap) };
 }
 
 /** Satellite mass standing in the swarm by a given year after the first launch. */

@@ -161,11 +161,20 @@ test('Earth: a uniform interior shell adds ~1.9 W/m² per 1 % coverage; ≤ 1 W/
   near(h.earthSafeCoverage(pMid, 1.0), 0.0053, 0.0007, 'Earth-safe coverage');
 });
 
-test('Earth limits: the night sky caps the swarm near 0.6 %, about where the shell meets 1 W/m²', () => {
+test('Earth limits: the night sky binds first, near 0.4 % for the shell and 0.6 % for the far side', () => {
+  // the study's own shell figure: 0.58 lux per 1 % at rho 0.003, r 0.91 AU, Sun 18° down
+  const p91 = { ...pMid, rhoVis: 0.003, placement: 'manual', rManual: 0.91 };
+  near(h.skyLux(p91, 0.01), 0.58, 0.02, 'shell ground lux per 1 % (earth_safe.json)');
+  near(h.skyLux({ ...pMid, rhoVis: 0.003, earthPlacement: 'farside' }, 0.01), 0.31, 1e-9, 'far side');
   const L = h.earthLimits(pMid);
-  near(L.sky, 0.0060, 0.0005, 'full-Moon sky cap at rho 0.004');
+  near(L.sky, 0.0041, 0.0004, 'full-Moon sky cap at rho 0.004, shell');
   near(L.shell, 0.0053, 0.0007, 'shell climate cap at 1 W/m²');
-  near(h.earthLimits({ ...pMid, earthPlacement: 'farside' }).farside, 0.0379, 0.002, 'far side with a 1.5× shade');
+  assert.equal(L.binding, 'night sky');
+  near(L.skyLuxAtCap, 0.25, 1e-3, 'cap sits at the sky limit');
+  const F = h.earthLimits({ ...pMid, earthPlacement: 'farside' });
+  near(F.sky, 0.0060, 0.0005, 'far-side sky cap');
+  near(F.farside, 0.0379, 0.002, 'far side with a 1.5× shade');
   assert.ok(L.cap <= Math.min(L.sky, L.climate) + 1e-12);
   assert.ok(L.flops > 1e38 && L.flops < 5e38, `allowed FLOP/s ${L.flops}`);
+  assert.ok(Math.abs(F.flops / L.flops - 1) < 0.2, 'either placement allows about the same compute');
 });

@@ -171,7 +171,7 @@ function renderMercury() {
 
 function readout(a) {
   const p = state.params;
-  const lux = h.FIXED.skyLuxPerFRho * p.rhoVis * a.f;
+  const lux = h.skyLux(p, a.f);
   const items = [
     ['Year', `${Math.round(a.calendarYear)}`],
     ['Sunlight captured', pct(a.f, 2)],
@@ -257,11 +257,11 @@ function renderEarth() {
   $('earth-prose').innerHTML = `<p>${p1}</p><p>${p2}</p><p>${p3}</p>`;
   $('earth-prose-2').innerHTML = farside
     ? `<p>The far-side placement is selected. Sails share Earth's own orbit beyond the Sun, where they never pass in front of it. Each one always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass makes that face dark in the infrared and pushes the heat out of the back, away from Earth, and a small cloud of sails at L1 shades away part of the rest. It costs about a third of the computing per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth. The night sky still limits it to ${num(pct(E.sky, 2))}.</p>`
-    : `<p>A better placement exists if a brighter night sky is accepted. Sails can share Earth's own orbit on the far side of the Sun, where they never pass in front of it. Each one then always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass can make that face dark in the infrared and push the heat out of the back, away from Earth. A small cloud of sails at L1, 1.6 million km sunward of Earth, can shade away part of the rest. That allows ${num(pct(far.farside, 1))} of the Sun within ${num(`${p.forcingLimit} W/m²`)}. It costs about a third of the computing per watt, and a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth.</p>`;
+    : `<p>Another placement lets more sails fly under the same sky. Sails can share Earth's own orbit on the far side of the Sun, where they never pass in front of it. Their glow stays in a cone along the ecliptic within 45° of the Sun, so the night sky allows ${num(pct(far.sky, 2))}. Each sail there always faces both the Sun and Earth, so a fine aluminium mesh in the cover glass can make that face dark in the infrared and push the heat out of the back, away from Earth, and a small cloud of sails at L1, 1.6 million km sunward of Earth, can shade away part of the rest: within ${num(`${p.forcingLimit} W/m²`)} the climate alone would allow ${num(pct(far.farside, 1))}. The mesh costs about a third of the computing per watt, so under the same night sky the far side runs ${num(`${sci(far.flops, 2)} FLOP/s`)}, ${farVsShell(far.flops / E.flops)} the shell. And a cloud that dense needs collision-free orbit lanes and the capture of every derelict, because lost parts drift toward Earth.</p>`;
   orbitMap($('orbit-map'), {
     shellR: Math.min(0.96, h.swarmAt(p, E.cap).rSail),
     shellLabel: farside ? `inside Earth's orbit: ${pct(E.shell, 2)} within ${p.forcingLimit} W/m²` : `allowed now: ${pct(E.cap, 2)}, spread inside Earth's orbit`,
-    cloudLabel: farside ? `selected: on Earth's orbit, ${pct(E.cap, 2)}` : `option: ${pct(far.farside, 1)} on Earth's orbit`,
+    cloudLabel: farside ? `selected: on Earth's orbit, ${pct(E.cap, 2)}` : `option: ${pct(far.cap, 2)} on Earth's orbit`,
   });
   let kink = null;
   for (const r of state.table) if (h.swarmAt(p, r.f).rSail > 1) { kink = r.f; break; }
@@ -273,11 +273,17 @@ function renderEarth() {
       { v: runaway, label: `${Math.round(runaway)} W/m², runaway greenhouse` },
     ],
     marks: [
-      { f: E.shell, label: `within budget, ${pct(E.shell, 2)}`, color: 'var(--earth)', left: true },
+      { f: E.shell, label: `within budget, ${pct(E.shell, 2)}`, color: 'var(--earth)', left: E.shell < E.sky },
+      ...(farside ? [] : [{ f: E.sky, label: `night-sky limit, ${pct(E.sky, 2)}`, color: 'var(--swarm)', left: E.sky <= E.shell }]),
       { f: ceil, label: `industry's ceiling, ${pct(ceil, 1)}`, color: 'var(--ink)', top: true, left: true },
     ],
   });
   $('earth-caption').innerHTML = `<b>Extra energy absorbed by Earth, against the share of sunlight captured</b>, for sails spread evenly inside Earth's orbit: their infrared minus the sunlight they block.${kink ? ` The kink near ${pct(kink, 0)} is where a dense swarm has to retreat outside Earth's orbit to stay cool.` : ''}`;
+}
+
+function farVsShell(r) {
+  if (r > 0.85 && r < 1.18) return 'about the same as';
+  return r > 1 ? `${r.toFixed(1)} times as much as` : `${(1 / r).toFixed(1)} times less than`;
 }
 
 function renderStar() {

@@ -1,17 +1,25 @@
 # Earth: how big the swarm may get
 
 **Answer.** Industry can build the swarm to about 14 % of the Sun's light (central case). Earth
-allows about **0.5–1 %**: roughly 2×10³⁸ FLOP/s, reached around 2130. Two limits arrive together:
+allows about **0.4–0.6 %**: roughly 1.7×10³⁸ FLOP/s, reached around 2128. Two limits arrive
+together, and the night sky comes first:
 
-- **The night sky.** Sails on the far side of the Sun show Earth their sunlit faces, so a glow
-  rises along the ecliptic after dusk. It lights the ground as brightly as a full Moon once the
-  swarm captures 0.44–1.0 % of the Sun. The range comes from the sail's total visible reflectance,
-  0.0024–0.0056 (film, hinge strips, scribes, hems, vanes).
+- **The night sky.** Sails beyond the Sun show Earth their sunlit faces, so a glow rises where the
+  Sun went down. Once the Sun is 18° below the horizon it should light the ground no more than a
+  full Moon (0.25 lux).
+  - A shell inside Earth's orbit glows as a uniform disc out to asin(r) from the Sun, about 60°.
+    It reaches full-Moon light at 0.41 % of the Sun (0.61 lux per 1 % at reflectance 0.004).
+  - The far-side cloud's glow is a cone along the ecliptic within 45° of the Sun. It reaches
+    full-Moon light at 0.60 % (0.31 lux per 1 % at reflectance 0.003).
+  - Both scale inversely with the sail's total visible reflectance, 0.0024–0.0056 (film, hinge
+    strips, scribes, hems, vanes).
 - **The climate.** Sails spread evenly inside Earth's orbit add about 1.5–1.9 W/m² of heat to Earth
   for every 1 % of sunlight they capture, after subtracting the sunlight they block. A 1 W/m²
   budget therefore allows about 0.5–0.7 %.
 
-A different placement buys more compute only if a brighter night sky is accepted.
+The far-side placement lets more sails fly under the same night sky, but its infrared-dark fronts
+cost a third of the computing per watt, so both placements allow about the same computing. It buys
+more only if a brighter night sky is accepted.
 
 This answer comes from a geometry study, `docs/data/earth_safe.json`, and an adversarial review of
 it, `docs/data/earth_safe_skeptic.json`. Both ran their own radiative-transfer, orbital-dynamics
@@ -87,7 +95,9 @@ The far-side cloud has costs the shell does not:
   violet-blue cast, because the hardware, not the navy film, dominates the reflection.
   - Surface brightness is ~1,700 × reflectance cd/m² per 1 % of coverage, a thousand to ten
     thousand times the zodiacal light.
-  - At the 0.6 % limit the ground is lit like a full Moon until the Sun is ~45° below the horizon.
+  - For the shell at its 0.41 % limit the disc glows at 0.9 cd/m², 5,000 times the natural night
+    sky. The ground gets 0.43 lux at the end of civil twilight, 0.25 lux (a full Moon) when the Sun
+    is 18° down, 0.12 lux at 30° and nothing once the Sun is 60° down.
   - North of ~45° in summer the glow never sets.
 - **By day.** Nothing to the eye. No shadows, transits or flicker for the far-side cloud. For the
   shell, transits last ~1.4 h with flicker near 2×10⁻⁷.

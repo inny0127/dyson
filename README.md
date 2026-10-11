@@ -42,9 +42,10 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 - **Earth is the binding constraint.** Sails spread evenly inside Earth's orbit add about 1.9 W/m²
   of heat to Earth for every 1 % of sunlight they capture. A geometry study moves them to the far
   side of the Sun on Earth's own orbit, with infrared-dark front faces and a small L1 shade.
-  Under a 1 W/m² budget that allows about seven times more coverage (`docs/earth.md`), but the
-  glow in Earth's night sky reaches full-moon brightness at 0.6 % either way. What Earth allows is
-  about 0.5 % of the Sun, 2×10³⁸ FLOP/s, reached around 2130.
+  Under a 1 W/m² budget that allows about seven times more coverage (`docs/earth.md`). The night
+  sky binds first either way: the shell's glow lights the ground like a full Moon at 0.4 % of the
+  Sun, the far-side cloud's at 0.6 %, and the far side computes a third less per watt. What Earth
+  allows is about 0.4–0.6 % of the Sun, 1.7×10³⁸ FLOP/s, reached around 2128.
 
 ## Layout
 

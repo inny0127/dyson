@@ -123,11 +123,12 @@ At the ceiling, the sails sit inside Earth's orbit (0.86–0.91 AU).
   share. A uniform shell adds about **1.9 W/m² for every 1 % of coverage**, almost independent of
   radius. At the central ceiling that is about +29 W/m², more than seven CO₂ doublings.
 - **The safe limit.** Keeping the added forcing under 1 W/m² allows only ~0.5 % coverage in a
-  uniform shell. That is about 2×10³⁸ FLOP/s, reached around 2130.
+  uniform shell, and keeping the night sky no brighter than a full Moon allows 0.41 %. That is
+  about 1.7×10³⁸ FLOP/s, reached around 2128.
 - **Fixes that don't work.** A shadow-free corridor for Earth or a shell outside Earth's orbit
   both make it worse.
 - **What Earth allows.** `docs/earth.md` works this out: the night-sky glow and the climate both cap
-  the swarm near 0.5–1 % of the Sun. A far-side placement with infrared-dark fronts and an L1 shade
+  the swarm near 0.4–0.6 % of the Sun. A far-side placement with infrared-dark fronts and an L1 shade
   raises the climate limit to ~4 %, at a cost in compute per watt, night-sky brightness and debris
   risk.
 
