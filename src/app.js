@@ -356,11 +356,12 @@ function renderWhy() {
   const ratio = s.sail.flopsPerKg / s.pod.flopsPerKg;
   const at15 = h.swarmAt({ ...p, podFrac: 0.15 }, 0.01).kgPerW / s.kgPerW;
   const podLine = s.q >= 0.149
-    ? `Here they carry ${num(pct(s.q, 1))} of chip power, the share needed if film chiplets cannot run agent sandboxes. If every chiplet could, it would fall toward 1%.`
-    : `Here they carry ${num(pct(s.q, 1))} of chip power. If every chiplet can run a sandbox, that falls toward 1%. If none can, it rises to 15%, and the swarm gets ${num(pct(at15 - 1, 0))} heavier.`;
+    ? `Here pods carry ${num(pct(s.q, 1))} of the chips' power, the share needed if the film's chips cannot safely run AI agents walled off from each other. If every chip could, it would fall toward 1%.`
+    : `Here pods carry ${num(pct(s.q, 1))} of the chips' power. If every chip in the film can safely run AI agents walled off from each other, that falls toward 1%. If none can, it rises to 15%, and the swarm gets ${num(pct(at15 - 1, 0))} heavier.`;
   $('why-prose').innerHTML = `
-    <p>Packing a satellite's chips into one module looks like the obvious design, since chips that work in lockstep want short wires. The trouble is the heat. Once it is concentrated it has to be carried somewhere large enough to radiate it, and the pumps, pipes and radiators that do the carrying weigh more than the short wires save. Per kilogram of Mercury, spread-out sails deliver ${num(`${ratio.toFixed(1)}×`)} the computing of the best concentrated module.</p>
-    <p>Pods still earn a place. Some memory can't survive radiation without a shield, some dies are too large for the film, and archives and agent sandboxes want a sealed box. ${podLine}</p>`;
+    <p>Putting a satellite's chips together in one box looks like the obvious design, since chips that work together want short wires between them. The trouble is the heat. Once it is gathered in one place it has to be carried somewhere big enough to radiate it, and the pumps, pipes and radiators that do the carrying weigh more than the short wires save. For each kilogram of Mercury, spread-out sails compute ${num(`${ratio.toFixed(1)} times`)} as much as the best box.</p>
+    <p>Boxes, called pods here, still earn a place. Some memory has to be shielded from radiation, some chips are too big to print into the film, and some data wants a sealed case.</p>
+    <details class="deep"><summary>How much of the work goes to pods</summary><p>${podLine}</p></details>`;
   heatPaths($('heatpaths'), { sailGW: s.sail.kgPerW * 1e3, podGW: s.pod.kgPerW * 1e3, chipW: p.chipPower });
   const rows = [
     ['Mass per watt of chips', `${(s.sail.kgPerW * 1e3).toFixed(2)} g/W`, `${(s.pod.kgPerW * 1e3).toFixed(2)} g/W`],
@@ -550,7 +551,8 @@ function renderFuture() {
   const a = h.swarmAt(p26, 0.01), b = h.swarmAt(right, 0.01);
   const f1 = x => `${(x * 100).toFixed(1)}%`;
   $('future-prose').innerHTML = `
-    <p>Industry needs most of a century to reach the heat wall, and sails are re-skinned every 10 to 20 years, so nearly every sail that ever flies carries hardware built after 2095. HBM memory, today's SRAM-heavy chips and 64 small laser terminals per sail are long gone before the first launch. The architecture outlives all of that. Sails still beat pods, chips still run near 85 °C, and silicon is still the only solar cell Mercury can supply in bulk. What changes is how much each kilogram does.</p>`;
+    <p>Industry needs most of a century to reach the heat wall, and sails get new film every 10 to 20 years, so nearly every sail that ever flies carries hardware built after 2095. Today's memory chips, today's processors and the small lasers they would use to talk are long gone before the swarm is big enough to see.</p>
+    <p>The design itself outlives all of that. Spread-out sails still beat boxes, chips still run near 85 °C, and silicon is still the only solar cell Mercury's rock can make in bulk. What changes is how much each kilogram does. The table compares today's hardware with the hardware the swarm is actually built from.</p>`;
   const rows = [
     ['Energy per operation', `${sci(a.sail.jPerFlop, 2)} J`, `${sci(b.sail.jPerFlop, 2)} J`],
     ['Memory per chiplet', '16 MB SRAM', '1–2 GB non-volatile'],

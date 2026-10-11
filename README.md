@@ -55,7 +55,7 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 
 | Path | What it is |
 |---|---|
-| `index.html`, `src/app.js` | the page: a photo essay with live numbers, charts and the assumptions drawer |
+| `index.html`, `src/app.js` | the page: a photo essay told in time, with a year dashboard that follows the story, deep-dive boxes, a choice of swarms, live charts and the assumptions drawer |
 | `src/model/` | `hybrid.js` (model v4: sails, pods, eras, build-out), `model.js` (radiosity, logistics, Mercury, Earth), `sat2.js`, `constants.js` |
 | `src/ui/` | SVG charts and the assumptions drawer |
 | `test/` | `node --test` suites pinning the model |
