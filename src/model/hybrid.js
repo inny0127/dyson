@@ -99,11 +99,11 @@ export const PARAMS = [
   { key: 'shadeLimit', group: 'Earth', label: 'Most the L1 shade may cancel', unit: 'W/m²', min: 0, max: 300, step: 0.5, value: 300,
     help: 'The shade swaps sunlight for the swarm’s infrared: Earth keeps its temperature but gets 0.42 % less sunlight and 0.76 % less rain per W/m². 300 is no limit.' },
   { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['farside', 'cone', 'shell'], value: 'farside',
-    help: 'farside: on Earth’s orbit beyond the Sun, infrared-dark fronts toward Earth. cone: spread evenly inside Earth’s orbit except a ~25° cone round the Sun–Earth line. shell: spread evenly inside Earth’s orbit, Earth included.' },
+    help: 'farside: on Earth’s orbit beyond the Sun, infrared-dark fronts toward Earth. cone: spread evenly inside Earth’s orbit except a ~30° cone round the Sun–Earth line. shell: spread evenly inside Earth’s orbit, Earth included.' },
   { key: 'farsideLat', group: 'Earth', label: 'Far-side cloud reaches', unit: '° from Earth’s orbital plane', min: 30, max: 70, step: 5, value: 60,
     help: 'More room higher up, but tilted orbits drift along Earth’s orbit (±20° at 60°), which eats into it: 18 % at 30°, 28 % at 60°, 29 % at 70°.' },
   { key: 'spillInside', group: 'Earth', label: 'When the far side is full', unit: '', options: ['inside', 'stop'], value: 'inside',
-    help: 'inside: the rest fly inside Earth’s orbit, outside a ~25° cone round the Sun–Earth line, so Earth sees none of their hot backs and gets half the heat. stop: the swarm stops at the far side’s room.' },
+    help: 'inside: the rest fly inside Earth’s orbit, outside a ~30° cone round the Sun–Earth line, so Earth sees none of their hot backs and gets half the heat. stop: the swarm stops at the far side’s room.' },
   // industry
   { key: 'yieldDelivered', group: 'Industry', label: 'Spacecraft kg per kg of rock', unit: '', min: 0.2, max: 0.9, step: 0.01, value: 0.42,
     help: 'Oxides reduced to Si, Mg, Al, Ca; the oxygen becomes glass and ion-thruster propellant. 0.5 would need ~100 % Si recovery.' },
@@ -534,9 +534,18 @@ export function skyLux(p, f) {
     const L = ((1 - fs) * fs * p.rhoVis * s.sail.S) / Math.PI / (1 - fs * p.rhoVis) * FIXED.lumensPerW;
     return L * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
   };
-  if (p.earthPlacement !== 'farside') return shellLux(f);
+  // outside a keep-out cone of acos(r) Earth sees none of the inner sails' near layer: only the far
+  // hemisphere's fronts, which stand in front of the far-side band
+  const coneLux = fs => {
+    if (!(fs > 0)) return 0;
+    const s = swarmCore(p, fs);
+    return (fs * p.rhoVis * s.sail.S) / Math.PI / (1 - fs * p.rhoVis) * FIXED.lumensPerW
+      * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
+  };
+  if (p.earthPlacement === 'shell') return shellLux(f);
+  if (p.earthPlacement === 'cone') return coneLux(f);
   const { fFar, fIn } = farsideSplit(p, f);
-  return FIXED.skyLuxPerFRho * p.rhoVis * fFar + shellLux(fIn);
+  return FIXED.skyLuxPerFRho * p.rhoVis * fFar * (1 - fIn) + coneLux(fIn);
 }
 
 /**

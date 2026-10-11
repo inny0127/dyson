@@ -90,6 +90,18 @@ def cap_samples(centre, radius, n):
 def glow_radiance(dirs, sun, g):
     """Radiance of the swarm glow above the atmosphere (W/m^2/sr, luminance channel)."""
     cosang = dirs @ sun
+    if g['kind'] == 'mix':
+        # the far-side cloud (f_far) plus sails inside Earth's orbit (f_in, r_in..r_out AU) kept out of
+        # a cone round the Sun-Earth line wide enough (acos r) that Earth sees none of their backs:
+        # within asin(r) of the Sun only the far hemisphere's sunlit fronts show, and they stand in
+        # front of the far-side band, dimming it by their coverage
+        far = glow_radiance(dirs, sun, {**g, 'kind': 'farside', 'f': g['f_far']})
+        f, rho = g['f_in'], g['rho']
+        ang = np.arccos(np.clip(cosang, -1, 1))
+        b = np.where(ang < math.pi / 2, np.sin(ang), 2.0)
+        frac = np.clip((g['r_out'] - b) / (g['r_out'] - g['r_in']), 0, 1)
+        r = 0.5 * (g['r_in'] + g['r_out'])
+        return f * frac * rho * S0 / r ** 2 / math.pi / (1 - f * rho) + far * (1 - f * frac)
     if g['kind'] == 'shell':
         r, f, rho = g['r_au'], g['f'], g['rho']
         S = S0 / r ** 2
@@ -258,14 +270,15 @@ def build(spec, out_prefix):
     sky_sun, T0 = atm.sky(d0, [(sun, Esun)], h_cam=spec.get('h_cam', 2070.0))
     E_model = A.horizontal_illuminance(sky_sun, w0, h0) @ A.LUMA * LM
     E_ref = twilight_lux(spec['sun_alt'])
-    k_sun = E_ref / E_model if E_model > 0 else 0.0
+    k_sun = E_ref / E_model * spec.get('sun_scale', 1.0) if E_model > 0 else 0.0     # sun_scale: an L1 shade
     sky0 = sky_sun * k_sun
     g = spec.get('glow')
     glow_sources = []
     if g:
-        if g['kind'] == 'farside':
+        if g['kind'] in ('farside', 'mix'):
             g['ecliptic_pole'] = pole.tolist()
-        pts, dO = cap_samples(sun, math.radians(62 if g['kind'] == 'shell' else 50), 160)
+        cap = {'shell': 62.0, 'farside': 50.0}.get(g['kind']) or math.degrees(math.asin(min(g.get('r_out', 0.92), 0.999)))
+        pts, dO = cap_samples(sun, math.radians(cap), 160)
         Lp = glow_radiance(pts, sun, g)
         glow_sources = [(p, GLOW_COLOUR * L * dO) for p, L in zip(pts, Lp) if L > 0]
         sky_glow, _ = atm.sky(d0, glow_sources, h_cam=spec.get('h_cam', 2070.0), steps=40)

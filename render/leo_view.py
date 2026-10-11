@@ -136,6 +136,11 @@ class Scene:
             # side of the Sun (thin-layer model in sky_map.glow_radiance)
             g = {'kind': 'farside', 'f': a.f, 'rho': a.rho, 'ecliptic_pole': self.pole, 'lat': a.far_lat}
             R_d = math.radians(50.0)
+        elif a.glow == 'mix':
+            # the far-side band plus sails inside Earth's orbit outside a keep-out cone
+            g = {'kind': 'mix', 'f_far': a.f, 'f_in': a.f_in, 'rho': a.rho, 'ecliptic_pole': self.pole,
+                 'lat': a.far_lat, 'r_in': a.r, 'r_out': a.r_out}
+            R_d = math.asin(min(a.r_out, 0.999))
         else:
             g = {'kind': 'shell', 'f': a.f, 'rho': a.rho, 'r_au': a.r, 'r_in': a.r, 'r_out': a.r_out}
             R_d = math.asin(min(a.r_out, 0.999))
@@ -145,7 +150,8 @@ class Scene:
         self.src_dirs, self.src_omega = SM.cap_samples(self.sun, R_d, a.disc_samples)
         Ld = SM.glow_radiance(self.src_dirs, self.sun, g)
         self.src_E = (Ld * self.src_omega)[:, None] * self.glow_rgb[None]          # RGB W/m^2 each
-        self.sun_E = A.sun_irradiance_rgb(S0 * (1 - a.f))
+        # sunlight past the swarm (a shell's own shadow) and an L1 shade
+        self.sun_E = A.sun_irradiance_rgb(S0 * (1 - (a.f if a.glow == 'shell' else 0.0)) * a.sun_scale)
         self.atm = A.Atmosphere()
         # the Moon: geocentric position (low-precision series), body frame with lon 0 toward Earth
         (mx, my, mz), dist_km = ephem.moon_eq(self.jd)
@@ -455,7 +461,9 @@ def main(argv):
     ap.add_argument('--el', type=float, default=-14.0)
     ap.add_argument('--roll', type=float, default=0.0)
     ap.add_argument('--lens', type=float, default=16.0)
-    ap.add_argument('--glow', choices=['shell', 'farside'], default='shell')
+    ap.add_argument('--glow', choices=['shell', 'farside', 'mix'], default='shell')
+    ap.add_argument('--f-in', type=float, default=0.0, help='mix: coverage inside Earth\'s orbit (r..r_out AU)')
+    ap.add_argument('--sun-scale', type=float, default=1.0, help='sunlight reaching Earth past an L1 shade')
     ap.add_argument('--f', type=float, default=0.00411)
     ap.add_argument('--rho', type=float, default=0.004)
     ap.add_argument('--r', type=float, default=0.8604, help='inner radius of the shell, AU')
