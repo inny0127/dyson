@@ -79,52 +79,21 @@ def glint_profile(t_in, t_out, alpha_max=10.0, n=4096):
     return a, core, halo
 
 
-def main(argv):
-    ap = argparse.ArgumentParser()
-    ap.add_argument('out')
-    ap.add_argument('--f', type=float, default=0.0041)
-    ap.add_argument('--rho', type=float, default=0.004, help='visible reflectance, film + all hardware incl. vanes (model rhoVis)')
-    ap.add_argument('--rho-film', type=float, default=0.0021, help='film, hinge strips, scribes, hems: everything but the vanes')
-    ap.add_argument('--r-in', type=float, default=0.86)
-    ap.add_argument('--r-out', type=float, default=0.92)
-    ap.add_argument('--r-cam', type=float, default=0.88)
-    ap.add_argument('--lens', type=float, default=35.0)
-    ap.add_argument('--res', default='2400x1600')
-    ap.add_argument('--samples', type=int, default=64)
-    ap.add_argument('--yaw', type=float, default=9.0, help='camera axis from the antisolar point, deg (to +Y)')
-    ap.add_argument('--pitch', type=float, default=4.0)
-    ap.add_argument('--dmax', type=float, default=40000.0, help='km; point sources inside, glow beyond')
-    ap.add_argument('--seed', type=int, default=3)
-    ap.add_argument('--earth-offset', type=float, default=3.2, help='deg from the antisolar point (0 = none)')
-    ap.add_argument('--aim-earth', action='store_true', help='yaw/pitch relative to Earth instead of the antisolar point')
-    a = ap.parse_args(argv)
+def build_sky(sc, a, cam, fwd, w, h, own_sun=True):
+    """The swarm's sky in this scene's frame (+X away from the Sun): point-source sails within
+    dmax inside the camera's view, the integrated glow beyond, the counter-sun and its halo, the
+    Milky Way, and (optionally) Earth and the Moon. Returns the glow map.
+
+    own_sun=False: the scene already has a Sun lamp for the camera's distance r_cam; Earth and the
+    Moon are then darkened by r_cam^2 so they still look lit at 1 AU."""
     spec = sail.load_spec()
     sf = spec['scene']
     side = spec['parts']['sail_film']['dims_m']['corner_to_corner'] / math.sqrt(2) / 1e3
     A_km2 = side * side
     dR = (a.r_out - a.r_in) * AU_KM
     n = -math.log(1 - a.f) / (A_km2 * dR)                  # sails per km^3
-    w, h = (int(x) for x in a.res.split('x'))
-    sc = lib.reset(samples=a.samples, res=(w, h))
-    sc.cycles.max_bounces = 0
-    # sub-pixel point sources on a smooth background: no denoiser (it smears undersampled points)
-    sc.cycles.use_denoising = False
-    sc.cycles.use_adaptive_sampling = False
-    sc.view_settings.use_white_balance = True
-    sc.view_settings.white_balance_temperature = 5772
-    sc.view_settings.white_balance_tint = 0.0
-    # Earth (if shown) sits earth_offset deg from the antisolar point, down and to the left
     eo = math.radians(a.earth_offset)
     ed = Vector((math.cos(eo), -math.sin(eo) * 0.6, -math.sin(eo) * 0.8)).normalized()
-    # camera: +X points away from the Sun; yaw/pitch put the antisolar point (or Earth) off-centre
-    yaw, pitch = math.radians(a.yaw), math.radians(a.pitch)
-    base = ed if a.aim_earth else Vector((1, 0, 0))
-    b_yaw = math.atan2(base.y, base.x)
-    b_pitch = math.asin(base.z)
-    fwd = Vector((math.cos(b_pitch + pitch) * math.cos(b_yaw + yaw), math.cos(b_pitch + pitch) * math.sin(b_yaw + yaw), math.sin(b_pitch + pitch)))
-    cam = lib.camera(Vector((0, 0, 0)), fwd, lens=a.lens)
-    cam.data.clip_start = 1.0
-    cam.data.clip_end = 1e12
     hfov = 2 * math.atan(18 / a.lens)
     vfov = 2 * math.atan(18 * h / w / a.lens)
     pix = hfov / w
@@ -316,11 +285,65 @@ def main(argv):
         moon.data.materials.append(lib.principled('Moon', (0.12, 0.115, 0.11), rough=1.0))
         # Earth sits 1/0.88^2 = 1.29x farther from the Sun than the camera: dim the lamp's effect by
         # lighting with the 1 AU flux
-        lib.add_sun(1.0, direction=(1.0, 0, 0))
+        if own_sun:
+            lib.add_sun(1.0, direction=(1.0, 0, 0))
+        else:
+            k = a.r_cam ** 2
+            bsdf.inputs['Base Color'].default_value = (k, k, k, 1)
+            mix = em_.node_tree.nodes.new('ShaderNodeMix'); mix.data_type = 'RGBA'; mix.blend_type = 'MULTIPLY'
+            mix.inputs['Factor'].default_value = 1.0
+            em_.node_tree.links.new(tex.outputs['Color'], mix.inputs[6])
+            mix.inputs[7].default_value = (k, k, k, 1)
+            em_.node_tree.links.new(mix.outputs[2], bsdf.inputs['Base Color'])
+            moon.data.materials[0].node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = (0.12 * k, 0.115 * k, 0.11 * k, 1)
         from bpy_extras.object_utils import world_to_camera_view
         for ob_, nm in ((earth, 'earth'), (moon, 'moon')):
             pc = world_to_camera_view(sc, cam, ob_.location)
             print('PIXEL', nm, round(pc.x * w), round((1 - pc.y) * h), 'depth', pc.z)
+    return G
+
+
+def main(argv):
+    ap = argparse.ArgumentParser()
+    ap.add_argument('out')
+    ap.add_argument('--f', type=float, default=0.0041)
+    ap.add_argument('--rho', type=float, default=0.004, help='visible reflectance, film + all hardware incl. vanes (model rhoVis)')
+    ap.add_argument('--rho-film', type=float, default=0.0021, help='film, hinge strips, scribes, hems: everything but the vanes')
+    ap.add_argument('--r-in', type=float, default=0.86)
+    ap.add_argument('--r-out', type=float, default=0.92)
+    ap.add_argument('--r-cam', type=float, default=0.88)
+    ap.add_argument('--lens', type=float, default=35.0)
+    ap.add_argument('--res', default='2400x1600')
+    ap.add_argument('--samples', type=int, default=64)
+    ap.add_argument('--yaw', type=float, default=9.0, help='camera axis from the antisolar point, deg (to +Y)')
+    ap.add_argument('--pitch', type=float, default=4.0)
+    ap.add_argument('--dmax', type=float, default=40000.0, help='km; point sources inside, glow beyond')
+    ap.add_argument('--seed', type=int, default=3)
+    ap.add_argument('--earth-offset', type=float, default=3.2, help='deg from the antisolar point (0 = none)')
+    ap.add_argument('--aim-earth', action='store_true', help='yaw/pitch relative to Earth instead of the antisolar point')
+    a = ap.parse_args(argv)
+    w, h = (int(x) for x in a.res.split('x'))
+    sc = lib.reset(samples=a.samples, res=(w, h))
+    sc.cycles.max_bounces = 0
+    # sub-pixel point sources on a smooth background: no denoiser (it smears undersampled points)
+    sc.cycles.use_denoising = False
+    sc.cycles.use_adaptive_sampling = False
+    sc.view_settings.use_white_balance = True
+    sc.view_settings.white_balance_temperature = 5772
+    sc.view_settings.white_balance_tint = 0.0
+    # Earth (if shown) sits earth_offset deg from the antisolar point, down and to the left
+    eo = math.radians(a.earth_offset)
+    ed = Vector((math.cos(eo), -math.sin(eo) * 0.6, -math.sin(eo) * 0.8)).normalized()
+    # camera: +X points away from the Sun; yaw/pitch put the antisolar point (or Earth) off-centre
+    yaw, pitch = math.radians(a.yaw), math.radians(a.pitch)
+    base = ed if a.aim_earth else Vector((1, 0, 0))
+    b_yaw = math.atan2(base.y, base.x)
+    b_pitch = math.asin(base.z)
+    fwd = Vector((math.cos(b_pitch + pitch) * math.cos(b_yaw + yaw), math.cos(b_pitch + pitch) * math.sin(b_yaw + yaw), math.sin(b_pitch + pitch)))
+    cam = lib.camera(Vector((0, 0, 0)), fwd, lens=a.lens)
+    cam.data.clip_start = 1.0
+    cam.data.clip_end = 1e12
+    G = build_sky(sc, a, cam, fwd, w, h)
     G_ref = float(np.percentile(G[G > 0], 75)) if (G > 0).any() else 1e-3
     sc.view_settings.exposure = math.log2(0.10 / G_ref)
     sc.render.image_settings.file_format = 'OPEN_EXR'

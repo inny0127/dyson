@@ -91,8 +91,16 @@ def glow_radiance(dirs, sun, g):
         r, f, rho = g['r_au'], g['f'], g['rho']
         S = S0 / r ** 2
         L = (1 - f) * f * rho * S / math.pi / (1 - f * rho)
-        R = math.asin(min(r, 0.999))
         ang = np.arccos(np.clip(cosang, -1, 1))
+        if 'r_out' in g:
+            # a shell from r_in to r_out (AU), seen from 1 AU. Coverage accrues as f dr / (r_out - r_in)
+            # along any path for sun-facing sails, so a line of sight passing b = sin(angle) from the
+            # Sun crosses (r_out - b) of it on each side of its closest approach. Inside asin(r_in),
+            # full depth; beyond, near and far halves both thin out linearly in b.
+            b = np.where(ang < math.pi / 2, np.sin(ang), 2.0)
+            frac = np.clip((g['r_out'] - b) / (g['r_out'] - g['r_in']), 0, 1)
+            return (1 - f * frac) * f * frac * rho * S / math.pi / (1 - f * rho) * np.where(frac > 0, 1.0, 0.0)
+        R = math.asin(min(r, 0.999))
         # the swarm spans a range of radii (thermal orbits of sails of different ages), so the
         # limb is a few degrees soft
         edge = np.clip((R + math.radians(2.5) - ang) / math.radians(5.0), 0, 1)

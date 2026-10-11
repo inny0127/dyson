@@ -160,3 +160,11 @@ downloads are in `tools/` (`tools/fetch.sh` lists the exact download URLs).
   110.7195 W). It covers 14 km west to 3 km east and 12 km south to 13 km north. Heights are stored
   as uint16 decimetres above `base_m` (sidecar JSON). The DEM's surface over the lake is the water
   level (2068.4 m). `render/teton_prep.py` carves a bed under it and builds the foreground beach.
+
+## moon_albedo_2k.jpg
+
+NASA Scientific Visualization Studio, CGI Moon Kit (Ernie Wright, 2019), colour map from LRO LROC
+WAC mosaics: https://svs.gsfc.nasa.gov/4720 (lroc_color_poles_2k.tif). Public domain. Re-encoded as
+JPEG at quality 92. The map is display-stretched (decoded linear mean 0.30); render/leo_view.py
+scales it by 0.40 to the Moon's mean normal albedo of about 0.12.
+
