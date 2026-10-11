@@ -12,6 +12,13 @@ const { YEAR } = PHYS;
 const $ = id => document.getElementById(id);
 const num = v => `<span class="num">${v}</span>`;
 const yr = t => (Number.isFinite(t) ? Math.round(t) : 'never');
+/** A large number in words, to two figures: 3.1e16 -> '31 million billion'. */
+function words(x) {
+  const names = [[1e18, 'billion billion'], [1e15, 'million billion'], [1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million'], [1e3, 'thousand']];
+  const two = v => (v >= 10 ? String(Math.round(Number(v.toPrecision(2)))) : v.toFixed(1).replace(/\.0$/, ''));
+  for (const [v, w] of names) if (x >= v) return `${two(x / v)} ${w}`;
+  return two(x);
+}
 
 const WORLD_AI_FLOPS_2025 = 3.2e22;     // FLOP/s of AI accelerators on Earth, 2025 (workloads study)
 const BRAIN_FLOPS = 1e15;               // Carlsmith 2020 central estimate (range 1e13-1e17)
@@ -106,12 +113,35 @@ function renderFigures() {
     : ['never', 'industry stops short of what Earth allows'];
   const ratio = ceilFlops / E.flops;
   const items = [
-    [`${sci(E.flops, 2)} FLOP/s`, `what Earth allows, ${pct(E.cap, 2)} of the Sun`],
+    [`${sci(E.flops, 2)} FLOP/s`, `calculations a second, in the swarm Earth allows: ${pct(E.cap, 2)} of the Sun's light`],
     reached,
     [`${f.MW.toFixed(0)} MW`, `in one sail ${Math.round(f.diag)} m across`],
     ratio > 1.05 ? [`${Math.round(ratio)}×`, 'more than Earth allows, if industry ran unchecked'] : ['within', 'industry never outgrows what Earth allows'],
   ];
   $('figures').innerHTML = items.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+}
+
+function renderSummary() {
+  const p = state.params, d = state.d, E = state.earth;
+  const f = sailFacts(p);
+  const s = h.swarmAt(p, E.cap);
+  const nSails = (s.sailPower / s.sail.chipWm2 / p.sailArea) * s.areaFactor;
+  const yCap = d.yearsToCoverage(E.cap);
+  const rock = (E.mass * d.minedPerDelivered) / MERCURY.M_SHELL;
+  const farside = p.earthPlacement === 'farside';
+  const items = [
+    ['What it is', `About ${num(words(nSails))} separate satellites. Each is a square of solar film ${num(`${Math.round(f.side)} m`)} on a side, thinner than paper, with ${num(`${words(f.chips)}`)} tiny computer chips spread over its back. There is no shell or ring: every sail flies its own orbit around the Sun.`],
+    ['What it is made of', `Rock from Mercury, dug up, thrown into orbit and turned into film and chips there. The swarm described here uses ${num(pct(rock, rock < 0.1 ? 1 : 0))} of Mercury's rock.`],
+    ['What stops it growing', `Not energy, not materials, but heat. Every watt the sails catch is turned into heat, and some of that heat reaches Earth. Keeping Earth's extra heating to ${num(`${p.forcingLimit} W/m²`)}, about a quarter of what doubling CO₂ does, limits the swarm to ${num(pct(E.cap, 1))} of the Sun's light.`],
+    ['Where it flies', farside
+      ? `On Earth's own orbit, but on the far side of the Sun. There the sails never pass between us and the Sun, and they can turn their warm backs away from us. A thin screen of sails at L1, a balance point between Earth and the Sun, shades away a little sunlight to make room for their heat. Spread evenly round the Sun instead, the same sails would be allowed only ${num(pct(E.shell, 2))}.`
+      : `Spread evenly round the Sun just inside Earth's orbit, where the chips run at their temperature limit. Moved to Earth's orbit on the far side of the Sun, with a sunshade at L1, the same heat budget would allow ${num(pct(state.far.cap, 1))}.`],
+    ['What it computes', `${num(`${sci(E.flops, 1)} calculations a second`)}, about ${num(words(E.flops / WORLD_AI_FLOPS_2025))} times all the AI chips on Earth in 2025. If building starts in ${num(p.seedYear)}, it gets there around ${num(yr(p.seedYear + yCap))}.`],
+    ['What you would see', farside
+      ? `From Earth, a band of light along the Sun's path across the sky, as bright as twilight, after sunset and before dawn. From inside the swarm, a sky split in two. From another star, a Sun ${num(pct(E.cap, 1))} dimmer, with a faint infrared glow that was never there before.`
+      : `From Earth, a disc of light 60° across round the Sun after dusk. From inside, a sky of faint points and a second sun opposite the real one. From another star, a Sun ${num(pct(E.cap, 1))} dimmer with a faint infrared glow.`],
+  ];
+  $('summary-list').innerHTML = items.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
 }
 
 function renderSail() {
@@ -371,7 +401,7 @@ const SOURCES = [
 ];
 
 function renderAll() {
-  renderFigures(); renderSail(); renderComputer(); renderWhy(); renderMercury(); renderBuild(); renderEarth(); renderStar(); renderFuture();
+  renderFigures(); renderSummary(); renderSail(); renderComputer(); renderWhy(); renderMercury(); renderBuild(); renderEarth(); renderStar(); renderFuture();
   for (const b of document.querySelectorAll('.era button')) b.setAttribute('aria-pressed', String(b.dataset.era === state.era));
 }
 function renderYear() { updateYear(h.atYear(state.params, state.d, state.t)); renderStar(); renderMercury(); }

@@ -87,6 +87,16 @@ h2 { margin: 0.5rem 0 0; font: 400 clamp(1.9rem, 3.6vw, 2.6rem)/1.08 var(--serif
 
 figure { margin: 0; display: grid; gap: 0.75rem; min-width: 0; }
 figcaption { font: 400 0.875rem/1.5 var(--sans); color: var(--ink-2); max-width: var(--col); }
+figcaption .how { display: block; margin-top: 0.4rem; font-size: 0.8125rem; color: var(--ink-3); }
+.dek { margin: 0.7rem 0 0; font-size: 1.2rem; line-height: 1.45; color: var(--ink-2); text-wrap: pretty; }
+dl.summary { margin: 0; display: grid; grid-template-columns: 11rem 1fr; gap: 0.9rem 1.5rem; }
+dl.summary dt { font: 600 0.875rem/1.5 var(--sans); color: var(--ink); padding-top: 0.2rem; }
+dl.summary dd { margin: 0; }
+details.glossary { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 0.9rem 0; }
+details.glossary summary { cursor: pointer; font: 500 0.875rem/1.4 var(--sans); color: var(--ink-2); }
+details.glossary dl { margin: 1rem 0 0.2rem; display: grid; grid-template-columns: 10rem 1fr; gap: 0.55rem 1.25rem; font: 400 0.875rem/1.5 var(--sans); }
+details.glossary dt { font-weight: 600; color: var(--ink); }
+details.glossary dd { margin: 0; color: var(--ink-2); }
 figcaption b { font-weight: 600; color: var(--ink); }
 .plate { background: var(--plate); }
 .plate img { width: 100%; height: auto; }
@@ -143,6 +153,8 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   body { font-size: 1.0625rem; }
   .standfirst p { font-size: 1.25rem; }
   .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  dl.summary, details.glossary dl { grid-template-columns: 1fr; gap: 0.2rem; }
+  dl.summary dd, details.glossary dd { margin-bottom: 0.7rem; }
   .figures div:nth-child(3) { padding-left: 0; border-left: 0; }
   .figures div:nth-child(n+3) { border-top: 1px solid var(--rule); }
   .pair { grid-template-columns: minmax(0, 1fr); }
@@ -178,8 +190,36 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   </div>
   <div class="wide figures" id="figures"></div>
 
+  <section class="chapter" id="summary">
+    <div class="col"><div class="kicker">In brief</div><h2>The short version</h2></div>
+    <div class="col"><dl class="summary" id="summary-list"></dl></div>
+    <figure class="wide drawing">
+      <div id="orbit-map"></div>
+      <figcaption class="col"><b>Where the sails fly, to scale,</b> seen from above, in a frame that turns with Earth so Earth stays put. The swarm Earth allows shares Earth's own orbit on the far side of the Sun, with a small sunshade at L1, between Earth and the Sun. The alternative spreads the sails evenly inside Earth's orbit.</figcaption>
+    </figure>
+    <div class="col">
+      <details class="glossary">
+        <summary>Words and units used on this page</summary>
+        <dl>
+          <dt>Share of the Sun's light</dt><dd>The fraction of everything the Sun puts out that the sails catch. The swarm Earth allows catches a few per cent.</dd>
+          <dt>AU</dt><dd>The distance from Earth to the Sun, 150 million km.</dd>
+          <dt>W/m² of extra heat</dt><dd>How much more energy Earth absorbs, for every square metre of its surface. Doubling the CO₂ in the air adds about 3.9.</dd>
+          <dt>FLOP/s</dt><dd>Calculations per second. One 2025 AI chip does about 10¹⁵; all of them together, about 3×10²².</dd>
+          <dt>lux</dt><dd>How brightly the ground is lit. A moonless night is 0.001, a full Moon 0.25, a lit street 10 to 20.</dd>
+          <dt>cd/m²</dt><dd>How bright a surface or a patch of sky looks. A dark night sky is 0.0002, the sky at dusk 1 to 100, a white page under office light about 100.</dd>
+          <dt>Magnitude</dt><dd>Astronomers' scale for points of light. Lower is brighter, and 5 steps is a factor of 100. The faintest stars you can see are +6, Venus −4.5, the full Moon −12.7, the Sun −26.7.</dd>
+          <dt>Kelvin (K)</dt><dd>Temperature counted up from absolute zero. A room is about 295 K, a chip at its limit about 360 K, and 1,650 K is orange-hot.</dd>
+          <dt>Ecliptic</dt><dd>The path the Sun and planets follow across the sky. Seen from Earth, the far-side swarm lies along it.</dd>
+          <dt>L1 and L3</dt><dd>L1 is the balance point 1.5 million km from Earth toward the Sun, where a sunshade can hover. L3 is the point on Earth's orbit directly behind the Sun.</dd>
+          <dt>Counter-sun</dt><dd>The point in the sky exactly opposite the Sun. Every sail beyond you in that direction mirrors the Sun back at you at once.</dd>
+          <dt>Thermal infrared</dt><dd>The heat glow that thermal cameras see, here the 8–14 µm band. Warmer things are brighter.</dd>
+        </dl>
+      </details>
+    </div>
+  </section>
+
   <section class="chapter" id="sail">
-    <div class="col"><div class="kicker">The satellite</div><h2 id="sail-title">A sheet, not a box</h2></div>
+    <div class="col"><div class="kicker">The satellite</div><h2 id="sail-title">A sheet, not a box</h2><p class="dek">Each satellite is a huge, nearly black sheet of solar film, thinner than paper, which is also the computer.</p></div>
     <div class="col prose" id="sail-prose"></div>
     <figure class="wide drawing" id="anatomy-fig">
       <div id="anatomy"></div>
@@ -190,25 +230,25 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
         <div class="plate"><img src="renders/sail-far-counter-sun.jpg" alt="One corner of a sail seen from just above it: a deep navy film ruled by bright converging lines rises to a small tensioner mast, and a brilliant point inside a pale disc of light shines in the black sky beyond the tip" width="2400" height="1600" loading="lazy"></div>
         <div class="plate"><img src="renders/sail-corner.jpg" alt="Close view of one corner of the sail: a tensioner, tethers and a tilted mirror vane over the dark film" width="2400" height="1350" loading="lazy"></div>
       </div>
-      <figcaption class="col"><b>Two closer looks.</b> On the left the camera hangs 30 m sunward of a corner, looking away from the Sun. The bright lines are hinge strips, one every 1.63 m. They light up only because we are looking almost straight back along the sunlight, where their slightly curled edges catch it. Past the tip is the counter-sun. Every sail farther out within a quarter of a degree of the point opposite the Sun mirrors the Sun straight back at the camera. On the far side the sails are packed close, and the aluminium mesh in their cover glass is itself a weak mirror, about 4%, so together they reach magnitude −20.5, a thousand times brighter than the full Moon, inside a halo 15° across from the curled panel edges. The film is exposed two stops brighter than a grey card would need, or it would print as plain black, and at that exposure the sky's glow prints black too. On the right, a corner from 28 m: the tensioner at the boom tip, the tethers, the doubled film edge and a mirror vane tilted for steering.</figcaption>
+      <figcaption class="col"><b>Two closer looks at one sail.</b> On the left, from 30 m above one corner, looking away from the Sun: the dark film, its bright fold lines, and beyond the tip a blinding point of light, the counter-sun. It is the Sun mirrored back by every sail farther out in that one direction, together a thousand times brighter than the full Moon. On the right, the same corner from 28 m, with the tensioner that keeps the film taut, its tethers, and a mirror vane used for steering.<span class="how">The fold lines are hinge strips, one every 1.63 m; their slightly curled edges catch the Sun only near the counter-sun. The counter-sun is magnitude −20.5: on the far side the sails are packed close, and the aluminium mesh in their cover glass reflects about 4% like a mirror. Its halo, 15° across, comes from the curled panel edges. The film is exposed two stops brighter than a grey card would need, or it would print as plain black; at that exposure the sky's glow prints black too.</span></figcaption>
     </figure>
   </section>
 
   <section class="chapter" id="computer">
-    <div class="col"><div class="kicker">Thermal infrared</div><h2>The panel is the computer</h2></div>
+    <div class="col"><div class="kicker">Thermal infrared</div><h2>The panel is the computer</h2><p class="dek">The chips are spread through the film, so the film's own surface gets rid of their heat.</p></div>
     <div class="col prose" id="computer-prose"></div>
     <figure class="wide">
       <div class="pair">
         <div class="plate"><img src="renders/sail-back-lwir-macro.jpg" alt="False-colour thermal image of the back of the film: a fine grid of warm dots with a cold truss in front" width="1920" height="1080" loading="lazy"></div>
         <div class="plate"><img src="renders/sail-hub-lwir.jpg" alt="Thermal image of the hub seen from behind: a cold octagon with laser terminals over a glowing film" width="1920" height="1080" loading="lazy"></div>
       </div>
-      <figcaption class="col"><b>The back of the sail in the 8–14 µm band.</b> On the left, half a metre away, each warm dot is a chiplet running a few kelvin above the film around it. The dark bars are a support boom, cold because it sees nothing but deep space. On the right, the hub and its laser terminals. In visible light this side is simply black, since it lies in the film's own shadow.</figcaption>
+      <figcaption class="col"><b>The back of the sail, seen by a thermal camera.</b> On the left, from half a metre: each warm dot is one chip, a few degrees warmer than the film around it. The dark bars are a support boom, cold because it sees only deep space. On the right, the hub with its laser terminals, which link the sail to its neighbours. To the eye this side is simply black.<span class="how">Radiance in the 8–14 µm band on a fixed false-colour scale.</span></figcaption>
       <div class="col irscale"><span>320 K</span><i></i><span>350 K</span></div>
     </figure>
   </section>
 
   <section class="chapter" id="why">
-    <div class="col"><div class="kicker">Concentrated or spread out</div><h2>Why the chips are not in one box</h2></div>
+    <div class="col"><div class="kicker">Concentrated or spread out</div><h2>Why the chips are not in one box</h2><p class="dek">Gathering the chips into one box would need pumps, pipes and radiators that weigh more than the chips. Spreading them out avoids all of it.</p></div>
     <div class="col prose" id="why-prose"></div>
     <figure class="wide drawing">
       <div id="heatpaths"></div>
@@ -219,50 +259,50 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
         <div class="plate"><img src="renders/pod-visible.jpg" alt="A pod in sunlight: a small bright module where four white trusses meet, dark solar wings, and radiator blades that are almost invisible" width="2400" height="1350" loading="lazy"></div>
         <div class="plate"><img src="renders/pod-lwir.jpg" alt="The same pod in thermal infrared: the radiator blades glow yellow, the wings orange, the module and trusses dark" width="2400" height="1350" loading="lazy"></div>
       </div>
-      <figcaption class="col"><b>One of the few pods, a 1 MW module at 0.88 AU, in sunlight and in the 8–14 µm band.</b> The 1.8 m module holds memory stacked on logic, wrapped in a glass-cloth blanket over a magnesium shield. Two 68 m solar wings feed it, and four radiator blades, 6 m tall and only 25 mm thick, get rid of its heat 20–100 m away. In sunlight you can barely see the blades, because they are held exactly edge-on to the Sun. In the infrared they are the brightest things in the frame, about 346 K at the roots, while the wings sit at 330 K and the blanketed module is the coldest part of all.</figcaption>
+      <figcaption class="col"><b>One of the few pods, in sunlight and through a thermal camera.</b> A pod is the alternative design: a 1 MW box of chips fed by two 68 m solar wings, with four radiator blades, 6 m tall and only 25 mm thick, to get rid of its heat. In sunlight you can barely see the blades, because they are held exactly edge-on to the Sun. In the thermal image they are the brightest things in the frame.<span class="how">At 0.88 AU. The 1.8 m module holds memory stacked on logic, under a glass-cloth blanket and a magnesium shield. Blade roots about 346 K, wings 330 K; the blanketed module is the coldest part. Thermal image: 8–14 µm band.</span></figcaption>
       <div class="col irscale"><span>280 K</span><i></i><span>360 K</span></div>
     </figure>
     <div class="col tablewrap"><table class="compare" id="why-table"></table></div>
   </section>
 
   <section class="chapter" id="inside">
-    <div class="col"><div class="kicker">From inside the swarm</div><h2>A sky cut in two</h2></div>
+    <div class="col"><div class="kicker">From inside the swarm</div><h2>A sky cut in two</h2><p class="dek">Inside the swarm the sky splits in two: an even glow on one side, and on the other the rest of the swarm, seen across the empty middle of Earth's orbit.</p></div>
     <div class="col prose">
       <p>Out on the far side the sails sit in one thin layer on Earth's orbit, about 600,000 km thick and hundreds of millions of kilometres across, and they are packed close: neighbours are about 60 km apart. From any one of them the sky splits along the layer. Every sail farther from the Sun than you shows you its sunlit face, and together they fill the half of the sky away from the Sun with an even glow of 12 cd/m², as bright as a clear sky in early twilight.</p>
       <p>The other half is stranger. Look sunward and you see the backs of the sails just inside you, which are dark, and through the gaps between them, across the empty middle of Earth's orbit, the rest of the cloud from the inside. Every sail over there faces the Sun, and so faces you, which makes that part of the sky nearly twice as bright: 22 cd/m². It has hard edges. The cloud stops 30° above and below Earth's orbit and leaves a gap round the point straight behind the Sun, and past those edges space is black.</p>
     </div>
     <figure class="wide">
       <div class="plate"><img src="renders/inside-far-orbit.jpg" alt="A sky in bands: an even grey glow above a straight horizon line, a brighter band below it, then a black arch, with a lighter patch of sky visible through the arch and black on either side" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>Looking along Earth's orbit from a sail in the far-side cloud, 120° from Earth.</b> Above the line, the glow of the sails farther out. Below it, the rest of the cloud seen from inside: first its near part, then the dark arch of the empty gap behind the Sun, then, through the arch, the cloud's other half on the far side of the Sun. The black on either side is where the cloud's 30° edges stop. The few specks are sails within 3,000 km, the nearest 73 km away and only four pixels wide; those below the line show their dark backs. The Sun is 27° below the bottom of the frame.</figcaption>
+      <figcaption class="col"><b>Looking along Earth's orbit from a sail in the far-side swarm.</b> Above the line, the even glow of all the sails farther from the Sun. Below it, the rest of the swarm, seen across the empty middle of Earth's orbit: first its near part, then a dark arch, which is the empty gap behind the Sun, then, through the arch, the swarm's other half. Where the swarm ends, above and below Earth's orbit, space is black.<span class="how">From 120° along the orbit from Earth. The specks are sails within 3,000 km; the nearest in frame is 73 km away and only four pixels wide, and those below the line show their dark backs. The Sun is 27° below the bottom of the frame.</span></figcaption>
     </figure>
     <div class="col prose">
       <p>The layout inside Earth's orbit is a different place. Its sails are spread over the whole sky round the Sun, about 300 km apart, so from any one of them the others are just points of light. Two dozen or so within 1,000 km shine like the brightest stars, and tens of thousands more fill the sky down to the limit of the eye. Added together they light the sky away from the Sun to about 0.8 cd/m². You could live inside that swarm and still see mostly empty space.</p>
     </div>
     <figure class="wide">
       <div class="plate"><img src="renders/swarm-inside-wide.jpg" alt="A pale grey starry sky with a glowing violet disc of light surrounding a brilliant point" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>Looking away from the Sun from a sail in the layout inside Earth's orbit, 0.41% of the Sun captured.</b> Exposed for the sky's glow. Every star in this picture is another sail. The counter-sun in the middle of the halo reaches magnitude SHELL_CS_MAG, and the white point inside the halo is Earth, 18 million km away near the antisolar point.</figcaption>
+      <figcaption class="col"><b>The other layout: looking away from the Sun from a sail spread inside Earth's orbit.</b> Every star in this picture is another sail. The bright point in the violet halo is the counter-sun, the Sun mirrored back by all the sails beyond the camera in that direction. The white point inside the halo is Earth, 18 million km away.<span class="how">0.41% of the Sun's light captured. Exposed for the sky's glow. Counter-sun magnitude SHELL_CS_MAG.</span></figcaption>
     </figure>
     <figure class="wide">
       <div class="plate"><img src="renders/swarm-inside-tele.jpg" alt="Telephoto view: violet glinting points and a white Earth with a smaller Moon" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>The same sky through a 300 mm lens, 3° from the counter-sun, exposed five stops darker so the halo's gradient shows.</b> Single sails glint inside the halo at magnitudes SHELL_GLINT_MAGS. Earth and the Moon come out as overexposed white discs, because Earth's daylit face is 15,000 times brighter per square degree than the swarm's glow.</figcaption>
+      <figcaption class="col"><b>The same sky through a 300 mm lens, next to the counter-sun.</b> Single sails glint inside the halo. Earth and the Moon are overexposed white discs, because Earth's sunlit face is 15,000 times brighter per square degree than the swarm's glow.<span class="how">3° from the counter-sun, exposed five stops darker so the halo's gradient shows. Sail glints at magnitudes SHELL_GLINT_MAGS.</span></figcaption>
     </figure>
   </section>
 
   <section class="chapter" id="mercury">
-    <div class="col"><div class="kicker">The mine</div><h2>Where the rock comes from</h2></div>
+    <div class="col"><div class="kicker">The mine</div><h2>Where the rock comes from</h2><p class="dek">Mercury has rock to spare. What it runs short of is a way to get rid of the heat of digging it up and throwing it into space.</p></div>
     <div class="col prose" id="mercury-prose"></div>
     <figure class="wide">
       <div class="pair">
         <div class="plate"><img src="renders/mercury-pristine.jpg" alt="Mercury from orbit, grey and cratered, less than half lit" width="1600" height="1600" loading="lazy"></div>
         <div class="plate"><img src="renders/mercury-heatwall.jpg" alt="The same view of Mercury glowing evenly orange all over, night side as bright as day, the terminator barely visible" width="1600" height="1600" loading="lazy"></div>
       </div>
-      <figcaption class="col"><b>Mercury today, and at the heat wall, at the same exposure.</b> MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance. To shed the 5×10¹⁸ W the model allows, the whole planet is paved with radiators that heat pumps hold at about 1,650 K. A surface that hot glows orange at about 31,000 cd/m², brighter than sunlit rock, and sunlight adds only 2.4% to what it has to get rid of, so the radiators work by day as well as by night. The night side shines as brightly as the day side and the terminator all but disappears. The planet radiates 2.8×10¹⁹ W in all, 170 times the sunlight it receives; most of that is the pumps' own work, powered from the swarm.</figcaption>
+      <figcaption class="col"><b>Mercury today, and when mining runs at full speed, at the same exposure.</b> To get rid of the heat of mining, the whole planet is paved with radiators held at about 1,650 K, hot enough to glow orange and brighter than sunlit rock. So the night side shines as brightly as the day side, and the line between them all but disappears. The planet gives off 170 times more energy than it receives from the Sun. Most of that is the work of the heat pumps that push the heat up to such a temperature, powered from the swarm.<span class="how">MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance. The model lets Mercury shed 5×10¹⁸ W of waste heat; with the pumps the radiators emit 2.8×10¹⁹ W in all, at about 31,000 cd/m². Sunlight adds only 2.4% to what a radiator that hot has to get rid of, so they work by day as well as by night.</span></figcaption>
     </figure>
     <div class="col prose"><p>Chip fabs set the pace, so they are the first thing to leave Mercury. In space a fab needs no building, no clean air and no water. The free vacuum alone removes about 60% of a fab's electricity and a third or more of its equipment. Mercury has almost no hydrogen, so the chemistry has to run dry, on chlorine, oxygen, zinc and magnesium.</p></div>
   </section>
 
   <section class="chapter" id="buildout">
-    <div class="col"><div class="kicker">Timeline</div><h2>How fast it can be built, and where it stops</h2></div>
+    <div class="col"><div class="kicker">Timeline</div><h2>How fast it can be built, and where it stops</h2><p class="dek">For decades there is nothing to see. Then the swarm grows fast, until Mercury cannot shed heat any faster.</p></div>
     <div class="col prose" id="build-prose"></div>
     <figure class="wide">
       <div class="chart" id="build-chart"></div>
@@ -276,29 +316,29 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   </section>
 
   <section class="chapter" id="earth">
-    <div class="col"><div class="kicker">The binding constraint</div><h2>Earth decides how big it may get</h2></div>
+    <div class="col"><div class="kicker">The binding constraint</div><h2>Earth decides how big it may get</h2><p class="dek">Every watt the sails catch ends up as heat, and some of it lands on Earth. That, not engineering, sets the size.</p></div>
     <div class="col prose" id="earth-prose"></div>
     <figure class="wide">
       <div class="pair">
         <div class="plate"><img src="renders/earth-dusk-tonight.jpg" alt="Blue hour at a mountain lake: Grand Teton in silhouette against a deep blue sky, reflected in still water, a cobble beach in front" width="2400" height="1600" loading="lazy"></div>
         <div class="plate"><img src="renders/earth-dusk-far.jpg" alt="The same lake and mountains at the same moment with the far-side cloud: a bright, sharp-edged band of light rising out of the range to the right of Grand Teton, reflected in the lake" width="2400" height="1600" loading="lazy"></div>
       </div>
-      <figcaption class="col" id="dusk-caption"><b>Jenny Lake in Grand Teton, 22 August at 21:04 with the Sun 9° below the horizon, as it is tonight and with the far-side cloud at Earth's limit.</b> DUSK_DETAIL</figcaption>
+      <figcaption class="col" id="dusk-caption"><b>Jenny Lake in Grand Teton at dusk, as it is tonight and with the swarm.</b> DUSK_DETAIL<span class="how">22 August at 21:04, with the Sun 9° below the horizon. Same camera, same exposure. Terrain from USGS elevation data; twilight from a multiple-scattering model of the atmosphere, checked against measured twilight.</span></figcaption>
     </figure>
     <figure class="wide">
       <div class="pair">
         <div class="plate"><img src="renders/earth-night-tonight.jpg" alt="Night at the same lake: the Milky Way rising beside Grand Teton, stars reflected in the water" width="2400" height="1600" loading="lazy"></div>
         <div class="plate"><img src="renders/earth-night-far.jpg" alt="The same view at night with the far-side cloud: the sky a twilight blue with few stars, the tip of a bright band of light showing in a notch of the range and reflected in the lake" width="2400" height="1600" loading="lazy"></div>
       </div>
-      <figcaption class="col" id="night-caption"><b>The same view an hour later, at the end of astronomical twilight.</b> On the left, tonight, a long exposure shows the Milky Way, the airglow and stars reflected in the lake. On the right, with the cloud, the exposure is almost four stops shorter. In late August the ecliptic climbs out of the west at only 24° here, so most of the band is already behind the range and only its top shows in a notch. Even so, the air scatters its light across the whole sky, turning it the blue of late twilight, and the ground gets 0.12 lux: half a full Moon, a hundred times tonight. The Milky Way is gone. On a spring evening, when the ecliptic stands upright, the band would tower over the range and light the ground at 1.9 lux.</figcaption>
+      <figcaption class="col" id="night-caption"><b>The same view an hour later, when the sky is fully dark.</b> On the left, tonight: the Milky Way, faint airglow, stars reflected in the lake. On the right, with the swarm. In late August its band lies low in the west here, so most of it is already behind the mountains and only its top shows in a notch. Even so, its light, scattered by the air, turns the whole sky the blue of late twilight and drowns the Milky Way. The ground is lit like half a full Moon, a hundred times brighter than tonight. On a spring evening, when the band stands upright, it would tower over the range and light the ground like seven full Moons.<span class="how">End of astronomical twilight, Sun 18.5° down. The exposure on the right is almost four stops shorter. Ground illuminance 0.12 lux, tonight 0.0012; 1.9 lux with the ecliptic upright. Here in late August the ecliptic climbs out of the west at only 24°.</span></figcaption>
     </figure>
     <figure class="wide">
       <div class="plate"><img src="renders/leo-far-wide.jpg" alt="Earth's dark night side and its thin blue limb from orbit; rising straight up from the limb, a tall band of even pale light with sharp straight sides and a curved top, a tiny dark dot inside it" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>The far-side cloud from low Earth orbit, before dawn on 22 September 2128, 400 km above the Nile Delta.</b> The Sun is 6° below Earth's limb. Near the equinox the morning ecliptic stands almost upright here, so the cloud rises straight out of the dawn as a band of even light, 29 cd/m², brighter than the sky at the end of civil twilight. Its edges are as sharp as the orbits that bound it. The top is 45° from the Sun, where the cloud's near end sits a quarter of a turn from Earth; the sides are where the sails' orbits stop, 30° above and below Earth's. The empty gap round the point straight behind the Sun is just above the limb. The dark dot in the band is the crescent Moon. City lights are NASA's Black Marble.</figcaption>
+      <figcaption class="col"><b>The swarm from low Earth orbit, just before dawn.</b> The Sun is still below Earth's edge. The swarm rises straight out of the dawn as a tall band of even light, brighter than the sky half an hour after sunset. Its edges are sharp because the sails stop where their orbits stop: the top is the swarm's near end, a quarter of the way round the orbit from Earth, and the sides are its limits above and below Earth's orbit. The dark dot in the band is the crescent Moon.<span class="how">22 September 2128, 400 km above the Nile Delta, the Sun 6° below Earth's limb. The band is 29 cd/m² and reaches 45° from the Sun; the empty gap round the point behind the Sun is just above the limb. City lights: NASA Black Marble.</span></figcaption>
     </figure>
     <figure class="wide">
       <div class="plate"><img src="renders/leo-far-tele.jpg" alt="Telephoto: a black disc with a thin bright crescent on one edge, against an even pale grey sky" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>The Moon through a 170 mm lens.</b> Its night side, lit only by earthshine, is about a hundredth as bright as the band behind it, so it shows as a black disc beside a thin crescent. That is how you can tell the light comes from far beyond the Moon. About a billion sails lie behind every pixel of this frame, each near magnitude 27, far too faint to see alone. That is why the band is so smooth.</figcaption>
+      <figcaption class="col"><b>The Moon in front of the swarm, through a 170 mm lens.</b> The Moon's dark side is black against the band, which shows the light comes from far beyond the Moon. The band is perfectly smooth: about a billion sails lie behind every pixel, each far too faint to see on its own.<span class="how">The dark side, lit only by earthshine, is about a hundredth as bright as the band. Each sail is near magnitude 27.</span></figcaption>
     </figure>
     <div class="col prose" id="earth-prose-2"></div>
     <figure class="wide">
@@ -308,10 +348,6 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
       </div>
       <figcaption class="col" id="far20-caption"><b>A 20% swarm, the same two views.</b> FAR20_DETAIL</figcaption>
     </figure>
-    <figure class="wide drawing">
-      <div id="orbit-map"></div>
-      <figcaption class="col"><b>Where the sails can fly, to scale,</b> in a frame that turns with Earth. The swarm Earth allows shares Earth's orbit on the far side of the Sun, with a small sunshade at L1. The alternative spreads evenly inside Earth's orbit.</figcaption>
-    </figure>
     <figure class="wide">
       <div class="chart" id="earth-chart"></div>
       <figcaption class="col" id="earth-caption"></figcaption>
@@ -319,7 +355,7 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   </section>
 
   <section class="chapter" id="star">
-    <div class="col"><div class="kicker">Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2></div>
+    <div class="col"><div class="kicker">Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2><p class="dek">From light-years away the Sun would look a little dimmer, with a faint infrared glow it never had before.</p></div>
     <div class="col prose" id="star-prose"></div>
     <figure class="wide">
       <div class="chart" id="sed-chart"></div>
@@ -328,7 +364,7 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
   </section>
 
   <section class="chapter" id="future">
-    <div class="col"><div class="kicker">Built later than you think</div><h2>Today's hardware never flies</h2></div>
+    <div class="col"><div class="kicker">Built later than you think</div><h2>Today's hardware never flies</h2><p class="dek">The swarm takes a century to build and its sails are replaced every 10 to 20 years, so it is made of hardware that does not exist yet.</p></div>
     <div class="col prose" id="future-prose"></div>
     <div class="col tablewrap"><table class="compare" id="future-table"></table></div>
   </section>
