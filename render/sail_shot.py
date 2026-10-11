@@ -61,6 +61,8 @@ def main(argv):
     ap.add_argument('--earth-offset', type=float, default=2.6)
     ap.add_argument('--far-sky', action='store_true',
                     help="the far-side cloud behind (farside_field): the sail on Earth's orbit, 120 deg from Earth")
+    ap.add_argument('--layout', choices=['farside', 'uniform'], default='uniform',
+                    help='with --far-sky: the far-side cloud (3.8 %%) or the near-uniform swarm (83 %%, 0.95 AU)')
     a = ap.parse_args(argv)
     spec = sail.load_spec()
     num = lib.load_numbers()[a.era]['sparse']          # model v4 (node scripts/export-numbers.mjs)
@@ -75,7 +77,7 @@ def main(argv):
     v = VIEWS[a.view]
     tx, ty = (math.radians(t) for t in v['tilt'])
     if a.far_sky:
-        r = 1.0
+        r = 0.95 if a.layout == 'uniform' else 1.0
     if not (a.swarm_sky or a.far_sky):
         lib.add_sun(r, direction=(math.sin(tx), math.sin(ty), -1.0))
         lib.camera(Vector(v['cam']), Vector(v['target']), lens=v['lens'])
@@ -93,9 +95,11 @@ def main(argv):
             import farside_field
             fk = argparse.Namespace(f=0.0379, lat=30.0, rho=0.004, rho_film=0.0021, dr=0.004, psi=120.0,
                                     lens=v['lens'], dmax=3000.0, sky_width=4096, seed=5, sun_disc=False)
+            if a.layout == 'uniform':
+                fk.mode, fk.tau, fk.r_layer, fk.cone, fk.psi = 'uniform', 0.881, 0.95, 23.07, 90.0
             farside_field.build_far_sky(sc, cam, fwd, w, h, fk)
             # the sail sits mid-layer: the plates sunward of it take tau/2 of the sunlight
-            tau = fk.f / ((180 - 2 * 15.0) / 360 * 0.5)
+            tau = fk.tau if a.layout == 'uniform' else fk.f / ((180 - 2 * 15.0) / 360 * 0.5)
             for ob in bpy.data.objects:
                 if ob.type == 'LIGHT' and ob.data.type == 'SUN':
                     ob.data.energy *= math.exp(-tau / 2)

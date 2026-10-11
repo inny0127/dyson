@@ -66,9 +66,16 @@ def build_far_sky(sc, cam, fwd, w, h, a):
     near sails, Earth and the Moon, the integrated glow, the counter-sun and the Sun. `a` needs
     f, lat, rho, rho_film, dr, psi, lens, dmax, sky_width, seed. Returns the glow map."""
     fwd = np.asarray(fwd, dtype=float)
-    patch = (180 - 2 * FS.FAR_GAP) / 360 * math.sin(math.radians(a.lat))
-    tau = a.f / patch
-    S = FS.S0
+    R = getattr(a, 'r_layer', 1.0)                            # layer radius, AU
+    if getattr(a, 'mode', 'farside') == 'uniform':
+        FS.set_geometry('uniform', R, getattr(a, 'cone', 23.07))
+        tau = a.tau
+    else:
+        FS.set_geometry('farside')
+        patch = (180 - 2 * FS.FAR_GAP) / 360 * math.sin(math.radians(a.lat))
+        tau = a.f / patch
+    S = FS.S0 / R ** 2                                        # sunlight at the layer
+    TH_SUN = FS.TH_SUN_1AU / R
     spec = sail.load_spec()
     side_km = spec['parts']['sail_film']['dims_m']['corner_to_corner'] / math.sqrt(2) / 1e3
     A_km2 = side_km ** 2
@@ -104,9 +111,9 @@ def build_far_sky(sc, cam, fwd, w, h, a):
     R_glint = F0_film + MESH_R0
     L_sun = S / (math.pi * TH_SUN ** 2)                        # W/m^2/sr of the solar disc at 1 AU
     ang = np.degrees(np.arccos(np.clip(dirs[:, 0], -1, 1)))    # from the antisolar point (+X)
-    gi = glint_intensity(ang, t_out, edge_frac)
+    gi = glint_intensity(ang, t_out, edge_frac, th_sun=TH_SUN)
     E_glint = np.where(cosv > 0, R_glint * S * A_km2 * 1e6 * cosv * gi / (dist * 1e3) ** 2, 0.0)
-    E_int = np.where(ang < 0.2666, E_glint, 0.0)
+    E_int = np.where(ang < math.degrees(TH_SUN), E_glint, 0.0)
     E_edge = E_glint - E_int
     # vanes
     vane_half = math.degrees(math.acos(1 - 2 * gf['p_random_direction_per_vane']))
@@ -229,15 +236,17 @@ def build_far_sky(sc, cam, fwd, w, h, a):
 
     # --- Earth and the Moon: Earth at psi from the camera along the orbit (heliocentric -psi)
     lamE = -math.radians(a.psi)
-    E_pos = np.array([math.cos(lamE), math.sin(lamE), 0.0])
+    E_hat = np.array([math.cos(lamE), math.sin(lamE), 0.0])
+    E_pos = E_hat / R                                          # Earth at 1 AU, in layer radii
     dE = E_pos - np.array([1.0, 0.0, 0.0])
-    dist_E = np.linalg.norm(dE)
-    dE /= dist_E
-    alpha = math.acos(np.clip(np.dot(-E_pos, -dE), -1, 1))    # Sun-Earth-camera phase angle
+    dist_E = np.linalg.norm(dE) * R                            # AU
+    dE /= np.linalg.norm(dE)
+    alpha = math.acos(np.clip(np.dot(-E_hat, -dE), -1, 1))    # Sun-Earth-camera phase angle
+    S_E = FS.S0
     lam = (math.sin(alpha) + (math.pi - alpha) * math.cos(alpha)) / math.pi
     trans = math.exp(-tau / 2)                                 # through the inner half of the layer
-    E_earth = S * 0.434 * (6371.0 / (dist_E * AU_KM)) ** 2 * lam * trans
-    E_moon = S * 0.12 * (1737.4 / (dist_E * AU_KM)) ** 2 * lam * 0.75 * trans
+    E_earth = S_E * 0.434 * (6371.0 / (dist_E * AU_KM)) ** 2 * lam * trans
+    E_moon = S_E * 0.12 * (1737.4 / (dist_E * AU_KM)) ** 2 * lam * 0.75 * trans
     off = np.cross(dE, [0.0, 0.0, 1.0]); off /= np.linalg.norm(off)
     dM = dE + off * (3.0e5 / (dist_E * AU_KM)) + np.array([0, 0, 1.0]) * (2.0e5 / (dist_E * AU_KM))
     dM /= np.linalg.norm(dM)
@@ -270,7 +279,7 @@ def build_far_sky(sc, cam, fwd, w, h, a):
     # the counter-sun: glints of the column straight out beyond dmax
     col_out = FS.column_out(tau, a.dr, a.dmax)
     al_ = (np.arange(4096) + 0.5) / 4096 * 10.0                 # deg from the antisolar point
-    prof = col_out * R_glint * S * glint_intensity(al_, t_out, edge_frac)
+    prof = col_out * R_glint * S * glint_intensity(al_, t_out, edge_frac, th_sun=TH_SUN)
     flux = float(np.sum(prof * 2 * np.pi * np.radians(al_) * np.radians(al_[1] - al_[0])))
     print(json.dumps({'column_out': col_out, 'R_glint': R_glint, 'counter_sun_mag': -26.74 - 2.5 * math.log10(flux / 1361),
                       'counter_sun_peak_W_m2_sr': float(prof[0]), 'sky_max_cd_m2': float(G.max() * 93)}), flush=True)
@@ -342,6 +351,10 @@ def main(argv):
     ap.add_argument('--dmax', type=float, default=3000.0, help='km')
     ap.add_argument('--sky-width', type=int, default=4096)
     ap.add_argument('--seed', type=int, default=5)
+    ap.add_argument('--mode', choices=['farside', 'uniform'], default='farside')
+    ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the layer')
+    ap.add_argument('--r-layer', type=float, default=1.0, help='layer radius, AU (uniform: 0.95)')
+    ap.add_argument('--cone', type=float, default=23.07, help='uniform: empty cone round the Sun-Earth line, deg')
     a = ap.parse_args(argv)
     w, h = (int(x) for x in a.res.split('x'))
     sc = lib.reset(samples=a.samples, res=(w, h))

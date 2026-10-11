@@ -34,6 +34,15 @@ EDGE_DEG = 3.0                   # orbital scatter softens the patch edges
 
 TH_SUN_1AU = math.radians(0.2666)            # the Sun's angular radius at 1 AU
 
+# Layer geometry. 'farside': on Earth's orbit, the far-side patch. 'uniform' (docs/full-swarm.md):
+# radius r AU, all round the Sun except `cone` deg round the Sun-Earth line and FAR_GAP round L3.
+# Inside these functions lengths are in layer radii; callers pass AU and km as before.
+GEOM = {'kind': 'farside', 'r': 1.0, 'cone': 23.07}
+
+
+def set_geometry(kind='farside', r=1.0, cone=23.07):
+    GEOM.update(kind=kind, r=r, cone=cone)
+
 
 def glint_intensity(ang_deg, t_out_deg, edge_frac, th_sun=TH_SUN_1AU):
     """Glint of one sun-facing sail toward a direction ang_deg from its mirror direction, as
@@ -63,6 +72,11 @@ def smooth(x):
 
 def patch_mask(P, psi_cam, lat_max):
     """Soft membership of points P (AU, camera frame) in the far-side patch."""
+    w = EDGE_DEG
+    if GEOM['kind'] == 'uniform':
+        E = np.array([math.cos(math.radians(-psi_cam)), math.sin(math.radians(-psi_cam)), 0.0])
+        ang = np.degrees(np.arccos(np.clip((P @ E) / np.linalg.norm(P, axis=-1), -1, 1)))
+        return smooth((ang - GEOM['cone'] + w / 2) / w) * smooth((180.0 - FAR_GAP - ang + w / 2) / w)
     lam = np.degrees(np.arctan2(P[..., 1], P[..., 0]))           # longitude from the camera
     psi = (lam + psi_cam) % 360.0                                  # longitude from Earth
     r = np.linalg.norm(P, axis=-1)
@@ -89,6 +103,8 @@ def far_glow(D, tau, rho, dr, psi_cam, lat_max, dmax_km, n_seg=48):
     shp = D.shape[:-1]
     d = D.reshape(-1, 3)
     C = np.array([1.0, 0.0, 0.0])
+    R = GEOM['r']
+    dr = dr / R
     h = dr / 2
     r_in, r_out = 1 - h, 1 + h
     kappa = tau / dr
@@ -99,7 +115,7 @@ def far_glow(D, tau, rho, dr, psi_cam, lat_max, dmax_km, n_seg=48):
     sq = np.sqrt(np.maximum(disc_in, 0))
     s_in1 = np.where(hits_in, -cd - sq, s_out)                     # leave the layer inward
     s_in2 = np.where(hits_in, -cd + sq, s_out)                     # re-enter it on the far side
-    dmax = dmax_km / AU_KM
+    dmax = dmax_km / (AU_KM * R)
     L = np.zeros(len(d))
     T = np.ones(len(d))
     for a0, a1 in ((np.full(len(d), dmax), s_in1), (s_in2, s_out)):
@@ -115,7 +131,7 @@ def far_glow(D, tau, rho, dr, psi_cam, lat_max, dmax_km, n_seg=48):
             m = patch_mask(P, psi_cam, lat_max) * inside
             sun = np.exp(-kappa * np.clip(r - r_in, 0, dr))
             dtau = kappa * np.abs(c) * ds * m
-            L += T * rho * S0 / r ** 2 / math.pi * kappa * np.maximum(c, 0) * ds * m * sun * np.exp(-dtau / 2)
+            L += T * rho * S0 / (r * R) ** 2 / math.pi * kappa * np.maximum(c, 0) * ds * m * sun * np.exp(-dtau / 2)
             T *= np.exp(-dtau)
     return L.reshape(shp), T.reshape(shp)
 
@@ -123,10 +139,13 @@ def far_glow(D, tau, rho, dr, psi_cam, lat_max, dmax_km, n_seg=48):
 def column_out(tau, dr, dmax_km, n=400):
     """Glint-weighted column of plates straight out (+X) beyond dmax: each plate's glint reaches the
     camera through the backs between, and is lit through the fronts inward of it."""
+    R = GEOM['r']
+    dr = dr / R
     h = dr / 2
     kappa = tau / dr
-    s = dmax_km / AU_KM + (np.arange(n) + 0.5) / n * (h - dmax_km / AU_KM)
-    ds = (h - dmax_km / AU_KM) / n
+    dm = dmax_km / (AU_KM * R)
+    s = dm + (np.arange(n) + 0.5) / n * (h - dm)
+    ds = (h - dm) / n
     r = 1 + s
     return float(np.sum(kappa * ds * np.exp(-kappa * (r - (1 - h))) * np.exp(-kappa * s) / r ** 2))
 
