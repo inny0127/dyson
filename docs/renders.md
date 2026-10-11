@@ -117,6 +117,27 @@ directly rather than path-traced.
 - **Not modelled:** the bands of the orbit lattice (`docs/full-swarm.md`) would give the layer
   texture; it is uniform here.
 
+## Europe in July, today and Mediterranean (`med_earth.py`, `leo_view.py`)
+
+- **Camera:** 4,000 km above 43° N, 6° E, looking straight down with a 24 mm lens, 15 July at 11:00
+  UTC, Sun about 70° high over the Mediterranean.
+- **Today:** the July 2004 Blue Marble (`assets/earth_day_8k.jpg`) and the Blue Marble cloud
+  composite, through the same multiple-scattering atmosphere as the low-orbit views.
+- **Mediterranean (`render/med_earth.py`):** the dry-summer belt moved about five degrees north,
+  the far end of what shading by latitude and season might do (`docs/full-swarm.md`).
+  - The new belt (44–51° N, fading over 41–44 and 51–56° N, and from 12° E to nothing by 25° E as
+    Atlantic winter rain gives out) takes the colour distribution of today's Mediterranean lands
+    (Iberia, the south of Italy and Greece, 37–42° N) by per-channel histogram matching. Every field,
+    forest and city stays where it is; only the season's palette changes.
+  - The old southern edge (33–37.5° N) takes the palette of the steppe south of the Atlas
+    (29–32.5° N).
+  - Land above ~1,500 m (from the GEBCO relief, tied to Mont Blanc and the Paris basin) keeps its
+    colours. Summer cloud over the new belt and its seas is cut by 75 %, over the drier edge by 40 %.
+  - About 1.8 million km² changes to the Mediterranean palette and 1.2 million km² to steppe.
+- **Sunlight:** the L1 shade takes 19.6 %; both frames share one exposure, so the second is darker.
+- **Not a climate-model result:** no model has run shading aimed this way; the picture shows one
+  plausible outcome of the mechanism.
+
 ## Mercury today and at the heat wall (`mercury.py`)
 
 - **Globe:** MESSENGER MDIS albedo (mean 0.080) and the USGS 665 m DEM as true displacement, lit by
