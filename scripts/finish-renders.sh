@@ -40,10 +40,16 @@ python3 render/post.py "$RAW/swarm_tele.png" "$OUT/swarm-inside-tele.jpg" --fov 
 
 # Sail views (AgX PNGs metered in sunlight)
 python3 render/post.py "$RAW/sail_corner.png" "$OUT/sail-corner.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
-# The sail against the swarm's sky (scene-linear: the counter-sun needs glare)
-python3 render/glare.py "$RAW/sail_counter_sun.exr" "$RAW/sail_counter_sun_g.exr"
-dev "$RAW/sail_counter_sun_g.exr" "$RAW/sail_counter_sun.png" "$(grep -o 'exposure [-0-9.]*' "$RAW/sail_counter_sun.log" | tail -1 | awk '{print $2}')"
-python3 render/post.py "$RAW/sail_counter_sun.png" "$OUT/sail-counter-sun.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
+# The sail against the far-side cloud's sky (sail_shot --far-sky; scene-linear: the counter-sun
+# needs glare)
+python3 render/glare.py "$RAW/sail_far_counter_sun.exr" "$RAW/sail_far_counter_sun_g.exr"
+dev "$RAW/sail_far_counter_sun_g.exr" "$RAW/sail_far_counter_sun.png" "$(grep -o 'exposure [-0-9.]*' "$RAW/sail_far_counter_sun.log" | tail -1 | awk '{print $2}')"
+python3 render/post.py "$RAW/sail_far_counter_sun.png" "$OUT/sail-far-counter-sun.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
+
+# Inside the far-side cloud, along Earth's orbit (farside_field.py), metered on the glow
+python3 render/glare.py "$RAW/inside_far_orbit.exr" "$RAW/inside_far_orbit_g.exr"
+dev "$RAW/inside_far_orbit_g.exr" "$RAW/inside_far_orbit.png" "$(exposure_of inside_far_orbit)"
+python3 render/post.py "$RAW/inside_far_orbit.png" "$OUT/inside-far-orbit.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
 
 # The far-side cloud from low Earth orbit (render/leo_view.py), 22 September 2128 before dawn:
 # 3.8 % wide and 170 mm, and 20 % (±60° cloud) wide. Each exposed for its band.

@@ -92,17 +92,42 @@ directly rather than path-traced.
 - **Stars and planets:** the V ≤ 8 catalogue and the planets, as points through the air's
   transmittance. Then `glare.py` and `develop.py`, exposed for the band.
 
-## The sail and the counter-sun (`sail_shot.py --view corner_counter_sun --swarm-sky`)
+## The sail and the counter-sun (`sail_shot.py --view corner_counter_sun --far-sky`)
 
-- **Camera:** 30 m sunward of a corner and 17 m beyond its tip, looking away from the Sun at
-  0.92 AU.
-- **Sky:** `swarm_field.build_sky`, the same sky as the view from inside the swarm.
-  - Sails within 40,000 km are points.
-  - The rest is integrated glow, and the counter-sun: magnitude −15.1, from an outward
-    coverage of 0.40 %.
-- **Film:** near-black navy, so it is exposed 2 stops over a grey card in sunlight. The hinge
-  strips show as bright lines because their curled edges glint within 7.7° of the antisolar
-  point.
+- **Camera:** 30 m sunward of a corner and 17 m beyond its tip, looking away from the Sun, on a
+  sail in the far-side cloud at 1 AU, 120° from Earth.
+- **Sky:** `farside_field.build_far_sky`, the same sky as the view from inside the far-side cloud.
+  The Sun's disc is left out of the world (the scene's Sun lamp lights the sail), and the lamp is
+  dimmed by exp(−τ/2) for the sails sunward of this one.
+- **The counter-sun:** magnitude −20.5. The fronts carry the aluminium mesh that makes them dark in
+  the infrared; with ~21 % of the area in Al lines its coherent mirror reflection is about
+  (0.21 · 0.95)² = 0.04, on top of the film's 0.0013, and the column of plates straight out beyond
+  the camera covers 7.5 % of the view.
+- **Film:** near-black navy, so it is exposed 2 stops over a grey card in sunlight; the 12 cd/m²
+  sky prints black at that exposure. The hinge strips show as bright lines because their curled
+  edges glint within 7.7° of the antisolar point.
+
+## Inside the far-side cloud (`farside_field.py`, `farside_sky.py`)
+
+- **The cloud:** sun-facing sails in a layer on Earth's orbit, 1 ± 0.002 AU (600,000 km: room for
+  a collision-free lattice with eccentricities up to 0.002), 90–165° and 195–270° from Earth,
+  within 30° of the ecliptic, covering τ = 0.18 of that patch at 3.79 %. That is
+  3.9 × 10⁻⁶ sails per km³, one every 64 km. The camera sits mid-layer, 120° from Earth.
+- **The sky beyond 3,000 km (`farside_sky.far_glow`):** each ray is marched through the layer as a
+  medium of plates. Coverage per unit radial depth is τ/Δr; a plate is seen at |d · r̂|.
+  - Plates outward of the camera show their sunlit fronts (ρ S / π, dimmed by the plates sunward
+    of them); plates inward show their backs, which only block.
+  - Rays that dip below the layer's tangent plane cross the inner half (backs), the empty inside of
+    Earth's orbit, and meet the far part of the cloud from inside, where every plate faces them.
+  - Away from the Sun the sky is 12 cd/m²; the rest of the cloud seen through the inside of the
+    orbit is 22 cd/m²; past the cloud's edges space is black.
+- **Sails within 3,000 km:** squares 279 m across facing the Sun when they span more than 1.5
+  pixels, points otherwise; fronts at ρ S / π with glints, backs black. Vanes flash as in
+  `swarm_field.py`.
+- **Earth and the Moon:** points at their true direction, 30° from the Sun and 1.73 AU away:
+  Earth at magnitude −2.6 (geometric albedo 0.434, Lambert phase), the Moon at +2.0.
+- **Not modelled:** the study expects texture in a real lattice, with sails stacked along shared
+  node lines into overlap bands and gaps; the layer here is uniform.
 
 ## The pod, visible and thermal (`pod.py`)
 
@@ -119,26 +144,29 @@ directly rather than path-traced.
   - module exterior 300 K, trusses 293 K;
   - emissivities from the spec.
 
-## The sky from inside the swarm (`swarm_field.py`)
+## The sky inside the layout within Earth's orbit (`swarm_field.py`)
 
-- **Sails:** the Earth-limited swarm, 0.41 % coverage in a shell 0.86–0.92 AU, gives
+- **Sails:** the layout inside Earth's orbit at 0.41 % coverage, in a shell 0.86–0.92 AU, gives
   n = −ln(1 − f) / (A ΔR) = 5.9 × 10⁻⁹ sails per km³.
   - Every sail within 40,000 km in the frame is a point source: diffuse from film and hardware
     (reflectance 0.0021), plus glints.
   - Sails further out are integrated into the sky's glow (reflectance 0.004 including the vanes'
     average).
-- **Glints (design spec scene facts):**
-  - The film reflects the Sun straight back (0.52° half-angle, glint radiance 26,400 W/m²/sr at
-    0.919 AU).
-  - The curled edges of the fold panels (21.6 % of the area) reflect within 7.7°. Their slope
-    decays exponentially away from each hinge, so the halo falls as 1/α².
+- **Glints (design spec scene facts, `farside_sky.glint_intensity`):**
+  - The film reflects the Sun straight back (F0 0.0013). Its interior is flat to 0.016°, so it
+    mirrors the Sun's disc: F0 times the Sun's radiance, seen only within the Sun's angular radius
+    (0.29° at 0.92 AU). An earlier version spread that full radiance over the spec's 0.52°, which
+    does not conserve the reflected power and made the counter-sun about 3× too bright.
+  - The curled edges of the fold panels (21.6 % of the area) reflect within 7.7°, the maximum
+    varying panel to panel. Their slope decays exponentially away from each hinge, so the halo
+    falls as 1/α².
   - Vanes are energy-conserving mirrors: 87 m² at R = 0.9, tilted 0–40°, beam broadened by
     wrinkles to 1.3°.
 - **The counter-sun:**
-  - Seen from inside the shell, the sails beyond the camera within 0.52° of the antisolar point
-    all glint at once.
-  - With an outward column coverage of 0.27 % this is a disc of 62 W/m²/sr, magnitude −14.7,
-    inside a halo reaching 7.7°.
+  - Seen from inside the shell, the sails beyond the camera within the Sun's radius of the
+    antisolar point all glint at once.
+  - With an outward column coverage of 0.27 % this is magnitude SHELL_CS_MAG, inside a halo
+    reaching 7.7°.
   - Nobody designed it. It follows from flat sails facing the Sun.
 - **Earth and the Moon:** 0.12 AU away near the antisolar point, lit by the Sun at 1 AU.
 - **Lens glare:** `glare.py` adds a measured-like point-spread function (bloom plus power-law

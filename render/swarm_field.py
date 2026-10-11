@@ -5,10 +5,12 @@ Every number comes from the design spec's scene facts and the model's coverage:
   D_MAX of the camera each sail is a point source; beyond that the glow is integrated.
 - A sail shows the camera its sunlit front when the camera is sunward of it. Diffuse flux
   E = rho S(r) A cos / (pi d^2) with rho the visible reflectance of film plus hardware.
-- Glints (design_spec scene_facts.glint): the film reflects the Sun straight back, so every sail
-  within 0.52 deg of the camera's antisolar point glints at full strength (mag -12 at 1,000 km), and
-  the curled fold-panel edges (21.6 % of the area) within 7.7 deg glint ~800x fainter: a glint halo
-  round the antisolar point. The four Al corner vanes, tilted 0-40 deg for control, flash anywhere
+- Glints (design_spec scene_facts.glint): the film reflects the Sun straight back (F0 0.0013). Its
+  interior is flat to 0.016 deg, so it mirrors the Sun's disc: a sail within the Sun's angular
+  radius of the camera's antisolar point glints at F0 times the Sun's radiance. The curled
+  fold-panel edges (21.6 % of the area) spread their share out to 7.7 deg as 1/angle^2: a glint
+  halo round the antisolar point. Both conserve the reflected power (FS.glint_intensity).
+  The four Al corner vanes, tilted 0-40 deg for control, flash anywhere
   within ~80 deg of the Sun direction, each with probability 1.3e-4 for a given viewer.
 - Earth and the Moon, 0.12 AU away, appear near the antisolar point when the camera is on the
   Sun-Earth line.
@@ -30,6 +32,7 @@ import numpy as np  # noqa: E402
 from mathutils import Vector  # noqa: E402
 import lib  # noqa: E402
 import sail  # noqa: E402
+import farside_sky as FS  # noqa: E402
 
 AU_KM = lib.AU / 1e3
 
@@ -58,25 +61,6 @@ def glow_map(f, rho, r_c, r_in, r_out, n_km3, a_km2, dmax, w=512, h=256):
         S = lib.L_SUN / (4 * math.pi * (r * 1e3) ** 2)
         L += np.where(inside, n_km3 * a_km2 * rho / math.pi * S * np.maximum(cosv, 0) * (s1 - s0), 0.0)
     return L.reshape(h, w)
-
-
-def glint_profile(t_in, t_out, alpha_max=10.0, n=4096):
-    """Radiance of the integrated film glints vs angle from the antisolar point, per unit of
-    (outward column coverage x glint radiance): the interior's mirror image of the Sun (0.52 deg,
-    soft-edged by the Sun's own 0.29 deg radius) and the curled panel edges, whose maximum slope
-    varies panel to panel (u = 0.3-1 of the 3.7 deg curl), each spreading its light as 1/alpha^2."""
-    a = (np.arange(n) + 0.5) / n * alpha_max
-    core = np.clip((t_in + 0.15 - a) / 0.3, 0, 1)
-    halo = np.zeros(n)
-    # panel-to-panel residual moment: u uniform in 0.3-1, with a tail to 1.3 (lamination scatter)
-    us = np.linspace(0.3, 1.3, 41)
-    wts = np.where(us <= 1.0, 1.0, (1.3 - us) / 0.3)
-    for u, wt in zip(us, wts):
-        tu = max(t_out * u, t_in * 1.2)
-        prof = tu ** 2 / (2 * math.log(tu / t_in) * np.maximum(a, t_in) ** 2)
-        halo += wt * np.where(a < tu, prof, 0) * (t_in / tu) ** 2
-    halo /= wts.sum()
-    return a, core, halo
 
 
 def build_sky(sc, a, cam, fwd, w, h, own_sun=True):
@@ -129,14 +113,13 @@ def build_sky(sc, a, cam, fwd, w, h, own_sun=True):
     # glints: angle between the camera direction from the sail and the Sun's mirror direction (-rhat)
     ang = np.degrees(np.arccos(np.clip(np.einsum('ij,ij->i', to_cam, -rhat), -1, 1)))
     g = sf['glint']
-    E_int = np.where(ang < g['half_angle_interior_deg'], 1.835e-3 * (1000 / dist) ** 2, 0.0)
-    # curled edges: slope decays exponentially from each hinge strip, so the area per slope goes as
-    # 1/s and the reflected intensity per solid angle as 1/alpha^2 out to the 7.7 deg maximum;
-    # normalised to the same total edge flux as a uniform cone
-    t_in, t_out = g['half_angle_interior_deg'], g['half_angle_hinge_edges_deg']
-    edge_ratio = (g['hinge_edge_area_fraction'] / (1 - g['hinge_edge_area_fraction'])) * (t_in / t_out) ** 2
-    prof = t_out ** 2 / (2 * math.log(t_out / t_in) * np.maximum(ang, t_in) ** 2)
-    E_edge = np.where(ang < t_out, 1.835e-3 * edge_ratio * prof * (1000 / dist) ** 2, 0.0)
+    t_out = g['half_angle_hinge_edges_deg']
+    F0 = spec['sail']['appearance_front']['glint']['F0']
+    th_sun = FS.TH_SUN_1AU * lib.AU / np.linalg.norm(P * 1e3, axis=1)     # the Sun's radius seen from each sail
+    E_g = np.where(front, F0 * S * A_km2 * 1e6 * cosv * FS.glint_intensity(ang, t_out, g['hinge_edge_area_fraction'], th_sun)
+                   / (dist * 1e3) ** 2, 0.0)
+    E_int = np.where(np.radians(ang) < th_sun, E_g, 0.0)
+    E_edge = E_g - E_int
     # vanes: 4 per sail, 87 m2 of wrinkled aluminium (R 0.9), tilted 0-40 deg for control (uniform
     # over that cap). The reflected beam is the Sun's disc broadened by wrinkles to ~1.3 deg
     # half-angle; intensity = reflected power / beam solid angle (energy-conserving).
@@ -235,15 +218,13 @@ def build_sky(sc, a, cam, fwd, w, h, own_sun=True):
     ad = nt.nodes.new('ShaderNodeAddShader')
     nt.links.new(b1.outputs[0], ad.inputs[0]); nt.links.new(b2.outputs[0], ad.inputs[1])
     # the integrated glints of every unresolved sail beyond dmax: the counter-sun and its halo
-    t_in, t_out = g['half_angle_interior_deg'], g['half_angle_hinge_edges_deg']
+    t_out = g['half_angle_hinge_edges_deg']
     path_km = (a.r_out - a.r_cam) * AU_KM - a.dmax
     f_out = n * A_km2 * path_km                                  # outward column coverage
-    S_mid = lib.flux(0.5 * (a.r_cam + a.r_out))
-    L_g = sf['glint']['glint_radiance_W_m2_sr'] if 'glint_radiance_W_m2_sr' in sf['glint'] else sf['sail_brightness']['glint_radiance_W_m2_sr']
-    L_g = L_g * S_mid / lib.flux(0.919)
-    edge_frac = g['hinge_edge_area_fraction']
-    al, core, halo = glint_profile(t_in, t_out)
-    prof = f_out * L_g * ((1 - edge_frac) * core + edge_frac * halo)
+    r_mid = 0.5 * (a.r_cam + a.r_out)
+    F0 = spec['sail']['appearance_front']['glint']['F0']
+    al = (np.arange(4096) + 0.5) / 4096 * 10.0
+    prof = f_out * F0 * lib.flux(r_mid) * FS.glint_intensity(al, t_out, g['hinge_edge_area_fraction'], FS.TH_SUN_1AU / r_mid)
     print(json.dumps({'counter_sun_W_m2_sr': float(prof[0]), 'f_out': f_out,
                       'counter_sun_mag': float(-26.74 - 2.5 * math.log10(np.sum(prof * 2 * np.pi * np.radians(al) * np.radians(al[1] - al[0])) / 1361)),
                       'halo_2deg_W_m2_sr': float(np.interp(2.0, al, prof))}))

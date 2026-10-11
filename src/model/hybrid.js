@@ -242,6 +242,7 @@ export function swarmAt(p, fIn) {
   const flopsPods = podPower > 0 ? (kF * podPower) / pod.jPerFlop : 0;
   return {
     f, q, feasible, rThermal, rSail, rPod, sail, pod, farside, rOrbit: farside ? 1 : rSail,
+    areaFactor: kM,                 // film area per watt relative to the sail's thermal orbit
     intercepted, chipPower, sailPower, podPower, massSails, massPods, mass,
     kgPerW: chipPower > 0 ? mass / chipPower : Infinity,
     flopsSails, flopsPods, flops: flopsSails + flopsPods,
@@ -361,7 +362,7 @@ export function compute(p) {
   const s = swarmAt(p, p.coverage);
   const { f, q, rSail, rPod, sail, pod, intercepted, chipPower, sailPower, podPower, mass } = s;
   const o = filmOptics(p);
-  const sailAreaTotal = sail.chipWm2 > 0 ? sailPower / sail.chipWm2 : 0;
+  const sailAreaTotal = sail.chipWm2 > 0 ? (sailPower / sail.chipWm2) * s.areaFactor : 0;
   const wingAreaTotal = pod.chipWm2 > 0 ? podPower / pod.chipWm2 : 0;
   const radAreaTotal = podPower > 0 ? podPower * pod.radAreaPerW : 0;
 
@@ -528,7 +529,7 @@ export function atYear(p, d, year) {
   return {
     year, calendarYear: p.seedYear + year, built, frac: d.mass > 0 ? built / d.mass : 0, f,
     rSail: s.rSail,
-    nSails: f > 0 && s.sail.chipWm2 > 0 ? s.sailPower / s.sail.chipWm2 / p.sailArea : 0,
+    nSails: f > 0 && s.sail.chipWm2 > 0 ? (s.sailPower / s.sail.chipWm2 / p.sailArea) * s.areaFactor : 0,
     nPods: f > 0 ? s.podPower / p.podPower : 0,
     chipPower: f > 0 ? s.chipPower : 0,
     flops: f > 0 ? s.flops : 0,

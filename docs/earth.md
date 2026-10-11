@@ -120,6 +120,12 @@ The far-side cloud has costs the shell does not:
 - A general-circulation-model ensemble (GeoMIP-style) for infrared added at night with sunlight
   removed by day.
 - Measured emissivity of the hot mesh front and the 15 µm back enamel.
+- Where the mesh sends visible light. About 21 % of the front is aluminium lines. Their coherent
+  mirror reflection, ~4 %, goes straight back to the Sun (it makes the counter-sun inside the cloud
+  magnitude −20.5). The rest of what they reflect goes into diffraction orders if the mesh is
+  periodic, or scatters if it is random. Scattered diffusely it would raise the sails' visible
+  reflectance from 0.004 toward ~0.1 and the night glow with it; a periodic pitch ≤ 0.6 µm keeps
+  the first orders beyond ~42°, out of Earth's view.
 - Collision-free lattice design and derelict capture for a dense co-orbital cloud.
 - Directional emitters (angle-selective back coatings) could give ~1.75× more compute per W/m² than
   mesh fronts, without hot chips or PV loss.

@@ -119,7 +119,7 @@ function renderSail() {
   const f = sailFacts(p);
   $('sail-title').textContent = 'A sheet, not a box';
   const atLimit = h.swarmAt(p, state.earth.cap);
-  const nSails = atLimit.sailPower / atLimit.sail.chipWm2 / p.sailArea;
+  const nSails = (atLimit.sailPower / atLimit.sail.chipWm2 / p.sailArea) * atLimit.areaFactor;
   $('sail-prose').innerHTML = `
     <p>Each satellite is a square of solar film ${num(`${Math.round(f.side)} m`)} on a side, flown corner-first as a diamond ${num(`${Math.round(f.diag)} m`)} from tip to tip. The film is ${num('80 µm')} thick, a little thinner than office paper, which makes the sail ${num(sci(f.side / FILM_THICKNESS, 2))} times wider than it is thick. Shrink it to the width of a room and it would be about as thick as the wall of a soap bubble. It weighs ${num(kg(f.mass))}. That works only because, out there, nothing pushes on it except sunlight.</p>
     <p>Behind the cells sit ${num(sci(f.chips, 2))} chiplets, one every ${num(length(f.s.sail.chipPitch))}. Together they draw ${num(`${f.MW.toFixed(1)} MW`)} and compute ${num(`${sci(f.flops, 2)} FLOP/s`)}, ${num(`${(f.flops / WORLD_AI_FLOPS_2025).toFixed(2)}×`)} all the AI hardware on Earth in 2025. That is one sail. The swarm Earth allows has about ${num(sci(nSails, 1))} of them.</p>

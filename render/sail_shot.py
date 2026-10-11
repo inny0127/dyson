@@ -59,6 +59,8 @@ def main(argv):
     ap.add_argument('--era', default='mid', help="'2026' (design spec) or a model era: low, mid, high")
     ap.add_argument('--swarm-sky', action='store_true', help='the swarm behind: counter-sun, glow, sails as stars, Earth')
     ap.add_argument('--earth-offset', type=float, default=2.6)
+    ap.add_argument('--far-sky', action='store_true',
+                    help="the far-side cloud behind (farside_field): the sail on Earth's orbit, 120 deg from Earth")
     a = ap.parse_args(argv)
     spec = sail.load_spec()
     num = lib.load_numbers()[a.era]['sparse']          # model v4 (node scripts/export-numbers.mjs)
@@ -72,7 +74,9 @@ def main(argv):
     root, _ = sail.build(spec, era=a.era, pitch=pitch)
     v = VIEWS[a.view]
     tx, ty = (math.radians(t) for t in v['tilt'])
-    if not a.swarm_sky:
+    if a.far_sky:
+        r = 1.0
+    if not (a.swarm_sky or a.far_sky):
         lib.add_sun(r, direction=(math.sin(tx), math.sin(ty), -1.0))
         lib.camera(Vector(v['cam']), Vector(v['target']), lens=v['lens'])
     else:
@@ -84,10 +88,21 @@ def main(argv):
         cam = lib.camera(R(v['cam']), R(v['target']), lens=v['lens'])
         cam.data.clip_end = 1e12
         fwd = (R(v['target']) - R(v['cam'])).normalized()
-        sk = argparse.Namespace(f=0.0041, rho=0.004, rho_film=0.0021, r_in=0.86, r_out=0.92, r_cam=r,
-                                lens=v['lens'], dmax=40000.0, seed=3, earth_offset=a.earth_offset)
         sc.cycles.use_adaptive_sampling = False
-        swarm_field.build_sky(sc, sk, cam, fwd, w, h, own_sun=False)
+        if a.far_sky:
+            import farside_field
+            fk = argparse.Namespace(f=0.0379, lat=30.0, rho=0.004, rho_film=0.0021, dr=0.004, psi=120.0,
+                                    lens=v['lens'], dmax=3000.0, sky_width=4096, seed=5, sun_disc=False)
+            farside_field.build_far_sky(sc, cam, fwd, w, h, fk)
+            # the sail sits mid-layer: the plates sunward of it take tau/2 of the sunlight
+            tau = fk.f / ((180 - 2 * 15.0) / 360 * 0.5)
+            for ob in bpy.data.objects:
+                if ob.type == 'LIGHT' and ob.data.type == 'SUN':
+                    ob.data.energy *= math.exp(-tau / 2)
+        else:
+            sk = argparse.Namespace(f=0.0041, rho=0.004, rho_film=0.0021, r_in=0.86, r_out=0.92, r_cam=r,
+                                    lens=v['lens'], dmax=40000.0, seed=3, earth_offset=a.earth_offset)
+            swarm_field.build_sky(sc, sk, cam, fwd, w, h, own_sun=False)
         from bpy_extras.object_utils import world_to_camera_view
         bpy.context.view_layer.update()
         pc = world_to_camera_view(sc, cam, cam.location + Vector((1e9, 0, 0)))
