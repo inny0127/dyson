@@ -50,9 +50,9 @@ def glint_intensity(ang_deg, t_out_deg, edge_frac, th_sun=TH_SUN_1AU):
     wts = wts / wts.sum()
     halo = np.zeros_like(a)
     for u, wt in zip(us, wts):
-        tu = max(math.radians(t_out_deg) * u, th_sun * 1.2)
+        tu = np.maximum(math.radians(t_out_deg) * u, th_sun * 1.2)
         halo += wt * np.where((a >= th_sun) & (a < tu),
-                              edge_frac / (2 * math.pi * math.log(tu / th_sun) * np.maximum(a, th_sun) ** 2), 0.0)
+                              edge_frac / (2 * math.pi * np.log(tu / th_sun) * np.maximum(a, th_sun) ** 2), 0.0)
     return core + halo
 
 
