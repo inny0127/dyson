@@ -826,7 +826,8 @@ def main(argv):
     ap.add_argument('out')
     ap.add_argument('--date', default='2026-08-22')
     ap.add_argument('--sun-alt', type=float, default=-9.0)
-    ap.add_argument('--glow', choices=['none', 'shell', 'farside', 'mix'], default='none')
+    ap.add_argument('--glow', choices=['none', 'shell', 'farside', 'mix', 'uniform'], default='none')
+    ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the swarm round the Sun')
     ap.add_argument('--f-in', type=float, default=0.0, help='mix: coverage inside Earth\'s orbit (r..r_out AU)')
     ap.add_argument('--sun-scale', type=float, default=1.0, help='sunlight reaching Earth past an L1 shade')
     ap.add_argument('--far-lat', type=float, default=30.0, help='far-side cloud half-height, deg')
@@ -853,10 +854,12 @@ def main(argv):
             'sun_az': round(ev['sun_az'], 3), 'width': a.sky_width, 'h_cam': 2070.0, 'jd': round(ev['jd'], 6)}
     if a.glow != 'none':
         spec['glow'] = {'kind': a.glow, 'f': a.f, 'rho': a.rho, 'r_au': a.r, 'lat': a.far_lat}
-        if a.glow in ('shell', 'mix'):
+        if a.glow in ('shell', 'mix', 'uniform'):
             spec['glow'].update(r_in=a.r, r_out=a.r_out)
         if a.glow == 'mix':
             spec['glow'].update(f_far=a.f, f_in=a.f_in)
+        if a.glow == 'uniform':
+            spec['glow'].update(tau=a.tau)
     spec['sun_scale'] = a.sun_scale
     prefix, info = sky_assets(spec)
     w, h = (int(v) for v in a.res.split('x'))

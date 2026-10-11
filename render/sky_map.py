@@ -90,6 +90,22 @@ def cap_samples(centre, radius, n):
 def glow_radiance(dirs, sun, g):
     """Radiance of the swarm glow above the atmosphere (W/m^2/sr, luminance channel)."""
     cosang = dirs @ sun
+    if g['kind'] == 'uniform':
+        # near-uniform swarm (docs/full-swarm.md): sun-facing sails between r_in and r_out AU all round
+        # the Sun, filled to tau, empty within acos(r_in) of the Sun-Earth line (so every line of sight
+        # from Earth misses the near layer) and within 15 deg of L3, which from Earth is a dark hole
+        # ~7 deg round the Sun. Earth sees the far hemisphere's sunlit fronts: tau rho S / pi.
+        tau, rho = g['tau'], g['rho']
+        ang = np.arccos(np.clip(cosang, -1, 1))
+        b = np.where(ang < math.pi / 2, np.sin(ang), 2.0)
+        frac = np.clip((g['r_out'] - b) / (g['r_out'] - g['r_in']), 0, 1)
+        r = 0.5 * (g['r_in'] + g['r_out'])
+        # the L3 gap's edge, 165 deg round the orbit from Earth, seen from Earth
+        hole = math.atan2(r * math.sin(math.radians(15)), 1 + r * math.cos(math.radians(15)))
+        w = math.radians(1.0)
+        open_ = np.clip((ang - hole + w / 2) / w, 0, 1)
+        open_ = open_ * open_ * (3 - 2 * open_)
+        return tau * frac * open_ * rho * S0 / r ** 2 / math.pi / (1 - tau * rho)
     if g['kind'] == 'mix':
         # the far-side cloud (f_far) plus sails inside Earth's orbit (f_in, r_in..r_out AU) kept out of
         # a cone round the Sun-Earth line wide enough (acos r) that Earth sees none of their backs:
@@ -278,6 +294,8 @@ def build(spec, out_prefix):
         if g['kind'] in ('farside', 'mix'):
             g['ecliptic_pole'] = pole.tolist()
         cap = {'shell': 62.0, 'farside': 50.0}.get(g['kind']) or math.degrees(math.asin(min(g.get('r_out', 0.92), 0.999)))
+        if g['kind'] == 'uniform':
+            cap = 80.0
         pts, dO = cap_samples(sun, math.radians(cap), 160)
         Lp = glow_radiance(pts, sun, g)
         glow_sources = [(p, GLOW_COLOUR * L * dO) for p, L in zip(pts, Lp) if L > 0]

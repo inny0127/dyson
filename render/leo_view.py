@@ -136,6 +136,9 @@ class Scene:
             # side of the Sun (thin-layer model in sky_map.glow_radiance)
             g = {'kind': 'farside', 'f': a.f, 'rho': a.rho, 'ecliptic_pole': self.pole, 'lat': a.far_lat}
             R_d = math.radians(50.0)
+        elif a.glow == 'uniform':
+            g = {'kind': 'uniform', 'tau': a.tau, 'rho': a.rho, 'r_in': a.r, 'r_out': a.r_out}
+            R_d = math.radians(80.0)
         elif a.glow == 'mix':
             # the far-side band plus sails inside Earth's orbit outside a keep-out cone
             g = {'kind': 'mix', 'f_far': a.f, 'f_in': a.f_in, 'rho': a.rho, 'ecliptic_pole': self.pole,
@@ -461,7 +464,8 @@ def main(argv):
     ap.add_argument('--el', type=float, default=-14.0)
     ap.add_argument('--roll', type=float, default=0.0)
     ap.add_argument('--lens', type=float, default=16.0)
-    ap.add_argument('--glow', choices=['shell', 'farside', 'mix'], default='shell')
+    ap.add_argument('--glow', choices=['shell', 'farside', 'mix', 'uniform'], default='shell')
+    ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the swarm round the Sun')
     ap.add_argument('--f-in', type=float, default=0.0, help='mix: coverage inside Earth\'s orbit (r..r_out AU)')
     ap.add_argument('--sun-scale', type=float, default=1.0, help='sunlight reaching Earth past an L1 shade')
     ap.add_argument('--f', type=float, default=0.00411)
