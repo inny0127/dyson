@@ -54,7 +54,7 @@ python3 render/post.py "$RAW/inside_far_orbit.png" "$OUT/inside-far-orbit.jpg" -
 # The far-side cloud from low Earth orbit (render/leo_view.py), 22 September 2128 before dawn:
 # 3.8 % wide and 170 mm, and 20 % (±60° cloud) wide. Each exposed for its band.
 LEO_E=${LEO_E:-0.5}
-LEO20_E=${LEO20_E:--1.9}
+LEO20_E=${LEO20_E:--1.1}
 for x in leo_far038 leo_far038_tele leo_far20; do
   python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
 done
