@@ -37,8 +37,8 @@ REPO = os.path.dirname(HERE)
 ASSETS = os.path.join(REPO, 'assets')
 LM = 93.0
 S0 = 1361.0
-FARSIDE_LAT = 30.0                 # deg, the cloud's half-height in heliocentric latitude
-FARSIDE_PATCH = 0.25               # its share of the sphere seen from the Sun: (180/360) sin 30
+FARSIDE_LAT = 30.0                 # deg, the cloud's default half-height in heliocentric latitude
+FARSIDE_L3_GAP = 15.0              # deg either side of L3 kept empty (near-IR would return to Earth)
 FARSIDE_EDGE_DEG = 3.0
 S10 = 2.74e-8 * 10 ** (-0.4 * 10) * (180 / math.pi) ** 2      # one V=10 star per deg^2, W/m^2/sr
 # glow colour: hardware near-neutral, ~9 % of the reflectance from the film's violet AR residual
@@ -109,16 +109,17 @@ def glow_radiance(dirs, sun, g):
         edge = np.clip((R + math.radians(2.5) - ang) / math.radians(5.0), 0, 1)
         edge = edge * edge * (3 - 2 * edge)
         return L * edge
-    # Far-side cloud (docs/data/earth_safe.json, b_coorbital_L3pm90_lat30): sun-facing sails in a
-    # thin layer on Earth's orbit, 90-270 deg of heliocentric longitude from Earth and within 30 deg of
-    # the ecliptic, covering a fraction tau = f / 0.25 of that patch. A line of sight from Earth meets
+    # Far-side cloud (docs/earth.md): sun-facing sails in a thin layer on Earth's orbit, 90-165 and
+    # 195-270 deg of heliocentric longitude from Earth and within g['lat'] (30) deg of the ecliptic,
+    # covering a fraction tau = f / patch of it, patch = (150/360) sin(lat) of the sphere. A line of sight from Earth meets
     # the 1 AU sphere once more, at P = -sun + 2 cos(angle) d (in AU, Sun at the origin); a Lambertian
     # sail front there in full sunlight has radiance rho S / pi from any angle Earth sees it at, so
     # the glow is tau rho S / pi wherever P lies in the patch. Orbital scatter softens the edges by a
     # couple of degrees.
     pole = np.asarray(g['ecliptic_pole'], dtype=float)
     f, rho = g['f'], g['rho']
-    tau = f / FARSIDE_PATCH
+    lat_max = g.get('lat', FARSIDE_LAT)
+    tau = f / ((180 - 2 * FARSIDE_L3_GAP) / 360 * math.sin(math.radians(lat_max)))
     c = np.clip(cosang, 0.0, 1.0)
     P = -sun[None, :] + 2.0 * c[:, None] * dirs
     b = np.degrees(np.arcsin(np.clip(P @ pole, -1, 1)))
@@ -129,7 +130,8 @@ def glow_radiance(dirs, sun, g):
     def smooth(x):
         x = np.clip(x, 0, 1)
         return x * x * (3 - 2 * x)
-    inside = smooth((FARSIDE_LAT + w / 2 - np.abs(b)) / w) * smooth((np.abs(psi) - 90 + w / 2) / w)
+    inside = (smooth((lat_max + w / 2 - np.abs(b)) / w) * smooth((np.abs(psi) - 90 + w / 2) / w)
+              * smooth((180 - FARSIDE_L3_GAP + w / 2 - np.abs(psi)) / w))
     return np.where(cosang > 0, tau * inside * rho * S0 / math.pi, 0.0)
 
 

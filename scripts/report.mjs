@@ -59,7 +59,7 @@ line('Computing Earth allows, shell', ({ S }) => `${sci(S.flops, 2)} FLOP/s`);
 line('Earth allows, far side + L1 shade (≤ 1 W/m²)', ({ E }) => pct(E.cap, 2));
 line('Computing Earth allows, far side', ({ E }) => `${sci(E.flops, 2)} FLOP/s`);
 line('Year the far-side limit is reached', ({ p, d, E }) => yr(p, d.yearsToCoverage(E.cap)));
-line('Night sky at that limit (Sun 18° down)', ({ E }) => `${E.skyLuxAtCap.toFixed(2)} lux`);
+line('Night sky at that limit (Sun 18° down, ecliptic upright)', ({ E }) => `${E.skyLuxAtCap.toFixed(2)} lux`);
 table(['', ...eras.map(e => h.ERAS[e].label)], rows);
 
 const { p, d } = ds.mid;
@@ -108,7 +108,7 @@ w('');
 w('## Earth');
 w('');
 w(`Runaway-greenhouse limit: ${EARTH.runawayAbsorbedLimit} W/m² absorbed (today ${EARTH.absorbedSolar.toFixed(0)}). One CO₂ doubling: ${EARTH.co2DoublingForcing} W/m².`);
-w('Earth\'s limit is its climate alone: at most 1 W/m² of extra heat. A uniform shell on thermal orbits adds its infrared minus the sunlight it blocks. The far-side cloud never crosses the Sun; its infrared-dark fronts send Earth 0.396 W/m² per 1 %, and an L1 shade cancels up to half a budget more (the shade costs ~0.76 % of global rainfall per W/m² it cancels). The cloud can fill at most 21 % of the sky around the Sun it occupies. The glow on the night sky is a consequence, not a limit: for the shell a uniform disc out to asin(r) from the Sun, for the far-side cloud the study\'s 0.31 lux per 1 % at visible reflectance 0.003, in two wings along the ecliptic. See `docs/earth.md`.');
+w('Earth\'s limit is its climate alone: at most 1 W/m² of extra heat. A uniform shell on thermal orbits adds its infrared minus the sunlight it blocks. The far-side cloud never crosses the Sun; its infrared-dark fronts send Earth 0.396 W/m² per 1 %, and an L1 shade cancels up to half a budget more (the shade costs ~0.76 % of global rainfall per W/m² it cancels). Within ±30° of the ecliptic the cloud can fill at most 18.75 % of the Sun\'s light. The glow on the night sky is a consequence, not a limit: for the shell a uniform disc out to asin(r) from the Sun, for the far-side cloud a band of even light along the ecliptic out to 45° from the Sun (a thin layer of sun-facing sails, tau rho S / pi), 0.368 lux per 1 % at visible reflectance 0.003 when the ecliptic stands upright, much less when it lies low. See `docs/earth.md`.');
 w('');
 writeFileSync(out, L.join('\n'));
 console.log(`wrote ${out}`);

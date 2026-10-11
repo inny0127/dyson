@@ -22,14 +22,18 @@ corrected ones are used here. The model (`src/model/hybrid.js`, v4) and its test
 ## When the swarm is built, and with what
 
 With a first launch in 2050 (central case), industry doubles until Mercury's surface cannot shed
-the waste heat of mining (the heat wall). After that, export is capped.
+the waste heat of mining (the heat wall). After that, export is capped. The table uses the page's
+defaults: 0.3 MJ/kg left on Mercury (surface launch to low orbit only) and the far-side placement
+(`docs/earth.md`); `NUMBERS.md` has every row. With a full surface launch (2 MJ/kg) the central
+case reaches 1 % in 2139 and 10 % only in 2642.
 
 | | pessimistic | central | optimistic |
 |---|---|---|---|
-| heat wall | 2202 | 2124 | 2100 |
-| 1 % of sunlight captured | 2230 | 2138 | 2109 |
-| 10 % captured | never | 2420 | 2214 |
-| ceiling (coverage where refresh balances export) | 3.4 % | 14 % | 40 % |
+| heat wall | 2190 | 2123 | 2103 |
+| 1 % of sunlight captured | 2191 | 2124 | 2103 |
+| 3.8 %, what Earth allows | 2207 | 2133 | 2109 |
+| 10 % captured | 2256 | 2155 | 2122 |
+| ceiling, industry left alone (refresh or rock) | 17 % | 37 % | 60 % |
 | compute at the ceiling | 5×10³⁷ FLOP/s | 6×10³⁹ FLOP/s | 2×10⁴¹ FLOP/s |
 
 Refresh keeps the fleet 0–15 years old, so almost all of it carries hardware from after 2095. The
@@ -59,8 +63,11 @@ Hardware is not animated over time: it changes only while the swarm is still too
   - 10²–10⁵ sails can cooperate through low-communication training. That is unproven beyond
     ~5×10²³ FLOP today.
   - 97–99 % of the swarm syncs only on hour scales.
-- **Mercury's heat caps the export rate.** About 3.2×10¹⁹ kg/yr of spacecraft at 5×10¹⁸ W of surface
-  heat and 2 MJ/kg.
+- **Mercury's heat caps the export rate.** About 2×10²⁰ kg/yr of spacecraft at 5×10¹⁸ W of surface
+  heat and 0.3 MJ/kg. 5×10¹⁸ W is the planet paved with radiators heat-pumped to ~1,650 K; bare
+  ground at 500 K sheds 2.4×10¹⁷ W, and 2,000 K radiators reach only ~9×10¹⁸ W. The lever is the heat
+  each kilogram leaves: ~0.05 MJ to dig it, ~0.23 MJ to throw it into low orbit at 3 km/s and 95 %.
+  Catapults in orbit add the rest of the launch, and refining and fabs work there too.
 
 ## What flips
 
@@ -117,20 +124,19 @@ Hardware is not animated over time: it changes only while the swarm is still too
 
 ## Earth decides how big the swarm may be
 
-At the ceiling, the sails sit inside Earth's orbit (0.86–0.91 AU).
+Spread evenly round the Sun, the sails sit inside Earth's orbit (0.86–0.91 AU).
 
 - **The infrared problem.** Every watt they intercept leaves as infrared, and Earth absorbs its
   share. A uniform shell adds about **1.9 W/m² for every 1 % of coverage**, almost independent of
   radius. At the central ceiling that is about +29 W/m², more than seven CO₂ doublings.
 - **The safe limit.** Keeping the added forcing under 1 W/m² allows only ~0.5 % coverage in a
-  uniform shell, and keeping the night sky no brighter than a full Moon allows 0.41 %. That is
-  about 1.7×10³⁸ FLOP/s, reached around 2128.
+  uniform shell, 2×10³⁸ FLOP/s.
 - **Fixes that don't work.** A shadow-free corridor for Earth or a shell outside Earth's orbit
   both make it worse.
-- **What Earth allows.** `docs/earth.md` works this out: the night-sky glow and the climate both cap
-  the swarm near 0.4–0.6 % of the Sun. A far-side placement with infrared-dark fronts and an L1 shade
-  raises the climate limit to ~4 %, at a cost in compute per watt, night-sky brightness and debris
-  risk.
+- **What Earth allows.** `docs/earth.md` works this out: a far-side placement with infrared-dark
+  fronts and an L1 shade raises the climate limit to 3.8 %, 1.0×10³⁹ FLOP/s, at a cost in compute
+  per watt, rainfall, debris risk and a bright band along the ecliptic at night. The night sky is
+  not treated as a limit.
 
 ## What the swarm computes
 

@@ -134,17 +134,19 @@ export const FIXED = {
   podComputeShare: 0.9,
   podDieMm2PerW: 5.5,      // pod die (memory weighted) per W
   toolLife: 10,            // yr; fab tools are replaced like everything else
-  // Earth-safe studies (docs/data/earth_safe*.json): far-side cloud ground illuminance after
-  // astronomical twilight per unit coverage per unit visible reflectance (0.31 lux per 1 % at
-  // rho 0.003; the shell is computed by skyLux); far-side cloud with Mercury-native Al/Mg mesh
-  // low-e fronts: 0.396 W/m² of IR per 1 %, FLOP/J ×0.66 vs the shell (chips at 110 °C), and at
-  // most 0.9 of its patch of sky (Earth's orbit, 90–270° from Earth, ±30°): 21 %.
-  skyLuxPerFRho: 0.31 / (0.01 * 0.003),
+  // Earth-safe studies (docs/data/earth_safe*.json, docs/earth.md). Far-side cloud: a thin layer on
+  // Earth's orbit, 90–165° and 195–270° from Earth (L3 ± 15° stays empty), ±30° of the ecliptic.
+  // Ground illuminance once the Sun is 18° down, ecliptic upright (the worst case): 0.368 lux per
+  // 1 % at rho 0.003 (render/sky_map.py; 0.31 in the study's run without the L3 gap; the shell is
+  // computed by skyLux). Mercury-native Al/Mg mesh low-e fronts: 0.396 W/m² of IR per 1 %, FLOP/J
+  // ×0.66 vs the shell (chips at 110 °C). At most 0.9 of the patch can be filled: 0.9 · 150/360 ·
+  // sin 30° = 18.75 % (±60° would double that for ~6 % more infrared per 1 %).
+  skyLuxPerFRho: 0.368 / (0.01 * 0.003),
   skyDepression: 18,       // deg: the sky rule is set at the end of astronomical twilight
   lumensPerW: 93,          // sunlight reflected off the sails
   farsideIRPerF: 39.6,
   farsideFlopFactor: 0.66,
-  farsideGeomCap: 0.21,
+  farsideGeomCap: 0.9 * (150 / 360) * 0.5,
   horizon: 6000,           // yr simulated
 };
 

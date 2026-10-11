@@ -132,9 +132,9 @@ class Scene:
         self.north = np.cross(self.up, self.east)
         self.P = (RG + a.alt) * self.up
         if a.glow == 'farside':
-            # sails sharing Earth's orbit beyond the Sun: two wings along the ecliptic, 7.5-45 deg
-            # from the Sun (docs/data/earth_safe.json profile, in sky_map.glow_radiance)
-            g = {'kind': 'farside', 'f': a.f, 'rho': a.rho, 'ecliptic_pole': self.pole}
+            # sails sharing Earth's orbit beyond the Sun: a band along the ecliptic 7.5-45 deg either
+            # side of the Sun (thin-layer model in sky_map.glow_radiance)
+            g = {'kind': 'farside', 'f': a.f, 'rho': a.rho, 'ecliptic_pole': self.pole, 'lat': a.far_lat}
             R_d = math.radians(50.0)
         else:
             g = {'kind': 'shell', 'f': a.f, 'rho': a.rho, 'r_au': a.r, 'r_in': a.r, 'r_out': a.r_out}
@@ -460,6 +460,7 @@ def main(argv):
     ap.add_argument('--rho', type=float, default=0.004)
     ap.add_argument('--r', type=float, default=0.8604, help='inner radius of the shell, AU')
     ap.add_argument('--r-out', type=float, default=0.92, help='outer radius of the shell, AU')
+    ap.add_argument('--far-lat', type=float, default=30.0, help='far-side cloud half-height, deg')
     ap.add_argument('--disc-samples', type=int, default=24)
     ap.add_argument('--steps', type=int, default=48)
     ap.add_argument('--aim-moon', action='store_true', help='point at the Moon (az/el become offsets in deg)')

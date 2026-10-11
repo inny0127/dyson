@@ -7,7 +7,7 @@ neutral). Nothing is painted in. Scripts are in `render/`. Each render writes a 
 `render/develop.py` turns it into a photograph (exposure, white balance, AgX), so changing the
 exposure never changes the physics.
 
-## Jenny Lake: tonight and at Earth's limit (`earth_sky.py`)
+## Jenny Lake: tonight and with the far-side cloud (`earth_sky.py`)
 
 - **Place:** Jenny Lake, Grand Teton National Park.
   - Terrain is USGS 3DEP elevation at 8 m (`assets/teton_dem.png`).
@@ -23,17 +23,24 @@ exposure never changes the physics.
     too dark, and turns deep twilight orange where the real sky is blue.
   - The clean-air model is itself 2–4× too bright in deep twilight, so the Sun's sky is scaled to
     measured clear-sky twilight illuminance (3.4 lux at −6°, 0.0083 lux at −12°).
-- **The swarm (`sky_map.py`):** the model's Earth-limited shell, 0.41 % of the Sun at 0.86 AU with
-  visible reflectance 0.004.
-  - Its glow is a disc of radius asin(0.86) = 59° around the Sun, at
-    L = (1 − f) f ρ S / π = 0.0096 W/m²/sr (0.89 cd/m²), seen through the atmosphere's
-    transmittance.
-  - Its edge fades out between asin(0.86) = 59° and asin(0.92) = 67°. For sun-facing sails,
-    coverage builds up as f dr / (r_out − r_in) along any path. A line of sight passing
-    b = sin(angle) from the Sun crosses (r_out − b) of the shell on each side.
-  - It is 99.6 % transparent. Stars behind it lose 0.4 % of their light. It hides faint stars by
-    its brightness, as twilight does.
-  - The same atmosphere model scatters it (the disc split into 36 point sources).
+- **The swarm (`sky_map.py`):** the far-side cloud at Earth's limit, 3.79 % of the Sun, visible
+  reflectance 0.004; and at 20 % in a cloud stretched to ±60°.
+  - The sails are a thin layer of sun-facing fronts on Earth's orbit, 90–165° and 195–270° of
+    heliocentric longitude from Earth, within ±30° of the ecliptic, covering a fraction
+    tau = f / (150/360 · sin 30°) of that patch (0.18 at 3.79 %).
+  - A line of sight from Earth meets the 1 AU sphere once more, at P = −ŝ + 2 cos(θ) d̂. If P is in
+    the patch, it sees a Lambertian sail front in full sunlight over a fraction tau of the way:
+    L = tau ρ S / π = 0.315 W/m²/sr (29 cd/m²) at 3.79 %, the same everywhere in the band. The
+    band's edges are the orbits' limits, softened over 3° for orbital scatter.
+  - This reproduces the Earth-safe study's sky numbers exactly (0.368 lux per 1 % on the ground
+    with the Sun 18° down and the ecliptic upright, for the patch without its L3 gap at 1.2 %).
+    The previous version of the renderer used the study's ring-averaged profile and multiplied it
+    by a latitude window, which counted the band's narrowing twice.
+  - On 22 August at Jenny Lake the evening ecliptic leans about 30° from the horizon, so most of
+    the band is below it.
+  - It is 82 % transparent at 3.79 %: stars behind it lose 18 % of their light. Its brightness
+    hides them long before that matters, as twilight does, so the renderer leaves the dimming out.
+  - The same atmosphere model scatters it (the band split into point sources).
   - Colour: sunlight off near-neutral hardware plus the film's violet anti-reflection residual
     (9 % of the reflectance).
 - **Night sky:**
@@ -46,28 +53,24 @@ exposure never changes the physics.
 - **Air between camera and terrain:** transmittance over each ray's length (Rayleigh plus a summer
   aerosol load at ~2.3 km). In-scattered light is the air's single-scattering source, integrated
   over the whole sky. In twilight the near-ground air is in Earth's shadow and lit only by the sky.
-- **Result:**
-  - Dusk: the disc is ~10× brighter than the blue-hour sky beside it, and lights the ground with
-    0.33 lux of the 0.48 total.
-  - Night: it lights the ground at 0.25 lux, a full Moon, which is exactly the limit the model
-    enforces, and drowns the Milky Way.
+- **Result:** see the captions on the page; the ground illuminance each frame receives is in its
+  render log.
 
 ## The swarm from low Earth orbit (`leo_view.py`)
 
 A numpy renderer: the scene is a sphere, its air and the sky, so it is ray-cast and integrated
 directly rather than path-traced.
 
-- **Where and when:** 400 km over the Nile Delta, 01:06 UTC on 28 March 2128.
-  - The Sun is 36° below the camera's horizontal, 16° below Earth's limb, so the limb's air is
-    in shadow.
-  - The Moon is a waning crescent 35° from the Sun (`ephem.moon_eq`, ~0.3°). Jupiter, at
-    magnitude −2.0, is 5° from it.
-- **The swarm:** the Earth-limited shell, f = 0.41 % between 0.86 and 0.92 AU. From 1 AU it is
-  a disc 59° in radius round the Sun at 0.0096 W/m²/sr, fading out by 67°.
+- **Where and when:** 400 km over the Nile Delta, 01:54 UTC on 22 September 2128.
+  - The Sun is 6° below Earth's limb. Near the September equinox the morning ecliptic stands
+    almost upright over the eastern horizon at 31° N, so the band rises straight up from the dawn.
+  - The Moon is a waning crescent 29° from the Sun (`ephem.moon_eq`, ~0.3°), inside the band.
+    Mercury (V 0.4) and Mars (V 1.8) are about 10° below it.
+- **The swarm:** the far-side cloud as on the Jenny Lake frames (`sky_map.glow_radiance`):
+  3.79 % at 29 cd/m², and 20 % in a ±60° cloud at 92 cd/m².
   - From orbit nothing stands in front of it, except where the line of sight grazes the air.
-  - It is smooth. About 10¹⁶ sails make it, each near magnitude 25 from Earth. Even through
-    the 170 mm lens about 10⁷ sails share a pixel, so it varies by under 1 %, vane flashes
-    included.
+  - It is smooth. About 10¹⁷ sails make it, each near magnitude 25–26 from Earth, so millions share
+    every pixel even through the 170 mm lens.
 - **Earth:**
   - City lights: NASA Black Marble 2016. Global at 5 km, with 1 km and 500 m crops of the
     region in view rescaled to the global map. A map value of 1 is taken as 3.8 × 10⁻³ W/m²/sr
@@ -75,20 +78,19 @@ directly rather than path-traced.
     about 3×. Colour 3,500 K.
   - Clouds: the Blue Marble composite, albedo 0.65. Land: Blue Marble colour.
   - Ocean: albedo 0.03 plus a rough mirror of the sky (Fresnel, wave slopes σ = 0.2).
-  - Night-side lighting: the part of the disc above each point's horizon, through the air. It
-    gives 0.05 lux under the camera and 0.23 lux near the limb, plus 12 % skylight.
+  - Night-side lighting: the part of the band above each point's horizon, through the air, plus
+    12 % skylight.
 - **Air:** the multiple-scattering model of `atmosphere.py`, integrated along each ray from
   orbit and lit by the disc (as point sources) and the Sun.
   - Airglow layers: O 557.7 nm at 97 km (250 R), Na 589 nm at 92 km (50 R), O 630 nm at 250 km
-    (80 R). They are about 370× fainter than the swarm's glow, so they do not register.
+    (80 R). They are thousands of times fainter than the band, so they do not register.
 - **The Moon:**
   - LRO albedo scaled to a mean normal albedo of 0.12.
   - Sunlight with lunar-Lambert photometry (McEwen 1991, Lambert beyond 100° phase).
-  - Earthshine: Earth at 35° phase, Bond albedo 0.30, gives 0.065 W/m². Its night side comes
-    out about a quarter as bright as the glow behind it, so it shows dark.
+  - Earthshine: Earth at ~30° phase, Bond albedo 0.30, gives 0.063 W/m². Its night side comes
+    out about a hundredth as bright as the band behind it, so it shows black.
 - **Stars and planets:** the V ≤ 8 catalogue and the planets, as points through the air's
-  transmittance. Then `glare.py` and `develop.py`, at an exposure that puts the glow at about
-  0.15 of white.
+  transmittance. Then `glare.py` and `develop.py`, exposed for the band.
 
 ## The sail and the counter-sun (`sail_shot.py --view corner_counter_sun --swarm-sky`)
 

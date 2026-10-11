@@ -31,7 +31,7 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell). 
 | Earth allows, far side + L1 shade (≤ 1 W/m²) | 3.79% | 3.79% | 3.79% | 3.79% |
 | Computing Earth allows, far side | 1.6×10³⁷ FLOP/s | 3.9×10³⁷ FLOP/s | 1×10³⁹ FLOP/s | 1.4×10⁴⁰ FLOP/s |
 | Year the far-side limit is reached | 2303 | 2207 | 2133 | 2109 |
-| Night sky at that limit (Sun 18° down) | 1.57 lux | 1.57 lux | 1.57 lux | 1.57 lux |
+| Night sky at that limit (Sun 18° down, ecliptic upright) | 1.86 lux | 1.86 lux | 1.86 lux | 1.86 lux |
 
 ## Central case, year by year
 
@@ -40,15 +40,15 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell). 
 | 2070 | 1.6×10⁻¹¹% | 4.2×10²⁷ | 4.4×10⁵ | 7.8×10⁻¹²% | 0.088% | 0.00 W/m² | 0.00 lux |
 | 2100 | 1.8×10⁻⁵% | 4.8×10³³ | 5×10¹¹ | 8.9×10⁻⁶% | 0.088% | 0.00 W/m² | 0.00 lux |
 | 2110 | 0.0019% | 5×10³⁵ | 5.2×10¹³ | 9.2×10⁻⁴% | 0.088% | 0.00 W/m² | 0.00 lux |
-| 2120 | 0.19% | 5.2×10³⁷ | 5.4×10¹⁵ | 0.096% | 0.088% | 0.08 W/m² | 0.08 lux |
-| 2130 | 2.862% | 7.7×10³⁸ | 8.2×10¹⁶ | 1.423% | 3% | 1.00 W/m² | 1.18 lux |
-| 2150 | 8.613% | 2.3×10³⁹ | 2.6×10¹⁷ | 4.399% | 58% | 2.91 W/m² | 3.56 lux |
-| 2200 | 21.15% | 5.7×10³⁹ | 6.8×10¹⁷ | 11.84% | 86% | 7.87 W/m² | 8.74 lux |
-| 2300 | 35.10% | 9.4×10³⁹ | 1.3×10¹⁸ | 24.37% | 100% | 13.40 W/m² | 14.51 lux |
-| 2450 | 18.73% | 5×10³⁹ | 5.9×10¹⁷ | 24.37% | 100% | 6.92 W/m² | 7.74 lux |
-| 2750 | 5.392% | 1.4×10³⁹ | 1.6×10¹⁷ | 24.37% | 100% | 1.64 W/m² | 2.23 lux |
-| 3150 | 1.032% | 2.8×10³⁸ | 2.9×10¹⁶ | 24.37% | 100% | 0.41 W/m² | 0.43 lux |
-| 3550 | 0.2% | 5.3×10³⁷ | 5.6×10¹⁵ | 24.37% | 100% | 0.08 W/m² | 0.08 lux |
+| 2120 | 0.19% | 5.2×10³⁷ | 5.4×10¹⁵ | 0.096% | 0.088% | 0.08 W/m² | 0.09 lux |
+| 2130 | 2.862% | 7.7×10³⁸ | 8.2×10¹⁶ | 1.423% | 3% | 1.00 W/m² | 1.40 lux |
+| 2150 | 8.613% | 2.3×10³⁹ | 2.6×10¹⁷ | 4.399% | 58% | 2.91 W/m² | 4.23 lux |
+| 2200 | 21.15% | 5.7×10³⁹ | 6.8×10¹⁷ | 11.84% | 86% | 7.87 W/m² | 10.38 lux |
+| 2300 | 35.10% | 9.4×10³⁹ | 1.3×10¹⁸ | 24.37% | 100% | 13.40 W/m² | 17.22 lux |
+| 2450 | 18.73% | 5×10³⁹ | 5.9×10¹⁷ | 24.37% | 100% | 6.92 W/m² | 9.19 lux |
+| 2750 | 5.392% | 1.4×10³⁹ | 1.6×10¹⁷ | 24.37% | 100% | 1.64 W/m² | 2.65 lux |
+| 3150 | 1.032% | 2.8×10³⁸ | 2.9×10¹⁶ | 24.37% | 100% | 0.41 W/m² | 0.51 lux |
+| 3550 | 0.2% | 5.3×10³⁷ | 5.6×10¹⁵ | 24.37% | 100% | 0.08 W/m² | 0.10 lux |
 
 ## What sets the ceiling: service life and recycling (central case)
 
@@ -94,4 +94,4 @@ At these figures the swarm Earth allows (3.79% on the far side) takes 7.7% of Me
 ## Earth
 
 Runaway-greenhouse limit: 282 W/m² absorbed (today 238). One CO₂ doubling: 3.93 W/m².
-Earth's limit is its climate alone: at most 1 W/m² of extra heat. A uniform shell on thermal orbits adds its infrared minus the sunlight it blocks. The far-side cloud never crosses the Sun; its infrared-dark fronts send Earth 0.396 W/m² per 1 %, and an L1 shade cancels up to half a budget more (the shade costs ~0.76 % of global rainfall per W/m² it cancels). The cloud can fill at most 21 % of the sky around the Sun it occupies. The glow on the night sky is a consequence, not a limit: for the shell a uniform disc out to asin(r) from the Sun, for the far-side cloud the study's 0.31 lux per 1 % at visible reflectance 0.003, in two wings along the ecliptic. See `docs/earth.md`.
+Earth's limit is its climate alone: at most 1 W/m² of extra heat. A uniform shell on thermal orbits adds its infrared minus the sunlight it blocks. The far-side cloud never crosses the Sun; its infrared-dark fronts send Earth 0.396 W/m² per 1 %, and an L1 shade cancels up to half a budget more (the shade costs ~0.76 % of global rainfall per W/m² it cancels). Within ±30° of the ecliptic the cloud can fill at most 18.75 % of the Sun's light. The glow on the night sky is a consequence, not a limit: for the shell a uniform disc out to asin(r) from the Sun, for the far-side cloud a band of even light along the ecliptic out to 45° from the Sun (a thin layer of sun-facing sails, tau rho S / pi), 0.368 lux per 1 % at visible reflectance 0.003 when the ecliptic stands upright, much less when it lies low. See `docs/earth.md`.

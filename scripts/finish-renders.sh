@@ -11,18 +11,19 @@ OUT=renders
 dev() { blender -b --python render/develop.py -- "$1" "$2" --exposure "$3" > /dev/null 2>&1; }
 exposure_of() { grep -o '"exposure": [-0-9.]*' "$RAW/$1.log" | tail -1 | awk '{print $2}'; }
 
-# Earth: dusk pair at one exposure (metered on tonight's blue sky), night pair each metered
+# Earth: dusk pair at one exposure (metered on tonight's blue sky), night frames each metered.
+# *_far038: the far-side cloud at Earth's limit (3.8 %); night_far20: 20 % in a ±60° cloud.
 E_DUSK=$(exposure_of dusk_tonight)
 dev "$RAW/dusk_tonight.exr" "$RAW/dusk_tonight.png" "$E_DUSK"
-dev "$RAW/dusk_limit.exr" "$RAW/dusk_limit.png" "$E_DUSK"
-dev "$RAW/night_tonight.exr" "$RAW/night_tonight.png" "$(exposure_of night_tonight)"
-dev "$RAW/night_limit.exr" "$RAW/night_limit.png" "$(exposure_of night_limit)"
-for x in dusk_tonight dusk_limit; do
-  python3 render/post.py "$RAW/$x.png" "$OUT/earth-${x/_/-}.jpg" --fov 104 --noise 0.8 --glare 0.02 --width 2400 --quality 86
+dev "$RAW/dusk_far038.exr" "$RAW/dusk_far038.png" "$E_DUSK"
+for x in night_tonight night_far038 night_far20; do
+  dev "$RAW/$x.exr" "$RAW/$x.png" "$(exposure_of $x)"
 done
-for x in night_tonight night_limit; do
-  python3 render/post.py "$RAW/$x.png" "$OUT/earth-${x/_/-}.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
-done
+python3 render/post.py "$RAW/dusk_tonight.png" "$OUT/earth-dusk-tonight.jpg" --fov 104 --noise 0.8 --glare 0.02 --width 2400 --quality 86
+python3 render/post.py "$RAW/dusk_far038.png" "$OUT/earth-dusk-far.jpg" --fov 104 --noise 0.8 --glare 0.02 --width 2400 --quality 86
+python3 render/post.py "$RAW/night_tonight.png" "$OUT/earth-night-tonight.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
+python3 render/post.py "$RAW/night_far038.png" "$OUT/earth-night-far.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
+python3 render/post.py "$RAW/night_far20.png" "$OUT/earth-night-far20.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
 
 # Pod: visible photograph, and the false-colour thermal frame (no optical effects)
 python3 render/post.py "$RAW/pod_hero.png" "$OUT/pod-visible.jpg" --fov 84 --noise 0.6 --width 2400 --quality 88
@@ -44,12 +45,17 @@ python3 render/glare.py "$RAW/sail_counter_sun.exr" "$RAW/sail_counter_sun_g.exr
 dev "$RAW/sail_counter_sun_g.exr" "$RAW/sail_counter_sun.png" "$(grep -o 'exposure [-0-9.]*' "$RAW/sail_counter_sun.log" | tail -1 | awk '{print $2}')"
 python3 render/post.py "$RAW/sail_counter_sun.png" "$OUT/sail-counter-sun.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
 
-# The swarm from low Earth orbit (render/leo_view.py output): one exposure for both, the glow at
-# ~0.15 of white
-for x in leo_wide leo_tele; do
+# The far-side cloud from low Earth orbit (render/leo_view.py), 22 September 2128 before dawn:
+# 3.8 % wide and 170 mm, and 20 % (±60° cloud) wide. Each exposed for its band.
+LEO_E=${LEO_E:-0.5}
+LEO20_E=${LEO20_E:--1.9}
+for x in leo_far038 leo_far038_tele leo_far20; do
   python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
-  dev "$RAW/${x}_g.exr" "$RAW/$x.png" 4.0
 done
-python3 render/post.py "$RAW/leo_wide.png" "$OUT/leo-wide.jpg" --fov 84 --noise 0.8 --width 2400 --quality 88
-python3 render/post.py "$RAW/leo_tele.png" "$OUT/leo-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
+dev "$RAW/leo_far038_g.exr" "$RAW/leo_far038.png" "$LEO_E"
+dev "$RAW/leo_far038_tele_g.exr" "$RAW/leo_far038_tele.png" "$LEO_E"
+dev "$RAW/leo_far20_g.exr" "$RAW/leo_far20.png" "$LEO20_E"
+python3 render/post.py "$RAW/leo_far038.png" "$OUT/leo-far-wide.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
+python3 render/post.py "$RAW/leo_far038_tele.png" "$OUT/leo-far-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
+python3 render/post.py "$RAW/leo_far20.png" "$OUT/leo-far20.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
 ls -la $OUT

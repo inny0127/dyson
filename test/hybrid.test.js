@@ -184,17 +184,18 @@ test('Earth: a uniform interior shell adds ~1.9 W/m² per 1 % coverage; ≤ 1 W/
 });
 
 test('Earth limits: climate only; the far side with an L1 shade allows ~3.8 %, 7× the shell', () => {
-  // the study's own glow figures: 0.58 lux per 1 % at rho 0.003, r 0.91 AU (shell), 0.31 (far side)
+  // glow: the study's 0.58 lux per 1 % at rho 0.003, r 0.91 AU (shell); the far side with its L3 gap
+  // 0.368 (render/sky_map.py, = the study's 0.368 at 1.2 % without the gap)
   const p91 = { ...pMid, rhoVis: 0.003, placement: 'manual', rManual: 0.91 };
   near(h.skyLux(p91, 0.01), 0.58, 0.02, 'shell ground lux per 1 % (earth_safe.json)');
-  near(h.skyLux({ ...pFar, rhoVis: 0.003 }, 0.01), 0.31, 1e-9, 'far side');
+  near(h.skyLux({ ...pFar, rhoVis: 0.003 }, 0.01), 0.368, 1e-9, 'far side');
   const S = h.earthLimits(pMid), F = h.earthLimits(pFar);
   near(S.cap, 0.0053, 0.0007, 'shell at 1 W/m²');
   near(F.cap, 0.0379, 0.002, 'far side with a 1.5× shade');
   near(F.shell, S.cap, 1e-12, 'the shell figure does not depend on the placement chosen');
   near(h.earthForcing(pFar, F.cap).net, pFar.forcingLimit, 1e-9, 'net forcing at the cap is the budget');
   near(h.earthForcing(pFar, F.cap).shade, 0.5, 1e-9, 'the shade cancels half a budget');
-  near(F.skyLuxAtCap, 1.57, 0.05, 'the night sky is lit by ~6 full Moons');
+  near(F.skyLuxAtCap, 1.86, 0.05, 'with the ecliptic upright, the night sky is lit by ~7 full Moons');
   assert.ok(F.flops / S.flops > 3.5 && F.flops / S.flops < 6, `far side vs shell ${F.flops / S.flops}`);
-  near(h.earthLimits({ ...pFar, forcingLimit: 10, thermostatCredit: 2.5 }).cap, 0.21, 1e-12, 'geometric cap');
+  near(h.earthLimits({ ...pFar, forcingLimit: 10, thermostatCredit: 2.5 }).cap, 0.1875, 1e-12, 'geometric cap');
 });
