@@ -6,280 +6,286 @@
 <title>Mercury Swarm Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Saira+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: a photo essay in a reading column (photographs exposed like real cameras, so they only
-   read on black) with a docked ledger of live numbers on the right. One dark world on purpose.
-   Colour: sunlight amber is the one accent; infrared orange marks heat; cool blue marks Earth. */
+/* Layout: an editorial essay. One reading column of serif text; photographs sit on black plates
+   that break wider than the text; illustrations are fine-line technical drawings in the ink colour,
+   with one hue only where it carries meaning (sunlight amber, infrared red, Earth blue).
+   Type: Newsreader for reading and headlines, IBM Plex Sans for figures, captions and controls. */
 :root {
-  --bg: #05070b;
-  --panel: #0a0e15;
-  --raise: #0f141d;
-  --line: rgba(150, 163, 186, 0.18);
-  --fg: #ece6d8;
-  --soft: #cfc9bc;
-  --muted: #8f96a4;
-  --sun: #ffb547;
-  --ir: #ff6a3d;
-  --cool: #86b6ff;
-  --warn: #ff7a59;
-  --ok: #8fd3a6;
-  --swarm: #9a73ec;
-  --font-display: 'Saira Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
-  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  --ledger-w: 360px;
-  --measure: 66ch;
+  --paper: #f6f7f8;
+  --ink: #16191e;
+  --ink-2: #484e57;
+  --ink-3: #7a808a;
+  --rule: #dcdfe4;
+  --wash: #eceef1;
+  --plate: #040506;
+  --sun: #b26a08;
+  --sun-mark: #eda100;
+  --heat: #c8442a;
+  --earth: #2a78d6;
+  --swarm: #6250d6;
+  --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --col: 40rem;
+  --wide: 72rem;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1114; --ink: #ebe9e4; --ink-2: #b9bbbf; --ink-3: #868b93; --rule: #272b31; --wash: #171a1e;
+    --sun: #f0a73a; --sun-mark: #c98500; --heat: #ff7a59; --earth: #3987e5; --swarm: #9085e9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1114; --ink: #ebe9e4; --ink-2: #b9bbbf; --ink-3: #868b93; --rule: #272b31; --wash: #171a1e;
+  --sun: #f0a73a; --sun-mark: #c98500; --heat: #ff7a59; --earth: #3987e5; --swarm: #9085e9;
   color-scheme: dark;
 }
-html { background: var(--bg); }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
+
+html { background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.1875rem/1.62 var(--serif); font-optical-sizing: auto; -webkit-font-smoothing: antialiased; }
 button, input, select { font: inherit; color: inherit; }
-button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
 img { max-width: 100%; display: block; }
-a { color: var(--sun); }
+a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px; }
 
-.app { display: grid; grid-template-columns: minmax(0, 1fr) var(--ledger-w); min-height: 100vh; }
+/* ---------------- hero */
+.hero { position: relative; background: var(--plate); color: #f2f0eb; }
+.hero img { width: 100%; height: clamp(22rem, 58vw, 44rem); object-fit: cover; object-position: 58% 52%; }
+.hero .title { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 max(1rem, 5vw) clamp(1.5rem, 4vw, 3.5rem); display: grid; gap: 0.6rem; }
+.hero .kicker { font: 500 0.75rem/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: #c9c5bb; }
+.hero h1 { margin: 0; font: 300 clamp(2.6rem, 7vw, 5.6rem)/0.98 var(--serif); letter-spacing: -0.01em; text-wrap: balance; max-width: 14ch; }
+.hero .credit { position: absolute; right: max(1rem, 5vw); bottom: clamp(1.5rem, 4vw, 3.5rem); font: 400 0.75rem/1.4 var(--sans); color: #8d8a84; max-width: 20rem; text-align: right; }
 
-/* ---------- essay */
-.essay { min-width: 0; padding-inline: clamp(16px, 4vw, 56px); padding-block: 28px 140px; }
-.masthead { max-width: 1100px; margin: 0 auto 26px; display: grid; gap: 14px; }
-.masthead .eyebrow { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--sun); }
-.masthead h1 { margin: 0; font: 700 clamp(34px, 6vw, 64px)/0.95 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; text-wrap: balance; }
-.masthead h1 span { color: var(--sun); }
-.masthead p.lede { margin: 0; max-width: var(--measure); color: var(--soft); font-size: 17px; line-height: 1.55; }
-.eras { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.eras > span { font: 500 11px/1 var(--font-mono); color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-right: 4px; }
-.eras button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font: 500 12px/1 var(--font-mono); color: var(--soft); }
-.eras button:hover { border-color: var(--muted); }
-.eras button[aria-pressed="true"] { border-color: var(--sun); color: var(--bg); background: var(--sun); }
+main { padding-inline: 1rem; }
+.col { max-width: var(--col); margin-inline: auto; width: 100%; box-sizing: border-box; }
+.wide { max-width: var(--wide); margin-inline: auto; width: 100%; box-sizing: border-box; }
 
-.chapter { max-width: 1100px; margin: 0 auto; padding-block: 36px; border-top: 1px solid var(--line); display: grid; gap: 18px; }
-.chapter > header { display: grid; gap: 6px; }
-.chapter .eyebrow { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-.chapter h2 { margin: 0; font: 600 clamp(26px, 3.4vw, 38px)/1.02 var(--font-display); letter-spacing: 0.02em; text-wrap: balance; }
-.prose { max-width: var(--measure); display: grid; gap: 12px; }
-.prose p { margin: 0; color: var(--soft); }
-.prose b, .prose strong { color: var(--fg); font-weight: 600; }
-.n { font-family: var(--font-mono); font-size: 0.93em; color: var(--fg); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.n.sun { color: var(--sun); } .n.ir { color: var(--ir); } .n.warn { color: var(--warn); } .n.cool { color: var(--cool); }
+.standfirst { padding-block: 2.75rem 1rem; }
+.standfirst p { margin: 0; font-size: 1.45rem; line-height: 1.45; color: var(--ink); }
+.era { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.25rem; margin-top: 1.75rem; font: 400 0.875rem/1 var(--sans); }
+.era > span { color: var(--ink-3); margin-right: 0.5rem; }
+.era button { border: 0; background: none; padding: 0.45rem 0.7rem; border-radius: 999px; color: var(--ink-2); cursor: pointer; }
+.era button:hover { background: var(--wash); }
+.era button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 
-figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
-figure img { width: 100%; height: auto; border-radius: 3px; background: #000; }
-figcaption { font: 400 12px/1.5 var(--font-mono); color: var(--muted); max-width: var(--measure); }
-figcaption b { color: var(--soft); font-weight: 500; }
-.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.scale { display: flex; align-items: center; gap: 8px; font: 400 11px/1 var(--font-mono); color: var(--muted); }
-.scale i { display: block; height: 8px; width: 160px; border-radius: 2px;
-  background: linear-gradient(90deg, #000004, #320a5e, #781c6d, #bb3754, #ed6925, #fbb61a, #fcffa4); }
+.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-block: 2rem 1rem; }
+.figures div { padding: 1.1rem 1rem 1.2rem 0; display: grid; gap: 0.35rem; align-content: start; }
+.figures div + div { padding-left: 1rem; border-left: 1px solid var(--rule); }
+.figures b { font: 500 1.6rem/1.1 var(--sans); letter-spacing: -0.01em; }
+.figures span { font: 400 0.8125rem/1.35 var(--sans); color: var(--ink-3); }
 
-/* comparison table */
-.tablewrap { overflow-x: auto; max-width: 100%; }
-table.compare { border-collapse: collapse; min-width: 440px; width: 100%; font-size: 13.5px; }
-table.compare th, table.compare td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-table.compare th { font: 600 12px/1.2 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-table.compare td.v { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--fg); }
-table.compare td.k { width: 34%; }
-table.compare td.k { color: var(--soft); }
-table.compare tr.win td.v.best { color: var(--sun); }
+/* ---------------- chapters */
+section.chapter { padding-block: 3.5rem 1rem; display: grid; gap: 1.6rem; }
+.kicker { font: 500 0.75rem/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+h2 { margin: 0.5rem 0 0; font: 400 clamp(1.9rem, 3.6vw, 2.6rem)/1.08 var(--serif); letter-spacing: -0.005em; text-wrap: balance; }
+.prose p { margin: 0 0 1.05rem; }
+.prose p:last-child { margin-bottom: 0; }
+.num { font: 500 0.92em/1 var(--sans); font-variant-numeric: lining-nums; white-space: nowrap; }
 
-/* build-out chart */
-.chartcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 14px 10px; display: grid; gap: 10px; min-width: 0; }
-.chartcard svg { width: 100%; height: auto; display: block; touch-action: none; }
-.chartcard .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font: 400 11px/1.3 var(--font-mono); color: var(--muted); }
-.chartcard .legend i { display: inline-block; width: 12px; height: 2px; vertical-align: 3px; margin-right: 6px; border-radius: 1px; }
-.scrub { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
-.scrub button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--sun); }
-.scrub input[type=range] { width: 100%; accent-color: var(--sun); margin: 0; }
-.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
-.readout div { display: grid; gap: 2px; padding-top: 6px; border-top: 1px solid var(--line); }
-.readout span { font: 400 11px/1.3 var(--font-mono); color: var(--muted); }
-.readout b { font: 500 15px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--fg); }
-.readout b.sun { color: var(--sun); } .readout b.warn { color: var(--warn); }
+figure { margin: 0; display: grid; gap: 0.75rem; min-width: 0; }
+figcaption { font: 400 0.875rem/1.5 var(--sans); color: var(--ink-2); max-width: var(--col); }
+figcaption b { font-weight: 600; color: var(--ink); }
+.plate { background: var(--plate); }
+.plate img { width: 100%; height: auto; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.irscale { display: flex; align-items: center; gap: 0.6rem; font: 400 0.8125rem/1 var(--sans); color: var(--ink-3); }
+.irscale i { display: block; height: 6px; width: 9rem; border-radius: 3px; background: linear-gradient(90deg, #000004, #320a5e, #781c6d, #bb3754, #ed6925, #fbb61a, #fcffa4); }
 
-/* ---------- ledger */
-aside.ledger { position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
-.ledger-head { padding: 16px 18px 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.ledger-head h2 { margin: 0; font: 600 16px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; }
-.ledger-head .yr { font: 500 12px/1 var(--font-mono); color: var(--sun); }
-.btn { border: 1px solid var(--line); background: transparent; border-radius: 5px; padding: 6px 10px; font: 500 11px/1 var(--font-mono); color: var(--fg); }
-.btn:hover { border-color: var(--muted); }
-.btn.accent { border-color: rgba(255, 181, 71, 0.5); color: var(--sun); }
-.ledger-body { overflow-y: auto; padding: 4px 18px 28px; min-height: 0; flex: 1; }
-.ledger section { padding: 12px 0 6px; border-bottom: 1px solid var(--line); }
-.ledger section:last-child { border-bottom: 0; }
-.ledger h3 { margin: 0 0 6px; font: 600 12.5px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
-.ledger h3 span { color: var(--sun); font: 400 10.5px/1 var(--font-mono); letter-spacing: 0; text-transform: none; }
-.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 12px; padding: 4px 0; align-items: baseline; }
-.row .k { color: var(--soft); font-size: 12.5px; min-width: 0; }
-.row .v { font: 500 12.5px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.row .note { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-.row.sun .v { color: var(--sun); } .row.warn .v { color: var(--warn); } .row.ok .v { color: var(--ok); }
+.drawing { color: var(--ink); }
+.drawing svg, .chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart { position: relative; }
+.tip { position: absolute; pointer-events: none; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 0.5rem 0.65rem; font: 400 0.8125rem/1.45 var(--sans); color: var(--ink); box-shadow: 0 4px 18px rgb(0 0 0 / 0.08); white-space: nowrap; transform: translate(-50%, calc(-100% - 12px)); }
+.tip b { font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font: 400 0.8125rem/1.3 var(--sans); color: var(--ink-2); }
+.legend i { display: inline-block; width: 14px; height: 2px; border-radius: 1px; vertical-align: 0.3em; margin-right: 0.45rem; }
 
-.drawer { position: fixed; top: 0; bottom: 0; right: 0; width: min(var(--ledger-w), 100%); z-index: 20; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.25s ease; padding-top: env(safe-area-inset-top, 0px); }
-.drawer.open { transform: none; }
-.param { padding: 10px 0; border-bottom: 1px solid var(--line); }
-.param label { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--soft); }
-.param label output { font: 500 12px var(--font-mono); color: var(--sun); white-space: nowrap; }
-.param input[type=range] { width: 100%; accent-color: var(--sun); margin: 6px 0 0; }
-.param select { width: 100%; margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px; }
-.param .help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
-.param-group { font: 600 12px/1 var(--font-display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); padding: 16px 0 2px; }
-.ledger-toggle { display: none; }
+.scrub { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem; align-items: center; }
+.scrub button { width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; font: 400 0.8rem/1 var(--sans); }
+.scrub input { width: 100%; accent-color: var(--ink); margin: 0; }
+.readout { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem 1.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.readout div { display: grid; gap: 0.2rem; }
+.readout span { font: 400 0.8125rem/1.3 var(--sans); color: var(--ink-3); }
+.readout b { font: 500 1.05rem/1.25 var(--sans); font-variant-numeric: tabular-nums; }
+.readout b.over { color: var(--heat); }
 
-footer.sources { max-width: 1100px; margin: 0 auto; padding-block: 30px 0; border-top: 1px solid var(--line); display: grid; gap: 10px; }
-footer.sources .eyebrow { margin: 0; font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-footer.sources p, footer.sources li { color: var(--muted); font-size: 13px; max-width: var(--measure); }
-footer.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+table.compare { width: 100%; border-collapse: collapse; font: 400 0.95rem/1.4 var(--sans); }
+table.compare th { text-align: left; font-weight: 500; color: var(--ink-3); font-size: 0.8125rem; padding: 0 0.75rem 0.6rem 0; border-bottom: 1px solid var(--ink); }
+table.compare td { padding: 0.7rem 0.75rem 0.7rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.compare td:first-child { color: var(--ink-2); width: 38%; }
+table.compare td.v { font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; }
 
-@media (max-width: 980px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
-  aside.ledger { position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: 64vh; z-index: 15; transform: translateY(100%); transition: transform 0.25s ease; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  aside.ledger.open { transform: none; }
-  .ledger-toggle { display: inline-block; position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 16; background: var(--sun); color: var(--bg); border: 0; border-radius: 999px; padding: 10px 16px; font: 600 13px/1 var(--font-mono); }
-}
-@media (max-width: 640px) {
+/* ---------------- assumptions */
+details.assumptions { border-top: 1px solid var(--ink); padding-top: 1.25rem; }
+details.assumptions summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+details.assumptions summary::-webkit-details-marker { display: none; }
+details.assumptions summary h2 { margin: 0; }
+details.assumptions summary span { font: 400 0.875rem/1 var(--sans); color: var(--ink-3); }
+.params { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.25rem 2rem; margin-top: 1.25rem; }
+.param-group { grid-column: 1 / -1; font: 500 0.75rem/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); padding-top: 1.5rem; }
+.param { padding: 0.7rem 0; border-bottom: 1px solid var(--rule); font-family: var(--sans); }
+.param label { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.875rem; color: var(--ink); }
+.param output { font-size: 0.875rem; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.param input[type=range] { width: 100%; accent-color: var(--ink); margin: 0.5rem 0 0; }
+.param select { width: 100%; margin-top: 0.5rem; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 0.35rem; }
+.param .help { font-size: 0.8125rem; line-height: 1.45; color: var(--ink-3); margin-top: 0.35rem; }
+.reset { margin-top: 1.25rem; border: 1px solid var(--rule); background: none; border-radius: 999px; padding: 0.5rem 1rem; font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+
+footer { padding-block: 3rem 5rem; font: 400 0.875rem/1.6 var(--sans); color: var(--ink-2); }
+footer h2 { font-size: 1.4rem; margin-bottom: 0.75rem; }
+footer ul { padding-left: 1.1rem; margin: 0.75rem 0 0; }
+footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospace; }
+
+@media (max-width: 760px) {
+  body { font-size: 1.0625rem; }
+  .standfirst p { font-size: 1.25rem; }
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .figures div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .figures div:nth-child(n+3) { border-top: 1px solid var(--rule); }
   .pair { grid-template-columns: minmax(0, 1fr); }
-  body { font-size: 14.5px; }
+  .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero .credit { display: none; }
+  .drawing > div, .chart { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .drawing svg, .chart svg { min-width: 760px; }
+  .drawing > div::after, .chart::after { content: 'Scroll sideways'; display: block; font: 400 0.75rem/1 var(--sans); color: var(--ink-3); padding-top: 0.4rem; position: sticky; left: 0; }
 }
-@media (prefers-reduced-motion: reduce) { .drawer, aside.ledger { transition: none; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 </style>
 </head>
 <body>
-<div class="app">
-  <main class="essay" id="essay">
-    <header class="masthead">
-      <div class="eyebrow">A Dyson swarm, built from Mercury, by the numbers</div>
-      <h1>Mercury <span>Swarm</span> Ledger</h1>
-      <p class="lede">Solar panels that are also computers, made from Mercury's rock and flown around the Sun. Every photograph and number on this page comes from one physics model. Change an assumption and the whole page recomputes.</p>
-      <div class="eras" role="group" aria-label="Hardware era">
-        <span>Hardware</span>
-        <button data-era="2026" aria-pressed="false">2026, today</button>
-        <button data-era="low" aria-pressed="false">Mature, pessimistic</button>
-        <button data-era="mid" aria-pressed="true">Mature, central</button>
-        <button data-era="high" aria-pressed="false">Mature, optimistic</button>
-      </div>
-    </header>
-
-    <section class="chapter" id="sail">
-      <figure>
-        <img src="renders/sail-hero.jpg" alt="A dark navy diamond-shaped solar sail against black space, with a line of bright glints across one side" width="2560" height="1440">
-        <figcaption><b>One compute sail, photographed from 1 km on the sunward side.</b> Cycles path tracing with the Sun at its true brightness and size, exposed like a camera metered on sunlit grey. The film reflects about 0.2 % of visible light, so it records as near-black navy. The bright line is the Sun's reflection in the cover glass, broken into segments where each 1.6 m fold panel curls a few degrees beside its hinge. Stars are about 20 stops too faint to appear at this exposure.</figcaption>
-      </figure>
-      <header><div class="eyebrow">The satellite</div><h2 id="sail-title">A computer the size of four city blocks, thinner than paper</h2></header>
-      <div class="prose" id="sail-prose"></div>
-    </section>
-
-    <section class="chapter" id="computer">
-      <header><div class="eyebrow">Thermal infrared, 8–14 µm</div><h2>The panel is the computer</h2></header>
-      <div class="pair">
-        <figure>
-          <img src="renders/sail-back-lwir-macro.jpg" alt="False-colour thermal image of the back of the film: a fine grid of warm dots with a cold black truss in front" width="1920" height="1080" loading="lazy">
-          <figcaption><b>The back, half a metre away.</b> Each dot is a chiplet a few kelvin warmer than the film. The black lines are a support boom, cold because it sees deep space.</figcaption>
-        </figure>
-        <figure>
-          <img src="renders/sail-hub-lwir.jpg" alt="Thermal image of the sail's hub: a cold dark octagon with laser terminals, booms radiating outward over a glowing film" width="1920" height="1080" loading="lazy">
-          <figcaption><b>The hub, seen from behind.</b> The film glows at about 76 °C. The hub, booms and laser terminals are colder and read dark.</figcaption>
-        </figure>
-      </div>
-      <div class="scale"><span id="ir-lo">320 K</span><i></i><span id="ir-hi">350 K</span><span>brightness temperature</span></div>
-      <div class="prose" id="computer-prose"></div>
-    </section>
-
-    <section class="chapter" id="why">
-      <header><div class="eyebrow">Concentrated or spread out</div><h2>Why the chips are not in one box</h2></header>
-      <div class="prose" id="why-prose"></div>
-      <div class="tablewrap"><table class="compare" id="why-table"></table></div>
-    </section>
-
-    <section class="chapter" id="mercury">
-      <header><div class="eyebrow">The mine</div><h2>Mercury, before and after</h2></header>
-      <div class="pair">
-        <figure>
-          <img src="renders/mercury-pristine.jpg" alt="Mercury from orbit, grey and cratered, half lit" width="1600" height="1600" loading="lazy">
-          <figcaption><b>Today.</b> MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance.</figcaption>
-        </figure>
-        <figure>
-          <img src="renders/mercury-heatwall.jpg" alt="Mercury with pale excavated fields on the day side and glowing radiator fields on the night side" width="1600" height="1600" loading="lazy">
-          <figcaption><b>At the heat wall.</b> Excavated ground is brighter than weathered regolith. On the night side, radiator fields shed the waste heat of mining, and they glow faintly red.</figcaption>
-        </figure>
-      </div>
-      <div class="prose" id="mercury-prose"></div>
-    </section>
-
-    <section class="chapter" id="buildout">
-      <header><div class="eyebrow">Timeline</div><h2>How fast it can be built, and where it stops</h2></header>
-      <div class="prose" id="build-prose"></div>
-      <div class="chartcard">
-        <div id="build-chart"></div>
-        <div class="legend" id="build-legend"></div>
-        <div class="scrub">
-          <button id="play" aria-label="Play the build-out">▶</button>
-          <input type="range" id="year" min="0" max="1000" step="1" value="300" aria-label="Year">
-        </div>
-        <div class="readout" id="build-readout"></div>
-      </div>
-    </section>
-
-    <section class="chapter" id="earth">
-      <header><div class="eyebrow">The binding constraint</div><h2>Earth decides how big it may get</h2></header>
-      <div class="prose" id="earth-prose"></div>
-      <div class="pair">
-        <figure>
-          <img src="renders/earth-sky-today.jpg" alt="A dark night sky over a dark landscape, almost nothing visible" width="1920" height="1080" loading="lazy">
-          <figcaption><b>Tonight, west, 90 minutes after sunset.</b> Same camera and exposure as the next frame.</figcaption>
-        </figure>
-        <figure>
-          <img src="renders/earth-sky-limit.jpg" alt="The same night sky filled by a broad grey dome of light rising from the western horizon" width="1920" height="1080" loading="lazy">
-          <figcaption><b>The same sky at Earth's limit, 0.55% of the Sun captured.</b> Sails beyond the Sun, seen through the gaps, glow at about 1.2 cd/m² out to 60° from the set Sun. The sky stays this bright all night in summer at high latitudes.</figcaption>
-        </figure>
-      </div>
-      <div class="chartcard"><div id="orbit-map"></div></div>
-      <div class="prose" id="earth-prose-2"></div>
-      <div class="chartcard"><div id="earth-chart"></div><div class="legend" id="earth-legend"></div></div>
-    </section>
-
-    <section class="chapter" id="star">
-      <header><div class="eyebrow">Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2></header>
-      <div class="prose" id="star-prose"></div>
-      <div class="chartcard"><div id="sed-chart"></div><div class="legend" id="sed-legend"></div></div>
-    </section>
-
-    <section class="chapter" id="future">
-      <header><div class="eyebrow">Built later than you think</div><h2>Today's hardware never flies</h2></header>
-      <div class="prose" id="future-prose"></div>
-      <div class="tablewrap"><table class="compare" id="future-table"></table></div>
-    </section>
-
-    <footer class="sources">
-      <h2 class="eyebrow">How this was made</h2>
-      <p>The model, the Blender scenes and the research behind them are in the project repository: <span class="n">docs/architecture.md</span> (why sails and pods), <span class="n">docs/future-tech.md</span> (what hardware actually flies), <span class="n">docs/data/</span> (every study's numbers and sources) and <span class="n">src/model/hybrid.js</span> (the model, with tests). Photographs are path traced in Blender Cycles at the true solar irradiance for the orbit, with physical units throughout; thermal images map 8–14 µm band radiance to a fixed false-colour scale.</p>
-      <ul id="sources-list"></ul>
-    </footer>
-  </main>
-
-  <aside class="ledger" id="ledger" aria-label="Live numbers">
-    <div class="ledger-head">
-      <h2>Ledger</h2>
-      <span class="yr" id="ledger-year"></span>
-      <button class="btn accent" id="open-assumptions">Assumptions</button>
-    </div>
-    <div class="ledger-body" id="ledger-body"></div>
-  </aside>
-  <button class="ledger-toggle" id="ledger-toggle" aria-controls="ledger">Numbers</button>
-
-  <div class="drawer" id="drawer" aria-label="Assumptions">
-    <div class="ledger-head">
-      <h2>Assumptions</h2>
-      <div style="display:flex;gap:6px">
-        <button class="btn" id="reset-params">Reset</button>
-        <button class="btn accent" id="close-assumptions">Done</button>
-      </div>
-    </div>
-    <div class="ledger-body" id="params"></div>
+<header class="hero">
+  <img src="renders/sail-hero.jpg" alt="A near-black diamond-shaped solar sail against black space, with a line of bright glints across it" width="2560" height="1440">
+  <div class="title">
+    <div class="kicker">A Dyson swarm, by the numbers</div>
+    <h1>Mercury Swarm Ledger</h1>
   </div>
-</div>
+  <div class="credit">One compute sail at 0.86 AU, from 1 km. Path traced at the Sun's true brightness.</div>
+</header>
+
+<main>
+  <div class="col standfirst">
+    <p>What if Mercury were mined into solar panels that are also computers, and flown around the Sun? Every photograph and number here comes from one physics model. Change an assumption and the whole page recomputes.</p>
+    <div class="era" role="group" aria-label="Hardware era">
+      <span>Hardware</span>
+      <button data-era="2026" aria-pressed="false">2026</button>
+      <button data-era="low" aria-pressed="false">Mature, pessimistic</button>
+      <button data-era="mid" aria-pressed="true">Mature, central</button>
+      <button data-era="high" aria-pressed="false">Mature, optimistic</button>
+    </div>
+  </div>
+  <div class="wide figures" id="figures"></div>
+
+  <section class="chapter" id="sail">
+    <div class="col"><div class="kicker">The satellite</div><h2 id="sail-title">A sheet, not a box</h2></div>
+    <div class="col prose" id="sail-prose"></div>
+    <figure class="wide drawing" id="anatomy-fig">
+      <div id="anatomy"></div>
+      <figcaption class="col"><b>The sail, drawn to scale.</b> Booms behind the film hold it taut at the corners, and four mirror vanes steer it. The insets enlarge the back of the film and its cross-section.</figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="computer">
+    <div class="col"><div class="kicker">Thermal infrared</div><h2>The panel is the computer</h2></div>
+    <div class="col prose" id="computer-prose"></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/sail-back-lwir-macro.jpg" alt="False-colour thermal image of the back of the film: a fine grid of warm dots with a cold truss in front" width="1920" height="1080" loading="lazy"></div>
+        <div class="plate"><img src="renders/sail-hub-lwir.jpg" alt="Thermal image of the hub seen from behind: a cold octagon with laser terminals over a glowing film" width="1920" height="1080" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>The back of the sail in the 8–14 µm band.</b> Left, half a metre away: each warm dot is a chiplet a few kelvin hotter than the film; the dark lines are a support boom, cold because it faces deep space. Right, the hub with its laser terminals. In visible light the back is black, because it sits in the film's own shadow.</figcaption>
+      <div class="col irscale"><span>320 K</span><i></i><span>350 K</span></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="why">
+    <div class="col"><div class="kicker">Concentrated or spread out</div><h2>Why the chips are not in one box</h2></div>
+    <div class="col prose" id="why-prose"></div>
+    <figure class="wide drawing">
+      <div id="heatpaths"></div>
+      <figcaption class="col"><b>Where the heat goes.</b> On a sail every chiplet radiates its own heat within a few centimetres. In a concentrated pod the same heat is pumped metres to radiator blades held edge-on to the Sun, through pipes that must be armoured against meteoroids.</figcaption>
+    </figure>
+    <div class="col tablewrap"><table class="compare" id="why-table"></table></div>
+  </section>
+
+  <section class="chapter" id="mercury">
+    <div class="col"><div class="kicker">The mine</div><h2>Mercury, before and after</h2></div>
+    <div class="col prose" id="mercury-prose"></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/mercury-pristine.jpg" alt="Mercury from orbit, grey and cratered, half lit" width="1600" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/mercury-heatwall.jpg" alt="Mercury with pale excavated fields by day and faint red radiator fields at night" width="1600" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Mercury today, and at the heat wall.</b> MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance. Excavated ground is brighter than weathered regolith; on the night side, radiator fields shed the waste heat of mining.</figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="buildout">
+    <div class="col"><div class="kicker">Timeline</div><h2>How fast it can be built, and where it stops</h2></div>
+    <div class="col prose" id="build-prose"></div>
+    <figure class="wide">
+      <div class="chart" id="build-chart"></div>
+      <div class="legend" id="build-legend"></div>
+      <div class="scrub">
+        <button id="play" aria-label="Play the build-out">▶</button>
+        <input type="range" id="year" min="0" max="1000" step="1" value="300" aria-label="Year">
+      </div>
+      <div class="readout" id="build-readout"></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="earth">
+    <div class="col"><div class="kicker">The binding constraint</div><h2>Earth decides how big it may get</h2></div>
+    <div class="col prose" id="earth-prose"></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/earth-sky-today.jpg" alt="A dark night sky over a dark landscape" width="1920" height="1080" loading="lazy"></div>
+        <div class="plate"><img src="renders/earth-sky-limit.jpg" alt="The same night sky filled by a broad grey dome of light rising from the western horizon" width="1920" height="1080" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Looking west 90 minutes after sunset, tonight and at Earth's limit.</b> Same camera, same exposure. With 0.55% of the Sun captured, sails beyond the Sun glow through the gaps at about 1.2 cd/m², out to 60° from where the Sun went down.</figcaption>
+    </figure>
+    <div class="col prose" id="earth-prose-2"></div>
+    <figure class="wide drawing">
+      <div id="orbit-map"></div>
+      <figcaption class="col"><b>Where the sails can fly, to scale.</b> The frame turns with Earth. The allowed swarm spreads evenly inside Earth's orbit; the option shares Earth's orbit on the far side of the Sun, with a small sunshade at L1.</figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="chart" id="earth-chart"></div>
+      <figcaption class="col" id="earth-caption"></figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="star">
+    <div class="col"><div class="kicker">Seen from another star</div><h2>The Sun dims, and a cool infrared star appears</h2></div>
+    <div class="col prose" id="star-prose"></div>
+    <figure class="wide">
+      <div class="chart" id="sed-chart"></div>
+      <div class="legend" id="sed-legend"></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="future">
+    <div class="col"><div class="kicker">Built later than you think</div><h2>Today's hardware never flies</h2></div>
+    <div class="col prose" id="future-prose"></div>
+    <div class="col tablewrap"><table class="compare" id="future-table"></table></div>
+  </section>
+
+  <section class="chapter wide" id="assumptions-section">
+    <details class="assumptions" id="assumptions">
+      <summary><h2>Change the assumptions</h2><span>Every number above recomputes</span></summary>
+      <div class="params" id="params"></div>
+      <button class="reset" id="reset-params">Reset to the selected hardware</button>
+    </details>
+  </section>
+
+  <footer class="col">
+    <h2>How this was made</h2>
+    <p>The model, the Blender scenes and the research behind them are in the project repository: <code>docs/architecture.md</code> (why sails and pods), <code>docs/future-tech.md</code> (what hardware actually flies), <code>docs/earth.md</code> (what Earth allows), <code>docs/data/</code> (every study's numbers and sources) and <code>src/model/hybrid.js</code> (the model, with tests). Photographs are path traced in Blender Cycles at the true solar irradiance for the orbit; thermal images map 8–14 µm band radiance to a fixed false-colour scale.</p>
+    <ul id="sources-list"></ul>
+  </footer>
+</main>
 <script type="module" src="src/app.js"></script>
 </body>
 </html>

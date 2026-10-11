@@ -6,9 +6,9 @@ function fmt(spec, v) {
   if (spec.key === 'seedYear') return String(Math.round(v));
   if (spec.unit === '' && v <= 1) return `${(v * 100).toFixed(spec.step && spec.step < 0.01 ? 1 : 0)}%`;
   if (spec.unit === '/K') return `${(v * 100).toFixed(2)} %/K`;
-  if (spec.unit === 'K') return `${Math.round(v)} K (${Math.round(v - 273.15)} °C)`;
+  if (spec.unit === 'K') return `${v} K`;
   if (spec.unit === '°C') return `${Math.round(v)} °C`;
-  return `${sci(v, 2)} ${spec.unit}`;
+  return `${sci(v, 3)} ${spec.unit}`;
 }
 
 /**

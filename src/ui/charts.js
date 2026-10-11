@@ -1,169 +1,210 @@
-// SVG charts for the essay. Every mark, tick and label is placed with one scale per axis.
-import { sci, pct, sup } from '../util/format.js';
+// SVG charts. One scale per axis, hairline solid grid, 2 px lines, ringed markers, text in ink
+// colours (never the series colour), a crosshair + tooltip on every chart.
+import { pct, sup, sci } from '../util/format.js';
 
-const AX = 'stroke:var(--line);stroke-width:1';
-const TK = 'fill:var(--muted);font:11px var(--font-mono)';
-const LB = 'fill:var(--fg);font:500 11.5px var(--font-mono)';
+const AX = 'stroke:var(--rule);stroke-width:1';
+const TK = 'fill:var(--ink-3);font:12px var(--sans)';
+const LB = 'fill:var(--ink);font:500 12.5px var(--sans)';
+const LB2 = 'fill:var(--ink-2);font:12px var(--sans)';
+
+/** Crosshair + tooltip. geom: viewBox frame; at(u) -> { x, y, html } for u in 0..1 across the plot. */
+function hover(el, geom, at, onPick) {
+  let tip = el.querySelector('.tip');
+  if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; el.appendChild(tip); }
+  const svg = el.querySelector('svg');
+  const line = svg.querySelector('.xhair');
+  const dot = svg.querySelector('.xdot');
+  const toU = e => {
+    const box = svg.getBoundingClientRect();
+    const vx = ((e.clientX - box.left) / box.width) * geom.W;
+    return { u: Math.max(0, Math.min(1, (vx - geom.L) / (geom.W - geom.L - geom.R))), box };
+  };
+  const show = e => {
+    const { u, box } = toU(e);
+    const q = at(u);
+    if (!q) return;
+    line.setAttribute('x1', q.x); line.setAttribute('x2', q.x); line.setAttribute('visibility', 'visible');
+    if (q.y != null) { dot.setAttribute('cx', q.x); dot.setAttribute('cy', q.y); dot.setAttribute('visibility', 'visible'); }
+    tip.innerHTML = q.html;
+    tip.hidden = false;
+    const sx = box.width / geom.W;
+    tip.style.left = `${Math.max(70, Math.min(box.width - 70, q.x * sx))}px`;
+    tip.style.top = `${(q.y ?? geom.T + 20) * sx}px`;
+  };
+  const hide = () => { tip.hidden = true; line.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('pointermove', e => { show(e); if (e.buttons && onPick) onPick(toU(e).u); });
+  svg.addEventListener('pointerdown', e => { if (onPick) { svg.setPointerCapture(e.pointerId); onPick(toU(e).u); } });
+  svg.addEventListener('pointerleave', hide);
+}
+const xhair = (T, B) => `<line class="xhair" y1="${T}" y2="${B}" style="stroke:var(--ink-3);stroke-width:1" visibility="hidden"/><circle class="xdot" r="4.5" style="fill:var(--ink);stroke:var(--paper);stroke-width:2" visibility="hidden"/>`;
 
 /**
- * Coverage (log) against calendar year. x uses a piecewise scale so the fast early decades and
- * the slow later centuries both get room: xOf(yearsSinceSeed) -> 0..1.
+ * Share of sunlight captured (log) against calendar year. x uses a piecewise scale (xOf) so the
+ * fast early decades and the slow later centuries both get room.
  */
-export function buildChart(el, { curves, markers, hlines, cursor, xOf, seedYear, span, yMin = -8 }) {
-  const W = 900, H = 330, L = 54, R = 16, T = 14, B = 34;
+export function buildChart(el, { main, others, markers, limit, cursor, xOf, tOf, seedYear, span, describe, onPick, yMin = -8 }) {
+  const W = 1100, H = 380, L = 64, R = 24, T = 18, B = 40;
   const X = t => L + xOf(Math.max(0, Math.min(span, t))) * (W - L - R);
   const Y = f => T + (1 - (Math.log10(Math.max(f, 10 ** yMin)) - yMin) / (0 - yMin)) * (H - T - B);
-  const yTicks = [];
-  for (let e = yMin; e <= 0; e += 2) yTicks.push(e);
-  const xTicks = [0, 25, 50, 75, 100, 250, 500, 1000, 1500].filter(t => t <= span);
   const path = pts => pts.map(([t, f], i) => `${i ? 'L' : 'M'}${X(t).toFixed(1)},${Y(f).toFixed(1)}`).join('');
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of sunlight captured by the swarm against year">`;
-  svg += yTicks.map(e => `<line x1="${L}" x2="${W - R}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" style="${AX}"/><text x="${L - 6}" y="${Y(10 ** e) + 4}" text-anchor="end" style="${TK}">${e === 0 ? '100%' : e === -2 ? '1%' : `10${sup(e + 2)}%`}</text>`).join('');
-  svg += xTicks.map(t => `<line x1="${X(t)}" x2="${X(t)}" y1="${H - B}" y2="${H - B + 4}" style="${AX}"/><text x="${X(t)}" y="${H - B + 17}" text-anchor="middle" style="${TK}">${seedYear + t}</text>`).join('');
-  for (const hl of hlines || []) {
-    const y = Y(hl.f);
-    svg += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" style="stroke:${hl.color};stroke-width:1.2;stroke-dasharray:5 4"/>`;
-    svg += `<text x="${W - R - 4}" y="${y - 5}" text-anchor="end" style="fill:${hl.color};font:500 11px var(--font-mono)">${hl.label}</text>`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of sunlight captured by the swarm, by year">`;
+  for (let e = yMin; e <= 0; e += 2) {
+    const lab = e === 0 ? '100%' : e === -2 ? '1%' : e === -4 ? '0.01%' : `10${sup(e + 2)}%`;
+    s += `<line x1="${L}" x2="${W - R}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" style="${AX}"/><text x="${L - 10}" y="${Y(10 ** e) + 4}" text-anchor="end" style="${TK}">${lab}</text>`;
   }
-  for (const c of curves) {
-    svg += `<path d="${path(c.pts)}" fill="none" stroke="${c.color}" stroke-width="${c.width || 2}" stroke-opacity="${c.opacity ?? 1}" stroke-linejoin="round"${c.dash ? ` stroke-dasharray="${c.dash}"` : ''}/>`;
+  for (const t of [0, 25, 50, 75, 100, 250, 500, 1000, 1500].filter(t => t <= span)) {
+    s += `<text x="${X(t)}" y="${H - B + 22}" text-anchor="middle" style="${TK}">${seedYear + t}</text>`;
   }
-  // markers along the main curve: close neighbours share one label; others stagger in rows
+  if (limit) {
+    const y = Y(limit.f);
+    s += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" style="stroke:var(--earth);stroke-width:1.5"/>`;
+    s += `<text x="${W - R}" y="${y + 17}" text-anchor="end" style="${LB}">${limit.label}</text>`;
+  }
+  for (const o of others) s += `<path d="${path(o.pts)}" style="fill:none;stroke:var(--ink-3);stroke-width:1.25;stroke-opacity:0.45;stroke-linejoin:round"/>`;
+  s += `<path d="${path(main)}" style="fill:none;stroke:var(--sun-mark);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round"/>`;
+  // markers on the main curve, labels placed where no other label sits
+  const boxes = [];
+  const free = b => !boxes.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
   const ms = (markers || []).filter(m => Number.isFinite(m.t) && m.t <= span).sort((a, b) => a.t - b.t);
   const merged = [];
   for (const m of ms) {
     const prev = merged[merged.length - 1];
-    if (prev && Math.abs(X(m.t) - X(prev.t)) < 24) prev.label += ` · ${m.label}`;
+    if (prev && Math.abs(X(m.t) - X(prev.t)) < 26) prev.label += ` · ${m.label}`;
     else merged.push({ ...m });
   }
-  // place each label in the first slot (above, then below the point) whose box hits no other label
-  const boxes = [];
-  const hits = bx => boxes.some(o => bx.x0 < o.x1 && bx.x1 > o.x0 && bx.y0 < o.y1 && bx.y1 > o.y0);
   for (const m of merged) {
-    const x = X(m.t), y = Y(m.f);
-    const w = m.label.length * 7 + 4;
-    const right = x > W - 220;
-    const x0 = right ? x - 6 - w : Math.max(L + 2, x + 6);
-    let ly = null;
-    for (const dy of [-12, -27, -42, 18, 33, 48]) {
-      const cand = y + dy;
-      if (cand < T + 10 || cand > H - B - 4) continue;
-      const bx = { x0, x1: x0 + w, y0: cand - 11, y1: cand + 3 };
-      if (!hits(bx)) { ly = cand; boxes.push(bx); break; }
+    const x = X(m.t), y = Y(m.f), w = m.label.length * 6.9 + 6;
+    const right = x > W - 260;
+    const x0 = right ? x - 8 - w : x + 8;
+    let ly = y - 12;
+    for (const dy of [-12, -28, -44, 22, 38]) {
+      const c = y + dy;
+      if (c < T + 12 || c > H - B - 6) continue;
+      const b = { x0, x1: x0 + w, y0: c - 12, y1: c + 4 };
+      if (free(b)) { ly = c; boxes.push(b); break; }
     }
-    if (ly === null) ly = Math.max(T + 10, y - 12);
-    svg += `<circle cx="${x}" cy="${y}" r="3.5" fill="${m.color || 'var(--sun)'}" stroke="var(--bg)" stroke-width="1.5"/>`;
-    svg += `<text x="${right ? x - 6 : x0}" y="${ly}" style="${LB}" ${right ? 'text-anchor="end"' : ''}>${m.label}</text>`;
+    s += `<circle cx="${x}" cy="${y}" r="4.5" style="fill:var(--sun-mark);stroke:var(--paper);stroke-width:2"/>`;
+    s += `<text x="${right ? x - 8 : x + 8}" y="${ly}" ${right ? 'text-anchor="end"' : ''} style="${LB2}">${m.label}</text>`;
   }
   if (cursor) {
     const x = X(cursor.t);
-    svg += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" style="stroke:var(--fg);stroke-width:1;stroke-opacity:0.6"/>`;
-    if (cursor.f > 0) svg += `<circle cx="${x}" cy="${Y(cursor.f)}" r="5" fill="var(--fg)" stroke="var(--bg)" stroke-width="2"/>`;
+    s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" style="stroke:var(--ink);stroke-width:1"/>`;
+    if (cursor.f > 10 ** yMin) s += `<circle cx="${x}" cy="${Y(cursor.f)}" r="5.5" style="fill:var(--ink);stroke:var(--paper);stroke-width:2"/>`;
   }
-  svg += `<rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent"/>`;
-  svg += `</svg>`;
-  el.innerHTML = svg;
-  return { L, R, W };
+  s += xhair(T, H - B);
+  s += `</svg>`;
+  el.innerHTML = s;
+  hover(el, { W, L, R, T }, u => {
+    const t = tOf(u);
+    let f = main[0][1];
+    for (const [tt, ff] of main) { if (tt > t) break; f = ff; }
+    return { x: X(t), y: Y(f), html: describe(t, f) };
+  }, onPick ? u => onPick(tOf(u)) : null);
 }
 
-/** Added energy absorbed by Earth (W/m²) against coverage, with reference lines. */
-export function earthChart(el, { pts, safeF, ceilingF, runaway, co2 }) {
-  const W = 900, H = 300, L = 54, R = 16, T = 14, B = 34;
+/** Extra energy absorbed by Earth (W/m², log) against share of sunlight captured (log). */
+export function earthChart(el, { pts, refs, marks }) {
+  const W = 1100, H = 340, L = 64, R = 24, T = 18, B = 40;
   const xMin = -5, xMax = 0, yMin = -3, yMax = 3;
   const X = f => L + ((Math.log10(f) - xMin) / (xMax - xMin)) * (W - L - R);
   const Y = v => T + (1 - (Math.log10(Math.max(v, 10 ** yMin)) - yMin) / (yMax - yMin)) * (H - T - B);
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Extra heat absorbed by Earth against the share of sunlight captured">`;
-  const yLabel = { '-3': '0.001', '-2': '0.01', '-1': '0.1', 0: '1', 1: '10', 2: '100', 3: '1000' };
-  for (let e = yMin; e <= yMax; e++) svg += `<line x1="${L}" x2="${W - R}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" style="${AX}"/><text x="${L - 6}" y="${Y(10 ** e) + 4}" text-anchor="end" style="${TK}">${yLabel[e]}</text>`;
-  for (let e = xMin; e <= xMax; e++) svg += `<text x="${X(10 ** e)}" y="${H - B + 17}" text-anchor="middle" style="${TK}">${pct(10 ** e, 0)}</text><line x1="${X(10 ** e)}" x2="${X(10 ** e)}" y1="${H - B}" y2="${H - B + 4}" style="${AX}"/>`;
-  const ref = (v, label, color) => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:${color};stroke-width:1.2;stroke-dasharray:5 4"/><text x="${L + 6}" y="${Y(v) - 5}" style="fill:${color};font:500 11px var(--font-mono)">${label}</text>`;
-  svg += ref(1, '1 W/m²: the Earth-safe budget used here', 'var(--ok)');
-  svg += ref(co2, `${co2} W/m²: one CO₂ doubling`, 'var(--sun)');
-  svg += ref(runaway, `${Math.round(runaway)} W/m²: runaway greenhouse`, 'var(--warn)');
-  const d = pts.filter(([f]) => f >= 10 ** xMin).map(([f, v], i) => `${i ? 'L' : 'M'}${X(f).toFixed(1)},${Y(v).toFixed(1)}`).join('');
-  svg += `<path d="${d}" fill="none" stroke="var(--cool)" stroke-width="2.2"/>`;
-  const mark = (f, label, color, below) => {
-    if (!(f > 10 ** xMin)) return '';
-    const x = X(f);
-    return `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" style="stroke:${color};stroke-width:1;stroke-opacity:0.7"/><text x="${x + (x > W - 200 ? -6 : 6)}" y="${below ? H - B - 8 : T + 12}" ${x > W - 200 ? 'text-anchor="end"' : ''} style="fill:${color};font:500 11px var(--font-mono)">${label}</text>`;
-  };
-  svg += mark(safeF, `safe: ${pct(safeF, 2)}`, 'var(--ok)', true);
-  svg += mark(ceilingF, `buildable: ${pct(ceilingF, 1)}`, 'var(--warn)', false);
-  svg += `</svg>`;
-  el.innerHTML = svg;
+  const yLab = { '-3': '0.001', '-2': '0.01', '-1': '0.1', 0: '1', 1: '10', 2: '100', 3: '1,000' };
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Extra energy absorbed by Earth against the share of sunlight the swarm captures">`;
+  for (let e = yMin; e <= yMax; e++) s += `<line x1="${L}" x2="${W - R}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" style="${AX}"/><text x="${L - 10}" y="${Y(10 ** e) + 4}" text-anchor="end" style="${TK}">${yLab[e]}</text>`;
+  for (let e = xMin; e <= xMax; e++) s += `<text x="${X(10 ** e)}" y="${H - B + 22}" text-anchor="middle" style="${TK}">${pct(10 ** e, 0)}</text>`;
+  s += `<text x="${L}" y="${T - 4}" style="${TK}">W/m²</text>`;
+  for (const r of refs) {
+    s += `<line x1="${L}" x2="${W - R}" y1="${Y(r.v)}" y2="${Y(r.v)}" style="stroke:var(--ink-3);stroke-width:1"/>`;
+    s += `<text x="${L + 8}" y="${Y(r.v) - 6}" style="${LB2}">${r.label}</text>`;
+  }
+  const area = pts.filter(([f]) => f >= 10 ** xMin);
+  s += `<path d="${area.map(([f, v], i) => `${i ? 'L' : 'M'}${X(f).toFixed(1)},${Y(v).toFixed(1)}`).join('')}" style="fill:none;stroke:var(--heat);stroke-width:2.25;stroke-linejoin:round"/>`;
+  for (const m of marks) {
+    const x = X(m.f);
+    s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" style="stroke:${m.color};stroke-width:1.5"/>`;
+    s += `<text x="${x + (m.left ? -8 : 8)}" y="${m.top ? T + 14 : H - B - 10}" ${m.left ? 'text-anchor="end"' : ''} style="${LB}">${m.label}</text>`;
+  }
+  s += xhair(T, H - B);
+  s += `</svg>`;
+  el.innerHTML = s;
+  hover(el, { W, L, R, T }, u => {
+    const lf = xMin + u * (xMax - xMin);
+    let best = area[0];
+    for (const p of area) if (Math.abs(Math.log10(p[0]) - lf) < Math.abs(Math.log10(best[0]) - lf)) best = p;
+    return { x: X(best[0]), y: Y(best[1]), html: `<b>${pct(best[0], 2)}</b> of sunlight captured<br>+${sci(best[1], 2)} W/m² on Earth` };
+  });
 }
 
-// Spectrum of the whole system seen from far away, as λL_λ / L☉ (energy per log-wavelength).
-// A blackbody of luminosity L has λL_λ = L · (15/π⁴) x⁴ / (eˣ − 1), x = hc / (λ k T): the curve's
-// height depends only on L, so the swarm's infrared hump is as tall as the sunlight it absorbs.
-const HC_K = 0.0143877688; // m·K
+// Spectrum seen from far away, as λL_λ / L☉ (energy per log-wavelength). A blackbody of luminosity
+// L has λL_λ = L · (15/π⁴) x⁴ / (eˣ − 1), x = hc / (λ k T), so the swarm's hump is as tall as the
+// share of sunlight it absorbs.
+const HC_K = 0.0143877688;
 const shape = x => (15 / Math.PI ** 4) * x ** 4 / Math.expm1(x);
 export function sedChart(el, { f, T }) {
-  const W = 900, H = 260, L = 54, R = 16, Tp = 14, B = 34;
+  const W = 1100, H = 300, L = 64, R = 24, Tp = 18, B = 40;
   const pts = [];
-  for (let i = 0; i <= 240; i++) {
-    const lgl = -7 + (i / 240) * 3.3;                // 0.1 µm .. 200 µm
-    const lam = 10 ** lgl;
+  for (let i = 0; i <= 300; i++) {
+    const lam = 10 ** (-7 + (i / 300) * 3.3);
     pts.push({ lam, sun: (1 - f) * shape(HC_K / (lam * 5772)), swarm: f * shape(HC_K / (lam * T)) });
   }
   const x = lam => L + ((Math.log10(lam) + 7) / 3.3) * (W - L - R);
   const ymin = -5, ymax = 0;
   const y = v => Tp + (1 - (Math.log10(Math.max(v, 1e-9)) - ymin) / (ymax - ymin)) * (H - Tp - B);
-  const path = key => pts.map((q, i) => `${i ? 'L' : 'M'}${x(q.lam).toFixed(1)},${Math.min(H - B, y(q[key])).toFixed(1)}`).join('');
-  const area = key => `${path(key)}L${x(pts[pts.length - 1].lam).toFixed(1)},${H - B}L${x(pts[0].lam).toFixed(1)},${H - B}Z`;
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Spectrum of the Sun and the swarm seen from far away">`;
-  svg += `<rect x="${x(3.8e-7)}" y="${Tp}" width="${x(7.5e-7) - x(3.8e-7)}" height="${H - Tp - B}" fill="var(--fg)" fill-opacity="0.05"/>`;
-  svg += `<text x="${(x(3.8e-7) + x(7.5e-7)) / 2}" y="${Tp + 12}" text-anchor="middle" style="${TK}">visible</text>`;
-  for (let e = ymin; e <= ymax; e++) svg += `<line x1="${L}" x2="${W - R}" y1="${y(10 ** e)}" y2="${y(10 ** e)}" style="${AX}"/><text x="${L - 6}" y="${y(10 ** e) + 4}" text-anchor="end" style="${TK}">${e === 0 ? '1' : `10${sup(e)}`}</text>`;
-  for (const [v, t] of [[1e-7, '0.1 µm'], [1e-6, '1 µm'], [1e-5, '10 µm'], [1e-4, '100 µm']]) svg += `<text x="${x(v)}" y="${H - B + 17}" text-anchor="middle" style="${TK}">${t}</text>`;
-  svg += `<path d="${area('sun')}" fill="var(--sun)" fill-opacity="0.14"/><path d="${area('swarm')}" fill="var(--swarm)" fill-opacity="0.16"/>`;
-  svg += `<path d="${path('sun')}" fill="none" stroke="var(--sun)" stroke-width="2"/><path d="${path('swarm')}" fill="none" stroke="var(--swarm)" stroke-width="2"/>`;
-  const peak = 2.897771955e-3 / T;
-  if (f > 1e-5) svg += `<text x="${Math.min(W - 150, x(peak) + 6)}" y="${Math.max(Tp + 26, y(f * 0.74) - 6)}" style="${LB}">swarm, ${Math.round(T)} K</text>`;
-  svg += `<text x="${x(5.5e-7) + 6}" y="${Math.max(Tp + 26, y((1 - f) * 0.74) - 6)}" style="${LB}">Sun, ${pct(1 - f, 2)} escapes</text>`;
-  svg += `</svg>`;
-  el.innerHTML = svg;
+  const line = k => pts.map((q, i) => `${i ? 'L' : 'M'}${x(q.lam).toFixed(1)},${Math.min(H - B, y(q[k])).toFixed(1)}`).join('');
+  const area = k => `${line(k)}L${x(pts[pts.length - 1].lam).toFixed(1)},${H - B}L${x(pts[0].lam).toFixed(1)},${H - B}Z`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Spectrum of the Sun and the swarm seen from another star">`;
+  s += `<rect x="${x(3.8e-7)}" y="${Tp}" width="${x(7.5e-7) - x(3.8e-7)}" height="${H - Tp - B}" style="fill:var(--wash)"/>`;
+  s += `<text x="${(x(3.8e-7) + x(7.5e-7)) / 2}" y="${Tp + 14}" text-anchor="middle" style="${TK}">visible</text>`;
+  for (let e = ymin; e <= ymax; e++) s += `<line x1="${L}" x2="${W - R}" y1="${y(10 ** e)}" y2="${y(10 ** e)}" style="${AX}"/><text x="${L - 10}" y="${y(10 ** e) + 4}" text-anchor="end" style="${TK}">${e === 0 ? '1' : `10${sup(e)}`}</text>`;
+  for (const [v, tl] of [[1e-7, '0.1 µm'], [1e-6, '1 µm'], [1e-5, '10 µm'], [1e-4, '100 µm']]) s += `<text x="${x(v)}" y="${H - B + 22}" text-anchor="middle" style="${TK}">${tl}</text>`;
+  s += `<path d="${area('sun')}" style="fill:var(--sun-mark);fill-opacity:0.1"/><path d="${area('swarm')}" style="fill:var(--swarm);fill-opacity:0.1"/>`;
+  s += `<path d="${line('sun')}" style="fill:none;stroke:var(--sun-mark);stroke-width:2"/><path d="${line('swarm')}" style="fill:none;stroke:var(--swarm);stroke-width:2"/>`;
+  const pk = 2.897771955e-3 / T;
+  s += `<text x="${x(1.0e-6)}" y="${Math.max(Tp + 30, y((1 - f) * shape(HC_K / (1e-6 * 5772))) - 10)}" style="${LB}">Sun, 5,772 K</text>`;
+  if (f > 1e-5) s += `<text x="${Math.min(W - 140, x(pk) + 10)}" y="${Math.max(Tp + 30, y(f * 0.74) - 10)}" style="${LB}">sails, ${Math.round(T)} K</text>`;
+  s += xhair(Tp, H - B);
+  s += `</svg>`;
+  el.innerHTML = s;
+  hover(el, { W, L, R, T: Tp }, u => {
+    const q = pts[Math.round(u * 300)];
+    const um = q.lam * 1e6;
+    const top = Math.max(q.sun, q.swarm);
+    return { x: x(q.lam), y: y(top), html: `<b>${um < 1 ? um.toFixed(2) : um.toFixed(um < 10 ? 1 : 0)} µm</b><br>Sun ${sci(q.sun, 2)} · sails ${sci(q.swarm, 2)}` };
+  });
 }
 
 /**
- * Top-down map of the inner solar system to scale, in a frame that turns with Earth (Earth fixed on
- * the right). Draws the far-side co-orbital cloud as bands on Earth's orbit (projected radius
- * cos(lat)·1 AU for the inclined orbits), the L3 gap, the L1 thermostat and the rejected inner shell.
+ * The inner solar system to scale, turning with Earth (Earth fixed on the right): the allowed
+ * swarm as an even shell inside Earth's orbit, and the option as a cloud on Earth's orbit
+ * beyond the Sun (projected radius cos(lat)·1 AU) with a gap round L3 and a shade at L1.
  */
-export function orbitMap(el, { spans = [[90, 165], [195, 270]], latMax = 30, density = 0.5, shell = [0.86, 0.91], showShell = true, shellLabel = 'baseline: sails spread inside Earth’s orbit', cloudLabel = 'option: sails on Earth’s orbit' }) {
-  const W = 900, H = 560, cx = W / 2 - 40, cy = H / 2, s = 236;   // px per AU
-  const P = (rAU, deg) => [cx + rAU * s * Math.cos((deg * Math.PI) / 180), cy - rAU * s * Math.sin((deg * Math.PI) / 180)];
-  const ring = (r, style) => `<circle cx="${cx}" cy="${cy}" r="${r * s}" fill="none" style="${style}"/>`;
-  const arcBand = (r0, r1, a0, a1) => {
+export function orbitMap(el, { shellR = 0.86, shellLabel, cloudLabel, spans = [[90, 165], [195, 270]], latMax = 30 }) {
+  const W = 1100, H = 560, cx = 470, cy = 280, s = 240;
+  const P = (r, deg) => [cx + r * s * Math.cos((deg * Math.PI) / 180), cy - r * s * Math.sin((deg * Math.PI) / 180)];
+  const ring = (r, style) => `<circle cx="${cx}" cy="${cy}" r="${r * s}" style="fill:none;${style}"/>`;
+  const band = (r0, r1, a0, a1) => {
     const [x0, y0] = P(r1, a0), [x1, y1] = P(r1, a1), [x2, y2] = P(r0, a1), [x3, y3] = P(r0, a0);
-    const large = a1 - a0 > 180 ? 1 : 0;
-    return `M${x0},${y0} A${r1 * s},${r1 * s} 0 ${large} 0 ${x1},${y1} L${x2},${y2} A${r0 * s},${r0 * s} 0 ${large} 1 ${x3},${y3} Z`;
+    return `M${x0},${y0} A${r1 * s},${r1 * s} 0 0 0 ${x1},${y1} L${x2},${y2} A${r0 * s},${r0 * s} 0 0 1 ${x3},${y3} Z`;
   };
   const r0 = Math.cos((latMax * Math.PI) / 180);
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of where the sails fly, to scale, turning with Earth">`;
-  svg += `<defs><radialGradient id="sunglow"><stop offset="0" stop-color="var(--sun)" stop-opacity="0.9"/><stop offset="1" stop-color="var(--sun)" stop-opacity="0"/></radialGradient></defs>`;
-  svg += ring(0.387, `stroke:var(--line);stroke-width:1`) + ring(0.723, `stroke:var(--line);stroke-width:1`);
-  svg += ring(1.0, `stroke:var(--cool);stroke-opacity:0.45;stroke-width:1`);
-  for (const [a0, a1] of spans) svg += `<path d="${arcBand(r0, 1.0, a0, a1)}" fill="var(--swarm)" fill-opacity="${(0.12 + 0.3 * density).toFixed(2)}" stroke="var(--swarm)" stroke-width="1" stroke-dasharray="4 3"/>`;
-  if (showShell) svg += `<circle cx="${cx}" cy="${cy}" r="${((shell[0] + shell[1]) / 2) * s}" fill="none" style="stroke:var(--sun);stroke-opacity:0.9;stroke-width:${Math.max(3, (shell[1] - shell[0]) * s)}"/>`;
-  svg += `<circle cx="${cx}" cy="${cy}" r="26" fill="url(#sunglow)"/><circle cx="${cx}" cy="${cy}" r="6" fill="var(--sun)"/>`;
+  const txt = (x, y, str, style = LB2, anchor = 'start') => `<text x="${x}" y="${y}" text-anchor="${anchor}" style="${style}">${str}</text>`;
+  let o = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map to scale: the allowed swarm as an even shell just inside Earth's orbit; an option on Earth's orbit beyond the Sun; a sunshade at L1">`;
+  o += ring(0.387, 'stroke:var(--rule);stroke-width:1') + ring(0.723, 'stroke:var(--rule);stroke-width:1');
+  o += ring(1.0, 'stroke:var(--earth);stroke-width:1;stroke-opacity:0.6');
+  for (const [a0, a1] of spans) o += `<path d="${band(r0, 1.0, a0, a1)}" style="fill:var(--swarm);fill-opacity:0.08;stroke:var(--swarm);stroke-width:1"/>`;
+  o += ring(shellR, 'stroke:var(--sun-mark);stroke-width:5;stroke-opacity:0.85');
+  o += `<circle cx="${cx}" cy="${cy}" r="7" style="fill:var(--sun-mark)"/>`;
   const [ex, ey] = P(1, 0);
-  svg += `<circle cx="${ex}" cy="${ey}" r="6" fill="var(--cool)"/>`;
-  const [lx, ly] = P(0.99, 0);
-  svg += `<circle cx="${lx - 9}" cy="${ly}" r="2.5" fill="var(--ok)"/>`;
-  const T = (x, y, t, style, anchor = 'start') => `<text x="${x}" y="${y}" text-anchor="${anchor}" style="${style}">${t}</text>`;
-  const lab = 'fill:var(--fg);font:500 12px var(--font-mono)';
-  const mut = 'fill:var(--muted);font:11px var(--font-mono)';
-  svg += T(ex + 12, ey + 4, 'Earth', lab);
-  svg += T(ex + 12, ey + 20, 'L1 shade, 1.6 million km sunward', 'fill:var(--ok);font:11px var(--font-mono)');
-  svg += T(cx, cy + 46, 'Sun', lab, 'middle');
-  const [vx, vy] = P(0.723, 58); svg += T(vx - 6, vy + 14, 'Venus orbit', mut, 'end');
-  const [mx, my] = P(0.387, 52); svg += T(mx - 6, my + 14, 'Mercury orbit', mut, 'end');
-  const [cx1, cy1] = P(1.05, 132); svg += T(cx1, cy1 - 6, cloudLabel, 'fill:var(--swarm);font:600 12px var(--font-mono)', 'end');
-  const [cx2, cy2] = P(1.05, 228); svg += T(cx2, cy2 + 16, `±${latMax}° above and below the ecliptic`, mut, 'end');
-  const [gx, gy] = P(1.08, 180); svg += T(gx - 4, gy + 4, 'gap ±15°', mut, 'end');
-  if (showShell) { const [sx, sy] = P(0.84, -42); svg += T(sx - 4, sy, shellLabel, 'fill:var(--sun);font:600 12px var(--font-mono)', 'end'); }
-  svg += T(W - 16, H - 14, 'to scale · frame turns with Earth', mut, 'end');
-  svg += `</svg>`;
-  el.innerHTML = svg;
+  o += `<circle cx="${ex}" cy="${ey}" r="6" style="fill:var(--earth);stroke:var(--paper);stroke-width:2"/><circle cx="${ex - 10}" cy="${ey}" r="2.5" style="fill:var(--ink)"/>`;
+  o += txt(ex + 14, ey + 4, 'Earth', LB);
+  o += txt(ex + 14, ey + 22, 'sunshade at L1, 1.6 million km sunward');
+  o += txt(cx, cy + 26, 'Sun', LB, 'middle');
+  { const [x, y] = P(0.723, 60); o += txt(x - 6, y + 16, 'Venus', LB2, 'end'); }
+  { const [x, y] = P(0.387, 55); o += txt(x - 6, y + 16, 'Mercury', LB2, 'end'); }
+  { const [x, y] = P(shellR, -40); o += txt(x - 10, y, shellLabel, LB, 'end'); }
+  { const [x, y] = P(1.04, 128); o += txt(x, y - 8, cloudLabel, LB, 'end'); }
+  { const [x, y] = P(1.06, 180); o += txt(x - 4, y + 4, 'gap', LB2, 'end'); }
+  o += txt(W - 24, H - 16, '1 AU = 150 million km', LB2, 'end');
+  o += `</svg>`;
+  el.innerHTML = o;
 }
