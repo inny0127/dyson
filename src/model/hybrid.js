@@ -14,7 +14,7 @@
 //  - Mercury's rock is finite;
 //  - the build stops at the chosen coverage.
 // The standing fleet is everything produced in the last L years.
-import { PHYS, MERCURY } from './constants.js';
+import { PHYS, MERCURY, EARTH } from './constants.js';
 import { pvEta, pvState, radiatorFlux } from './sat2.js';
 import { flux, rForFlux, sheetTemp, fluxForTemp, launchFromMercury, earthImpact,
   mercuryRadius, mercurySurfaceLayer } from './model.js';
@@ -94,11 +94,16 @@ export const PARAMS = [
   // Earth (docs/earth.md)
   { key: 'rhoVis', group: 'Earth', label: 'Visible reflectance of a sail, all hardware', unit: '', min: 0.001, max: 0.02, step: 0.0005, value: 0.004,
     help: 'Film 0.002 plus hinge strips, scribes, hems and vanes: 0.0024–0.0056 for the design spec.' },
-  { key: 'forcingLimit', group: 'Earth', label: 'Extra heat allowed on Earth', unit: 'W/m²', min: 0.05, max: 10, log: true, value: 1 },
-  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['farside', 'shell'], value: 'farside',
-    help: 'farside: on Earth’s orbit beyond the Sun, infrared-dark fronts, with an L1 shade. shell: evenly round the Sun inside Earth’s orbit (no shade, nothing drifts toward Earth).' },
-  { key: 'thermostatCredit', group: 'Earth', label: 'L1 shade may cancel up to', unit: '× the budget', min: 1, max: 2.5, step: 0.1, value: 1.5,
-    help: 'Trading sunlight for infrared changes rainfall and polar heating, so a shade can offset only part of the heat: 1.5–2× the budget (far-side placement only).' },
+  { key: 'forcingLimit', group: 'Earth', label: 'Extra heat Earth accepts', unit: 'W/m²', min: 0, max: 10, step: 0.05, value: 0,
+    help: 'Net, after the L1 shade. 0 holds Earth’s average temperature where it is; doubling CO₂ is 3.9.' },
+  { key: 'shadeLimit', group: 'Earth', label: 'Most the L1 shade may cancel', unit: 'W/m²', min: 0, max: 300, step: 0.5, value: 300,
+    help: 'The shade swaps sunlight for the swarm’s infrared: Earth keeps its temperature but gets 0.42 % less sunlight and 0.76 % less rain per W/m². 300 is no limit.' },
+  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['farside', 'cone', 'shell'], value: 'farside',
+    help: 'farside: on Earth’s orbit beyond the Sun, infrared-dark fronts toward Earth. cone: spread evenly inside Earth’s orbit except a ~25° cone round the Sun–Earth line. shell: spread evenly inside Earth’s orbit, Earth included.' },
+  { key: 'farsideLat', group: 'Earth', label: 'Far-side cloud reaches', unit: '° from Earth’s orbital plane', min: 30, max: 70, step: 5, value: 60,
+    help: 'More room higher up, but tilted orbits drift along Earth’s orbit (±20° at 60°), which eats into it: 18 % at 30°, 28 % at 60°, 29 % at 70°.' },
+  { key: 'spillInside', group: 'Earth', label: 'When the far side is full', unit: '', options: ['inside', 'stop'], value: 'inside',
+    help: 'inside: the rest fly inside Earth’s orbit, outside a ~25° cone round the Sun–Earth line, so Earth sees none of their hot backs and gets half the heat. stop: the swarm stops at the far side’s room.' },
   // industry
   { key: 'yieldDelivered', group: 'Industry', label: 'Spacecraft kg per kg of rock', unit: '', min: 0.2, max: 0.9, step: 0.01, value: 0.42,
     help: 'Oxides reduced to Si, Mg, Al, Ca; the oxygen becomes glass and ion-thruster propellant. 0.5 would need ~100 % Si recovery.' },
@@ -146,9 +151,33 @@ export const FIXED = {
   lumensPerW: 93,          // sunlight reflected off the sails
   farsideIRPerF: 39.6,
   farsideFlopFactor: 0.66,
-  farsideGeomCap: 0.9 * (150 / 360) * 0.5,
+  // room on the far side by the cloud's reach from Earth's orbital plane: 0.9 of the patch, less
+  // what tilted orbits lose to their yearly drift along the orbit (±4° at 30°, ±20° at 60°)
+  farsideRoom: [[30, 0.181], [45, 0.245], [60, 0.282], [70, 0.292]],
+  farsideIRLat: [[30, 1.0], [60, 1.06], [70, 1.08]],   // sails higher up see Earth less squarely
+  keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
+  rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)
+  polarPerW: 0.23,         // extra polar heating per W/m² swapped
   horizon: 6000,           // yr simulated
 };
+
+const interp = (tab, x) => {
+  if (x <= tab[0][0]) return tab[0][1];
+  for (let i = 1; i < tab.length; i++) if (x <= tab[i][0]) {
+    const [x0, y0] = tab[i - 1], [x1, y1] = tab[i];
+    return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+  }
+  return tab[tab.length - 1][1];
+};
+/** Share of the Sun's light the far side can hold, and the IR it sends Earth per unit coverage. */
+export const farsideRoom = p => interp(FIXED.farsideRoom, p.farsideLat ?? 30);
+export const farsideIRPerF = p => FIXED.farsideIRPerF * interp(FIXED.farsideIRLat, p.farsideLat ?? 30);
+/** Coverage on the far side and inside Earth's orbit, for total coverage f. */
+export function farsideSplit(p, f) {
+  if (p.earthPlacement !== 'farside') return { fFar: 0, fIn: f };
+  const fFar = p.spillInside === 'stop' ? f : Math.min(f, farsideRoom(p));
+  return { fFar, fIn: Math.max(0, f - fFar) };
+}
 
 /** Film optics for the radiosity model (model.js uses alpha, epsFront, epsBack, reflectVis). */
 export function filmOptics(p) {
@@ -211,8 +240,8 @@ export function podAt(p, rAU, f, tSail) {
   };
 }
 
-/** Physics of a finished swarm at coverage f (no build-out). */
-export function swarmAt(p, fIn) {
+/** Physics of a finished swarm of sails on their thermal orbits at coverage f (no build-out). */
+function swarmCore(p, fIn) {
   const f = Math.min(1, Math.max(1e-20, fIn));
   const rThermal = sailThermalRadius(p, f);
   const rSail = p.placement === 'manual' ? p.rManual : rThermal;
@@ -230,21 +259,46 @@ export function swarmAt(p, fIn) {
   const chipPower = feasible && perWsun > 0 ? intercepted / perWsun : 0;
   const sailPower = (1 - q) * chipPower;
   const podPower = q * chipPower;
-  // Far side: the same hardware on Earth's orbit at 1 AU, where sunlight is weaker, so each watt
-  // intercepted takes (1 AU / rSail)² more of it; infrared-dark fronts run the chips hotter.
-  const farside = p.earthPlacement === 'farside';
-  const kM = farside ? Math.max(1, 1 / rSail ** 2) : 1;
-  const kF = farside ? FIXED.farsideFlopFactor : 1;
-  const massSails = sailPower > 0 ? sailPower * sail.kgPerW * kM : 0;
-  const massPods = podPower > 0 ? podPower * pod.kgPerW * kM : 0;
-  const mass = massSails + massPods;
-  const flopsSails = sailPower > 0 ? (kF * sailPower) / sail.jPerFlop : 0;
-  const flopsPods = podPower > 0 ? (kF * podPower) / pod.jPerFlop : 0;
+  const massSails = sailPower > 0 ? sailPower * sail.kgPerW : 0;
+  const massPods = podPower > 0 ? podPower * pod.kgPerW : 0;
+  const flopsSails = sailPower > 0 ? sailPower / sail.jPerFlop : 0;
+  const flopsPods = podPower > 0 ? podPower / pod.jPerFlop : 0;
   return {
-    f, q, feasible, rThermal, rSail, rPod, sail, pod, farside, rOrbit: farside ? 1 : rSail,
-    areaFactor: kM,                 // film area per watt relative to the sail's thermal orbit
-    intercepted, chipPower, sailPower, podPower, massSails, massPods, mass,
-    kgPerW: chipPower > 0 ? mass / chipPower : Infinity,
+    f, q, feasible, rThermal, rSail, rPod, sail, pod,
+    intercepted, chipPower, sailPower, podPower, massSails, massPods, mass: massSails + massPods,
+    filmArea: sail.chipWm2 > 0 ? sailPower / sail.chipWm2 : 0,
+    flopsSails, flopsPods, flops: flopsSails + flopsPods,
+  };
+}
+
+/**
+ * A finished swarm at coverage f in its placement. Shell: every sail on its thermal orbit inside
+ * Earth's orbit. Far side: the same hardware on Earth's orbit at 1 AU, where sunlight is weaker, so
+ * each watt intercepted takes (1 AU / r)² more film, and infrared-dark fronts run the chips hotter
+ * (FLOP/J ×0.66); once the far side is full, the rest fly inside Earth's orbit (fIn).
+ */
+export function swarmAt(p, fIn) {
+  const f = Math.min(1, Math.max(1e-20, fIn));
+  if (p.earthPlacement !== 'farside') {
+    const s = swarmCore(p, f);
+    return { ...s, farside: false, rOrbit: s.rSail, areaFactor: 1, fFar: 0, fIn: f, kgPerW: s.chipPower > 0 ? s.mass / s.chipPower : Infinity };
+  }
+  const split = farsideSplit(p, f);
+  const a = swarmCore(p, Math.max(1e-20, split.fFar));
+  const kM = Math.max(1, 1 / a.rSail ** 2), kF = FIXED.farsideFlopFactor;
+  const b = split.fIn > 1e-12 ? swarmCore(p, split.fIn) : null;
+  const add = k => (b ? b[k] : 0);
+  const massSails = a.massSails * kM + add('massSails');
+  const massPods = a.massPods * kM + add('massPods');
+  const chipPower = a.chipPower + add('chipPower');
+  const mass = massSails + massPods;
+  const flopsSails = a.flopsSails * kF + add('flopsSails');
+  const flopsPods = a.flopsPods * kF + add('flopsPods');
+  return {
+    ...a, f, farside: true, rOrbit: 1, areaFactor: kM, fFar: split.fFar, fIn: split.fIn, rIn: b ? b.rSail : null,
+    intercepted: f * L_SUN, chipPower, sailPower: a.sailPower + add('sailPower'), podPower: a.podPower + add('podPower'),
+    massSails, massPods, mass, kgPerW: chipPower > 0 ? mass / chipPower : Infinity,
+    filmArea: a.filmArea * kM + add('filmArea'),
     flopsSails, flopsPods, flops: flopsSails + flopsPods,
   };
 }
@@ -362,7 +416,7 @@ export function compute(p) {
   const s = swarmAt(p, p.coverage);
   const { f, q, rSail, rPod, sail, pod, intercepted, chipPower, sailPower, podPower, mass } = s;
   const o = filmOptics(p);
-  const sailAreaTotal = sail.chipWm2 > 0 ? (sailPower / sail.chipWm2) * s.areaFactor : 0;
+  const sailAreaTotal = s.filmArea;
   const wingAreaTotal = pod.chipWm2 > 0 ? podPower / pod.chipWm2 : 0;
   const radAreaTotal = podPower > 0 ? podPower * pod.radAreaPerW : 0;
 
@@ -474,40 +528,83 @@ export function discGroundFactor(R, depressionDeg = FIXED.skyDepression) {
  */
 export function skyLux(p, f) {
   if (!(f > 0)) return 0;
-  if (p.earthPlacement === 'farside') return FIXED.skyLuxPerFRho * p.rhoVis * f;
-  const s = swarmAt(p, f);
-  const L = ((1 - f) * f * p.rhoVis * s.sail.S) / Math.PI / (1 - f * p.rhoVis) * FIXED.lumensPerW;
-  return L * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
+  const shellLux = fs => {
+    if (!(fs > 0)) return 0;
+    const s = swarmCore(p, fs);
+    const L = ((1 - fs) * fs * p.rhoVis * s.sail.S) / Math.PI / (1 - fs * p.rhoVis) * FIXED.lumensPerW;
+    return L * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
+  };
+  if (p.earthPlacement !== 'farside') return shellLux(f);
+  const { fFar, fIn } = farsideSplit(p, f);
+  return FIXED.skyLuxPerFRho * p.rhoVis * fFar + shellLux(fIn);
 }
 
 /**
- * What Earth allows: its climate budget. The shell's cap uses earthImpact (infrared minus its own
- * shade); the far-side cloud sends only infrared, which an L1 shade may cancel up to
- * thermostatCredit × the budget, and it cannot cover more than its patch of sky. The night-sky glow
- * is reported, not limited.
- */
-/**
- * Extra heat Earth absorbs at coverage f (W/m²). Shell: earthImpact. Far side: the cloud's
- * infrared, less what the L1 shade cancels (sized as needed, up to (thermostatCredit − 1) × budget).
+ * Extra heat Earth absorbs at coverage f (W/m², global mean), before and after the L1 shade.
+ * Shell: its infrared minus the sunlight its own sails block (earthImpact). Cone: the same sails
+ * outside a keep-out cone, half the infrared and no shadow. Far side: the cloud's
+ * infrared through its dark fronts; any sails inside Earth's orbit fly outside a keep-out cone, so
+ * they block no sunlight and send half the infrared. The shade cancels whatever exceeds what Earth
+ * accepts, up to p.shadeLimit. Every W/m² of sunlight traded for infrared, by the shade or by the
+ * sails' own shadow, costs rainfall (FIXED.rainPerW) and warms the poles (FIXED.polarPerW).
  */
 export function earthForcing(p, f) {
-  if (p.earthPlacement !== 'farside') {
-    const s = swarmAt({ ...p, earthPlacement: 'shell' }, f);
+  let gross = 0, blocked = 0;
+  if (p.earthPlacement === 'shell') {
+    const s = swarmCore(p, f);
     const e = earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S);
-    return { gross: e.forcing, shade: 0, net: e.forcing };
+    gross = e.forcing;
+    blocked = e.dimming * EARTH.absorbedSolar;
+  } else if (p.earthPlacement === 'cone') {
+    const s = swarmCore(p, f);
+    gross = FIXED.keepoutIR * earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S).irForcing;
+  } else {
+    const { fFar, fIn } = farsideSplit(p, f);
+    gross = fFar * farsideIRPerF(p);
+    if (fIn > 0) {
+      const s = swarmCore(p, fIn);
+      gross += FIXED.keepoutIR * earthImpact(filmOptics(p), s.rSail, fIn, s.sail.T, s.sail.S).irForcing;
+    }
   }
-  const gross = f * FIXED.farsideIRPerF;
-  const shade = Math.min(Math.max(0, gross - p.forcingLimit), (p.thermostatCredit - 1) * p.forcingLimit);
-  return { gross, shade, net: gross - shade };
+  // the shade can block no more sunlight than still reaches Earth
+  const shade = Math.min(Math.max(0, gross - p.forcingLimit), p.shadeLimit ?? 0, Math.max(0, EARTH.absorbedSolar - blocked));
+  const swapped = blocked + shade;
+  // rain falls ~0.76 % per W/m² swapped for small swaps; it cannot fall below zero, so the loss saturates
+  return { gross, shade, net: gross - shade, swapped, sunlightCut: swapped / EARTH.absorbedSolar,
+    rainCut: 1 - Math.exp(-FIXED.rainPerW * swapped), polar: FIXED.polarPerW * swapped };
 }
 
-export function earthLimits(p) {
-  const shell = earthSafeCoverage({ ...p, placement: 'thermal', earthPlacement: 'shell' }, p.forcingLimit);
-  const farside = Math.min(FIXED.farsideGeomCap, (p.forcingLimit * p.thermostatCredit) / FIXED.farsideIRPerF);
-  const cap = Math.min(1, p.earthPlacement === 'farside' ? farside : shell);
+/** Largest coverage whose net extra heat on Earth stays within p.forcingLimit (net rises with f). */
+function earthCapOf(p) {
+  const ok = f => earthForcing(p, f).net <= p.forcingLimit + 1e-9;
+  let cap;
+  if (ok(1)) cap = 1;
+  else if (!ok(1e-8)) cap = 0;
+  else {
+    let lo = -8, hi = 0;
+    for (let i = 0; i < 48; i++) { const mid = (lo + hi) / 2; if (ok(10 ** mid)) lo = mid; else hi = mid; }
+    cap = 10 ** lo;
+  }
+  if (p.earthPlacement === 'farside' && p.spillInside === 'stop') cap = Math.min(cap, farsideRoom(p));
+  return cap;
+}
+
+/**
+ * How big the swarm gets: what Earth's climate allows (with the shade), the room on the far side if
+ * the swarm stops there, and, given the build-out d, what Mercury's industry can reach. The night
+ * sky is reported, not limited.
+ */
+export function earthLimits(p, d = null) {
+  const earth = earthCapOf(p);
+  const rock = d ? d.reachableCoverage : 1;
+  const cap = Math.min(earth, rock);
+  const stopAtRoom = p.earthPlacement === 'farside' && p.spillInside === 'stop';
+  const binding = rock < earth ? 'rock' : stopAtRoom && earth >= farsideRoom(p) - 1e-9 ? 'room' : 'climate';
   const s = swarmAt(p, cap);
-  return { shell, farside, cap, flops: s.flops, mass: s.mass, skyLuxAtCap: skyLux(p, cap),
-    shadeCancels: p.earthPlacement === 'farside' ? Math.max(0, cap * FIXED.farsideIRPerF - p.forcingLimit) : 0 };
+  return { cap, earthCap: earth, rock, binding, room: farsideRoom(p),
+    shell: earthCapOf({ ...p, placement: 'thermal', earthPlacement: 'shell' }),
+    flops: s.flops, mass: s.mass, nSails: s.filmArea / p.sailArea, fFar: s.fFar, fIn: s.fIn,
+    forcing: earthForcing(p, cap), skyLuxAtCap: skyLux(p, cap) };
 }
 
 /** Satellite mass standing in the swarm by a given year after the first launch. */
@@ -529,7 +626,7 @@ export function atYear(p, d, year) {
   return {
     year, calendarYear: p.seedYear + year, built, frac: d.mass > 0 ? built / d.mass : 0, f,
     rSail: s.rSail,
-    nSails: f > 0 && s.sail.chipWm2 > 0 ? (s.sailPower / s.sail.chipWm2 / p.sailArea) * s.areaFactor : 0,
+    nSails: f > 0 ? s.filmArea / p.sailArea : 0,
     nPods: f > 0 ? s.podPower / p.podPower : 0,
     chipPower: f > 0 ? s.chipPower : 0,
     flops: f > 0 ? s.flops : 0,

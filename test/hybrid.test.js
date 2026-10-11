@@ -81,14 +81,14 @@ test('film beats pods per kg in every era', () => {
 const dMid = h.compute({ ...pMid, coverage: 1 });
 const dFar = h.compute({ ...pFar, coverage: 1 });
 
-test('timeline (central, far side): heat wall ~2123, 1 % ~2124, Earth’s 3.8 % ~2133, ceiling ~38 % when the rock runs out', () => {
+test('timeline (central, far side): heat wall ~2124, 1 % ~2125, far side full ~2235, ceiling ~39 % when the rock runs out', () => {
   const g = dFar.growth;
   assert.equal(pFar.earthPlacement, 'farside');
-  near(g.tCap + pFar.seedYear, 2123, 3, 'heat wall');
-  near(dFar.yearsToCoverage(0.01) + pFar.seedYear, 2124, 3, '1 % coverage');
-  near(dFar.yearsToCoverage(h.earthLimits(pFar).cap) + pFar.seedYear, 2133, 4, 'what Earth allows');
-  near(dFar.yearsToCoverage(0.1) + pFar.seedYear, 2155, 6, '10 % coverage');
-  near(dFar.reachableCoverage, 0.375, 0.03, 'ceiling coverage');
+  near(g.tCap + pFar.seedYear, 2124, 3, 'heat wall');
+  near(dFar.yearsToCoverage(0.01) + pFar.seedYear, 2125, 3, '1 % coverage');
+  near(dFar.yearsToCoverage(0.1) + pFar.seedYear, 2157, 6, '10 % coverage');
+  near(dFar.yearsToCoverage(h.farsideRoom(pFar)) + pFar.seedYear, 2235, 6, 'the far side full (28 %)');
+  near(dFar.reachableCoverage, 0.395, 0.03, 'ceiling coverage');
   near(g.doublingYearsEff, 1.49, 0.08, 'doubling time with fabs (the far side carries less die per kg)');
   near(g.tRockOut + pFar.seedYear, 2285, 5, 'left alone, industry digs out all of Mercury’s rock');
   assert.ok(g.peakMass < 0.6 * g.steadyMass, 'the rock runs out before refresh balances export');
@@ -105,7 +105,7 @@ test('Mercury: heat per kg, not the surface, sets the export rate (5×10¹⁸ W 
   near(dFar.logistics.minedRateCap, 5e18 / 0.3e6, 1, 'kg/s mined');
   const slow = h.compute({ ...pFar, coverage: 1, heatPerKg: 2 });
   near(dFar.logistics.minedRateCap / slow.logistics.minedRateCap, 2 / 0.3, 1e-9, 'surface launch at full speed');
-  assert.ok(slow.yearsToCoverage(h.earthLimits(pFar).cap) - dFar.yearsToCoverage(h.earthLimits(pFar).cap) > 50, 'decades later');
+  assert.ok(slow.yearsToCoverage(0.1) - dFar.yearsToCoverage(0.1) > 50, 'decades later');
 });
 
 test('without recycling a 10-year fleet stalls at a few per cent', () => {
@@ -131,7 +131,7 @@ test('atYear coverage follows the mass standing, and its orbit is the thermal or
 });
 
 test('build constants come from the swarm actually built, not from an unreachable target', () => {
-  const a = h.compute({ ...pFar, coverage: 1 }), b = h.compute({ ...pFar, coverage: 0.2 });
+  const a = h.compute({ ...pFar, coverage: 1 }), b = h.compute({ ...pFar, coverage: a.reachableCoverage });
   near(a.growth.doublingYearsEff, b.growth.doublingYearsEff, 0.02, 'doubling time');
   near(a.logistics.sail.vLaunch, b.logistics.sail.vLaunch, 50, 'launch speed');
   assert.ok(a.logistics.sail.vLaunch < 8700, `launch speed ${a.logistics.sail.vLaunch}`);
@@ -183,19 +183,40 @@ test('Earth: a uniform interior shell adds ~1.9 W/m² per 1 % coverage; ≤ 1 W/
   near(h.earthSafeCoverage(pMid, 1.0), 0.0053, 0.0007, 'Earth-safe coverage');
 });
 
-test('Earth limits: climate only; the far side with an L1 shade allows ~3.8 %, 7× the shell', () => {
+test('Earth limits: the L1 shade holds Earth’s temperature; Mercury’s rock sets the size (~39 %)', () => {
   // glow: the study's 0.58 lux per 1 % at rho 0.003, r 0.91 AU (shell); the far side with its L3 gap
   // 0.368 (render/sky_map.py, = the study's 0.368 at 1.2 % without the gap)
   const p91 = { ...pMid, rhoVis: 0.003, placement: 'manual', rManual: 0.91 };
   near(h.skyLux(p91, 0.01), 0.58, 0.02, 'shell ground lux per 1 % (earth_safe.json)');
   near(h.skyLux({ ...pFar, rhoVis: 0.003 }, 0.01), 0.368, 1e-9, 'far side');
-  const S = h.earthLimits(pMid), F = h.earthLimits(pFar);
-  near(S.cap, 0.0053, 0.0007, 'shell at 1 W/m²');
-  near(F.cap, 0.0379, 0.002, 'far side with a 1.5× shade');
-  near(F.shell, S.cap, 1e-12, 'the shell figure does not depend on the placement chosen');
-  near(h.earthForcing(pFar, F.cap).net, pFar.forcingLimit, 1e-9, 'net forcing at the cap is the budget');
-  near(h.earthForcing(pFar, F.cap).shade, 0.5, 1e-9, 'the shade cancels half a budget');
-  near(F.skyLuxAtCap, 1.86, 0.05, 'with the ecliptic upright, the night sky is lit by ~7 full Moons');
-  assert.ok(F.flops / S.flops > 3.5 && F.flops / S.flops < 6, `far side vs shell ${F.flops / S.flops}`);
-  near(h.earthLimits({ ...pFar, forcingLimit: 10, thermostatCredit: 2.5 }).cap, 0.1875, 1e-12, 'geometric cap');
+  // default: far side to ±60° (28 % with orbit drift), the rest inside Earth's orbit outside a keep-out cone
+  const F = h.earthLimits(pFar, dFar);
+  assert.equal(F.binding, 'rock');
+  near(F.cap, dFar.reachableCoverage, 1e-12, 'everything Mercury can build');
+  near(F.fFar, 0.282, 1e-9, 'the far side full');
+  near(F.fIn, F.cap - 0.282, 1e-9, 'the rest inside Earth’s orbit');
+  near(F.forcing.net, 0, 1e-9, 'Earth held at today’s temperature');
+  near(F.forcing.gross, 36.9, 1.5, 'heat the shade cancels, W/m²');
+  near(F.forcing.sunlightCut, 0.155, 0.01, 'sunlight cut');
+  near(F.forcing.rainCut, 0.245, 0.02, 'rainfall cut');
+  // stop at the far side
+  const S = h.earthLimits({ ...pFar, spillInside: 'stop' }, dFar);
+  assert.equal(S.binding, 'room');
+  near(S.cap, 0.282, 1e-9, 'far side only');
+  near(S.forcing.gross, 11.8, 0.3, 'its heat');
+  // gentle: 1 W/m² allowed, a shade of half that, a ±30° cloud
+  const gentle = { ...pFar, forcingLimit: 1, shadeLimit: 0.5, farsideLat: 30 };
+  const G = h.earthLimits(gentle, dFar);
+  near(G.cap, 0.0379, 0.002, 'far side with a 1.5× shade');
+  near(h.earthForcing(gentle, G.cap).net, 1, 1e-9, 'net forcing at the cap is the budget');
+  near(h.earthLimits({ ...pMid, forcingLimit: 1, shadeLimit: 0 }).cap, 0.0053, 0.0007, 'shell at 1 W/m², no shade');
+  near(G.skyLuxAtCap, 1.86, 0.05, 'with the ecliptic upright, the night sky is lit by ~7 full Moons');
+  // the user's slit: an even swarm inside Earth's orbit that avoids the Sun–Earth line sends half the
+  // infrared of a full shell and casts no shadow; still ~3× the far-side mix's swap at the same rock
+  const shellE = h.earthForcing(pMid, 0.38), coneE = h.earthForcing({ ...pMid, earthPlacement: 'cone' }, 0.38);
+  near(coneE.gross, 0.5 * (shellE.gross + shellE.swapped - shellE.shade), 1e-9, 'half the infrared');
+  assert.ok(coneE.sunlightCut < shellE.sunlightCut && coneE.sunlightCut > 2.5 * F.forcing.sunlightCut, `cone ${coneE.sunlightCut}`);
+  // the shade cannot block more sunlight than reaches Earth
+  const big = h.earthForcing({ ...pMid, placement: 'manual', rManual: 0.99 }, 0.9);
+  assert.ok(big.swapped <= 238.5 && big.net > 0, `swap ${big.swapped}, net ${big.net}`);
 });
