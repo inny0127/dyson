@@ -28,14 +28,13 @@ done
 python3 render/post.py "$RAW/pod_hero.png" "$OUT/pod-visible.jpg" --fov 84 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/pod_hero_lwir.png" "$OUT/pod-lwir.jpg" --fov 84 --noise 0 --ca 0 --glare 0 --width 2400 --quality 90
 
-# Swarm from inside and Mercury's night side: HDR point sources need real lens glare
-for x in swarm_wide swarm_tele mercury_night; do
+# Swarm from inside: HDR point sources need real lens glare
+for x in swarm_wide swarm_tele; do
   python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
   dev "$RAW/${x}_g.exr" "$RAW/$x.png" "$(exposure_of $x)"
 done
 python3 render/post.py "$RAW/swarm_wide.png" "$OUT/swarm-inside-wide.jpg" --fov 54 --noise 0.8 --glare 0 --width 2400 --quality 88
 python3 render/post.py "$RAW/swarm_tele.png" "$OUT/swarm-inside-tele.jpg" --fov 7 --noise 0.8 --glare 0 --width 2400 --quality 88
-python3 render/post.py "$RAW/mercury_night.png" "$OUT/mercury-night-industry.jpg" --fov 74 --noise 0.8 --glare 0 --width 2400 --quality 88
 
 # Mercury surface scenes and the foundry (scene-linear EXR, metered in sunlight)
 for x in mass_driver mercury_base foundry; do

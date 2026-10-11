@@ -29,7 +29,7 @@ from mathutils import Vector, Matrix  # noqa: E402
 import lib  # noqa: E402
 import sail  # noqa: E402
 from earth_sky import G, new_mat  # noqa: E402
-from mercury_surface import R_M, instance_field  # noqa: E402
+from mercury_ground import R_M, instance_field  # noqa: E402
 from meshkit import Batch  # noqa: E402
 
 PIT_R = 1000.0

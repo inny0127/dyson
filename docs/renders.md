@@ -85,26 +85,6 @@ exposure never changes the physics.
 - **Lens glare:** `glare.py` adds a measured-like point-spread function (bloom plus power-law
   wings) that conserves energy.
 
-## Mercury's night side at the heat wall (`mercury_surface.py`)
-
-- **Heat:** the model's 5 × 10¹⁸ W of mining heat. Shed by the night side alone, that is
-  134 kW/m², a surface at about 1,270 K. Shed over the whole planet, about 1,100 K.
-- **Radiators:** panels at 1,200 ± 50 K, falling 140 K from inlet to outlet, with some blocks idle
-  at ~1,000 K.
-  - Their luminance is the CIE-weighted Planck integral: 23 / 141 / 655 cd/m² at
-    1,100 / 1,200 / 1,300 K, deep orange.
-  - They light the ground and the mass driver by themselves.
-- **Ground:** Mercury's curvature (horizon 3 km from eye height) and cratered regolith (albedo
-  0.06–0.12), graded under the field. The mass driver launches at 7.8 km/s and 100 g, so the
-  track is 31 km long; the first 3 km are modelled.
-- **Sky:**
-  - Every sail shows Mercury its sunlit front: a uniform glow of 0.0096 W/m²/sr (0.9 cd/m²).
-  - The counter-sun is magnified by the geometry: the 0.52° glint cone, seen from 0.39 AU at
-    sails 0.86 AU from the Sun, spans 0.52° × 0.86/0.39 = 1.16° in radius.
-  - Its radiance is coverage × glint radiance, 103 W/m²/sr: magnitude −17, about 16 lux on the
-    ground. The halo reaches 17°.
-- **Exposure:** metered for the panels, so the sky's glow does not register.
-
 ## The industrial base (`mercury_base.py`)
 
 - **When:** after the factories move to orbit, from about 2090. The manufacturing study leaves

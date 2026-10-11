@@ -26,7 +26,7 @@ import numpy as np  # noqa: E402
 from mathutils import Vector, Matrix  # noqa: E402
 import lib  # noqa: E402
 import sail  # noqa: E402
-from mercury_surface import crater_height, regolith_material, R_M  # noqa: E402
+from mercury_ground import crater_height, regolith_material, R_M  # noqa: E402
 from meshkit import Batch  # noqa: E402
 
 G0 = 9.80665
