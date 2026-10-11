@@ -11,59 +11,42 @@ OUT=renders
 dev() { blender -b --python render/develop.py -- "$1" "$2" --exposure "$3" > /dev/null 2>&1; }
 exposure_of() { grep -o '"exposure": [-0-9.]*' "$RAW/$1.log" | tail -1 | awk '{print $2}'; }
 
-# Earth: dusk pair at one exposure (metered on tonight's blue sky), night frames each metered.
-# *_far038: the far-side cloud at Earth's limit (3.8 %); night_far20: 20 % in a ±60° cloud.
-E_DUSK=$(exposure_of dusk_tonight)
-dev "$RAW/dusk_tonight.exr" "$RAW/dusk_tonight.png" "$E_DUSK"
-dev "$RAW/dusk_far038.exr" "$RAW/dusk_far038.png" "$E_DUSK"
-for x in night_tonight night_far038 night_far20; do
+# Earth: tonight and with the finished near-uniform swarm (*_U, 83 %, L1 shade). Tonight's frames
+# are metered on tonight's sky; the swarm frames on the swarm's glow (the captions give the gap).
+for x in dusk_tonight dusk_U night_tonight night_U; do
   dev "$RAW/$x.exr" "$RAW/$x.png" "$(exposure_of $x)"
 done
 python3 render/post.py "$RAW/dusk_tonight.png" "$OUT/earth-dusk-tonight.jpg" --fov 104 --noise 0.8 --glare 0.02 --width 2400 --quality 86
-python3 render/post.py "$RAW/dusk_far038.png" "$OUT/earth-dusk-far.jpg" --fov 104 --noise 0.8 --glare 0.02 --width 2400 --quality 86
+python3 render/post.py "$RAW/dusk_U.png" "$OUT/earth-dusk-swarm.jpg" --fov 104 --noise 0.8 --glare 0.02 --width 2400 --quality 86
 python3 render/post.py "$RAW/night_tonight.png" "$OUT/earth-night-tonight.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
-python3 render/post.py "$RAW/night_far038.png" "$OUT/earth-night-far.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
-python3 render/post.py "$RAW/night_far20.png" "$OUT/earth-night-far20.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
+python3 render/post.py "$RAW/night_U.png" "$OUT/earth-night-swarm.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
 
 # Pod: visible photograph, and the false-colour thermal frame (no optical effects)
 python3 render/post.py "$RAW/pod_hero.png" "$OUT/pod-visible.jpg" --fov 84 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/pod_hero_lwir.png" "$OUT/pod-lwir.jpg" --fov 84 --noise 0 --ca 0 --glare 0 --width 2400 --quality 90
 
-# Swarm from inside: HDR point sources need real lens glare
-for x in swarm_wide swarm_tele; do
-  python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
-done
-dev "$RAW/swarm_wide_g.exr" "$RAW/swarm_wide.png" "$(exposure_of swarm_wide)"
-dev "$RAW/swarm_tele_g.exr" "$RAW/swarm_tele.png" "$(python3 -c "print($(exposure_of swarm_tele) - 5)")"   # 5 stops shorter: the halo
-python3 render/post.py "$RAW/swarm_wide.png" "$OUT/swarm-inside-wide.jpg" --fov 54 --noise 0.8 --glare 0 --width 2400 --quality 88
-python3 render/post.py "$RAW/swarm_tele.png" "$OUT/swarm-inside-tele.jpg" --fov 7 --noise 0.8 --glare 0 --width 2400 --quality 88
-
 # Sail views (AgX PNGs metered in sunlight)
 python3 render/post.py "$RAW/sail_corner.png" "$OUT/sail-corner.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
-# The sail against the far-side cloud's sky (sail_shot --far-sky; scene-linear: the counter-sun
-# needs glare)
-python3 render/glare.py "$RAW/sail_far_counter_sun.exr" "$RAW/sail_far_counter_sun_g.exr"
-dev "$RAW/sail_far_counter_sun_g.exr" "$RAW/sail_far_counter_sun.png" "$(grep -o 'exposure [-0-9.]*' "$RAW/sail_far_counter_sun.log" | tail -1 | awk '{print $2}')"
-python3 render/post.py "$RAW/sail_far_counter_sun.png" "$OUT/sail-far-counter-sun.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
+# The sail against the near-uniform swarm's sky (sail_shot --far-sky --layout uniform; scene-linear:
+# the counter-sun needs glare)
+python3 render/glare.py "$RAW/sail_U.exr" "$RAW/sail_U_g.exr"
+dev "$RAW/sail_U_g.exr" "$RAW/sail_U.png" "$(grep -o 'exposure [-0-9.]*' "$RAW/sail_U.log" | tail -1 | awk '{print $2}')"
+python3 render/post.py "$RAW/sail_U.png" "$OUT/sail-swarm-counter-sun.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
 
-# Inside the far-side cloud, along Earth's orbit (farside_field.py), metered on the glow
-python3 render/glare.py "$RAW/inside_far_orbit.exr" "$RAW/inside_far_orbit_g.exr"
-dev "$RAW/inside_far_orbit_g.exr" "$RAW/inside_far_orbit.png" "$(exposure_of inside_far_orbit)"
-python3 render/post.py "$RAW/inside_far_orbit.png" "$OUT/inside-far-orbit.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
+# Inside the near-uniform swarm, looking toward Earth (farside_field.py --mode uniform), metered on the glow
+python3 render/glare.py "$RAW/inside_U.exr" "$RAW/inside_U_g.exr"
+dev "$RAW/inside_U_g.exr" "$RAW/inside_U.png" "$(exposure_of inside_U)"
+python3 render/post.py "$RAW/inside_U.png" "$OUT/inside-swarm.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
 
-# The far-side cloud from low Earth orbit (render/leo_view.py), 22 September 2128 before dawn:
-# 3.8 % wide and 170 mm, and 20 % (±60° cloud) wide. Each exposed for its band.
-LEO_E=${LEO_E:-0.5}
-LEO20_E=${LEO20_E:--1.1}
-for x in leo_far038 leo_far038_tele leo_far20; do
+# The swarm from low Earth orbit (render/leo_view.py), 22 September 2128 before dawn, wide and
+# 170 mm, both exposed for the swarm's disc (leo_view's exposure_for_disc)
+LEO_E=${LEO_E:--2.5}
+for x in leo_U leo_U_tele; do
   python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
+  dev "$RAW/${x}_g.exr" "$RAW/$x.png" "$LEO_E"
 done
-dev "$RAW/leo_far038_g.exr" "$RAW/leo_far038.png" "$LEO_E"
-dev "$RAW/leo_far038_tele_g.exr" "$RAW/leo_far038_tele.png" "$LEO_E"
-dev "$RAW/leo_far20_g.exr" "$RAW/leo_far20.png" "$LEO20_E"
-python3 render/post.py "$RAW/leo_far038.png" "$OUT/leo-far-wide.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
-python3 render/post.py "$RAW/leo_far038_tele.png" "$OUT/leo-far-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
-python3 render/post.py "$RAW/leo_far20.png" "$OUT/leo-far20.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
+python3 render/post.py "$RAW/leo_U.png" "$OUT/leo-swarm-wide.jpg" --fov 113 --noise 0.8 --width 2400 --quality 88
+python3 render/post.py "$RAW/leo_U_tele.png" "$OUT/leo-swarm-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
 # Mercury at the heat wall (render/mercury.py writes an AgX PNG at the pristine globe's exposure)
 python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=88)" \
   "$RAW/mercury_heatwall.png" "$OUT/mercury-heatwall.jpg"
