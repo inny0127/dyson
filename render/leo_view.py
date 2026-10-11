@@ -131,11 +131,17 @@ class Scene:
         self.east = np.array([-math.sin(lon), math.cos(lon), 0.0])
         self.north = np.cross(self.up, self.east)
         self.P = (RG + a.alt) * self.up
-        g = {'kind': 'shell', 'f': a.f, 'rho': a.rho, 'r_au': a.r, 'r_in': a.r, 'r_out': a.r_out}
+        if a.glow == 'farside':
+            # sails sharing Earth's orbit beyond the Sun: two wings along the ecliptic, 7.5-45 deg
+            # from the Sun (docs/data/earth_safe.json profile, in sky_map.glow_radiance)
+            g = {'kind': 'farside', 'f': a.f, 'rho': a.rho, 'ecliptic_pole': self.pole}
+            R_d = math.radians(50.0)
+        else:
+            g = {'kind': 'shell', 'f': a.f, 'rho': a.rho, 'r_au': a.r, 'r_in': a.r, 'r_out': a.r_out}
+            R_d = math.asin(min(a.r_out, 0.999))
         self.glow = g
         self.glow_rgb = SM.GLOW_COLOUR
-        # the disc as point sources for lighting the air and the ground
-        R_d = math.asin(min(a.r_out, 0.999))
+        # the glow as point sources for lighting the air and the ground
         self.src_dirs, self.src_omega = SM.cap_samples(self.sun, R_d, a.disc_samples)
         Ld = SM.glow_radiance(self.src_dirs, self.sun, g)
         self.src_E = (Ld * self.src_omega)[:, None] * self.glow_rgb[None]          # RGB W/m^2 each
@@ -449,6 +455,7 @@ def main(argv):
     ap.add_argument('--el', type=float, default=-14.0)
     ap.add_argument('--roll', type=float, default=0.0)
     ap.add_argument('--lens', type=float, default=16.0)
+    ap.add_argument('--glow', choices=['shell', 'farside'], default='shell')
     ap.add_argument('--f', type=float, default=0.00411)
     ap.add_argument('--rho', type=float, default=0.004)
     ap.add_argument('--r', type=float, default=0.8604, help='inner radius of the shell, AU')
@@ -476,7 +483,7 @@ def main(argv):
             'moon_elongation_deg': sc.moon_elong, 'earthshine_W_m2': sc.earthshine,
             'sun_alt_deg': sun_alt, 'sun_az_deg': sun_az, 'limb_dip_deg': dip,
             'sun_below_limb_deg': -dip - sun_alt,
-            'disc_radiance': float(SM.glow_radiance(sc.sun[None], sc.sun, sc.glow)[0])}
+            'disc_radiance': float(SM.glow_radiance(sc.src_dirs, sc.sun, sc.glow).max())}
     print(json.dumps(info), flush=True)
     img = render(sc, w, h, a.steps)
     glare.write(a.out, img)
