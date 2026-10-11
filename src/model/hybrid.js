@@ -67,6 +67,8 @@ export const PARAMS = [
     help: 'Needs a 15 µm microtextured silicate enamel; a 5 µm coat on Mg gives only ~0.61.' },
   { key: 'filmAreal', group: 'Compute sail', label: 'Sail areal density', unit: 'kg/m²', min: 0.05, max: 0.5, step: 0.005, value: 0.195,
     help: 'Design spec: 0.203 kg/m² (glass 0.050, c-Si 0.070, Mg 0.023, enamel 0.041, wiring, structure, terminals).' },
+  { key: 'filmThin', group: 'Compute sail', label: 'Film mass vs the design spec', unit: '×', min: 0.4, max: 1, step: 0.01, value: 0.52,
+    help: '1: the design spec (30 µm silicon, 20 µm cover glass, 15 µm back enamel). 0.52: 10 µm light-trapped silicon, 8 µm glass, 6 µm enamel; cells ~5 % less efficient, and the thinner glass lets more solar protons through, so cells are annealed at each refresh.' },
   { key: 'filmOverbuild', group: 'Compute sail', label: 'Spare area (attrition, dead chiplets)', unit: '', min: 0, max: 0.3, step: 0.01, value: 0.10 },
   { key: 'computeShare', group: 'Compute sail', label: 'Electricity reaching chips', unit: '', min: 0.5, max: 1, step: 0.01, value: 0.9 },
   { key: 'packing', group: 'Compute sail', label: 'Cell packing factor', unit: '', min: 0.7, max: 1, step: 0.01, value: 0.92 },
@@ -98,8 +100,8 @@ export const PARAMS = [
     help: 'Net, after the L1 shade. 0 holds Earth’s average temperature where it is; doubling CO₂ is 3.9.' },
   { key: 'shadeLimit', group: 'Earth', label: 'Most the L1 shade may cancel', unit: 'W/m²', min: 0, max: 300, step: 0.5, value: 300,
     help: 'The shade swaps sunlight for the swarm’s infrared: Earth keeps its temperature but gets 0.42 % less sunlight and 0.76 % less rain per W/m². 300 is no limit.' },
-  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['farside', 'cone', 'shell'], value: 'farside',
-    help: 'farside: on Earth’s orbit beyond the Sun, infrared-dark fronts toward Earth. cone: spread evenly inside Earth’s orbit except a ~30° cone round the Sun–Earth line. shell: spread evenly inside Earth’s orbit, Earth included.' },
+  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['uniform', 'farside', 'cone', 'shell'], value: 'uniform',
+    help: 'uniform: all round the Sun at 0.95 AU, infrared-dark fronts on every sail, empty only within 23° of the Sun–Earth line and 15° of L3. farside: only on Earth’s orbit beyond the Sun. cone and shell: inside Earth’s orbit with ordinary fronts, with and without the empty cone.' },
   { key: 'farsideLat', group: 'Earth', label: 'Far-side cloud reaches', unit: '° from Earth’s orbital plane', min: 30, max: 70, step: 5, value: 60,
     help: 'More room higher up, but tilted orbits drift along Earth’s orbit (±20° at 60°), which eats into it: 18 % at 30°, 28 % at 60°, 29 % at 70°.' },
   { key: 'spillInside', group: 'Earth', label: 'When the far side is full', unit: '', options: ['inside', 'stop'], value: 'inside',
@@ -117,8 +119,8 @@ export const PARAMS = [
     help: '0 = never retired. Sails are re-skinned on their frames every 10–20 years.' },
   { key: 'recycleFrac', group: 'Industry', label: 'Mass recycled in orbit at refresh', unit: '', min: 0, max: 0.99, step: 0.01, value: 0.94,
     help: 'The standing fleet levels off at export × life / (1 − recycled). Without recycling a 10-year fleet stalls near 1 % coverage.' },
-  { key: 'heatPerKg', group: 'Industry', label: 'Waste heat left on Mercury per kg mined', unit: 'MJ/kg', min: 0.05, max: 20, log: true, value: 0.3,
-    help: 'Digging (~0.05) plus a surface launch only to low orbit, 3 km/s at 95 %; catapults in orbit add the rest and shed their losses to space. Refining on the surface and a full-speed launch: ~2–5.' },
+  { key: 'heatPerKg', group: 'Industry', label: 'Waste heat left on Mercury per kg mined', unit: 'MJ/kg', min: 0.05, max: 20, log: true, value: 0.1,
+    help: 'Digging (~0.05) plus a surface launch only to low orbit at 3 km/s: 0.1 with superconducting launchers at 99 %, 0.3 at 95 %. Catapults in orbit add the rest and shed their losses to space. Refining on the surface and a full-speed launch: ~2–5.' },
   { key: 'mercuryHeatLimit', group: 'Industry', label: 'Heat Mercury’s surface can shed', unit: 'W', min: 1e17, max: 1e22, log: true, value: 5e18,
     help: 'The whole planet paved with radiators heat-pumped to ~1,650 K. Unpumped at 500 K it sheds only 2×10¹⁷; at 2,000 K about 10¹⁹, near the end of what refractories allow.' },
   { key: 'energyPerKg', group: 'Industry', label: 'Energy to make 1 kg of spacecraft', unit: 'MJ/kg', min: 100, max: 20000, log: true, value: 1150,
@@ -155,6 +157,12 @@ export const FIXED = {
   // what tilted orbits lose to their yearly drift along the orbit (±4° at 30°, ±20° at 60°)
   farsideRoom: [[30, 0.181], [45, 0.245], [60, 0.282], [70, 0.292]],
   farsideIRLat: [[30, 1.0], [60, 1.06], [70, 1.08]],   // sails higher up see Earth less squarely
+  // Near-uniform swarm (docs/full-swarm.md): the far-side hardware (mesh fronts, FLOP/J ×0.66) at
+  // 0.95 AU, over the whole sky round the Sun except a keep-out cone of acos(0.92) = 23° round the
+  // Sun–Earth line, where Earth would see hot backs, and 15° round L3: 94.3 % of the sky, filled to
+  // 0.9. Earth sees only infrared-dark fronts: the far side's 0.42 W/m² per 1 % scaled by the
+  // integral of cos θ / D² over the region, 0.563 per 1 %.
+  uniformR: 0.95, uniformShare: 0.943, uniformRoom: 0.849, uniformIRPerF: 56.3,
   keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
   rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)
   polarPerW: 0.23,         // extra polar heating per W/m² swapped
@@ -187,16 +195,21 @@ export function filmOptics(p) {
 
 export const joulesPerFlop = (p, tjC) => p.jPerFlop85 * p.clockFactor * energyPenalty(tjC, p.hotLogicSlope);
 
+/** Film areal density after thinning (filmThin ≤ 1), and what the thinner silicon costs the cells:
+ * 10 µm of light-trapped silicon converts ~5 % less than 30 µm (filmThin 0.52). */
+export const filmAreal = p => p.filmAreal * (p.filmThin ?? 1);
+export const thinCellFactor = p => 1 - 0.1 * (1 - (p.filmThin ?? 1));
+
 /** One square metre of compute sail at distance r inside a swarm of coverage f. */
 export function sailAt(p, rAU, f) {
   const o = filmOptics(p);
   const S = flux(rAU);
   const T = sheetTemp(S, f, o);
-  const eta = pvEta(T, { pvEta0: p.pvEta0, pvTempCo: p.pvTempCo, pvT0: o.pvT0 }) * o.packing;
+  const eta = pvEta(T, { pvEta0: p.pvEta0 * thinCellFactor(p), pvTempCo: p.pvTempCo, pvT0: o.pvT0 }) * o.packing;
   const elecM2 = eta * S;
   const chipWm2 = elecM2 * p.computeShare;
   const feasible = chipWm2 > 0;
-  const kgPerW = feasible ? (p.filmAreal * (1 + p.filmOverbuild)) / chipWm2 + o.laserKgPerW : Infinity;
+  const kgPerW = feasible ? (filmAreal(p) * (1 + p.filmOverbuild)) / chipWm2 + o.laserKgPerW : Infinity;
   const tj = T - 273.15 + p.filmSpreadDT;
   const J = joulesPerFlop(p, tj);
   return {
@@ -279,6 +292,22 @@ function swarmCore(p, fIn) {
  */
 export function swarmAt(p, fIn) {
   const f = Math.min(1, Math.max(1e-20, fIn));
+  if (p.earthPlacement === 'uniform') {
+    // infrared-dark fronts all but remove the cavity effect (a front absorbs ~1.5 % more from the
+    // swarm's inner wall than from the Sun alone), so every sail carries a sparse swarm's hardware
+    const fr = Math.min(f, 0.01), k = f / fr;
+    const a = swarmCore(p, fr);
+    const rOrbit = Math.max(FIXED.uniformR, a.rSail);
+    const kM = (rOrbit / a.rSail) ** 2, kF = FIXED.farsideFlopFactor;
+    const chipPower = a.chipPower * k, massSails = a.massSails * k * kM, massPods = a.massPods * k * kM;
+    return {
+      ...a, f, farside: false, uniform: true, rOrbit, areaFactor: kM, fFar: 0, fIn: 0,
+      intercepted: f * L_SUN, chipPower, sailPower: a.sailPower * k, podPower: a.podPower * k,
+      massSails, massPods, mass: massSails + massPods, kgPerW: chipPower > 0 ? (massSails + massPods) / chipPower : Infinity,
+      filmArea: a.filmArea * k * kM,
+      flopsSails: a.flopsSails * k * kF, flopsPods: a.flopsPods * k * kF, flops: (a.flopsSails + a.flopsPods) * k * kF,
+    };
+  }
   if (p.earthPlacement !== 'farside') {
     const s = swarmCore(p, f);
     return { ...s, farside: false, rOrbit: s.rSail, areaFactor: 1, fFar: 0, fIn: f, kgPerW: s.chipPower > 0 ? s.mass / s.chipPower : Infinity };
@@ -543,6 +572,11 @@ export function skyLux(p, f) {
       * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
   };
   if (p.earthPlacement === 'shell') return shellLux(f);
+  if (p.earthPlacement === 'uniform') {
+    // a disc of sunlit fronts out to asin(0.95) = 72° round the Sun, at the local fill f / share
+    const r = FIXED.uniformR, fl = Math.min(0.999, f / FIXED.uniformShare);
+    return (fl * p.rhoVis * flux(r)) / Math.PI / (1 - fl * p.rhoVis) * FIXED.lumensPerW * discGroundFactor(Math.asin(r));
+  }
   if (p.earthPlacement === 'cone') return coneLux(f);
   const { fFar, fIn } = farsideSplit(p, f);
   return FIXED.skyLuxPerFRho * p.rhoVis * fFar * (1 - fIn) + coneLux(fIn);
@@ -564,6 +598,8 @@ export function earthForcing(p, f) {
     const e = earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S);
     gross = e.forcing;
     blocked = e.dimming * EARTH.absorbedSolar;
+  } else if (p.earthPlacement === 'uniform') {
+    gross = f * FIXED.uniformIRPerF;
   } else if (p.earthPlacement === 'cone') {
     const s = swarmCore(p, f);
     gross = FIXED.keepoutIR * earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S).irForcing;
@@ -583,6 +619,13 @@ export function earthForcing(p, f) {
     rainCut: 1 - Math.exp(-FIXED.rainPerW * swapped), polar: FIXED.polarPerW * swapped };
 }
 
+/** Most of the Sun's light the layout has room for. */
+export function roomOf(p) {
+  if (p.earthPlacement === 'uniform') return FIXED.uniformRoom;
+  if (p.earthPlacement === 'farside' && p.spillInside === 'stop') return farsideRoom(p);
+  return 1;
+}
+
 /** Largest coverage whose net extra heat on Earth stays within p.forcingLimit (net rises with f). */
 function earthCapOf(p) {
   const ok = f => earthForcing(p, f).net <= p.forcingLimit + 1e-9;
@@ -594,8 +637,7 @@ function earthCapOf(p) {
     for (let i = 0; i < 48; i++) { const mid = (lo + hi) / 2; if (ok(10 ** mid)) lo = mid; else hi = mid; }
     cap = 10 ** lo;
   }
-  if (p.earthPlacement === 'farside' && p.spillInside === 'stop') cap = Math.min(cap, farsideRoom(p));
-  return cap;
+  return Math.min(cap, roomOf(p));
 }
 
 /**
@@ -607,10 +649,10 @@ export function earthLimits(p, d = null) {
   const earth = earthCapOf(p);
   const rock = d ? d.reachableCoverage : 1;
   const cap = Math.min(earth, rock);
-  const stopAtRoom = p.earthPlacement === 'farside' && p.spillInside === 'stop';
-  const binding = rock < earth ? 'rock' : stopAtRoom && earth >= farsideRoom(p) - 1e-9 ? 'room' : 'climate';
+  const room = roomOf(p);
+  const binding = rock < earth ? 'rock' : earth >= room - 1e-9 ? 'room' : 'climate';
   const s = swarmAt(p, cap);
-  return { cap, earthCap: earth, rock, binding, room: farsideRoom(p),
+  return { cap, earthCap: earth, rock, binding, room,
     shell: earthCapOf({ ...p, placement: 'thermal', earthPlacement: 'shell' }),
     flops: s.flops, mass: s.mass, nSails: s.filmArea / p.sailArea, fFar: s.fFar, fIn: s.fIn,
     forcing: earthForcing(p, cap), skyLuxAtCap: skyLux(p, cap) };
@@ -665,7 +707,7 @@ export const ERAS = {
     params: {
       jPerFlop85: 1.3e-13, hotLogicSlope: null, filmSpreadDT: 10,
       pvEta0: 0.20, pvTempCo: -0.0042, alpha: 0.9, epsFront: 0.85, epsBack: 0.90, packing: 0.9,
-      filmAreal: 0.172, laserKgPerW: 2e-5,
+      filmAreal: 0.172, filmThin: 1, laserKgPerW: 2e-5,
       podFrac: 0.15, wingAreal: 0.15, podKgPerKW: 2.1,
       yieldDelivered: 0.5, fabToolIntensity: 250, dieMm2PerW: 40, serviceLife: 10, recycleFrac: 0.9,
     },

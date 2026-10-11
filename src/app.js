@@ -79,7 +79,7 @@ function sailFacts(p) {
   const kS = s.farside ? s.rSail ** 2 : 1;
   const W = s.sail.chipWm2 * p.sailArea * kS;
   const flops = (W / s.sail.jPerFlop) * (s.farside ? h.FIXED.farsideFlopFactor : 1);
-  return { s, side, diag: side * Math.SQRT2, MW: W / 1e6, chips: W / p.chipPower, flops, mass: p.sailArea * p.filmAreal,
+  return { s, side, diag: side * Math.SQRT2, MW: W / 1e6, chips: W / p.chipPower, flops, mass: p.sailArea * h.filmAreal(p),
     farside: s.farside, S: s.sail.S * kS, pitch: s.sail.chipPitch / Math.sqrt(kS) };
 }
 
