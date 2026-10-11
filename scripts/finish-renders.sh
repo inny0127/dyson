@@ -64,4 +64,7 @@ dev "$RAW/leo_far20_g.exr" "$RAW/leo_far20.png" "$LEO20_E"
 python3 render/post.py "$RAW/leo_far038.png" "$OUT/leo-far-wide.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
 python3 render/post.py "$RAW/leo_far038_tele.png" "$OUT/leo-far-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
 python3 render/post.py "$RAW/leo_far20.png" "$OUT/leo-far20.jpg" --fov 104 --noise 0.8 --width 2400 --quality 88
+# Mercury at the heat wall (render/mercury.py writes an AgX PNG at the pristine globe's exposure)
+python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=88)" \
+  "$RAW/mercury_heatwall.png" "$OUT/mercury-heatwall.jpg"
 ls -la $OUT

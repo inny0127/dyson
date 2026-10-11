@@ -129,6 +129,22 @@ directly rather than path-traced.
 - **Not modelled:** the study expects texture in a real lattice, with sails stacked along shared
   node lines into overlap bands and gaps; the layer here is uniform.
 
+## Mercury today and at the heat wall (`mercury.py`)
+
+- **Globe:** MESSENGER MDIS albedo (mean 0.080) and the USGS 665 m DEM as true displacement, lit by
+  the Sun at 0.387 AU, phase 100°. Both frames share one exposure, metered on sunlit regolith.
+- **At the heat wall:** the model sheds 5×10¹⁸ W. Bare ground at 500 K would shed only
+  2.4×10¹⁷ W, so the whole planet is paved with radiator fields (corridors between them) that heat
+  pumps at half of Carnot hold at 1,650 K (`docs/future-tech.md`). They radiate 2.8×10¹⁹ W, 170
+  times the sunlight Mercury receives; most of it is the pumps' work, powered from the swarm.
+  - Glow: the CIE photopic integral of a 1,650 K grey body (ε 0.9), 30,700 cd/m², in the repo's
+    sunlight-radiance units (93 lm/W). Sunlit regolith at normal incidence is 21,500 cd/m².
+  - At 1,650 K sunlight is 2.4 % of what a radiator emits, so the fields cover the day side too,
+    where they also reflect sunlight at a visible albedo of 0.10.
+  - An earlier version drew 1,300 K fields on the night side only, which cannot shed the model's
+    heat, and scaled their glow by the visible share of the Planck spectrum, which overstates a
+    cool source's luminance.
+
 ## The pod, visible and thermal (`pod.py`)
 
 - **Geometry:** the design spec's 1 MW pod (render_spec parts `pod_*`):
