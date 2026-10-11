@@ -331,6 +331,9 @@ def ground_material(rad_strength):
     g.s(add.inputs[1], em.outputs[0])
     out = [n for n in m.node_tree.nodes if n.type == 'OUTPUT_MATERIAL'][0]
     g.s(out.inputs['Surface'], add.outputs[0])
+    # a light tree over tens of millions of emissive triangles runs out of memory; the glow is
+    # seen directly and reaches its surroundings through BSDF-sampled bounces
+    m.cycles.emission_sampling = 'NONE'
     return m
 
 
