@@ -191,7 +191,7 @@ export function sedChart(el, { f, T }) {
  * swarm as an even shell inside Earth's orbit, and the option as a cloud on Earth's orbit
  * beyond the Sun (projected radius cos(lat)·1 AU) with a gap round L3 and a shade at L1.
  */
-export function orbitMap(el, { shellR = 0.86, shellLabel, cloudLabel, spans = [[90, 165], [195, 270]], latMax = 30 }) {
+export function orbitMap(el, { mode, r = 0.95, cone = 23, l3 = 15, label, shellR = 0.86, shellLabel, cloudLabel, spans = [[90, 165], [195, 270]], latMax = 30 }) {
   const W = 1100, H = 560, cx = 470, cy = 280, s = 240;
   const P = (r, deg) => [cx + r * s * Math.cos((deg * Math.PI) / 180), cy - r * s * Math.sin((deg * Math.PI) / 180)];
   const ring = (r, style) => `<circle cx="${cx}" cy="${cy}" r="${r * s}" style="fill:none;${style}"/>`;
@@ -201,11 +201,19 @@ export function orbitMap(el, { shellR = 0.86, shellLabel, cloudLabel, spans = [[
   };
   const r0 = Math.cos((latMax * Math.PI) / 180);
   const txt = (x, y, str, style = LB2, anchor = 'start') => `<text x="${x}" y="${y}" text-anchor="${anchor}" style="${style}">${str}</text>`;
-  let o = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map to scale: the allowed swarm as an even shell just inside Earth's orbit; an option on Earth's orbit beyond the Sun; a sunshade at L1">`;
+  let o = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map to scale: where the swarm's sails fly round the Sun, Earth, and a sunshade at L1">`;
   o += ring(0.387, 'stroke:var(--rule);stroke-width:1') + ring(0.723, 'stroke:var(--rule);stroke-width:1');
   o += ring(1.0, 'stroke:var(--earth);stroke-width:1;stroke-opacity:0.6');
-  for (const [a0, a1] of spans) o += `<path d="${band(r0, 1.0, a0, a1)}" style="fill:var(--swarm);fill-opacity:0.08;stroke:var(--swarm);stroke-width:1"/>`;
-  o += ring(shellR, 'stroke:var(--sun-mark);stroke-width:5;stroke-opacity:0.85');
+  if (mode === 'uniform') {
+    // the near-uniform swarm in the plane of Earth's orbit: a ring at r, open round the Sun-Earth
+    // line (cone) and round L3; out of the plane it wraps the whole Sun
+    const arc = (a0, a1) => { const [x0, y0] = P(r, a0), [x1, y1] = P(r, a1); return `M${x0},${y0} A${r * s},${r * s} 0 ${a1 - a0 > 180 ? 1 : 0} 0 ${x1},${y1}`; };
+    for (const [a0, a1] of [[cone, 180 - l3], [180 + l3, 360 - cone]]) o += `<path d="${arc(a0, a1)}" style="fill:none;stroke:var(--swarm);stroke-width:6;stroke-opacity:0.85"/>`;
+    for (const a of [cone, -cone]) { const [x, y] = P(1.0, a); o += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" style="stroke:var(--earth);stroke-width:1;stroke-dasharray:3 4"/>`; }
+  } else {
+    for (const [a0, a1] of spans) o += `<path d="${band(r0, 1.0, a0, a1)}" style="fill:var(--swarm);fill-opacity:0.08;stroke:var(--swarm);stroke-width:1"/>`;
+    if (shellR) o += ring(shellR, 'stroke:var(--sun-mark);stroke-width:5;stroke-opacity:0.85');
+  }
   o += `<circle cx="${cx}" cy="${cy}" r="7" style="fill:var(--sun-mark)"/>`;
   const [ex, ey] = P(1, 0);
   o += `<circle cx="${ex}" cy="${ey}" r="6" style="fill:var(--earth);stroke:var(--paper);stroke-width:2"/><circle cx="${ex - 10}" cy="${ey}" r="2.5" style="fill:var(--ink)"/>`;
@@ -214,9 +222,15 @@ export function orbitMap(el, { shellR = 0.86, shellLabel, cloudLabel, spans = [[
   o += txt(cx, cy + 26, 'Sun', LB, 'middle');
   { const [x, y] = P(0.723, 60); o += txt(x - 6, y + 16, 'Venus', LB2, 'end'); }
   { const [x, y] = P(0.387, 55); o += txt(x - 6, y + 16, 'Mercury', LB2, 'end'); }
-  { const [x, y] = P(shellR, -40); o += txt(x - 10, y, shellLabel, LB, 'end'); }
-  { const [x, y] = P(1.04, 128); o += txt(x, y - 8, cloudLabel, LB, 'end'); }
-  { const [x, y] = P(1.06, 180); o += txt(x - 4, y + 4, 'gap', LB2, 'end'); }
+  if (mode === 'uniform') {
+    { const [x, y] = P(r, 128); o += txt(x - 10, y - 10, label, LB, 'end'); }
+    { const [x, y] = P(1.02, 0); o += txt(x + 14, y + 40, `no sails within ${cone}° of the Sun–Earth line`, LB2); }
+    { const [x, y] = P(r + 0.05, 180); o += txt(x - 4, y + 4, 'gap', LB2, 'end'); }
+  } else {
+    if (shellR && shellLabel) { const [x, y] = P(shellR, -40); o += txt(x - 10, y, shellLabel, LB, 'end'); }
+    if (cloudLabel) { const [x, y] = P(1.04, 128); o += txt(x, y - 8, cloudLabel, LB, 'end'); }
+    if (spans.length) { const [x, y] = P(1.06, 180); o += txt(x - 4, y + 4, 'gap', LB2, 'end'); }
+  }
   o += txt(W - 24, H - 16, '1 AU = 150 million km', LB2, 'end');
   o += `</svg>`;
   el.innerHTML = o;
