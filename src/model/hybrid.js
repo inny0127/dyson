@@ -371,6 +371,26 @@ function swarmCore(p, fIn) {
  * each watt intercepted takes (1 AU / r)² more film, and infrared-dark fronts run the chips hotter
  * (FLOP/J ×0.66); once the far side is full, the rest fly inside Earth's orbit (fIn).
  */
+/**
+ * Sail area needed to cover a share F of the sky round the Sun, as a multiple of the sphere's area.
+ * Every sail orbits on a great circle and any two great circles cross, so sails covering every
+ * direction must overlap somewhere: where their paths cross, they fly at different radii and one
+ * shades the other (the ones behind turn edge-on and idle until they are past). Flown as bands in
+ * formation, a closed sphere needs bands adding up to at least π/2 of its area: bands covering a
+ * sphere have total angular width ≥ π (Fejes Tóth's zone conjecture, proved by Jiang & Polyanskii,
+ * 2017), and bands sharing one axis meet that bound. Part-built, bands sharing an axis that cover a
+ * share f0 of the equator cover F = f0·acos(f0) + 1 − √(1 − f0²) of the sphere with area π f0 / 2:
+ * 1.03× at 10 %, 1.13× at half, 1.51× at 99 %, π/2 closed.
+ */
+export function bandArea(F) {
+  if (!(F > 0)) return 0;
+  if (F >= 1) return Math.PI / 2;
+  const cov = f0 => f0 * Math.acos(f0) + 1 - Math.sqrt(1 - f0 * f0);
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (cov(mid) < F) lo = mid; else hi = mid; }
+  return (Math.PI * (lo + hi)) / 4;
+}
+
 export function swarmAt(p, fIn) {
   const f = Math.min(1, Math.max(1e-20, fIn));
   if (p.earthPlacement === 'closed') {
@@ -381,13 +401,15 @@ export function swarmAt(p, fIn) {
     const r = FIXED.closedR;
     const kM = (r / a.rSail) ** 2 * (1 - FIXED.capFrac * f);
     const kF = closedFactor(p, f, a.sail);
-    const cap = f * FIXED.capFrac * 4 * Math.PI * (FIXED.capR * AU) ** 2 * FIXED.capKgM2;
-    const chipPower = a.chipPower * k, massSails = a.massSails * k * kM + cap, massPods = a.massPods * k * kM;
+    // overlap: the sails flown, as a multiple of those lit at any moment (bandArea)
+    const ov = f < 1e-6 ? 1 : bandArea(f) / f;
+    const cap = f * ov * FIXED.capFrac * 4 * Math.PI * (FIXED.capR * AU) ** 2 * FIXED.capKgM2;
+    const chipPower = a.chipPower * k, massSails = a.massSails * k * kM * ov + cap, massPods = a.massPods * k * kM * ov;
     return {
       ...a, f, farside: false, closed: true, rOrbit: r, areaFactor: kM, fFar: 0, fIn: 0, filmT: closedFilmT(p, f),
       intercepted: f * L_SUN, chipPower, sailPower: a.sailPower * k, podPower: a.podPower * k,
       massSails, massPods, mass: massSails + massPods, kgPerW: chipPower > 0 ? (massSails + massPods) / chipPower : Infinity,
-      filmArea: a.filmArea * k * kM,
+      filmArea: a.filmArea * k * kM * ov, overlap: ov,
       flopsSails: a.flopsSails * k * kF, flopsPods: a.flopsPods * k * kF, flops: (a.flopsSails + a.flopsPods) * k * kF,
     };
   }
@@ -576,7 +598,8 @@ export function compute(p) {
   let fBuild = Math.min(f, 0.01), sB, growth, chipAreaPerKg = 0, dieM2PerW = 0;
   for (let i = 0; i < 6; i++) {
     sB = swarmAt(p, fBuild);
-    dieM2PerW = ((1 - sB.q) * p.dieMm2PerW + sB.q * FIXED.podDieMm2PerW) * 1e-6;
+    // idle sails behind the overlaps carry chips too: die area per lit watt grows with the overlap
+    dieM2PerW = ((1 - sB.q) * p.dieMm2PerW + sB.q * FIXED.podDieMm2PerW) * 1e-6 * (sB.overlap ?? 1);
     chipAreaPerKg = Number.isFinite(sB.kgPerW) && sB.kgPerW > 0 ? dieM2PerW / sB.kgPerW : 0;
     growth = simulateBuild(p, mass, deliveredRateCap, chipAreaPerKg);
     const fNew = Math.max(1e-9, coverageForMass(p, Math.min(mass, growth.peakMass)));
@@ -669,14 +692,6 @@ export function discGroundFactor(R, depressionDeg = FIXED.skyDepression) {
  * (f, radiosity ρS / (1 − fρ)): a uniform disc out to asin(r) from the Sun.
  * Far-side cloud: the study's 0.31 lux per 1 % at ρ 0.003 (a cone along the ecliptic).
  */
-// discGroundFactor out to angles spread evenly in sin between the sphere's inner and outer edges
-// (0.92 and 0.98 AU seen from 1 AU), computed once
-let sphereG = null;
-function sphereGroundFactors() {
-  if (!sphereG) sphereG = Array.from({ length: 25 }, (_, i) => discGroundFactor(Math.asin(0.92 + (0.06 * i) / 24)));
-  return sphereG;
-}
-
 export function skyLux(p, f) {
   if (!(f > 0)) return 0;
   const shellLux = fs => {
@@ -695,17 +710,11 @@ export function skyLux(p, f) {
   };
   if (p.earthPlacement === 'shell') return shellLux(f);
   if (p.earthPlacement === 'closed') {
-    // the far side's sunlit fronts, seen through the near side's gaps. Inside asin(0.92) a line of
-    // sight crosses the whole layer each way: f (1 − f) ρ S / π. Toward the limb, asin(0.98), it
-    // crosses a share s of it; the sails are a random layer, so each half lets through t = (1 − f)^s
-    // and the glow is (1 − t) t ρ S / π: at high f a bright ring just inside the edge
-    // (render/sky_map.py, sphere_half).
-    const fo = Math.min(1, f / FIXED.closedRoom), L0 = (p.rhoVis * flux(FIXED.closedR)) / Math.PI * FIXED.lumensPerW;
-    const glow = sh => { const t = (1 - fo) ** sh; return (1 - t) * t; };
-    const G = sphereGroundFactors();
-    let lux = glow(1) * G[0];
-    for (let i = 1; i < G.length; i++) lux += glow(1 - (i - 0.5) / (G.length - 1)) * (G[i] - G[i - 1]);
-    return L0 * lux;
+    // the far side's sunlit fronts, seen through the mirror sails in front of Earth: f (1 − f) ρ S / π
+    // over a disc asin(0.95) in radius. The sails fly in bands a kilometre apart in radius, so the
+    // shell is ~7,000 km thick, thin enough that its edge is sharp and its gaps line up.
+    const r = FIXED.closedR, fo = Math.min(1, f / FIXED.closedRoom);
+    return (fo * (1 - fo) * p.rhoVis * flux(r)) / Math.PI * FIXED.lumensPerW * discGroundFactor(Math.asin(r));
   }
   if (p.earthPlacement === 'uniform') {
     // a disc of sunlit fronts out to asin(0.95) = 72° round the Sun, at the local fill f / share

@@ -274,6 +274,14 @@ test('closed: all the heat leaves through the backs, so the film runs ~419 K (38
   near(h.swarmAt(pC, 1).flops / uRoom.flops, 0.95, 0.02, 'closed vs near-uniform');
 });
 
+test('overlap: closing a sphere of orbiting bands takes π/2 of its area in sails', () => {
+  near(h.bandArea(1), Math.PI / 2, 1e-12, 'closed');
+  near(h.bandArea(0.01) / 0.01, 1, 0.01, 'sparse: no overlap');
+  near(h.bandArea(0.5) / 0.5, 1.13, 0.01, 'half');
+  near(h.bandArea(0.99) / 0.99, 1.51, 0.01, '99 %');
+  near(h.swarmAt(pC, 1).overlap, Math.PI / 2, 1e-9, 'the model flies the idle sails');
+});
+
 test('closed: Earth sees only the cap’s cold back (0.56 W/m²), no glow at night, full sunlight', () => {
   const E = h.earthLimits(pC, dC);
   near(h.earthForcing(pC, 1).gross, 0.56, 1e-12, 'infrared');
@@ -282,17 +290,17 @@ test('closed: Earth sees only the cap’s cold back (0.56 W/m²), no glow at nig
   assert.equal(E.binding, 'room');
 });
 
-test('closed timeline: heat wall ~2145, half ~2173, mantle gone ~2200, closed ~2214 from the core’s silicon', () => {
+test('closed timeline: heat wall ~2145, half ~2178, mantle gone ~2200 at 75 %, 99 % ~2343 from the core’s silicon', () => {
   const g = dC.growth;
   near(g.tCap + pC.seedYear, 2145, 3, 'heat wall');
-  near(dC.yearsToCoverage(0.5) + pC.seedYear, 2173, 4, 'half');
+  near(dC.yearsToCoverage(0.5) + pC.seedYear, 2178, 4, 'half');
   near(g.tMantleOut + pC.seedYear, 2200, 4, 'crust and mantle dug out');
-  near(dC.yearsToCoverage(0.99) + pC.seedYear, 2214, 5, 'closed');
+  near(dC.yearsToCoverage(0.99) + pC.seedYear, 2343, 8, '99 %');
   near(g.rockCore, MERCURY.M_CORE * 0.06 / 0.25 * pC.yieldDelivered, 1e9, 'core silicon as rock');
-  // with the mantle alone the swarm stops at ~93 %
-  near(h.compute({ ...pC, coverage: 1, rockSource: 'mantle' }).reachableCoverage, 0.933, 0.01, 'mantle only');
-  // what is dug: all the rock and ~9 % of the core; never more than the planet
-  near(dC.fracMercury, 0.31, 0.01, 'share of Mercury dug');
+  // with the mantle alone the swarm stops at ~75 %: the overlapping bands that close it cost π/2
+  near(h.compute({ ...pC, coverage: 1, rockSource: 'mantle' }).reachableCoverage, 0.747, 0.01, 'mantle only');
+  // what is dug: all the rock and nearly all the core; never more than the planet
+  near(dC.fracMercury, 0.93, 0.01, 'share of Mercury dug');
   for (const y of [100, 200, 1000, 5900]) assert.ok(h.atYear(pC, dC, y).mercuryRemoved <= 1, `year ${y}`);
   const a = h.atYear(pC, dC, 160);
   assert.equal(a.mercurySurface, 'core');
@@ -300,19 +308,18 @@ test('closed timeline: heat wall ~2145, half ~2173, mantle gone ~2200, closed ~2
   near(a.heatOnMercury, b, 0.01 * b, 'the core is dug at the same heat wall');
 });
 
-test('centuries of life: a 300-year rebuild losing 1 % needs ~1.2×10¹⁸ kg a year, ~19,000 years of the core', () => {
+test('centuries of life: a 300-year rebuild losing 1 % needs ~1.9×10¹⁸ kg a year, ~1,200 years of the core left', () => {
   const loss = dC.mass * (1 - pC.recycleFrac) / pC.serviceLife;
-  near(loss, 1.2e18, 0.05e18, 'kg a year');
+  near(loss, 1.89e18, 0.05e18, 'kg a year');
   const coreLeft = dC.growth.rockCore - (dC.mass - dC.growth.rockMantle);
-  assert.ok(coreLeft / loss > 15000, `${coreLeft / loss} years`);
+  near(coreLeft / loss, 1200, 100, 'years of replacements left in the core');
   // with today's life the core's silicon goes on replacements and the swarm never closes
   assert.ok(h.compute({ ...pC, coverage: 1, ...today, rockSource: 'whole' }).reachableCoverage < 0.95);
 });
 
 test('symmetric build: the night glow and Earth’s extra heat both go as f (1 − f), peaking at half closed', () => {
-  // glow from the far side's sunlit fronts through the near side's gaps: the same across the disc
-  // at 1 % and 99 %, but at 99 % a bright ring just inside the edge, where the sphere is thin
-  assert.ok(h.skyLux(pC, 0.99 * h.FIXED.closedRoom) > 2 * h.skyLux(pC, 0.01), 'the ring at 99 %');
+  // glow from the far side's sunlit fronts through the near side's gaps: the same at 1 % and 99 %
+  near(h.skyLux(pC, 0.01), h.skyLux(pC, 0.99 * h.FIXED.closedRoom), 0.02 * h.skyLux(pC, 0.01), 'glow at 1 % and 99 %');
   assert.ok(h.skyLux(pC, 0.5) > h.skyLux(pC, 0.1) && h.skyLux(pC, 0.5) > h.skyLux(pC, 0.9), 'brightest half closed');
   assert.equal(h.skyLux(pC, h.FIXED.closedRoom), 0, 'black once closed');
   // the far side's infrared-dark fronts through the gaps: ~8.6 W/m² at half closed, cancelled by

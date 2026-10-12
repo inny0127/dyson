@@ -865,7 +865,7 @@ def main(argv):
         if a.glow == 'closed':
             spec['glow'] = {'kind': 'closed', 'd': d_au, 'cap_deg': a.cap_deg}
         if a.glow == 'sphere':
-            spec['glow'] = {'kind': 'sphere', 'f': a.f, 'rho': a.rho, 'r_in': a.r, 'r_out': a.r_out, 'd': d_au}
+            spec['glow'] = {'kind': 'sphere', 'f': a.f, 'rho': a.rho, 'd': d_au, 'shell': 'thin'}
     spec['sun_scale'] = a.sun_scale
     prefix, info = sky_assets(spec)
     w, h = (int(v) for v in a.res.split('x'))

@@ -82,6 +82,7 @@ main { padding-inline: 1rem; }
 section.chapter { padding-block: 3.5rem 1rem; display: grid; gap: 1.6rem; }
 .kicker { font: 500 0.75rem/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 h2 { margin: 0.5rem 0 0; font: 400 clamp(1.9rem, 3.6vw, 2.6rem)/1.08 var(--serif); letter-spacing: -0.005em; text-wrap: balance; }
+.prose h3 { margin: 2.2rem 0 0.4rem; font: 500 1.35rem/1.25 var(--serif); }
 .prose p { margin: 0 0 1.05rem; }
 .prose p:last-child { margin-bottom: 0; }
 .num { font: 500 0.92em/1 var(--sans); font-variant-numeric: lining-nums; white-space: nowrap; }
@@ -306,7 +307,7 @@ section.stage { border-top: 1px solid var(--rule); }
   </section>
 
   <section class="chapter" id="strip" data-f="0.5">
-    <div class="col"><div class="kicker">2050–2216 · At a glance</div><h2>One lake, seven nights</h2><p class="dek">The same view at the end of twilight, as the swarm grows. It brightens, peaks when half the Sun is caught, and fades to black as the sphere closes.</p></div>
+    <div class="col"><div class="kicker">2050–<span data-y="1"></span> · At a glance</div><h2>One lake, seven nights</h2><p class="dek">The same view at the end of twilight, as the swarm grows. It brightens, peaks when half the Sun is caught, and fades to black as the sphere closes.</p></div>
     <div class="wide strip" id="strip-row">
       <a href="#stage-0"><figure><img src="renders/earth-night-tonight.jpg" alt="Tonight: the Milky Way beside Grand Teton" loading="lazy"><span><b>2050</b>nothing yet</span></figure></a>
       <a href="#stage-1e-6"><figure><img src="renders/stage-night-1e-6.jpg" alt="A faint glow above the range" loading="lazy"><span><b data-y="1e-6"></b>a millionth</span></figure></a>
@@ -320,7 +321,7 @@ section.stage { border-top: 1px solid var(--rule); }
   </section>
 
   <section class="chapter" id="progression-intro" data-f="1e-8">
-    <div class="col"><div class="kicker">2050–2216 · The progression</div><h2>Watching it grow</h2><p class="dek">Every stage below is the same sphere, the same in every direction, only fuller. What changes is how much of the Sun it has caught.</p></div>
+    <div class="col"><div class="kicker">2050–<span data-y="1"></span> · The progression</div><h2>Watching it grow</h2><p class="dek">Every stage below is the same sphere, the same in every direction, only fuller. What changes is how much of the Sun it has caught.</p></div>
     <div class="col prose" id="progression-prose"></div>
   </section>
 

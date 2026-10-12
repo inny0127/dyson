@@ -89,29 +89,42 @@ def cap_samples(centre, radius, n):
     return pts, 2 * math.pi * (1 - math.cos(radius)) / n
 
 
-R_CAP = 0.98                                                         # AU: the outer shell, where the mirror cap flies
+R_CAP = 0.98                                                         # AU: the mirror cap in front of Earth
+R_SHELL = 0.95                                                       # AU: the compute shell
+CAP_COS = 0.92                                                       # the cap spans 23.07 deg round the Sun-Earth line
 
 
-def sphere_depth(dirs, sun, g):
-    """The symmetric sphere (docs/closed-swarm.md): the share of the shell's depth a line of sight
-    from Earth crosses on each side of its closest approach to the Sun, 0..1. Sails fill r_in..r_out
-    AU and Earth is d AU from the Sun, so inside asin(r_in / d) a line crosses the whole layer twice;
-    beyond, both halves thin out until asin(r_out / d), the sphere's limb."""
+def _limb(dirs, sun, R, d, soft_deg=0.15):
+    """1 for lines of sight from Earth (d AU out) that meet a sphere of radius R AU, 0 for those that
+    miss, with an edge softened over ~soft_deg."""
     ang = np.arccos(np.clip(dirs @ sun, -1, 1))
-    b = np.where(ang < math.pi / 2, g.get('d', 1.0) * np.sin(ang), 2.0)
-    return np.clip((g['r_out'] - b) / (g['r_out'] - g['r_in']), 0, 1)
+    edge = math.asin(min(R / d, 0.9999))
+    return np.where(ang < math.pi / 2, np.clip((edge - ang) / math.radians(soft_deg) + 0.5, 0, 1), 0.0)
 
 
-def sphere_half(dirs, sun, g):
-    """Light one half of such a line lets through. Sails in different orbits are uncorrelated along a
-    slanted line, so the shell is a random layer: (1 - f) to the power of the share of depth crossed,
-    whatever the slant (for sun-facing plates the slant cancels)."""
-    return (1.0 - g['f']) ** sphere_depth(dirs, sun, g)
+def sphere_layers(dirs, sun, g):
+    """The symmetric sphere (docs/closed-swarm.md) as Earth sees it: the sails fly in bands at radii a
+    kilometre apart, so the compute shell (0.95 AU) is ~7,000 km thick, a thin layer whose gaps line
+    up; in front of Earth, the mirror cap (0.98 AU, within 23 deg of the Sun-Earth line) fills at the
+    same pace. Returns, for each direction, the cap crossings (near, and far where the line leaves the
+    0.98 AU sphere still inside the cap) and the compute shell's far side, each 0..1."""
+    d = g.get('d', 1.0)
+    near = _limb(dirs, sun, R_CAP, d)
+    ang = np.arccos(np.clip(dirs @ sun, -1, 1))
+    # where the line leaves the 0.98 AU sphere: still inside the cap?
+    b2 = np.maximum(R_CAP ** 2 - (d * np.sin(ang)) ** 2, 0.0)
+    t2 = d * np.cos(ang) + np.sqrt(b2)
+    far_cap = near * (((d - t2 * np.cos(ang)) / R_CAP) > CAP_COS)
+    shell = _limb(dirs, sun, R_SHELL, d)
+    return near, far_cap, shell
 
 
 def sphere_transmission(dirs, sun, g):
-    """Starlight through the sphere at coverage f: in through the near half and out through the far."""
-    return sphere_half(dirs, sun, g) ** 2
+    """Starlight through the sphere at coverage f: through the cap, once or twice, and the shell's far
+    side behind the Sun. Each thin layer passes 1 - f."""
+    f = g['f']
+    near, far_cap, shell = sphere_layers(dirs, sun, g)
+    return (1 - f * near) * (1 - f * far_cap) * (1 - f * shell)
 
 
 def closed_cap_deg(d):
@@ -124,11 +137,10 @@ def glow_radiance(dirs, sun, g):
     """Radiance of the swarm glow above the atmosphere (W/m^2/sr, luminance channel)."""
     cosang = dirs @ sun
     if g['kind'] == 'sphere':
-        # the far half's sunlit fronts, seen through the gaps of the near half: inside asin(r_in / d)
-        # f (1 - f) rho S / pi; toward the limb both halves thin, so at high f the glow peaks in a ring
-        t = sphere_half(dirs, sun, g)
-        r = 0.5 * (g['r_in'] + g['r_out'])
-        return (1 - t) * t * g['rho'] * S0 / r ** 2 / math.pi
+        # the far side's sunlit fronts (0.95 AU), seen through the cap's gaps: f (1 - f) rho S / pi
+        f = g['f']
+        near, _, shell = sphere_layers(dirs, sun, g)
+        return (1 - f * near) * f * shell * g['rho'] * S0 / R_SHELL ** 2 / math.pi
     if g['kind'] == 'uniform':
         # near-uniform swarm (docs/full-swarm.md): sun-facing sails between r_in and r_out AU all round
         # the Sun, filled to tau, empty within acos(r_in) of the Sun-Earth line (so every line of sight

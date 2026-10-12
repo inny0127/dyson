@@ -2,9 +2,10 @@
 planets, looking at the Sun, in visible light (scene-linear EXR) and through a thermal camera
 (8-14 um, false colour PNG). docs/closed-swarm.md; a ray caster, because the scene is two spheres.
 
-- Sails: sun-facing plates filling r_in..r_out AU (0.92-0.98) at coverage f, as a random layer of
-  radial optical depth tau = -ln(1 - f). For plates facing the Sun the optical depth of a path is
-  tau times the share of the layer's depth it crosses, whatever its slant.
+- Sails: sun-facing plates at coverage f in a thin shell at 0.95 AU (r_in..r_out): they fly in
+  formation bands a kilometre apart in radius, ~7,000 km in all, so each crossing passes 1 - f
+  (written as optical depth tau = -ln(1 - f) times the share of the layer crossed). The mirror cap
+  in front of Earth (0.98 AU) is drawn on the shell.
 - Visible: the near side shows the camera the plates' backs, unlit and black; through its gaps the
   far side shows their sunlit fronts, rho S(r) / pi (rho 0.004, all hardware), and the Sun, and
   behind everything the stars and the Milky Way.
@@ -63,8 +64,8 @@ def main(argv):
     ap.add_argument('--lens', type=float, default=28.0)
     ap.add_argument('--res', default='2400x1600')
     ap.add_argument('--rho', type=float, default=0.004)
-    ap.add_argument('--r-in', type=float, default=0.92)
-    ap.add_argument('--r-out', type=float, default=0.98)
+    ap.add_argument('--r-in', type=float, default=0.9495, help='the shell: bands a kilometre apart in radius, ~7,000 km thick')
+    ap.add_argument('--r-out', type=float, default=0.9505)
     ap.add_argument('--occulter', type=float, default=1.6, help='coronagraph: disc over the Sun, deg (0: none)')
     a = ap.parse_args(argv)
     w, h = (int(v) for v in a.res.split('x'))
