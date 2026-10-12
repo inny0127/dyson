@@ -16,27 +16,27 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell), 
 | Pod mass per W | 3.91 g/W | 2.86 g/W | 2.60 g/W | 2.51 g/W |
 | Pod share of chip power | 15% | 15% | 6.0% | 1.1% |
 | Swarm mass per W | 1.37 g/W | 0.89 g/W | 0.56 g/W | 0.32 g/W |
-| Swarm mass per W, closed (0.95 AU, thin film) | 1.47 g/W | 1.02 g/W | 0.69 g/W | 0.41 g/W |
+| Swarm mass per W, closed (0.95 AU, thin film) | 1.47 g/W | 1.03 g/W | 0.69 g/W | 0.41 g/W |
 | Service life / recycled | 10 yr / 90% | 50 yr / 95% | 300 yr / 99% | 1000 yr / 99.5% |
 | Energy per op (sail) | 7.8×10⁻¹⁴ J | 3.3×10⁻¹⁴ J | 1.4×10⁻¹⁵ J | 1.3×10⁻¹⁶ J |
 | FLOP per joule of sunlight | 1.6×10¹² | 3.9×10¹² | 1×10¹⁴ | 1.4×10¹⁵ |
-| Industry doubling (with fabs) | 5.17 yr | 3.93 yr | 1.88 yr | 1.19 yr |
-| Heat wall | 2317 | 2251 | 2145 | 2110 |
-| 1 % of sunlight | 2305 | 2242 | 2141 | 2107 |
-| 10 % of sunlight | 2325 | 2257 | 2149 | 2112 |
-| Ceiling (refresh or rock, industry left alone) | 39% | 91% | 100% | 100% |
-| Computing at the ceiling | 1.1×10³⁸ FLOP/s | 6.7×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
-| Crust and mantle dug out | 2392 | 2318 | 2200 | not within 6000 yr |
-| Core dug out too | 2645 | 2543 | not within 6000 yr | not within 6000 yr |
-| Share of Mercury dug for the finished swarm | 17% | 72% | 31% | 16% |
-| Film temperature, finished swarm | 404 K | 416 K | 419 K | 415 K |
-| Finished swarm: share of the Sun | 39% (rock runs out) | 91% (rock runs out) | 100% (closed) | 100% (closed) |
-| Computing, finished swarm | 1.1×10³⁸ FLOP/s | 6.7×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
-| Year finished | 2391 | 2539 | 2215 | 2142 |
-| Its infrared on Earth (the cap's back) | 8.31 W/m² | 3.69 W/m² | 0.56 W/m² | 0.56 W/m² |
-| Sunlight taken to cancel it | 3.49% | 1.55% | 0.24% | 0.24% |
-| Global rainfall | −6.1% | −2.8% | −0.42% | −0.42% |
-| Night sky, finished swarm (Sun 18° down) | 23.2 lux | 8.1 lux | 0.0 lux | 0.0 lux |
+| Industry doubling (with fabs) | 5.16 yr | 3.91 yr | 1.88 yr | 1.19 yr |
+| Heat wall | 2317 | 2250 | 2145 | 2110 |
+| 1 % of sunlight | 2305 | 2241 | 2141 | 2107 |
+| 10 % of sunlight | 2325 | 2256 | 2149 | 2112 |
+| Ceiling (refresh or rock, industry left alone) | 36% | 73% | 100% | 100% |
+| Computing at the ceiling | 9.9×10³⁷ FLOP/s | 5.7×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
+| Crust and mantle dug out | 2391 | 2317 | 2200 | 2161 |
+| Core dug out too | 2644 | 2541 | 3647 | not within 6000 yr |
+| Share of Mercury dug for the finished swarm | 17% | 72% | 93% | 27% |
+| Film temperature, finished swarm | 403 K | 411 K | 419 K | 415 K |
+| Finished swarm: share of the Sun | 36% (rock runs out) | 73% (rock runs out) | 100% (closed) | 100% (closed) |
+| Computing, finished swarm | 9.9×10³⁷ FLOP/s | 5.7×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
+| Year finished | 2390 | 2536 | 2350 | 2160 |
+| Its infrared on Earth (the cap's back) | 7.96 W/m² | 7.58 W/m² | 0.56 W/m² | 0.56 W/m² |
+| Sunlight taken to cancel it | 3.34% | 3.18% | 0.24% | 0.24% |
+| Global rainfall | −5.9% | −5.6% | −0.42% | −0.42% |
+| Night sky, finished swarm (Sun 18° down) | 22.5 lux | 19.2 lux | 0.0 lux | 0.0 lux |
 | For comparison, far side only (±60°) | 28%, 1×10³⁸ FLOP/s, −5.0% sunlight | 28%, 3×10³⁸ FLOP/s, −5.0% sunlight | 28%, 7×10³⁹ FLOP/s, −5.0% sunlight | 28%, 1×10⁴¹ FLOP/s, −5.0% sunlight |
 | For comparison, open toward Earth (near-uniform) | 39%, 1.4×10³⁸ FLOP/s, −9.1% sunlight, −15% rain | 85%, 7.7×10³⁸ FLOP/s, −20% sunlight, −30% rain | 85%, 2×10⁴⁰ FLOP/s, −20% sunlight, −30% rain | 85%, 2.8×10⁴¹ FLOP/s, −20% sunlight, −30% rain |
 
@@ -49,29 +49,29 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell), 
 | 2110 | 1.1×10⁻⁵% | 3×10³³ | 3.7×10¹¹ | 2.9×10⁻⁶% | 0% | 1.3×10⁻⁶% | 0.00 lux |
 | 2120 | 4.3×10⁻⁴% | 1.2×10³⁵ | 1.5×10¹³ | 1.2×10⁻⁴% | 0% | 5.1×10⁻⁵% | 0.00 lux |
 | 2130 | 0.017% | 4.9×10³⁶ | 6×10¹⁴ | 0.0047% | 0% | 0.002% | 0.02 lux |
-| 2150 | 12.27% | 3.3×10³⁹ | 4.2×10¹⁷ | 3.309% | 0% | 1.33% | 10.53 lux |
-| 2170 | 44.31% | 1×10⁴⁰ | 1.5×10¹⁸ | 11.79% | 0% | 3.48% | 24.13 lux |
-| 2200 | 93.56% | 1.8×10⁴⁰ | 3.1×10¹⁸ | 24.52% | 0% | 1.20% | 5.89 lux |
-| 2214 | 99.26% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 30.46% | 0% | 0.35% | 0.72 lux |
-| 2300 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 31.23% | 0% | 0.24% | 0.00 lux |
-| 2450 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 31.37% | 100% | 0.24% | 0.00 lux |
-| 2750 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 32.45% | 100% | 0.24% | 0.00 lux |
-| 3150 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 34.48% | 0% | 0.24% | 0.00 lux |
-| 3550 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 35.57% | 0% | 0.24% | 0.00 lux |
+| 2150 | 11.97% | 3.2×10³⁹ | 4.2×10¹⁷ | 3.309% | 0% | 1.30% | 10.30 lux |
+| 2170 | 40.24% | 9.5×10³⁹ | 1.5×10¹⁸ | 11.79% | 0% | 3.34% | 23.52 lux |
+| 2200 | 74.80% | 1.5×10⁴⁰ | 3.1×10¹⁸ | 24.52% | 0% | 3.05% | 18.43 lux |
+| 2214 | 78.04% | 1.6×10⁴⁰ | 3.3×10¹⁸ | 30.46% | 0% | 2.82% | 16.76 lux |
+| 2300 | 94.16% | 1.8×10⁴⁰ | 4.4×10¹⁸ | 66.94% | 0% | 1.11% | 5.37 lux |
+| 2450 | 100.00% | 1.9×10⁴⁰ | 5.2×10¹⁸ | 93.24% | 100% | 0.24% | 0.00 lux |
+| 2750 | 100.00% | 1.9×10⁴⁰ | 5.2×10¹⁸ | 94.95% | 100% | 0.24% | 0.00 lux |
+| 3150 | 100.00% | 1.9×10⁴⁰ | 5.2×10¹⁸ | 97.74% | 100% | 0.24% | 0.00 lux |
+| 3550 | 100.00% | 1.9×10⁴⁰ | 5.2×10¹⁸ | 99.87% | 100% | 0.24% | 0.00 lux |
 
 ## What sets the ceiling: service life and recycling (central case)
 
 | Service life | Recycled in orbit | Ceiling coverage | Closed in | Lost a year once finished |
 |---|---|---|---|---|
-| 10 yr | 0% | 15.8% | never | 3.6×10²¹ kg |
-| 10 yr | 90% | 73.0% | never | 3.6×10²⁰ kg |
-| 15 yr | 94% | 91.8% | never | 1.4×10²⁰ kg |
-| 30 yr | 97% | 100.0% | 2222 | 3.6×10¹⁹ kg |
-| 100 yr | 99% | 100.0% | 2213 | 3.6×10¹⁸ kg |
-| 300 yr | 99% | 100.0% | 2213 | 1.2×10¹⁸ kg |
-| 1000 yr | 99.5% | 100.0% | 2213 | 1.8×10¹⁷ kg |
+| 10 yr | 0% | 15.3% | never | 5.7×10²¹ kg |
+| 10 yr | 90% | 61.8% | never | 5.7×10²⁰ kg |
+| 15 yr | 94% | 73.8% | never | 2.3×10²⁰ kg |
+| 30 yr | 97% | 97.1% | never | 5.7×10¹⁹ kg |
+| 100 yr | 99% | 100.0% | 2345 | 5.7×10¹⁸ kg |
+| 300 yr | 99% | 100.0% | 2343 | 1.9×10¹⁸ kg |
+| 1000 yr | 99.5% | 100.0% | 2343 | 2.8×10¹⁷ kg |
 
-With the mantle alone (no core) the central case stops at 93%.
+With the mantle alone (no core) the central case stops at 75%.
 
 ## Concentrating chips costs mass (central case, 1 % coverage)
 
@@ -102,7 +102,7 @@ Export is capped at 5.9×10²⁰ kg/yr by the 5×10¹⁸ W the surface can shed 
 Where the heat comes from, per kg of rock: digging and crushing ~0.05 MJ; a surface launch to low orbit (3 km/s, 4.5 MJ/kg of kinetic energy) leaves ~0.045 MJ with superconducting launchers at 99 % (0.23 MJ at 95 %, which would make the wall 3× lower). Everything after that happens in orbit: catapults add the rest of the launch and shed their losses to space; reduction, refining and the fabs work there too. Launching the whole way from the surface at 95 % would leave ~1.8 MJ/kg, and refining on the surface tens of MJ/kg.
 
 What the surface can shed: Mercury's 7.5×10¹³ m² radiating at 500 K (ε 0.9) gets rid of only 2.4×10¹⁷ W. Heat pumps at half of Carnot lift the waste heat to radiators at 1,650 K: they radiate 2.8×10¹⁹ W, of which 5×10¹⁸ W is the waste heat and the rest the pumps' own work, supplied by beamed power. At 2,000 K the same arithmetic gives ~9×10¹⁸ W; refractory radiators cannot go much hotter. The planet paved with radiators is the ceiling; the lever that matters is how few joules per kg stay on it.
-The core (76% of the planet, ~6 % silicon) adds 2.5×10²² kg of spacecraft at 4.2× the heat per kg. The crust and mantle are dug out by 2200; the finished swarm (100% of the Sun) takes 31% of the planet, 9% of the core (`docs/closed-swarm.md`).
+The core (76% of the planet, ~6 % silicon) adds 2.5×10²² kg of spacecraft at 4.2× the heat per kg. The crust and mantle are dug out by 2200; the finished swarm (100% of the Sun) takes 93% of the planet, 91% of the core (`docs/closed-swarm.md`).
 
 ## Earth
 

@@ -26,17 +26,45 @@ It is the page's default (`earthPlacement: 'closed'`).
   radius plus the 0.27° spread of the Sun's disc over the 3.0 million km to Earth, so every point
   on Earth sees the whole Sun. The Moon gets its own, 15,700 km, which crosses the cap once a month
   as the elements in its path turn and turn back. Any other window is made the same way.
-- **The mass:** 3.61×10²² kg finished, against 3.38×10²² kg from Mercury's crust and mantle. The
-  last 7 % comes from the core (below).
+- **The mass:** 5.67×10²² kg finished: π/2 times what would tile the sphere, because orbits
+  cross (below, "Overlap"). Mercury's crust and mantle give 3.38×10²² kg; the last 40 % comes
+  from the core, and 93 % of the planet is taken apart.
+
+## Overlap: why closing takes π/2 of the sphere in sails
+
+- **Orbits cross.** Seen from the Sun every sail moves along a great circle, and any two great
+  circles cross. Sails covering every direction must therefore pass one another somewhere: they
+  fly at different radii there, and the one behind is shaded. A sail behind an overlap turns
+  edge-on and idles until it is past (the window's trick), so it neither wastes light nor traps
+  the lit sail's heat.
+- **The least it can cost.** Fly the sails as bands in formation, each band a great circle round
+  the Sun. Bands that cover a sphere must have angular widths adding up to at least π (Fejes
+  Tóth's zone conjecture, proved by Jiang and Polyanskii in 2017), so their area is at least
+  2πR² · π = π/2 times the sphere's. Bands sharing one axis meet the bound.
+- **Along the way.** Bands sharing an axis that cover a share f0 of its equator cover
+  F = f0·acos f0 + 1 − √(1 − f0²) of the sphere with area π f0 / 2. The sails flown per sail lit:
+  1.02 at 10 %, 1.13 at half, 1.36 at 90 %, 1.51 at 99 %, π/2 = 1.57 closed (`bandArea` in the
+  model). Independent orbits would do far worse: random overlap needs −ln(1 − F) times the sphere,
+  4.6× at 99 % and 10× to close.
+- **How the bands fly.** Each band is a formation of sails on parallel orbits, held off the great
+  circle by tilting their sails 3–4°, which costs 0.2 % of their light: about 70,000 km wide, so
+  ~6,400 bands close the sphere. Crossing bands fly at radii about a kilometre apart, so the whole
+  compute shell is ~7,000 km thick at 0.95 AU. That keeps it thin enough that its gaps line up
+  for slanted lines of sight (mostly) and for light from the Sun's limb (0.27° off radial shifts by only
+  ~30 km across it), and every lit sail's back still sees open space.
+- **What it costs:** 57 % more sails at closure (5.2×10¹⁸ against 3.3×10¹⁸), 5.67×10²² kg, and
+  the computing is unchanged: the same light reaches the same number of lit chips. The idle
+  sails carry chips too, so chips per kilogram are unchanged and so is the pace of the factories.
 
 ## Built symmetric, stage by stage
 
 The sphere is built up evenly: at every stage it is the same in every direction, only fuller. Its
 coverage f is the share of the Sun's light that hits a sail.
 
-- **From Earth**, just outside the sphere, every line of sight within ~72° of the Sun crosses the
-  near side, which shows Earth its sails' backs, and then the far side, which shows their sunlit
-  fronts.
+- **From Earth**, just outside the sphere, every line of sight within ~72° of the Sun (the limb of
+  the 0.95 AU shell) crosses the mirror cap in front of Earth, which shows Earth its backs, and
+  then the shell's far side, which shows its sunlit fronts. Out to ~78° (the cap's limb) only the
+  cap dims the stars.
   - The night glow is the far side's lit share seen through the near side's gaps:
     **L = f (1 − f) ρ S / π**, with ρ = 0.004 (all hardware) and S at 0.95 AU. It peaks at
     f = ½ (45 cd/m², ~24 lux on the ground at the end of twilight) and is the same at f and 1 − f.
@@ -50,7 +78,7 @@ coverage f is the share of the Sun's light that hits a sail.
     (switchable emittance, ε 0.1, as on spacecraft radiators today) while the sphere is open.
   - Heat on Earth: f · 0.45 + f (1 − f) · 0.1 σ T(f)⁴ · 0.226 W/m², where 0.226 = sin²(72°) / 4
     is a wall filling the 72° disc, averaged over Earth.
-  - It peaks at **8.6 W/m² at half closed** (2173). Earth's window is narrowed 3.6 % to cancel it,
+  - It peaks at **8.6 W/m² at half closed** (2178). Earth's window is narrowed 3.6 % to cancel it,
     which costs ~6 % of the world's rain unless the swarm supplies it (below).
   - With identical compute sails everywhere, Earth would see the hot backs between it and the Sun:
     f · 0.9 σ T⁴ · 0.344, over 500 W/m² once closed.
@@ -64,9 +92,9 @@ coverage f is the share of the Sun's light that hits a sail.
 | 10⁻⁶ | 2116 | 0.0002 (the dark sky's own) | 0.00003 | — |
 | 10⁻⁴ | 2129 | 0.018 | 0.003 | — |
 | 1 % | 2141 | 1.8 | 0.28 | 0.12 % |
-| 50 % | 2173 | 45 | 8.6 | 3.6 % |
-| 99 % | 2213 | 1.8 | 0.83 | 0.35 % |
-| closed | 2216 | 0 | 0.56 | 0.24 % |
+| 50 % | 2178 | 45 | 8.6 | 3.6 % |
+| 99 % | 2343 | 1.8 | 0.83 | 0.35 % |
+| closed | 2361 | 0 | 0.56 | 0.24 % |
 
 ## How complete the enclosure is
 
@@ -84,7 +112,8 @@ coverage f is the share of the Sun's light that hits a sail.
     That is wasted on chips that hot.
   - Mirrors that hand their sunlight to the 419 K sails behind them lose nothing. So the cap is
     made of mirrors.
-- **Why 23° and not 18°:** the sails' bands spread down to 0.92 AU, and acos 0.92 = 23°.
+- **Why 23° and not 18°:** Earth's orbit reaches 1.017 AU, from where acos(0.95 / 1.017) = 21° of
+  the shell is in view; 23° (acos 0.92) leaves room for the mirrors' drift.
 
 ## Windows in real time
 
@@ -226,8 +255,8 @@ coverage f is the share of the Sun's light that hits a sail.
 
 ## Mercury's core
 
-- **The crust and mantle deliver 3.38×10²² kg of spacecraft** at 0.42 kg per kg of rock. Closure
-  needs 3.61×10²² kg.
+- **The crust and mantle deliver 3.38×10²² kg of spacecraft** at 0.42 kg per kg of rock. Closure,
+  paying for the overlap, needs 5.67×10²² kg.
 - **The core is about 6 % silicon** (published estimates 1–25 %), against about 25 % in the rock.
   - The model counts it as rock-equivalent: M_core × 0.06 / 0.25 × 0.42 = 2.52×10²² kg of
     spacecraft.
@@ -236,10 +265,11 @@ coverage f is the share of the Sun's light that hits a sail.
     kept for shielding and reaction mass.
 - **Timeline (central hardware):**
   - heat wall 2145;
-  - half the Sun 2173;
-  - crust and mantle dug out 2200;
-  - closed (99 %) in **2214**.
-  - By then 31 % of Mercury has been taken apart. With the mantle alone the swarm stops at 93 %.
+  - half the Sun 2178;
+  - crust and mantle dug out 2200, at 75 %;
+  - 99 % in 2343, closed in **2361**: from the core each kilogram of spacecraft means lifting four
+    times as much, so the last quarter takes 160 years.
+  - By then 93 % of Mercury has been taken apart. With the mantle alone the swarm stops at 75 %.
 
 ## How long a sail lasts: centuries
 
@@ -253,15 +283,16 @@ physics allows, with repair in place.
 | Electromigration in chip wiring | at 155 °C 25× faster than at 105 °C: a chip built as today's would last ~1.6 years at the sail's 60 % clock | wiring cut into segments shorter than the Blech length (current density × length under ~3,000 A/cm for copper), where back-stress stops migration altogether; it costs routing density, not lifetime |
 | Radiation dose in memory | 133–437 krad a decade, unshielded | resistive RAM survives 10–20 Mrad (centuries); data is scrubbed, so retention at 155 °C is not the limit |
 | Meteoroid holes | 0.007–1.2 % of the area a year, depending on crack arrest | crack-stopped film keeps the low end, ~2 % in 300 years, patched in place |
-| Obsolescence | refresh pays when the chips' yearly gain g exceeds ln(1/ρ) / L | by 2214 chips have long sat at their practical floor; g → 0 |
+| Obsolescence | refresh pays when the chips' yearly gain g exceeds ln(1/ρ) / L | by 2343 chips have long sat at their practical floor; g → 0 |
 
 - **So the model takes a rebuild every 300 years**, with 99 % of each sail recycled in orbit
   (sliders: 0–1,000 years, up to 99.9 %).
   - Between rebuilds, depot craft anneal, patch and swap chiplets.
   - The rebuild exists for slow damage that repair cannot reach: displacement clusters, grain growth,
     accumulated patches.
-- **What it buys:** the finished swarm loses 1.2×10¹⁸ kg a year. The core's remaining silicon
-  covers that for about 19,000 years. With today's 15-year life and 94 % recycling, the core's
+- **What it buys:** the finished swarm loses 1.9×10¹⁸ kg a year. What is left of Mercury covers
+  that for about 1,200 years; after that the swarm needs better recycling (99.9 % gives 12,000
+  years) or rock from elsewhere. With today's 15-year life and 94 % recycling, the core's
   silicon would go on replacements and the swarm would never close.
 - **Eras:** pessimistic hardware gets 50 years and 95 %, optimistic 1,000 years and 99.5 %. The
   2026 bundle keeps 10 years and 90 %.

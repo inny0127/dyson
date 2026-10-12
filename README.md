@@ -44,28 +44,33 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   leaves ~0.1 MJ/kg on the planet (0.3 at 95 %, ~2 for a full surface launch).
 - **The page is the swarm's progression.** The sphere is built up evenly, the same in every direction
   at every stage. Its renders show it at a millionth, a ten-thousandth, 1 %, 50 % and 99 % of the
-  Sun's light and closed (2116–2216): from Jenny Lake at night, from low orbit, from inside and from
+  Sun's light and closed (2116–2361): from Jenny Lake at night, from low orbit, from inside and from
   3 AU in visible light and thermal infrared.
   - From Earth the night glow goes as f (1 − f), the far side's lit fronts seen through the near
     side's gaps. It peaks at 45 cd/m² at half closed and is the same at 1 % and 99 %.
   - Starlight from behind dims as (1 − f)².
   - Earth's extra heat peaks at 8.6 W/m² at half closed (fronts kept dark in the infrared while
     open, mirror sails in the part Earth sees). Earth's window is narrowed 3.6 % to cancel it.
-- **The finished swarm encloses the Sun** (`docs/closed-swarm.md`). Compute sails tile the whole
+- **Closing it costs π/2 in sails.** Every sail orbits on a great circle and any two cross, so a
+  closed sphere of orbiting sails must overlap: bands covering a sphere have widths adding up to at
+  least π (proved in 2017). Flown as ~6,400 formation bands a kilometre apart in radius (a shell
+  ~7,000 km thick), 36 % of the sails sit edge-on behind others at any moment. 5.2×10¹⁸ sails,
+  5.7×10²² kg.
+- **The finished swarm encloses the Sun** (`docs/closed-swarm.md`). Compute sails cover the whole
   sphere at 0.95 AU except a cap 23° round the Sun–Earth line, where co-orbiting mirrors at 0.98 AU
   (26 g/m², the mass their orbit allows) return the sunlight to the swarm and hide its hot backs from
   Earth. Windows are mirrors turned edge-on: Earth's lets its sunlight through in full.
-  - Closed in **2216**, at 1.9×10⁴⁰ FLOP/s.
+  - Closed in **2361**, at 1.9×10⁴⁰ FLOP/s.
   - All the heat leaves through the backs, so the film runs at 419 K and the chips near 155 °C. Each
     watt computes 19 % less than in a swarm left open toward Earth; catching all the light, it
     computes about the same in total. Closure buys control, not computing.
-- **It takes Mercury's core.** The crust and mantle (3.4×10²² kg of spacecraft) run out at 93 %. The
-  core's ~6 % silicon, lifted at four times the heat per kilogram, closes the rest: 31 % of the
-  planet in all.
+- **It takes nearly all of Mercury.** The crust and mantle (3.4×10²² kg of spacecraft) run out at
+  75 %, in 2200. The core's ~6 % silicon, lifted at four times the heat per kilogram, closes the
+  rest by 2361: 93 % of the planet in all.
 - **Sails last centuries.** Every wear mechanism but solar-wind sputtering (0.02 nm a year) can be
   repaired in place: cells annealed, wiring cut below the Blech length, resistive memory, crack-stopped
   film. The model rebuilds each sail every 300 years, recycling 99 %. The finished swarm then loses
-  1.2×10¹⁸ kg a year, which the rest of the core covers for ~19,000 years.
+  1.9×10¹⁸ kg a year, which what is left of Mercury covers for ~1,200 years.
 - **Earth keeps its sunlight; the night loses its stars round the Sun.** Earth sees only the cap's cold
   back: 0.56 W/m², cancelled by narrowing the window 0.24 %, at a cost of 0.4 % of rain.
   - At night the sky within 75–85° of the Sun (by season) is black.

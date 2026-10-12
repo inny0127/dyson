@@ -52,34 +52,33 @@ exposure never changes the physics.
 ## The sphere, stage by stage
 
 The page follows the swarm as it grows. At every stage it is the same symmetric sphere
-(`docs/closed-swarm.md`, "Built symmetric, stage by stage"), sails filling 0.92–0.98 AU at coverage f,
-the part Earth can see flown by mirror sails, Earth's sunlight passing through its window. The stages
-are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from the model (2116, 2129, 2141,
-2173, 2213, 2216). `scripts/stage-renders.sh` makes them all.
+(`docs/closed-swarm.md`, "Built symmetric, stage by stage"): a thin compute shell at 0.95 AU at
+coverage f (formation bands a kilometre apart in radius, ~7,000 km in all), the part Earth can see
+flown by mirror sails at 0.98 AU at the same coverage, Earth's sunlight passing through its window.
+The stages are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from the model (2116,
+2129, 2141, 2178, 2343, 2361). `scripts/stage-renders.sh` makes them all.
 
 - **Jenny Lake (`earth_sky.py --glow sphere`; `sky_map.py` kind `sphere`):** the frame of tonight's
   night picture, 22 August at 22:06, Sun 18.5° down.
-  - Glow: the far side's sunlit fronts through the near side's gaps, f (1 − f) ρ S / π with ρ 0.004,
-    over the disc the layer covers (full depth inside asin(0.92 / d), thinning out by asin(0.98 / d)).
-    The atmosphere scatters it like any other light.
-  - Earth's true distance on the date sets the disc: on 22 August Earth is 1.0116 AU out, so the
-    full depth ends at 65.5° and the edge is at 75.6°.
-  - The sails are a random layer: sails in different orbits do not line up along a slanted line.
-    A line crossing a share s of the layer's depth on each side gets through (1 − f)^s each way,
-    and the glow is (1 − t) t ρ S / π with t = (1 − f)^s: f (1 − f) inside, and at high f a bright
-    ring just inside the edge, where the line crosses so few sails that the layer is half open.
-  - Stars, Milky Way and zodiacal light behind it: × t²; the zodiacal dust and the planets are lit by
-    the sunlight that escapes, × (1 − f) more.
+  - Glow: the shell's far side, its sunlit fronts seen through the cap's gaps, f (1 − f) ρ S / π
+    with ρ 0.004, uniform out to the shell's limb, asin(0.95 / d). The atmosphere scatters it like
+    any other light.
+  - Earth's true distance on the date sets the discs: on 22 August Earth is 1.0116 AU out, so the
+    glow ends at 69.9° and the cap at 75.6°.
+  - Stars, Milky Way and zodiacal light behind: × (1 − f) for each thin layer crossed: the cap once
+    (or twice, where a line leaves the 0.98 AU sphere still inside the cap) and the shell's far side
+    once, (1 − f)² within 69.9°. The zodiacal dust and the planets are lit by the sunlight that
+    escapes, × (1 − f) more.
+  - The shell is thin enough that its gaps line up for a slanted line, so each crossing passes
+    1 − f, and its edge is sharp (softened over 0.15° here).
   - Twilight: the Sun's sky scaled by the sunlight Earth's window lets through (1 − the cut that
     cancels the sphere's heat: 0.12 % at 1 %, 3.6 % at 50 %).
   - Each frame is developed at its own metered exposure; captions give the difference from tonight.
 - **Low Earth orbit (`leo_view.py --glow sphere`):** the closed frame's composition (400 km over
   the Nile Delta, 00:54 UTC 22 September 2128, 12 mm, 58° above the Sun) at 10⁻⁴, 1 %, 50 % and
   99 %, with the same glow and transmission, exposed for the disc.
-- **Inside (`farside_field.py --mode sphere`):** a camera beside a sail mid-layer, a quarter of the
-  way round the Sun from Earth, 14 mm, looking up across the layer, at 1 % and 50 % (tau = −ln(1 − f));
-  near sails drawn one by one within 3,000 km. The closed stage is `closed_inside.py`.
-- **From 3 AU (`sphere_space.py`):** 25° above the plane of the planets, 28 mm, looking at the Sun.
+- **From 3 AU (`sphere_space.py`):** 25° above the plane of the planets, 28 mm, looking at the Sun;
+  the shell thin at 0.95 AU, the cap drawn on it.
   - Visible, through a coronagraph (a 1.6° disc over the Sun): the far side's fronts through the
     near side's gaps; at closure a black disc hiding the stars, with Earth a point at its edge, lit
     through its window.
