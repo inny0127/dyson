@@ -327,7 +327,7 @@ function renderStages() {
   }
   const pr = $('progression-prose');
   if (pr) pr.innerHTML = `<p>The sails go up evenly all round the Sun, so at every stage the swarm is a complete sphere, just a thin one. What it catches is its coverage, the share of the Sun's light that hits a sail; the rest passes through the gaps. The stages below are the moments when that share passes a millionth, a ten-thousandth, a hundredth, a half, ninety-nine hundredths, and finally all of it.</p>
-    <p>From Earth, the sphere is seen from just outside. Looking toward the Sun's side of the sky you look through the near side, which shows you the sails' dark backs, to the far side, which shows you their sunlit fronts. So the night sky first brightens, then darkens: its glow goes as f (1 − f), coverage times gaps, and is brightest at half. Starlight from behind has to pass both sides and dims as (1 − f)². Earth's own sunlight never dims, because the sails on the line between the Sun and Earth turn edge-on as they cross it.</p>`;
+    <p>From Earth, the sphere is seen from just outside. Looking toward the Sun's side of the sky you look through the near side, which shows you the sails' dark backs, to the far side, which shows you their sunlit fronts. So the night sky first brightens, then darkens: its glow goes as f (1 − f), coverage times gaps, and is brightest at half. Starlight from behind has to pass both sides and dims as (1 − f)². Earth's own sunlight is never blocked, because the sails on the line between the Sun and Earth turn edge-on as they cross it. It is dimmed on purpose, by at most a few per cent, only to cancel the heat the sphere sends Earth.</p>`;
 }
 
 function renderSummary() {
