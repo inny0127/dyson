@@ -128,7 +128,7 @@ physics allows, with repair in place.
 
 | Wear | Rate in the closed swarm (film 419 K, chips ~155 °C) | What stops it |
 |---|---|---|
-| Solar-wind sputtering of the cover glass | ~0.02 nm a year: 1×10¹² ions/m²/s at 0.95 AU × yield ~0.02 | nothing needs to; 8 µm of glass lasts ~400,000 years |
+| Solar-wind sputtering of the cover glass | ~0.02 nm a year: 2×10¹² ions/m²/s at 0.95 AU × yield ~0.02 | nothing needs to; 8 µm of glass lasts ~400,000 years |
 | Proton damage in the cells | 7.5 % of output a decade behind 20 µm of glass; more behind 8 µm | the film's 146 °C anneals phosphorus–vacancy centres continuously; divacancies and oxygen–vacancy centres anneal at 250–350 °C, which a patch reaches for an hour when the rest of the sail drives ~12 kW/m² through it |
 | Electromigration in chip wiring | at 155 °C 25× faster than at 105 °C: a chip built as today's would last ~1.6 years at the sail's 60 % clock | wiring cut into segments shorter than the Blech length (current density × length under ~3,000 A/cm for copper), where back-stress stops migration altogether; it costs routing density, not lifetime |
 | Radiation dose in memory | 133–437 krad a decade, unshielded | resistive RAM survives 10–20 Mrad (centuries); data is scrubbed, so retention at 155 °C is not the limit |

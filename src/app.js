@@ -591,7 +591,8 @@ function afterRockBox(p, d, E) {
 function renderBuild() {
   const p = state.params, d = state.d, g = d.growth, E = state.earth;
   const y1 = d.yearsToCoverage(0.01), y10 = d.yearsToCoverage(0.1), yCap = d.yearsToCoverage(E.cap);
-  const ceil = d.reachableCoverage;
+  // a layout's room caps what is built even when Mercury could supply more
+  const ceil = E.binding === 'room' ? Math.min(d.reachableCoverage, E.room) : d.reachableCoverage;
   const reach = [];
   if (Number.isFinite(y1)) reach.push(`${num('1%')} of the Sun's light by ${num(yr(p.seedYear + y1))}`);
   if (Number.isFinite(y10)) reach.push(`${num('10%')} by ${num(yr(p.seedYear + y10))}`);
@@ -605,12 +606,14 @@ function renderBuild() {
     ? `It stops there because that is the target you set.`
     : closedDone
     ? `It stops because there is nothing left to catch: in ${num(yr(p.seedYear + state.moments.cap))} the last gap closes and the Sun is enclosed.${coreLate ? ` By then Mercury's crust and mantle are gone, dug out by ${num(yr(p.seedYear + g.tMantleOut))} with the swarm at ${num(pct(fMantle, 0))}. The rest is built from silicon in its core, more slowly, because each kilogram of spacecraft from the core means lifting four times as much.` : ''}`
+    : E.binding === 'room' && ceil >= E.room * 0.99
+    ? `It stops when its layout is full, in ${num(yr(p.seedYear + state.moments.cap))}: there is no more room that Earth allows.`
     : g.tRockOut != null && g.tRockOut <= g.tPeak + 1
-    ? `What stops it is Mercury itself. By ${num(yr(p.seedYear + g.tRockOut))} all of its rock has been dug out, and from then on the fleet slowly wears away.`
+    ? `What stops it is Mercury itself. By ${num(yr(p.seedYear + g.tRockOut))} ${g.rockCore > 0 ? 'its rock and the silicon in its core are' : 'all of its rock has been'} dug out, and from then on the fleet slowly wears away.`
     : p.serviceLife > 0
     ? `The ceiling is set by upkeep, not by Mercury: sails wear out after ${num(`${p.serviceLife} years`)}, ${num(pct(p.recycleFrac, 0))} of each is recycled in orbit, and new exports only replace the rest.`
     : `With sails that never wear out, the swarm keeps growing at the heat-limited rate until it reaches its target or Mercury's rock runs out.`;
-  const earthLine = E.binding === 'rock' || closedDone ? '' : Number.isFinite(yCap)
+  const earthLine = E.binding === 'rock' || (E.binding === 'room' && ceil >= E.room * 0.99) ? '' : Number.isFinite(yCap)
     ? `${limitOf(p, E)}, the blue line, is reached in ${num(yr(p.seedYear + yCap))}.`
     : `It never reaches ${limitOf(p, E).toLowerCase()}, the blue line.`;
   $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} ${closedDone ? '' : `Then it tops out at ${num(pct(ceil, 1))}. `}${upkeep} ${earthLine}</p>${refreshBox(p, d, E)}${afterRockBox(p, d, E)}`;
@@ -697,6 +700,11 @@ function renderEarth() {
   const p4 = uniform
     ? `From Earth the swarm is a disc of light ${num('72°')} in radius round the Sun, about ${num(`${Math.round(discCd)} cd/m²`)}, as bright as the sky just after sunset, with a dark hole ${num('15°')} across round the Sun itself, where sails stay clear of the point behind it. By day it is lost in the blue. After sunset it stays up for hours: with the Sun ${num('18°')} below the horizon it still lights the ground at about ${num(`${Math.round(lux)} lux`)}, what the ground gets a few minutes after sunset. The sky gets dark only once the Sun is more than ${num('72°')} below the horizon, around midnight in the tropics and on winter nights at mid-latitudes. On summer nights it never does.`
     : `After sunset the swarm glows round the Sun's position, lighting the ground at up to ${num(`${lux < 10 ? lux.toFixed(1) : Math.round(lux)} lux`)}, ${lux / 0.25 >= 1.5 ? `${Math.round(lux / 0.25)} times` : 'about'} a full Moon.`;
+  const closedHead = p.earthPlacement === 'closed';
+  $('earth-title').textContent = closedHead ? 'Earth keeps its sunlight, and loses the stars round the Sun' : 'Earth keeps its temperature, behind a shade';
+  $('earth-dek').textContent = closedHead
+    ? 'Between the Sun and Earth the swarm is a cap of cold mirrors with a window in it. By day nothing changes. At night the sky round the Sun is black.'
+    : 'Every watt the sails catch ends up as heat, and some of it reaches Earth. A sunshade cancels it, at a price paid in sunlight and rain. The photographs below show the default, the Sun enclosed.';
   $('earth-prose').innerHTML = p.earthPlacement === 'closed' ? earthClosedProse(p, E)
     : `<p>${p1}</p>${slit}<p>${p2}</p>${noIR}${failsafe}${p3 ? `<p>${p3}</p>` : ''}${costs}<p>${p4}</p>`;
 
