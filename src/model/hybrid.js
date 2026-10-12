@@ -669,6 +669,14 @@ export function discGroundFactor(R, depressionDeg = FIXED.skyDepression) {
  * (f, radiosity ρS / (1 − fρ)): a uniform disc out to asin(r) from the Sun.
  * Far-side cloud: the study's 0.31 lux per 1 % at ρ 0.003 (a cone along the ecliptic).
  */
+// discGroundFactor out to angles spread evenly in sin between the sphere's inner and outer edges
+// (0.92 and 0.98 AU seen from 1 AU), computed once
+let sphereG = null;
+function sphereGroundFactors() {
+  if (!sphereG) sphereG = Array.from({ length: 25 }, (_, i) => discGroundFactor(Math.asin(0.92 + (0.06 * i) / 24)));
+  return sphereG;
+}
+
 export function skyLux(p, f) {
   if (!(f > 0)) return 0;
   const shellLux = fs => {
@@ -687,9 +695,17 @@ export function skyLux(p, f) {
   };
   if (p.earthPlacement === 'shell') return shellLux(f);
   if (p.earthPlacement === 'closed') {
-    // the far side's sunlit fronts, seen through the near side's gaps: f (1 − f) ρ S / π
-    const r = FIXED.closedR, fo = Math.min(1, f / FIXED.closedRoom);
-    return (fo * (1 - fo) * p.rhoVis * flux(r)) / Math.PI * FIXED.lumensPerW * discGroundFactor(Math.asin(r));
+    // the far side's sunlit fronts, seen through the near side's gaps. Inside asin(0.92) a line of
+    // sight crosses the whole layer each way: f (1 − f) ρ S / π. Toward the limb, asin(0.98), it
+    // crosses a share s of it; the sails are a random layer, so each half lets through t = (1 − f)^s
+    // and the glow is (1 − t) t ρ S / π: at high f a bright ring just inside the edge
+    // (render/sky_map.py, sphere_half).
+    const fo = Math.min(1, f / FIXED.closedRoom), L0 = (p.rhoVis * flux(FIXED.closedR)) / Math.PI * FIXED.lumensPerW;
+    const glow = sh => { const t = (1 - fo) ** sh; return (1 - t) * t; };
+    const G = sphereGroundFactors();
+    let lux = glow(1) * G[0];
+    for (let i = 1; i < G.length; i++) lux += glow(1 - (i - 0.5) / (G.length - 1)) * (G[i] - G[i - 1]);
+    return L0 * lux;
   }
   if (p.earthPlacement === 'uniform') {
     // a disc of sunlit fronts out to asin(0.95) = 72° round the Sun, at the local fill f / share

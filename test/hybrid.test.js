@@ -310,8 +310,9 @@ test('centuries of life: a 300-year rebuild losing 1 % needs ~1.2×10¹⁸ kg a 
 });
 
 test('symmetric build: the night glow and Earth’s extra heat both go as f (1 − f), peaking at half closed', () => {
-  // glow from the far side's sunlit fronts through the near side's gaps: the same at 1 % and 99 %
-  near(h.skyLux(pC, 0.01), h.skyLux(pC, 0.99 * h.FIXED.closedRoom), 0.02 * h.skyLux(pC, 0.01), 'glow at 1 % and 99 %');
+  // glow from the far side's sunlit fronts through the near side's gaps: the same across the disc
+  // at 1 % and 99 %, but at 99 % a bright ring just inside the edge, where the sphere is thin
+  assert.ok(h.skyLux(pC, 0.99 * h.FIXED.closedRoom) > 2 * h.skyLux(pC, 0.01), 'the ring at 99 %');
   assert.ok(h.skyLux(pC, 0.5) > h.skyLux(pC, 0.1) && h.skyLux(pC, 0.5) > h.skyLux(pC, 0.9), 'brightest half closed');
   assert.equal(h.skyLux(pC, h.FIXED.closedRoom), 0, 'black once closed');
   // the far side's infrared-dark fronts through the gaps: ~8.6 W/m² at half closed, cancelled by
