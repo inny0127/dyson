@@ -75,17 +75,21 @@ python3 render/post.py "$RAW/na_med_c.png" "$OUT/pacific-mediterranean.jpg" --fo
 python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=88)" \
   "$RAW/mercury_heatwall.png" "$OUT/mercury-heatwall.jpg"
 # The sphere, stage by stage (scripts/stage-renders.sh). Night frames: a millionth at tonight's
-# exposure, 1e-4 metered for the night, the rest metered for the glow; each caption gives the change.
+# exposure, 1e-4 metered for the night, then 1 %, half and 99 % all at the 1 % frame's glow-metered
+# exposure, so the half-built sky shows as the brightest; each caption gives the change.
 for f in 1e-6 1e-4 1e-2 0.5 0.99; do
   python3 render/glare.py "$RAW/night_$f.exr" "$RAW/night_${f}_g.exr"
-  E=$(exposure_of night_$f); [ "$f" = "1e-6" ] && E=$(exposure_of night_tonight)
+  E=$(exposure_of night_1e-2); [ "$f" = "1e-6" ] && E=$(exposure_of night_tonight); [ "$f" = "1e-4" ] && E=$(exposure_of night_1e-4)
   dev "$RAW/night_${f}_g.exr" "$RAW/night_$f.png" "$E"
   python3 render/post.py "$RAW/night_$f.png" "$OUT/stage-night-$f.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
 done
-# low orbit, each exposed for the sphere's disc (leo_view's exposure_for_disc)
+# low orbit: 1e-4 exposed for its disc, then 1 %, half and 99 % all at the 1 % disc's exposure, so
+# the half-built sphere shows as the brightest (leo_view's exposure_for_disc)
+E1=$(grep -o '"exposure_for_disc": [-0-9.]*' "$RAW/leo_1e-2.log" | awk '{print $2}')
 for f in 1e-4 1e-2 0.5 0.99; do
   python3 render/glare.py "$RAW/leo_$f.exr" "$RAW/leo_${f}_g.exr"
-  dev "$RAW/leo_${f}_g.exr" "$RAW/leo_$f.png" "$(grep -o '"exposure_for_disc": [-0-9.]*' "$RAW/leo_$f.log" | awk '{print $2}')"
+  E=$E1; [ "$f" = "1e-4" ] && E=$(grep -o '"exposure_for_disc": [-0-9.]*' "$RAW/leo_$f.log" | awk '{print $2}')
+  dev "$RAW/leo_${f}_g.exr" "$RAW/leo_$f.png" "$E"
   python3 render/post.py "$RAW/leo_$f.png" "$OUT/stage-leo-$f.jpg" --fov 113 --noise 0.8 --width 2400 --quality 88
 done
 # from 3 AU: thermal frames as written; visible at half (exposed for the disc) and closed (for the stars)
