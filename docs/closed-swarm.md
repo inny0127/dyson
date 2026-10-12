@@ -74,11 +74,18 @@ It is the page's default (`earthPlacement: 'closed'`).
     90 km spots from 10,000 km up, 9 km from 1,000 km (`docs/full-swarm.md`).
   - Laser light is not bound by the Sun's size. Sunlight converted to laser light at ~10 % and
     beamed from a 1 km aperture 3 million km away makes a spot 2.44 λ d / D ≈ 7 m at 1 µm.
+  - The laser stations sit in the cap. Only the cap can see Earth: from 1 AU the outside of the
+    0.95 AU sphere is visible only within 18° of the Sun–Earth line. The compute sails beam power
+    to the stations over the same laser links they already use.
   - 50 W/m² on a million km² is 5×10¹³ W of light, 5×10¹⁴ W of sunlight: about 10⁻¹² of the
     Sun. Land and sea absorb laser lines as well as sunlight, and plants grow under red and blue.
-- **Water:** rain can be supplied as well as moved. Evaporating 1 m of sea water a year over
-  10⁷ km² is 10¹⁶ kg × 2.45 MJ/kg per year = 8×10¹⁴ W (2×10⁻¹² of the Sun). Heating the right
-  ocean upwind puts the moisture where the winds carry it.
+- **Water:** rain can be supplied as well as moved.
+  - Evaporating 1 m of sea water a year over 10⁷ km² is 10¹⁶ kg × 2.45 MJ/kg per year =
+    8×10¹⁴ W (2×10⁻¹² of the Sun). Heating the right ocean upwind puts the moisture where the
+    winds carry it.
+  - To make it fall, a beam at a wavelength the air absorbs (a water-vapour band in the infrared)
+    heats a column of air rather than the ground. Warmed a few kelvin, it rises, cools adiabatically
+    and rains out its water: the trigger of an afternoon thunderstorm, placed where it is wanted.
 - **Chaos cuts both ways.** Weather cannot be forecast beyond about two weeks. For the same reason,
   small, well-timed inputs can steer a chaotic system, if it is observed completely and the inputs
   can be placed fast; that is the basis of chaos control (Ott, Grebogi and Yorke 1990). Nobody has

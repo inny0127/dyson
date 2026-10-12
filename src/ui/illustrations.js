@@ -16,7 +16,7 @@ const arrowDefs = id => `<defs>
  * The sail face-on, to scale, with two insets: the back of the film (chiplets at the model's
  * pitch, an optical lane) and the laminate cross-section (layer thicknesses to scale).
  */
-export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pitchMm = 23.5, chipW = 0.15, mw = 19, chips = 1.3e8, lanes = true }) {
+export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pitchMm = 23.5, chipW = 0.15, mw = 19, chips = 1.3e8, lanes = true, thin = false, closed = false }) {
   const W = 1100, H = 780;
   const k = 440 / diag;
   sag = sag * (side / 279.01);                  // catenary sag scales with the side                       // px per metre in the main view
@@ -92,9 +92,16 @@ export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pit
   s += t(ix, iy + ih + 20, `Back of the film, enlarged: ${chipW} W chiplets, 2.45 mm across`, F);
   s += t(ix, iy + ih + 38, `${(chips / 1e6).toFixed(0)} million per sail, ${mw.toFixed(0)} MW in all${lanes ? '; the pale band is an optical lane' : ''}`, F2);
 
-  // inset 2: cross-section, thickness to scale (2.4 px per µm), width not
-  const cxs = 600, cys = 420, cw = 300, um = 2.4;
-  const layers = [
+  // inset 2: cross-section, thickness to scale (2.4 px per µm, 3.6 for the thin film), width not
+  const cxs = 600, cys = 420, cw = 300, um = thin ? 3.6 : 2.4;
+  // the design-spec film, or the thinned film the mature swarm flies (docs/full-swarm.md): 10 µm of
+  // light-trapped silicon, 8 µm of glass, 6 µm of enamel
+  const layers = thin ? [
+    ['cover glass, Mg-aluminosilicate', 8, 'var(--paper)'],
+    ['silicon solar cell, light-trapped', 10, 'currentColor'],
+    ['magnesium heat spreader', 13, 'var(--ink-3)'],
+    ['silicate enamel, emits infrared', 6, 'var(--wash)'],
+  ] : [
     ['cover glass, Mg-aluminosilicate', 20, 'var(--paper)'],
     ['silicon solar cell', 30, 'currentColor'],
     ['magnesium heat spreader', 13, 'var(--ink-3)'],
@@ -118,7 +125,7 @@ export function sailAnatomy(el, { side = 279.01, diag = 394.58, sag = 11.16, pit
   const yDie = y + 50 * um;
   s += t(cxs, cys - 66, 'sunlight', F2);
   s += t(cxs + cw, cys - 66, 'infrared out of both faces', F2, 'end');
-  s += t(cxs, yDie + 26, 'Cross-section: thicknesses to scale, about 80 µm with wiring and coatings', F);
+  s += t(cxs, yDie + 26, `Cross-section: thicknesses to scale, about ${thin ? 40 : 80} µm with wiring and coatings`, F);
   s += `</svg>`;
   el.innerHTML = s;
 }
@@ -173,6 +180,98 @@ export function heatPaths(el, { sailGW, podGW, chipW = 0.15 }) {
   s += t(R0, H - 34, `${podGW.toFixed(2)} g per watt of chips`, 'font-family:var(--sans);font-size:22px;font-weight:500;fill:currentColor');
   s += t(R0, H - 12, 'one failure takes out 0.5–1 MW', F2);
   s += `<line x1="555" x2="555" y1="20" y2="${H - 10}" style="stroke:var(--rule);stroke-width:1"/>`;
+  s += `</svg>`;
+  el.innerHTML = s;
+}
+
+/**
+ * How the closed swarm puts light, and water, on Earth (docs/closed-swarm.md, "Steering climate").
+ * Not to scale: the window, relay mirrors in Earth orbit, lasers from the cap, and rain.
+ */
+export function lightPaths(el) {
+  const W = 1100, H = 610;
+  const SUN = 'stroke:var(--sun-mark);stroke-width:1.5;fill:none';
+  const LAS = 'stroke:var(--swarm);stroke-width:1.5;fill:none';
+  const P = (cx, cy, r, deg) => [cx + r * Math.cos((deg * Math.PI) / 180), cy - r * Math.sin((deg * Math.PI) / 180)];
+  const arc = (cx, cy, r, a0, a1) => { const [x0, y0] = P(cx, cy, r, a0), [x1, y1] = P(cx, cy, r, a1); return `M${x0},${y0} A${r},${r} 0 ${a1 - a0 > 180 ? 1 : 0} 0 ${x1},${y1}`; };
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagram: four ways the closed swarm puts light and rain on Earth">${arrowDefs('lp')}`;
+  s += `<defs><marker id="lp-las" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--swarm)"/></marker>
+    <marker id="lp-earth" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--earth)"/></marker></defs>`;
+  // --- top: the Sun, the closed swarm, the cap and its window, Earth
+  const sx = 140, sy = 200, rs = 120, rc = 133, xs0 = 40;
+  s += `<path d="${arc(sx, sy, rs, 24, 336)}" style="stroke:var(--swarm);stroke-width:7;fill:none;stroke-opacity:0.85"/>`;
+  for (const [a0, a1] of [[-24, -2.5], [2.5, 24]]) s += `<path d="${arc(sx, sy, rc, a0, a1)}" style="stroke:var(--ink-2);stroke-width:3;fill:none"/>`;
+  s += `<circle cx="${sx}" cy="${sy}" r="15" style="fill:var(--sun-mark)"/>`;
+  s += t(sx, sy + 36, 'Sun', F, 'middle');
+  s += t(sx - 10, sy - rs - 16, 'the swarm, closed', F, 'middle');
+  { const [x, y] = P(sx, sy, rc, -24); s += t(x + 14, y + 16, 'mirror cap', F2); }
+  const mark = (x, y, n) => `<circle cx="${x}" cy="${y}" r="9" style="fill:var(--paper);stroke:currentColor;stroke-width:1"/>` + t(x, y + 4, String(n), 'font-family:var(--sans);font-size:11px;font-weight:600;fill:currentColor', 'middle');
+  const ex = 820, ey = 200, re = 64;
+  // 1: sunlight through the window, widening to cover Earth
+  const [wx, wy] = P(sx, sy, rc, 0);
+  s += `<line x1="${sx + 18}" y1="${sy}" x2="${wx}" y2="${wy}" style="${SUN}"/>`;
+  s += `<line x1="${wx}" y1="${wy - 3}" x2="${ex - re * 0.35}" y2="${ey - re * 0.94}" style="${SUN}"/>`;
+  s += `<line x1="${wx}" y1="${wy + 3}" x2="${ex - re * 0.35}" y2="${ey + re * 0.94}" style="${SUN}"/>`;
+  s += t(wx + 14, wy - 8, 'window', F2);
+  // 2: relay mirrors in Earth orbit
+  s += `<circle cx="${ex}" cy="${ey}" r="${re + 34}" style="${THIN};stroke-dasharray:3 4"/>`;
+  for (const a of [125, 228, 300]) {
+    const [mx, my] = P(ex, ey, re + 34, a);
+    const n = (a + 90) * Math.PI / 180;
+    s += `<line x1="${mx - 7 * Math.cos(n)}" y1="${my + 7 * Math.sin(n)}" x2="${mx + 7 * Math.cos(n)}" y2="${my - 7 * Math.sin(n)}" style="stroke:currentColor;stroke-width:2.5"/>`;
+  }
+  { const [mx, my] = P(ex, ey, re + 34, 125); const [px, py] = P(ex, ey, re, 70);
+    s += `<line x1="${mx - 60}" y1="${my + 4}" x2="${mx}" y2="${my}" style="${SUN};stroke-width:1.2"/>`;
+    s += `<line x1="${mx}" y1="${my}" x2="${px}" y2="${py}" style="${SUN};stroke-width:1.2" marker-end="url(#lp-sun)"/>`; }
+  s += `<circle cx="${ex}" cy="${ey}" r="${re}" style="fill:var(--earth);fill-opacity:0.14;stroke:var(--earth);stroke-width:1.5"/>`;
+  s += t(ex, ey + 5, 'Earth', F, 'middle');
+  // 3: lasers from stations in the cap, powered by the swarm
+  for (const [ca, ea] of [[16, 140], [-16, 218]]) {
+    const [cx2, cy2] = P(sx, sy, rc + 6, ca), [px, py] = P(ex, ey, re, ea);
+    s += `<line x1="${cx2}" y1="${cy2}" x2="${px}" y2="${py}" style="${LAS};stroke-dasharray:7 4" marker-end="url(#lp-las)"/>`;
+    s += `<circle cx="${cx2}" cy="${cy2}" r="3.5" style="fill:var(--swarm)"/>`;
+  }
+  // numbered markers on the drawing, and their labels
+  s += mark(wx + 120, wy - 34, 1);
+  { const [mx, my] = P(ex, ey, re + 34, 125); s += mark(mx - 16, my - 16, 2); }
+  { const [cx2, cy2] = P(sx, sy, rc + 6, 16); s += mark(cx2 + 4, cy2 - 22, 3); }
+  s += t(470, 40, '1  The window', F);
+  s += t(470, 58, 'All of Earth’s sunlight passes through it. Narrow it and', F2);
+  s += t(470, 74, 'the whole planet dims; tilt the mirrors round it to brighten it.', F2);
+  s += t(930, 92, '2  Relay mirrors in orbit', F);
+  s += t(930, 110, 'Fed through the window.', F2);
+  s += t(930, 126, 'Spots 9–90 km across.', F2);
+  s += t(470, 340, '3  Lasers from the cap, powered by the swarm', F);
+  s += t(470, 358, 'Not bound by the Sun’s half-degree width: a 1 km beam', F2);
+  s += t(470, 374, 'director 3 million km away lights a spot a few metres wide.', F2);
+  s += t(W - 20, 340, 'Not to scale', F2, 'end');
+  // --- bottom: rain where it is wanted, a coast in cross-section
+  const y0 = 560, xc = 540, xl1 = 1060;
+  s += `<line x1="${xs0}" y1="${y0 - 0.5}" x2="${W - 40}" y2="${y0 - 0.5}" style="${THIN}"/>`;
+  s += `<path d="M${xs0},${y0} H${xc}" style="stroke:var(--earth);stroke-width:2;fill:none"/>`;
+  s += `<path d="M${xc},${y0} C${xc + 60},${y0 - 6} ${xc + 120},${y0 - 14} ${xc + 200},${y0 - 18} S${xc + 320},${y0 - 60} ${xc + 380},${y0 - 48} S${xl1 - 40},${y0 - 22} ${xl1},${y0 - 20}" style="${HAIR}"/>`;
+  s += t(xs0, y0 + 22, 'sea', F2);
+  s += t(xc + 30, y0 + 22, 'land', F2);
+  // laser heats the sea; vapour rises
+  s += `<line x1="230" y1="430" x2="230" y2="${y0 - 4}" style="${LAS};stroke-dasharray:7 4" marker-end="url(#lp-las)"/>`;
+  for (const x of [205, 230, 255]) s += `<path d="M${x},${y0 - 10} q6,-10 0,-20 q-6,-10 0,-20 q6,-10 0,-20" style="stroke:var(--earth);stroke-width:1.2;fill:none" marker-end="url(#lp-earth)"/>`;
+  s += t(250, 446, 'heat the sea upwind', F2);
+  // wind carries the moisture inland
+  s += `<line x1="300" y1="476" x2="560" y2="476" style="stroke:currentColor;stroke-width:1.25" marker-end="url(#lp-ink)"/>`;
+  s += t(430, 468, 'the wind carries the moist air', F2, 'middle');
+  // cloud and rain over land
+  const cl = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" style="fill:var(--paper);stroke:currentColor;stroke-width:1"/>`;
+  s += cl(640, 470, 18) + cl(668, 460, 24) + cl(700, 468, 20) + cl(724, 474, 14);
+  for (const x of [632, 652, 672, 692, 712]) s += `<line x1="${x}" y1="${492}" x2="${x - 6}" y2="${y0 - 26}" style="stroke:var(--earth);stroke-width:1.2"/>`;
+  s += t(680, 430, 'rain', F2, 'middle');
+  // or heat a column of air with a wavelength it absorbs
+  s += `<line x1="920" y1="400" x2="920" y2="486" style="${LAS};stroke-dasharray:7 4"/>`;
+  s += `<rect x="904" y="486" width="32" height="${y0 - 40 - 486}" style="fill:var(--heat);fill-opacity:0.12;stroke:none"/>`;
+  s += `<line x1="920" y1="${y0 - 44}" x2="920" y2="470" style="stroke:var(--heat);stroke-width:1.25" marker-end="url(#lp-heat)"/>`;
+  s += t(948, 452, 'or heat the air itself', F2);
+  s += t(948, 468, 'at a wavelength it absorbs:', F2);
+  s += t(948, 484, 'it rises, cools and rains', F2);
+  s += t(xs0, 385, '4  Rain where it is wanted', F);
   s += `</svg>`;
   el.innerHTML = s;
 }

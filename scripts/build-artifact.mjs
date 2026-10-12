@@ -3,6 +3,7 @@
 // Usage: node scripts/build-artifact.mjs <outDir>
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, copyFileSync, rmSync } from 'node:fs';
 import { join, dirname, relative, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -26,27 +27,41 @@ const title = html.match(/<title>.*?<\/title>/)[0];
 html = `${title}\n${html.replace(title, '')}`;
 writeFileSync(join(out, 'index.html'), html);
 
+// Every script and photograph is published under a content-stamped name (app.3f2a9c1b0d.js), so a
+// changed file always has a new URL and no browser can keep using a stale copy.
+const hash = buf => createHash('sha1').update(buf).digest('hex').slice(0, 10);
 const files = {};
-function walk(dir) {
-  for (const name of readdirSync(dir)) {
-    const p = join(dir, name);
-    if (statSync(p).isDirectory()) walk(p);
-    else if (p.endsWith('.js')) {
-      const rel = relative(root, p);
-      mkdirSync(dirname(join(out, rel)), { recursive: true });
-      copyFileSync(p, join(out, rel));
-      files[rel] = join(out, rel);
-    }
-  }
+const named = new Map();
+function nameOf(rel) {
+  if (named.has(rel)) return named.get(rel);
+  let src = readFileSync(join(root, rel), 'utf8');
+  // relative imports point at the dependencies' stamped names (dependencies first)
+  src = src.replace(/(\bfrom\s*['"]|\bimport\s*\(\s*['"]|\bimport\s+['"])(\.{1,2}\/[^'"]+\.js)(['"])/g, (m, a, spec, b) => {
+    const dep = relative(root, resolve(dirname(join(root, rel)), spec));
+    let r = relative(dirname(rel), nameOf(dep));
+    if (!r.startsWith('.')) r = `./${r}`;
+    return a + r + b;
+  });
+  const name = rel.replace(/\.js$/, `.${hash(src)}.js`);
+  mkdirSync(dirname(join(out, name)), { recursive: true });
+  writeFileSync(join(out, name), src);
+  files[name] = join(out, name);
+  named.set(rel, name);
+  return name;
 }
-walk(join(root, 'src'));
+const app = nameOf('src/app.js');
+html = html.replace('src="src/app.js"', `src="${app}"`);
 // photographs the page shows
 for (const name of readdirSync(join(root, 'renders'))) {
   if (!name.endsWith('.jpg')) continue;
-  const rel = join('renders', name);
+  const buf = readFileSync(join(root, 'renders', name));
+  const stamped = join('renders', name.replace(/\.jpg$/, `.${hash(buf)}.jpg`));
+  if (!html.includes(`renders/${name}"`)) continue;            // only what the page uses
+  html = html.split(`renders/${name}"`).join(`${stamped}"`);
   mkdirSync(join(out, 'renders'), { recursive: true });
-  copyFileSync(join(root, rel), join(out, rel));
-  files[rel] = join(out, rel);
+  copyFileSync(join(root, 'renders', name), join(out, stamped));
+  files[stamped] = join(out, stamped);
 }
+writeFileSync(join(out, 'index.html'), html);
 writeFileSync(join(out, 'files.json'), JSON.stringify(files, null, 2));
 console.log(`staged ${Object.keys(files).length + 1} files in ${out}`);
