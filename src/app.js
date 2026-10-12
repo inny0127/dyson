@@ -149,7 +149,7 @@ function stageOf(a) {
   if (a.year < 0.5 || a.nSails < 1) return 'Before the first launch';
   if (a.f < 1e-7) return 'A few sails: invisible from Earth';
   if (a.year < g.tCap) return `Industry doubling every ${g.doublingYearsEff.toFixed(1)} years`;
-  if (a.f < E.cap * 0.98) return g.rockCore > 0 && g.tMantleOut != null && a.year > g.tMantleOut ? "Digging into Mercury's core" : "Mercury's heat wall: steady growth";
+  if (a.f < E.cap * (p.earthPlacement === 'closed' ? 1 - 1e-5 : 0.98)) return g.rockCore > 0 && g.tMantleOut != null && a.year > g.tMantleOut ? "Digging into Mercury's core" : "Mercury's heat wall: steady growth";
   if (g.tRockOut != null && a.year > g.tRockOut + 5) return 'The rock is gone: the fleet slowly wears down';
   if (a.f < E.cap * 1.05) return E.binding === 'rock' ? 'Finished: the rock runs out' : E.binding === 'room' ? (p.earthPlacement === 'closed' ? 'Finished: the Sun is enclosed' : 'Finished: no room left') : "Earth's limit";
   return p.coverage < 1 ? 'Holding at the target' : "Past Earth's limit";
