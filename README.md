@@ -42,11 +42,20 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   almost nothing happens on the surface: rock is dug and thrown unrefined into low orbit at 3 km/s,
   and catapults, refineries and fabs work in orbit. With superconducting launchers at 99 % that
   leaves ~0.1 MJ/kg on the planet (0.3 at 95 %, ~2 for a full surface launch).
-- **The default swarm encloses the Sun** (`docs/closed-swarm.md`). Compute sails tile the whole
+- **The page is the swarm's progression.** The sphere is built up evenly, the same in every direction
+  at every stage. Its renders show it at a millionth, a ten-thousandth, 1 %, 50 % and 99 % of the
+  Sun's light and closed (2116–2216): from Jenny Lake at night, from low orbit, from inside and from
+  3 AU in visible light and thermal infrared.
+  - From Earth the night glow goes as f (1 − f), the far side's lit fronts seen through the near
+    side's gaps. It peaks at 45 cd/m² at half closed and is the same at 1 % and 99 %.
+  - Starlight from behind dims as (1 − f)².
+  - Earth's extra heat peaks at 8.6 W/m² at half closed (fronts kept dark in the infrared while
+    open, mirror sails in the part Earth sees). Earth's window is narrowed 3.6 % to cancel it.
+- **The finished swarm encloses the Sun** (`docs/closed-swarm.md`). Compute sails tile the whole
   sphere at 0.95 AU except a cap 23° round the Sun–Earth line, where co-orbiting mirrors at 0.98 AU
   (26 g/m², the mass their orbit allows) return the sunlight to the swarm and hide its hot backs from
   Earth. Windows are mirrors turned edge-on: Earth's lets its sunlight through in full.
-  - Closed in **2214**, at 1.9×10⁴⁰ FLOP/s.
+  - Closed in **2216**, at 1.9×10⁴⁰ FLOP/s.
   - All the heat leaves through the backs, so the film runs at 419 K and the chips near 155 °C. Each
     watt computes 19 % less than in a swarm left open toward Earth; catching all the light, it
     computes about the same in total. Closure buys control, not computing.
@@ -77,11 +86,11 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 | `src/model/` | `hybrid.js` (model v4: sails, pods, eras, build-out), `model.js` (radiosity, logistics, Mercury, Earth), `sat2.js`, `constants.js` |
 | `src/ui/` | SVG charts and the assumptions drawer |
 | `test/` | `node --test` suites pinning the model |
-| `render/` | Blender scenes, each lit only by what the model says is there: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `pod.py` (1 MW pod, visible and LWIR), `swarm_field.py` (the sky inside the layout within Earth's orbit: sails as stars, the counter-sun and its glint halo), `farside_field.py` + `farside_sky.py` (the sky inside the far-side cloud: the layer's glow, the rest of the cloud seen through the inside of Earth's orbit, near sails as squares), `mercury.py` (globe), `earth_sky.py` (Jenny Lake at dusk and night, tonight vs with the swarm, and with the Sun enclosed), `leo_view.py` (the swarm from low Earth orbit: Earth's night side, the Moon, the planets), `closed_inside.py` (inside the enclosure). Support: `atmosphere.py` (multiple-scattering sky, Hillaire 2020) and `sky_map.py` (twilight, swarm glow, Milky Way, airglow, stars), `teton_prep.py` (lake bed, cobble beach), `ephem.py` (Sun and sidereal time), `lib.py` (physical sun, metering, materials), `develop.py` (EXR to photo: exposure, white balance, AgX), `glare.py` (lens glare), `post.py` (camera effects) |
+| `render/` | Blender scenes, each lit only by what the model says is there: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `pod.py` (1 MW pod, visible and LWIR), `swarm_field.py` (the sky inside the layout within Earth's orbit: sails as stars, the counter-sun and its glint halo), `farside_field.py` + `farside_sky.py` (the sky inside the far-side cloud: the layer's glow, the rest of the cloud seen through the inside of Earth's orbit, near sails as squares), `mercury.py` (globe), `earth_sky.py` (Jenny Lake at dusk and night, tonight vs with the swarm, and with the Sun enclosed), `leo_view.py` (the swarm from low Earth orbit: Earth's night side, the Moon, the planets), `closed_inside.py` (inside the enclosure), `sphere_space.py` (the sphere from 3 AU, visible and thermal). Support: `atmosphere.py` (multiple-scattering sky, Hillaire 2020) and `sky_map.py` (twilight, swarm glow, Milky Way, airglow, stars), `teton_prep.py` (lake bed, cobble beach), `ephem.py` (Sun and sidereal time), `lib.py` (physical sun, metering, materials), `develop.py` (EXR to photo: exposure, white balance, AgX), `glare.py` (lens glare), `post.py` (camera effects) |
 | `renders/` | finished photographs used by the page |
 | `docs/` | `architecture.md`, `future-tech.md`, `earth.md`, `full-swarm.md`, `closed-swarm.md`, and `data/` with every study's numbers and sources |
 | `assets/` | MESSENGER, Blue Marble, USGS terrain, star catalogue and Milky Way data with credits |
-| `scripts/` | report, numbers export, screenshot, artifact staging |
+| `scripts/` | report, numbers export, screenshot, artifact staging (content-stamped filenames), `stage-renders.sh` and `finish-renders.sh` |
 
 ## How the numbers were checked
 

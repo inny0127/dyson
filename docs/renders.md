@@ -49,6 +49,39 @@ exposure never changes the physics.
 - **Result:** see the captions on the page; the ground illuminance each frame receives is in its
   render log.
 
+## The sphere, stage by stage
+
+The page follows the swarm as it grows. At every stage it is the same symmetric sphere
+(`docs/closed-swarm.md`, "Built symmetric, stage by stage"), sails filling 0.92–0.98 AU at coverage f,
+the part Earth can see flown by mirror sails, Earth's sunlight passing through its window. The stages
+are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from the model (2116, 2129, 2141,
+2173, 2213, 2216). `scripts/stage-renders.sh` makes them all.
+
+- **Jenny Lake (`earth_sky.py --glow sphere`; `sky_map.py` kind `sphere`):** the frame of tonight's
+  night picture, 22 August at 22:06, Sun 18.5° down.
+  - Glow: the far side's sunlit fronts through the near side's gaps, f (1 − f) ρ S / π with ρ 0.004,
+    over the disc the layer covers seen from 1 AU (full depth inside asin 0.92 = 67°, thinning out by
+    asin 0.98 = 78.5°). The atmosphere scatters it like any other light.
+  - Stars, Milky Way and zodiacal light behind it: × (1 − f) through the mirror sails (out to 75.6°)
+    and × (1 − f) again through the far side; the zodiacal dust and the planets are lit by the
+    sunlight that escapes, × (1 − f).
+  - Twilight: the Sun's sky scaled by the sunlight Earth's window lets through (1 − the cut that
+    cancels the sphere's heat: 0.12 % at 1 %, 3.6 % at 50 %).
+  - Each frame is developed at its own metered exposure; captions give the difference from tonight.
+- **Low Earth orbit (`leo_view.py --glow sphere`):** the closed frame's composition (400 km over
+  the Nile Delta, 00:54 UTC 22 September 2128, 12 mm, 58° above the Sun) at 10⁻⁴, 1 %, 50 % and
+  99 %, with the same glow and transmission, exposed for the disc.
+- **Inside (`farside_field.py --mode sphere`):** a camera beside a sail mid-layer, a quarter of the
+  way round the Sun from Earth, 14 mm, looking up across the layer, at 1 % and 50 % (tau = −ln(1 − f));
+  near sails drawn one by one within 3,000 km. The closed stage is `closed_inside.py`.
+- **From 3 AU (`sphere_space.py`):** 25° above the plane of the planets, 28 mm, looking at the Sun.
+  - Visible, through a coronagraph (a 1.6° disc over the Sun): the far side's fronts through the
+    near side's gaps; at closure a black disc hiding the stars, with Earth a point at its edge, lit
+    through its window.
+  - Thermal, 8–14 µm, fixed false-colour scale 150–450 K: the backs at the film temperature
+    (382 K sparse, 402 K at half, 419 K closed) and, through the gaps, the far side's infrared-dark
+    fronts. The mirror sails in front of Earth show as a cold patch.
+
 ## Jenny Lake with the Sun enclosed (`earth_sky.py --glow closed`)
 
 - **Same place, moment and exposure as tonight's night frame** (22 August, 22:06 MDT, Sun 18.5° below

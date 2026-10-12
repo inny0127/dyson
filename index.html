@@ -218,6 +218,21 @@ details.deep p:last-child { margin: 0; }
 .note { font: 400 0.8125rem/1.45 var(--sans); color: var(--ink-3); margin-top: 0; }
 @media (max-width: 760px) { .choices { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+
+/* ---------------- the progression */
+.strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.strip figure { gap: 0.35rem; }
+.strip img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--plate); }
+.strip span { font: 500 0.75rem/1.3 var(--sans); color: var(--ink-2); }
+.strip span b { display: block; color: var(--ink); font-weight: 600; }
+.strip a { text-decoration: none; color: inherit; }
+section.stage { border-top: 1px solid var(--rule); }
+.stage .kicker .share { color: var(--ink); }
+.stage-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.9rem 1.5rem; padding: 1rem 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.stage-facts div { display: grid; gap: 0.2rem; }
+.stage-facts span { font: 400 0.8125rem/1.3 var(--sans); color: var(--ink-3); }
+.stage-facts b { font: 500 1.05rem/1.25 var(--sans); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } .stage-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 </head>
 <body>
@@ -239,7 +254,7 @@ details.deep p:last-child { margin: 0; }
 </aside>
 <main>
   <div class="col standfirst">
-    <p>Most pictures of a Dyson swarm show the Sun wrapped in glittering machinery. We tried to work one out properly: take Mercury apart, turn it into solar panels that are also computers, and fly them around the Sun until it is enclosed. The swarm we ended up with is made of nearly black sheets that catch all of the Sun's light and let it out only through windows. One window is Earth's, so Earth keeps its sunlight and its temperature. What it loses is the night sky round the Sun. Every photograph and figure here comes from one physics model, and if you change an assumption the whole page recomputes.</p>
+    <p>A Dyson sphere is not built overnight. This one starts with a single factory on Mercury in 2050 and ends, some 165 years later, with the Sun enclosed: billions of billions of black sheets, each a solar panel and a computer, spread evenly round it just inside Earth's orbit. Scroll down and watch it grow, stage by stage, from a lake in Wyoming, from orbit, from inside and from far away. Every picture and every number on this page comes from one physics model, and if you change an assumption the page recomputes.</p>
     <div class="explain" role="group" aria-label="About this page">
       <button data-explain="what">What is this?</button>
       <button data-explain="how">How was it worked out?</button>
@@ -247,18 +262,11 @@ details.deep p:last-child { margin: 0; }
       <button data-explain="change">Can I change it?</button>
     </div>
     <div class="explain-panel" id="explain-panel" hidden></div>
-    <div class="era" role="group" aria-label="Hardware era">
-      <span>Hardware</span>
-      <button data-era="2026" aria-pressed="false">2026</button>
-      <button data-era="low" aria-pressed="false">Mature, pessimistic</button>
-      <button data-era="mid" aria-pressed="true">Mature, central</button>
-      <button data-era="high" aria-pressed="false">Mature, optimistic</button>
-    </div>
   </div>
   <div class="wide figures" id="figures"></div>
 
   <section class="chapter" id="summary" data-moment="cap">
-    <div class="col"><div class="kicker">In brief</div><h2>The short version</h2></div>
+    <div class="col"><div class="kicker">In brief</div><h2>The plan</h2></div>
     <div class="col"><dl class="summary" id="summary-list"></dl></div>
     <figure class="wide drawing">
       <div id="orbit-map"></div>
@@ -283,6 +291,19 @@ details.deep p:last-child { margin: 0; }
         </dl>
       </details>
     </div>
+  </section>
+  <section class="chapter" id="strip" data-f="0.5">
+    <div class="col"><div class="kicker">2050–2216 · At a glance</div><h2>One lake, seven nights</h2><p class="dek">The same view at the end of twilight, as the swarm grows. It brightens, peaks when half the Sun is caught, and fades to black as the sphere closes.</p></div>
+    <div class="wide strip" id="strip-row">
+      <a href="#stage-0"><figure><img src="renders/earth-night-tonight.jpg" alt="Tonight: the Milky Way beside Grand Teton" loading="lazy"><span><b>2050</b>nothing yet</span></figure></a>
+      <a href="#stage-1e-6"><figure><img src="renders/stage-night-1e-6.jpg" alt="A faint glow above the range" loading="lazy"><span><b data-y="1e-6"></b>a millionth</span></figure></a>
+      <a href="#stage-1e-4"><figure><img src="renders/stage-night-1e-4.jpg" alt="A pale glow fills the western sky" loading="lazy"><span><b data-y="1e-4"></b>1 in 10,000</span></figure></a>
+      <a href="#stage-1e-2"><figure><img src="renders/stage-night-1e-2.jpg" alt="Twilight-bright sky over the range" loading="lazy"><span><b data-y="1e-2"></b>1%</span></figure></a>
+      <a href="#stage-0.5"><figure><img src="renders/stage-night-0.5.jpg" alt="The brightest sky of all" loading="lazy"><span><b data-y="0.5"></b>half</span></figure></a>
+      <a href="#stage-0.99"><figure><img src="renders/stage-night-0.99.jpg" alt="The glow dims again, starless" loading="lazy"><span><b data-y="0.99"></b>99%</span></figure></a>
+      <a href="#stage-1"><figure><img src="renders/earth-night-closed.jpg" alt="A black, starless sky over the range" loading="lazy"><span><b data-y="1"></b>closed</span></figure></a>
+    </div>
+    <p class="col note">Each frame is exposed for its own sky, as a photographer would; how much brighter or darker it really is, is in each stage's caption below.</p>
   </section>
 
   <section class="chapter" id="sail" data-moment="first">
@@ -359,6 +380,141 @@ details.deep p:last-child { margin: 0; }
     </figure>
   </section>
 
+  <section class="chapter" id="progression-intro" data-f="1e-8">
+    <div class="col"><div class="kicker">2050–2216 · The progression</div><h2>Watching it grow</h2><p class="dek">Every stage below is the same sphere, the same in every direction, only fuller. What changes is how much of the Sun it has caught.</p></div>
+    <div class="col prose" id="progression-prose"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-0" data-f="0">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="0"></span></div><h2>Nothing to see</h2><p class="dek">The first factory lands on Mercury. For six decades the swarm grows unseen.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/earth-night-tonight.jpg" alt="Night at a mountain lake: the Milky Way rising beside Grand Teton, stars reflected in the water" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake in Grand Teton at the end of twilight, as it is tonight.</b> The reference for every night frame below: the Milky Way, faint airglow, the zodiacal light low in the west.<span class="how">22 August, 22:06, Sun 18.5° below the horizon. Terrain from USGS elevation data; twilight from a multiple-scattering model of the atmosphere, checked against measured twilight. Ground illuminance 0.0012 lux.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-0"></div>
+    <div class="col prose" id="prose-0"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1e-6" data-f="1e-6">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1e-6"></span></div><h2>A glow nobody notices</h2><p class="dek">A millionth of the Sun's light caught. The sky round the set Sun is twice as bright as before, and almost no one can tell.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-1e-6.jpg" alt="The same lake at night with a faint pale glow in the sky above the range" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>The same view with a millionth of the Sun caught.</b><span class="how"></span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1e-6"></div>
+    <div class="col prose" id="prose-1e-6"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1e-4" data-f="1e-4">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1e-4"></span></div><h2>The night sky lightens</h2><p class="dek">One part in ten thousand. Round the Sun's side of the sky the night is a hundred times brighter than it used to be.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-1e-4.jpg" alt="The lake at night under a pale glowing sky over the range, stars only high up" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake, one part in ten thousand.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-1e-4.jpg" alt="From orbit before dawn: Earth's night side and airglow, a faint glow filling the sky above" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit before dawn.</b><span class="how"></span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1e-4"></div>
+    <div class="col prose" id="prose-1e-4"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1e-2" data-f="1e-2">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1e-2"></span></div><h2>Twilight all night</h2><p class="dek">One per cent. On the Sun's side of the sky, night never gets darker than early twilight.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-1e-2.jpg" alt="The lake under a bright twilight-coloured sky" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake at 1%.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-1e-2.jpg" alt="From orbit: a glowing disc fills the sky above Earth's night side" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/stage-inside-1e-2.jpg" alt="Inside the swarm: black sky, scattered points of light" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/stage-space-ir-1e-2.jpg" alt="Thermal image from far away: a faint purple disc" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Inside the swarm, and from 3 AU through a thermal camera.</b><span class="how"></span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1e-2"></div>
+    <div class="col prose" id="prose-1e-2"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-0.5" data-f="0.5">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="0.5"></span></div><h2>The brightest night</h2><p class="dek">Half the Sun caught. Earth sees the most glow it ever will, and needs the most cooling.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-0.5.jpg" alt="The lake under a bright, even sky, the range dark against it" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake with half the Sun caught.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-0.5.jpg" alt="From orbit: a bright glowing disc over Earth" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/stage-inside-0.5.jpg" alt="Inside the swarm: a glowing sky with dark specks" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/stage-space-vis-0.5.jpg" alt="From far away: a glowing disc round a black coronagraph spot" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Inside the swarm, and from 3 AU in visible light.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-space-ir-0.5.jpg" alt="Thermal image: an orange disc with a dark crescent at one edge" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From 3 AU through a thermal camera.</b><span class="how"></span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-0.5"></div>
+    <div class="col prose" id="prose-0.5"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-0.99" data-f="0.99">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="0.99"></span></div><h2>Darkening</h2><p class="dek">Ninety-nine per cent. The glow is back to where it was at one per cent, and now nothing shines through it.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-0.99.jpg" alt="The lake under a twilight-bright sky with no stars on the Sun's side" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake at 99%.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-0.99.jpg" alt="From orbit: a dimmer glowing disc over Earth" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-space-ir-0.99.jpg" alt="Thermal image: a bright orange-yellow disc" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From 3 AU through a thermal camera.</b><span class="how"></span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-0.99"></div>
+    <div class="col prose" id="prose-0.99"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1" data-f="1">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1"></span></div><h2>The Sun enclosed</h2><p class="dek">The last gap closes. Earth still gets its sunlight through its window. Everything else stays inside.</p></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/earth-night-tonight.jpg" alt="Night at the lake tonight" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/earth-night-closed.jpg" alt="The same view with a straight sharp edge across the sky and no stars beyond it" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Jenny Lake tonight, and with the Sun enclosed.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/leo-closed-wide.jpg" alt="From orbit before dawn: Earth's night side, a vast black dome above it, the Milky Way beyond its rim" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit before dawn.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/leo-closed-tele.jpg" alt="The Milky Way cut off along a smooth curved edge" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Where the sky ends.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/inside-closed.jpg" alt="Inside: an even violet-grey sky over a floor of dark diamond panels" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/stage-space-vis-1.jpg" alt="From far away: a black disc hiding the stars, a bright point beside it" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Inside the enclosure, and from 3 AU in visible light.</b><span class="how"></span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-space-ir-1.jpg" alt="Thermal image: a uniformly glowing yellow disc with one dark patch at its edge" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From 3 AU through a thermal camera.</b><span class="how"></span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1"></div>
+    <div class="col prose" id="prose-1"></div>
+  </section>
+
   <section class="chapter" id="earth" data-moment="cap">
     <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Earth</div><h2 id="earth-title">Earth keeps its sunlight, and loses the stars round the Sun</h2><p class="dek" id="earth-dek">Between the Sun and Earth the swarm is a cap of cold mirrors with a window in it. By day nothing changes. At night the sky round the Sun is black.</p></div>
     <div class="col prose" id="earth-prose"></div>
@@ -406,18 +562,6 @@ details.deep p:last-child { margin: 0; }
     </figure>
   </section>
 
-  <section class="chapter" id="inside" data-moment="cap">
-    <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Inside the swarm</div><h2>Daylight in every direction</h2><p class="dek">Inside a closed swarm there is no night and no sky. Every direction is the lit face of a sail.</p></div>
-    <div class="col prose">
-      <p>Stand on the sunward side of the finished swarm and look anywhere but at the Sun. Every line of sight ends on the front of a sail: the ones beside you, or, across the empty middle of the swarm, the far side, 1.9 AU away, where every sail faces you. All of them are lit by the same Sun. They reflect only 0.4% of its light, but that is still about 180 cd/m² from every direction, as bright as the sky at sunset, and perfectly even. The mirror cap, seen from inside, only shows more of the same. Earth and the Moon are pinholes in it, too small to see.</p>
-      <p>There are no stars anywhere, and nothing stands out but the Sun itself. In the infrared the sky glows as a 419 K oven, which is what heats the swarm: every front radiates into it, and every other front absorbs what it radiates.</p>
-    </div>
-    <figure class="wide">
-      <div class="plate"><img src="renders/inside-closed.jpg" alt="An even, pale violet-grey sky over a level floor that stretches to a straight horizon; the floor is scattered with dark navy diamond-shaped panels, large in the foreground and shrinking to a fine texture toward the horizon" width="2400" height="1600" loading="lazy"></div>
-      <figcaption class="col"><b>Inside the enclosure, 800 m sunward of the innermost sails, looking across them.</b> The nearest sails are dark navy diamonds 279 m across, lit from straight overhead. Between and beyond them the deeper sails fill the floor, and above the horizon the far side of the swarm, 1.9 AU away, fills the whole sky with the same light, about 190 cd/m², as bright as an overcast day. There is no shadow and nothing dark anywhere. The Sun is directly overhead, out of the frame.<span class="how">0.92 AU, 14 mm lens, 6° below the horizon, exposed for the sky. The innermost bands are drawn covering a quarter of the plane. Fronts: cells of albedo 0.0006 with lighter hinge strips every 1.63 m; everything farther away averages 0.004 with the steering vanes. A vane's flash reaches a camera this low only from within a few kilometres, and none fell in this frame.</span></figcaption>
-    </figure>
-  </section>
-
   <section class="chapter" id="star" data-moment="cap">
     <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Seen from another star</div><h2>The Sun goes out, and a cool infrared star takes its place</h2><p class="dek">From light-years away the Sun fades as the swarm grows, and its light comes back as warm infrared.</p></div>
     <div class="col prose" id="star-prose"></div>
@@ -425,13 +569,6 @@ details.deep p:last-child { margin: 0; }
       <div class="chart" id="sed-chart"></div>
       <div class="legend" id="sed-legend"></div>
     </figure>
-  </section>
-
-  <section class="chapter" id="choose" data-moment="cap">
-    <div class="col"><div class="kicker">Your call</div><h2>Choose your swarm</h2><p class="dek">How big the swarm gets, and what Earth pays for it, is a choice. Pick one and the whole page, the numbers above included, recomputes for it.</p></div>
-    <div class="col choices" id="choices" role="group" aria-label="Choose a swarm"></div>
-    <div class="col tablewrap"><table class="compare" id="choose-table"></table></div>
-    <p class="col note">The photographs always show the default: the finished swarm with the Sun enclosed.</p>
   </section>
 
   <section class="chapter" id="future">
@@ -445,7 +582,7 @@ details.deep p:last-child { margin: 0; }
     <details class="assumptions" id="assumptions">
       <summary><h2>Change the assumptions</h2><span>Every number above recomputes</span></summary>
       <div class="params" id="params"></div>
-      <button class="reset" id="reset-params">Reset to the selected hardware</button>
+      <button class="reset" id="reset-params">Reset to the central assumptions</button>
     </details>
   </section>
 

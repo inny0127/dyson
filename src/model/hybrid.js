@@ -180,6 +180,11 @@ export const FIXED = {
   // 419 K cavity; ε 0.02 per face leaks 1.1 W/m² out of the back, and Earth, seeing the cap over a
   // disc 76° in radius, averages 0.40 of that (docs/closed-swarm.md).
   capIR: 0.45,             // W/m² on Earth from the cap's back
+  // While the sphere is open, Earth sees the far side's fronts through the gaps of the near side: a
+  // disc 72° in radius round the Sun, which a Lambertian wall fills to sin²(72°) on a sunward plane,
+  // 0.226 of it averaged over Earth. Fronts with switchable infrared emittance (as on spacecraft
+  // radiators today) stay dark, ε 0.1, until the sphere closes.
+  epsFrontBuild: 0.1, farWallG: Math.sin(Math.asin(0.95)) ** 2 / 4,
   capKgM2: 0.026,
   // Everything is caught except what leaks: the cap's back sheds 1.1 W/m² over its 1.1e22 m²
   // (3e-5 of the Sun), and Earth's window lets out 5e-9 (the Moon's 3e-9).
@@ -242,7 +247,7 @@ export function orbitChoice(p, E) {
  */
 export function closedFilmT(p, f, r = FIXED.closedR) {
   const S = flux(r);
-  const open = (p.alpha * S) / ((p.epsFront + p.epsBack) * SIGMA);
+  const open = (p.alpha * S) / ((FIXED.epsFrontBuild + p.epsBack) * SIGMA);
   const shut = S / ((1 - FIXED.capFrac) * p.epsBack * SIGMA);
   return (open + Math.min(1, f) * (shut - open)) ** 0.25;
 }
@@ -680,7 +685,11 @@ export function skyLux(p, f) {
       * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
   };
   if (p.earthPlacement === 'shell') return shellLux(f);
-  if (p.earthPlacement === 'closed') return 0;                 // Earth sees only the cap's dark back
+  if (p.earthPlacement === 'closed') {
+    // the far side's sunlit fronts, seen through the near side's gaps: f (1 − f) ρ S / π
+    const r = FIXED.closedR, fo = Math.min(1, f / FIXED.closedRoom);
+    return (fo * (1 - fo) * p.rhoVis * flux(r)) / Math.PI * FIXED.lumensPerW * discGroundFactor(Math.asin(r));
+  }
   if (p.earthPlacement === 'uniform') {
     // a disc of sunlit fronts out to asin(0.95) = 72° round the Sun, at the local fill f / share
     const r = FIXED.uniformR, fl = Math.min(0.999, f / FIXED.uniformShare);
@@ -708,7 +717,10 @@ export function earthForcing(p, f) {
     gross = e.forcing;
     blocked = e.dimming * EARTH.absorbedSolar;
   } else if (p.earthPlacement === 'closed') {
-    gross = f * FIXED.capIR;                                    // the cap grows with the swarm it hides
+    // the symmetric sphere: the patch in front of Earth (mirror sails, cold backs) fills at the same
+    // pace as the rest, and through its gaps Earth sees the far side's infrared-dark fronts
+    const T = closedFilmT(p, f), fo = Math.min(1, f / FIXED.closedRoom);   // optical cover: 1 when closed
+    gross = fo * FIXED.capIR + fo * (1 - fo) * FIXED.epsFrontBuild * SIGMA * T ** 4 * FIXED.farWallG;
   } else if (p.earthPlacement === 'uniform') {
     gross = f * FIXED.uniformIRPerF;
   } else if (p.earthPlacement === 'cone') {

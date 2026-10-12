@@ -73,6 +73,8 @@ def smooth(x):
 def patch_mask(P, psi_cam, lat_max):
     """Soft membership of points P (AU, camera frame) in the far-side patch."""
     w = EDGE_DEG
+    if GEOM['kind'] == 'sphere':                                     # symmetric: sails everywhere
+        return np.ones(P.shape[:-1])
     if GEOM['kind'] == 'uniform':
         E = np.array([math.cos(math.radians(-psi_cam)), math.sin(math.radians(-psi_cam)), 0.0])
         ang = np.degrees(np.arccos(np.clip((P @ E) / np.linalg.norm(P, axis=-1), -1, 1)))

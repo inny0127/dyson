@@ -89,9 +89,34 @@ def cap_samples(centre, radius, n):
     return pts, 2 * math.pi * (1 - math.cos(radius)) / n
 
 
+def sphere_depth(dirs, sun, g):
+    """The symmetric sphere (docs/closed-swarm.md): how much of the shell a line of sight from Earth
+    crosses on each side, 0..1. Sails fill r_in..r_out AU, so inside asin(r_in) of the Sun a line
+    crosses the whole layer twice; beyond, near and far halves thin out until asin(r_out)."""
+    ang = np.arccos(np.clip(dirs @ sun, -1, 1))
+    b = np.where(ang < math.pi / 2, np.sin(ang), 2.0)
+    return np.clip((g['r_out'] - b) / (g['r_out'] - g['r_in']), 0, 1)
+
+
+def sphere_transmission(dirs, sun, g):
+    """Starlight through the sphere at coverage f: the mirror sails in front of Earth (out to
+    cap_deg from the Sun) and, inside the disc, the far side as well."""
+    f = g['f']
+    ang = np.degrees(np.arccos(np.clip(dirs @ sun, -1, 1)))
+    cap = np.clip((g.get('cap_deg', 75.6) - ang) / 1.0 + 0.5, 0, 1)
+    far = sphere_depth(dirs, sun, g)
+    return (1 - f * cap) * (1 - f * far)
+
+
 def glow_radiance(dirs, sun, g):
     """Radiance of the swarm glow above the atmosphere (W/m^2/sr, luminance channel)."""
     cosang = dirs @ sun
+    if g['kind'] == 'sphere':
+        # the far side's sunlit fronts, seen through the gaps of the near side: f (1 - f) rho S / pi
+        f, rho = g['f'], g['rho']
+        frac = sphere_depth(dirs, sun, g)
+        r = 0.5 * (g['r_in'] + g['r_out'])
+        return f * frac * (1 - f * frac) * rho * S0 / r ** 2 / math.pi
     if g['kind'] == 'uniform':
         # near-uniform swarm (docs/full-swarm.md): sun-facing sails between r_in and r_out AU all round
         # the Sun, filled to tau, empty within acos(r_in) of the Sun-Earth line (so every line of sight
@@ -302,7 +327,7 @@ def build(spec, out_prefix):
         if g['kind'] in ('farside', 'mix'):
             g['ecliptic_pole'] = pole.tolist()
         cap = {'shell': 62.0, 'farside': 50.0}.get(g['kind']) or math.degrees(math.asin(min(g.get('r_out', 0.92), 0.999)))
-        if g['kind'] == 'uniform':
+        if g['kind'] in ('uniform', 'sphere'):
             cap = 80.0
         pts, dO = cap_samples(sun, math.radians(cap), 160)
         Lp = glow_radiance(pts, sun, g)
@@ -323,7 +348,13 @@ def build(spec, out_prefix):
     direct = np.zeros((W * H, 3))
     if g:
         direct += glow_radiance(dirs, sun, g)[:, None] * GLOW_COLOUR
-    if closed:
+    if g and g['kind'] == 'sphere':
+        # stars, Milky Way and zodiacal light seen through the sphere; the dust beyond it is lit only
+        # by the sunlight that escapes (1 - f)
+        Tsph = sphere_transmission(dirs, sun, g)
+        direct += milky_way(dirs, M) * Tsph[:, None]
+        direct += (zodiacal(dirs, sun, pole) * (1 - g['f']) * Tsph)[:, None] * A.SUN_RGB / (A.SUN_RGB @ A.LUMA)
+    elif closed:
         open_sky = np.clip((cap_cos - dirs @ sun) / 0.01 + 0.5, 0, 1)            # ~1 deg soft edge
         direct += milky_way(dirs, M) * open_sky[:, None]
     else:
@@ -337,7 +368,13 @@ def build(spec, out_prefix):
     np.save(out_prefix + '_inscatter.npy', inscatter_source(total, W, H).astype(np.float32))
     np.save(out_prefix + '_trans.npy', T.reshape(H, W, 3)[::4, ::4].astype(np.float32))
     sd, sE, sT = stars(M)
-    if closed:
+    if g and g['kind'] == 'sphere':
+        sE = sE * sphere_transmission(sd, sun, g)
+        if 'jd' in spec:                                           # planets: lit by the escaping light
+            pd_, pE, pT = planets(M, spec['jd'])
+            pE = pE * (1 - g['f']) * sphere_transmission(pd_, sun, g)
+            sd, sE, sT = np.concatenate([sd, pd_]), np.concatenate([sE, pE]), np.concatenate([sT, pT])
+    elif closed:
         keep = sd @ sun < cap_cos
         sd, sE, sT = sd[keep], sE[keep], sT[keep]
     elif 'jd' in spec:

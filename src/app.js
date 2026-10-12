@@ -99,15 +99,9 @@ function recompute() {
     first: 5,                                           // the first sails
     wall: g.tCap,                                       // Mercury's heat wall
     one: state.d.yearsToCoverage(0.01),                 // 1 % of the Sun's light
-    cap: when(state.earth.cap * 0.995),                 // the finished swarm
+    cap: when(state.earth.cap * (p.earthPlacement === 'closed' ? 1 - 1e-5 : 0.995)),   // the finished swarm
   };
   state.curve = curveFor(state.d, state.table);
-  for (const era of ['2026', 'low', 'mid', 'high']) {
-    if (!state.curves[era]) {
-      const q = h.eraParams(era);
-      state.curves[era] = curveFor(h.compute(q), coverageTable(q));
-    }
-  }
   renderAll();
 }
 
@@ -238,9 +232,12 @@ function goTo(t) {
 }
 function watchChapters() {
   const io = new IntersectionObserver(entries => {
-    for (const e of entries) if (e.isIntersecting) goTo(state.moments[e.target.dataset.moment]);
+    for (const e of entries) if (e.isIntersecting) {
+      const el = e.target;
+      goTo(el.dataset.f !== undefined ? stageYear(Number(el.dataset.f)) : state.moments[el.dataset.moment]);
+    }
   }, { rootMargin: '-35% 0px -60% 0px' });
-  for (const el of document.querySelectorAll('section[data-moment]')) io.observe(el);
+  for (const el of document.querySelectorAll('section[data-moment], section[data-f]')) io.observe(el);
 }
 
 // --------------------------------------------------------------------------------- explainers
@@ -248,8 +245,8 @@ function watchChapters() {
 const EXPLAIN = {
   what: `<p>A worked-out design for a Dyson swarm: a cloud of separate satellites around the Sun that catches its light and uses it to compute, until it encloses the Sun and lets sunlight out only through windows it chooses. It covers the satellites themselves, the factories on Mercury that make them, how fast they can be built, and what the swarm does to Earth.</p><p>Every number, chart and photograph on the page comes from one physics model. The photographs are not illustrations; they are rendered from the model's numbers, with every light in them at its true brightness.</p>`,
   how: `<p>Eight research studies came first: computer chips and memory after 2095, the solar cells Mercury's rock can make, the satellite's structure and optics, manufacturing and recycling, what the swarm does to Earth's climate and night sky, and an adversarial review of the results. A ninth asked what really stops the swarm from filling the sky round the Sun, and a tenth what it takes to close it. Their numbers are in the project repository.</p><p>They feed a model that runs in your browser and builds the swarm year by year: industry doubles until Mercury can't shed the heat any faster, sails wear and are rebuilt, and the swarm stops when the Sun is enclosed or Mercury runs out. The pictures come from Blender scenes and our own renderer, fed the same numbers.</p>`,
-  unsure: `<p>A lot. The hardware is seventy years beyond today's, and the swarm assumes a film half as heavy as the detailed design and launchers that waste only 1% of their energy. How Mercury gets rid of its heat is the least certain part of the build-out, and the silicon in its core is known only to lie somewhere between 1% and 25%. Sails that last centuries assume every way they wear can be repaired in place. On Earth, shaping climate region by region is far beyond anything climate models have run.</p><p>The buttons below switch between pessimistic and optimistic hardware, and every assumption can be changed at the bottom of the page. That energy is never the limit holds across all of them.</p>`,
-  change: `<p>Yes. The hardware buttons below switch eras. Near the end you can choose between five swarms, and at the very bottom every assumption has a slider. The text, the charts and the dashboard all recompute; only the photographs stay fixed, at the finished swarm.</p><p>As you scroll, the dashboard ${matchMedia('(min-width: 1200px)').matches ? 'on the right' : 'at the top'} follows the story year by year.</p>`,
+  unsure: `<p>A lot. The hardware is seventy years beyond today's, and the swarm assumes a film half as heavy as the detailed design and launchers that waste only 1% of their energy. How Mercury gets rid of its heat is the least certain part of the build-out, and the silicon in its core is known only to lie somewhere between 1% and 25%. Sails that last centuries assume every way they wear can be repaired in place. On Earth, shaping climate region by region is far beyond anything climate models have run.</p><p>Every assumption can be changed at the bottom of the page. Across all of them, energy is never the limit: heat on Mercury and its silicon are.</p>`,
+  change: `<p>Yes. At the very bottom every assumption has a slider. The text, the charts, the dates of every stage and the dashboard all recompute; only the photographs stay fixed, rendered for the central assumptions.</p><p>As you scroll, the dashboard ${matchMedia('(min-width: 1200px)').matches ? 'on the right' : 'at the top'} follows the story year by year.</p>`,
 };
 function wireExplainers() {
   const panel = $('explain-panel');
@@ -266,58 +263,71 @@ function wireExplainers() {
   }
 }
 
-// --------------------------------------------------------------------------------- choose your swarm
-
-const SWARMS = [
-  { key: 'closed', title: 'The Sun enclosed', blurb: "Sails all the way round the Sun. Between it and Earth, a cap of cold mirrors with a window that lets Earth's sunlight through in full.",
-    params: { earthPlacement: 'closed', forcingLimit: 0, shadeLimit: 300 } },
-  { key: 'full', title: 'Open toward Earth', blurb: "All round the Sun except round the line to Earth, every sail's front dark in the infrared. A shade at L1 takes a fifth of Earth's sunlight to keep its temperature.",
-    params: { earthPlacement: 'uniform', forcingLimit: 0, shadeLimit: 300 } },
-  { key: 'far', title: 'Only beyond the Sun', blurb: "The same sails, but only on the far side of Earth's orbit, farthest from Earth. The shade again keeps Earth's temperature.",
-    params: { earthPlacement: 'farside', spillInside: 'stop', farsideLat: 60, forcingLimit: 0, shadeLimit: 300 } },
-  { key: 'gentle', title: 'Barely there', blurb: 'The far side, kept small: Earth takes 1 W/m² of extra heat and the shade cancels half a watt more. Sunlight and rain hardly change.',
-    params: { earthPlacement: 'farside', spillInside: 'stop', farsideLat: 30, forcingLimit: 1, shadeLimit: 0.5 } },
-  { key: 'slit', title: 'Even, with plain glass', blurb: "The same gap round the line to Earth, but ordinary glass fronts that glow toward Earth. Each sail computes more, but with the same fifth of Earth's sunlight shaded away the swarm must stay far smaller.",
-    params: { earthPlacement: 'cone', forcingLimit: 0, shadeLimit: 47 } },
-];
-function renderChoose() {
-  const p = state.params;
-  const rows = SWARMS.map(sw => {
-    const q = { ...p, ...sw.params };
-    const d = h.compute({ ...q, coverage: 1 });
-    const E = h.earthLimits(q, d);
-    const y = d.yearsToCoverage(E.cap * 0.995);
-    return { sw, E, y: Number.isFinite(y) ? y : d.growth.tPeak, fc: E.forcing, dug: h.minedFor(q, E.mass) / MERCURY.M, q };
-  });
-  const active = SWARMS.find(sw => Object.entries(sw.params).every(([k, v]) => p[k] === v));
-  $('choices').innerHTML = rows.map(({ sw, E }) => `<button data-swarm="${sw.key}" aria-pressed="${active && active.key === sw.key}"><b>${sw.title}</b><span>${sw.blurb}</span><span><b style="font:500 1rem/1 var(--sans)">${pct(E.cap, E.cap < 0.1 ? 1 : 0)}</b> of the Sun's light</span></button>`).join('');
-  for (const b of $('choices').querySelectorAll('button')) b.addEventListener('click', () => {
-    const sw = SWARMS.find(x => x.key === b.dataset.swarm);
-    state.params = { ...state.params, ...sw.params };
-    state.era = 'custom';
-    paramsUI.rebind(state.params);
-    recompute();
-  });
-  const minus = x => (x > 0.0005 ? `−${pct(x, x < 0.1 ? 1 : 0)}` : 'unchanged');
-  const line = (k, f) => `<tr><td>${k}</td>${rows.map(r => `<td class="v">${f(r)}</td>`).join('')}</tr>`;
-  $('choose-table').innerHTML = `<thead><tr><th></th>${rows.map(r => `<th>${r.sw.title}</th>`).join('')}</tr></thead><tbody>
-    ${line("Share of the Sun's light", r => pct(r.E.cap, r.E.cap < 0.1 ? 1 : 0))}
-    ${line('What stops it', r => limitOf(r.q, r.E))}
-    ${line('Computing', r => `${sci(r.E.flops, 2)} FLOP/s`)}
-    ${line('Finished around', r => yr(p.seedYear + r.y))}
-    ${line("The swarm's heat on Earth", r => `${r.fc.gross.toFixed(r.fc.gross < 1 ? 2 : 1)} W/m²`)}
-    ${line('Sunlight on Earth', r => minus(r.fc.sunlightCut))}
-    ${line("World's rainfall", r => minus(r.fc.rainCut))}
-    ${line('Extra heat at the poles', r => (r.fc.polar > 0.05 ? `+${r.fc.polar.toFixed(1)} W/m²` : '—'))}
-    ${line('Night sky, worst case', r => `${r.E.skyLuxAtCap < 10 ? r.E.skyLuxAtCap.toFixed(1) : Math.round(r.E.skyLuxAtCap)} lux`)}
-    ${line('Share of Mercury dug', r => pct(r.dug, 0))}
-  </tbody>`;
-}
-
 /** Hours of the swarm's output that would pull Mercury apart against its own gravity. */
 function hoursToTakeApart(E) {
   const n = Math.max(1, Math.round(MERCURY_BINDING_J / (E.cap * PHYS.L_SUN) / 3600));
   return n === 1 ? 'about an hour' : `${n} hours`;
+}
+
+// --------------------------------------------------------------------------------- the stages
+
+/** Years after the first launch at which the sphere catches a share f of the Sun (1: closed). */
+function stageYear(f) {
+  if (!(f > 0)) return 0;
+  if (f >= 1) return state.moments.cap;
+  const t = state.d.yearsToCoverage(Math.min(f, 0.9999) * h.FIXED.closedRoom);
+  return Number.isFinite(t) ? t : state.moments.cap;
+}
+const SHARE = { '0': 'nothing yet', '1e-6': 'a millionth of the Sun', '1e-4': 'one part in 10,000', '1e-2': '1% of the Sun', '0.5': 'half the Sun', '0.99': '99% of the Sun', '1': 'the Sun enclosed' };
+
+/** Everything a stage's text needs, at coverage f. */
+function stageCtx(f) {
+  const p = state.params, d = state.d;
+  const t = stageYear(f), a = h.atYear(p, d, t);
+  const fo = f >= 1 ? 1 : f;
+  const S = 1361 / h.FIXED.closedR ** 2;
+  const glow = fo * (1 - fo) * p.rhoVis * S / Math.PI * h.FIXED.lumensPerW;          // cd/m²
+  const fc = h.earthForcing(p, f >= 1 ? state.earth.cap : f * h.FIXED.closedRoom);
+  const T = h.closedFilmT(p, f >= 1 ? 1 : f);
+  return { f, t, year: Math.round(p.seedYear + t), a, glow, lux: h.skyLux(p, f >= 1 ? state.earth.cap : f * h.FIXED.closedRoom), fc, T,
+    chipC: T + (p.filmSpreadDT ?? 9) - 273.15, vsAI: a.flops / WORLD_AI_FLOPS_2025, starsBehind: (1 - fo) ** 2 };
+}
+const cd = x => (x >= 10 ? `${Math.round(x)}` : x >= 1 ? x.toFixed(1) : x >= 0.001 ? String(Number(x.toPrecision(2))) : sci(x, 1));
+
+const STAGE_TEXT = {
+  '0': c => `<p>The first factory lands on Mercury in ${num(state.params.seedYear)}. For the next six decades there is nothing to see. Industry doubles every ${num(`${state.d.growth.doublingYearsEff.toFixed(1)} years`)}, and each sail is built from rock already dug, so the swarm grows exactly as fast as the factories do. By ${num(Math.round(state.params.seedYear + stageYear(1e-8)))} there are ${num(words(h.atYear(state.params, state.d, stageYear(1e-8)).nSails))} sails, catching a hundred-millionth of the Sun's light and already out-computing every AI chip of 2025 many times over. From Earth they are invisible.</p>`,
+  '1e-6': c => `<p>By ${num(c.year)} there are ${num(words(c.a.nSails))} sails, spread evenly round the Sun at ${num('0.95 AU')}, computing ${num(`${sci(c.a.flops, 1)} FLOP/s`)}, ${num(words(c.vsAI))} times all the AI chips of 2025. That evenness is what Earth sees. At night, looking toward the Sun's side of the sky, you look through the near side of the sphere, where the sails show you their dark backs, to its far side, where every sail faces you with its sunlit front. A millionth of the sky covered by sails that reflect 0.4% of sunlight shines at ${num(`${cd(c.glow)} cd/m²`)}: as bright as the natural night sky itself. The result is a faint glow round the set Sun, ${num('144°')} across, easy to mistake for the zodiacal light.</p>`,
+  '1e-4': c => `<p>A hundred times more, by ${num(c.year)}. The glow, ${num(`${cd(c.glow)} cd/m²`)}, is now a hundred times the dark sky, like the sky over a suburb, and it fills the whole western sky at dusk. The Milky Way fades where it runs behind it. Earth takes ${num(`${c.fc.gross.toFixed(3)} W/m²`)} of extra heat: nothing.</p><p>The heat is small because of two choices. The sails' fronts are kept dark in the infrared while the sphere is open, so that the far side, which Earth sees through the gaps, barely glows at it. And the part of the sphere directly in front of Earth is flown by mirror sails, which hand their sunlight on to the rest and show Earth a cold back. They fill at the same pace as everywhere else.</p>`,
+  '1e-2': c => `<p>One per cent, in ${num(c.year)}. The sky on the Sun's side never gets darker than early twilight, ${num(`${cd(c.glow)} cd/m²`)}, and the ground is lit at ${num(`${c.lux.toFixed(1)} lux`)} all night, about four full Moons. The Milky Way is gone from half the sky. Mercury has just hit its heat wall: the whole planet is paved with radiators glowing orange, and exports no longer grow.</p><p>The swarm computes ${num(`${sci(c.a.flops, 1)} FLOP/s`)}. Through the gaps, Earth now gets ${num(`${c.fc.gross.toFixed(2)} W/m²`)} from the far side's fronts, and Earth's window is narrowed by ${num(pct(c.fc.sunlightCut, 2))} to cancel it.</p>`,
+  '0.5': c => `<p>Half the Sun, in ${num(c.year)}. This is as bright as Earth's night ever gets. The glow goes as f (1 − f): the far side's lit share, seen through the near side's gaps. Half times half is its peak, ${num(`${cd(c.glow)} cd/m²`)}, and the ground is lit at ${num(`${Math.round(c.lux)} lux`)} long after sunset.</p><p>It is also the hardest stage for Earth's climate. The far side's fronts, seen through the gaps, send ${num(`${c.fc.gross.toFixed(1)} W/m²`)}, about ${num(`${(c.fc.gross / 3.93).toFixed(1)} doublings`)} of CO₂. Earth's window is narrowed by ${num(pct(c.fc.sunlightCut, 1))} to hold its temperature, at a cost of about ${num(pct(c.fc.rainCut, 0))} of the world's rain. The swarm can put that rain back (below). It computes ${num(`${sci(c.a.flops, 1)} FLOP/s`)}, and ${num(pct(c.a.mercuryRemoved, 0))} of Mercury has been taken apart.</p>`,
+  '0.99': c => `<p>Ninety-nine per cent, in ${num(c.year)}. The glow is back to where it was at one per cent, ${num(`${cd(c.glow)} cd/m²`)}, because f (1 − f) is the same at 0.01 and 0.99. But now nothing shines through it: of the starlight from behind the sphere, only one part in ${num(words(Math.round(1 / c.starsBehind)))} gets through both layers. Mercury's crust and mantle are gone; the last per cent is built from silicon in its core.</p><p>The sails run hotter as the gaps close, because their fronts face each other instead of space: the film is at ${num(kelvin(c.T))}, the chips near ${num(`${Math.round(c.chipC)} °C`)}.</p>`,
+  '1': c => `<p>The last gap closes in ${num(c.year)}. From Earth the sky within ${num('76°')} of the Sun is black: no glow, no stars, no planets. Earth's own sunlight still comes through its window, a hole ${num('20,000 km')} across that follows it round its orbit, ${num('5×10⁻⁹')} of the Sun's output. All the rest is caught.</p><p>Inside it is daylight in every direction. From far away the Sun has gone, and in its place, in the infrared, is a ball ${num('1.9 AU')} across glowing at ${num(kelvin(c.T))}, with one cold patch: the mirror sails in front of Earth. The swarm computes ${num(`${sci(c.a.flops, 2)} FLOP/s`)}, and its sails are rebuilt in place every few centuries.</p>`,
+};
+
+function renderStages() {
+  for (const el of document.querySelectorAll('[data-y]')) el.textContent = String(Math.round(state.params.seedYear + stageYear(Number(el.dataset.y))));
+  for (const key of Object.keys(STAGE_TEXT)) {
+    const f = Number(key), c = stageCtx(f);
+    const when = document.querySelector(`.stage-when[data-f="${key}"]`);
+    if (when) when.innerHTML = `${c.year} · <span class="share">${SHARE[key]}</span>`;
+    const facts = [
+      ['Sails flying', f > 0 ? sci(c.a.nSails, 1) : '0'],
+      ['Computing', f > 0 ? `${sci(c.a.flops, 1)} FLOP/s` : '—'],
+      ['Mercury dug out', f > 0 ? pct(c.a.mercuryRemoved, c.a.mercuryRemoved < 0.01 ? 3 : 0) : '—'],
+      ['Night glow, Sun’s side', f >= 1 ? 'none: black' : f > 0 ? `${cd(c.glow)} cd/m²` : 'dark sky, 0.0002 cd/m²'],
+      ['Extra heat on Earth', f > 0 ? `${c.fc.gross < 0.01 ? sci(c.fc.gross, 1) : c.fc.gross.toFixed(2)} W/m²` : '—'],
+      ['Earth’s sunlight', f > 0 && c.fc.sunlightCut > 0.00005 ? `−${pct(c.fc.sunlightCut, 2)}` : 'unchanged'],
+      ['Film temperature', f > 0 ? kelvin(c.T) : '—'],
+      ['Starlight from behind', f > 0 ? (c.starsBehind > 0.995 ? 'all of it' : c.starsBehind < 1e-6 ? 'none' : pct(c.starsBehind, 0)) : 'all of it'],
+    ];
+    const fe = $(`facts-${key}`);
+    if (fe) fe.innerHTML = facts.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+    const pe = $(`prose-${key}`);
+    if (pe) pe.innerHTML = STAGE_TEXT[key](c);
+  }
+  const pr = $('progression-prose');
+  if (pr) pr.innerHTML = `<p>The sails go up evenly all round the Sun, so at every stage the swarm is a complete sphere, just a thin one. What it catches is its coverage, the share of the Sun's light that hits a sail; the rest passes through the gaps. The stages below are the moments when that share passes a millionth, a ten-thousandth, a hundredth, a half, ninety-nine hundredths, and finally all of it.</p>
+    <p>From Earth, the sphere is seen from just outside. Looking toward the Sun's side of the sky you look through the near side, which shows you the sails' dark backs, to the far side, which shows you their sunlit fronts. So the night sky first brightens, then darkens: its glow goes as f (1 − f), coverage times gaps, and is brightest at half. Starlight from behind has to pass both sides and dims as (1 − f)². Earth's own sunlight never dims, because the sails on the line between the Sun and Earth turn edge-on as they cross it.</p>`;
 }
 
 function renderSummary() {
@@ -333,7 +343,7 @@ function renderSummary() {
   const closed = p.earthPlacement === 'closed';
   const Tc = h.closedFilmT(p, E.cap);
   const where = {
-    closed: `All the way round the Sun at ${num('0.95 AU')}, just inside Earth's orbit, in nested bands that leave no gap. Between the Sun and Earth, ${num('23°')} round the line joining them, the enclosure is made of cold mirrors instead of compute sails, ${num('0.98 AU')} out and keeping pace with Earth: they are the only part of it Earth can see, so they must not glow, and they send their sunlight back into the swarm. Nothing gets out except through windows that open where mirrors turn edge-on. Earth's lets out ${num('5 billionths')} of the Sun's light.`,
+    closed: `A sphere round the Sun at ${num('0.95 AU')}, just inside Earth's orbit, the same in every direction, built up evenly from the first sail to the last. The part Earth can see, ${num('23°')} round the line from the Sun to Earth, is flown by mirror sails with cold backs instead of compute sails: they hand their sunlight on to the rest, so that Earth never sees a hot sail. Nothing gets out except through windows, where sails on a line of sight turn edge-on. Earth's lets out ${num('5 billionths')} of the Sun's light.`,
     uniform: `All round the Sun at ${num('0.95 AU')}, just inside Earth's orbit. Every sail's front is dark in the infrared, so the side Earth sees hardly glows. No sail flies within ${num('23°')} of the line from the Sun to Earth, where it would show Earth its hot back or cast a shadow.`,
     farside: `On Earth's own orbit, on the far side of the Sun, the part of the orbit farthest from Earth. Every sail's front is dark in the infrared.`,
     cone: `Spread evenly just inside Earth's orbit, empty round the line from the Sun to Earth, with ordinary glass fronts.`,
@@ -352,7 +362,7 @@ function renderSummary() {
       : `Rock from Mercury, dug up, thrown into orbit and turned into film and chips there. This swarm uses ${E.binding === 'rock' ? num('all') : num(pct(rock, 0))} of Mercury's rock. The planet's iron core is left: the swarm needs silicon, and the core has little.`],
     ['Where it flies', where],
     ['What it does to Earth', closed
-      ? `Nothing you would notice by day. Earth sees only the cold back of the mirror cap, which sends it ${num(`${fc.gross.toFixed(2)} W/m²`)}, ${pct(co2, 0)} of a CO₂ doubling, and its sunlight arrives in full through the window. Narrow the window and all of Earth dims; tilt the mirrors around it and Earth brightens. Lasers powered by the swarm can light or warm any region, down to a single field, and heat sea or air to make rain where it is wanted.`
+      ? `Nothing you would notice by day. Once the sphere is closed Earth sees only the mirror sails' cold backs, which send it ${num(`${fc.gross.toFixed(2)} W/m²`)}, ${pct(co2, 0)} of a CO₂ doubling, and its sunlight arrives in full through the window. Narrow the window and all of Earth dims; tilt the mirrors around it and Earth brightens. Lasers powered by the swarm can light or warm any region, down to a single field, and heat sea or air to make rain where it is wanted.`
       : fc.shade > 0
       ? `Its heat would warm Earth like ${num(co2 >= 1.5 ? `${Math.round(co2)} doublings` : 'a doubling')} of CO₂. A sunshade between Earth and the Sun cancels it by taking ${num(pct(fc.sunlightCut, 0))} of Earth's sunlight, so Earth keeps its temperature. The price is about ${num(pct(fc.rainCut, 0))} less rain worldwide and warmer poles, unless the shade is shaped.`
       : `It adds ${num(`${fc.net.toFixed(1)} W/m²`)} of heat to Earth${fc.net > 0 ? `, ${pct(fc.net / EARTH.co2DoublingForcing, 0)} of a CO₂ doubling` : ''}.`],
@@ -423,7 +433,7 @@ function renderSail() {
     <p>The photograph at the top was taken by a simulated camera a kilometre away. The film reflects about 0.2% of visible light, so it comes out nearly black, which is what a good solar cell should look like: light it reflects is power it didn't collect. The bright line is the Sun's reflection in the cover glass, broken into segments where each 1.6 m fold panel curls slightly beside its hinge.</p>`;
   sailAnatomy($('anatomy'), {
     side: f.side, diag: f.diag, pitchMm: f.pitch * 1e3, chipW: p.chipPower, mw: f.MW, chips: f.chips,
-    lanes: state.era !== '2026', thin: (p.filmThin ?? 1) < 0.8, closed: p.earthPlacement === 'closed',
+    lanes: true, thin: (p.filmThin ?? 1) < 0.8, closed: p.earthPlacement === 'closed',
   });
 }
 
@@ -434,7 +444,7 @@ function renderComputer() {
   // parameters a year; agents scale with FLOP/s, compute-optimal model size with its square root
   const agents = 1.3e7 * (f.flops / 5.7e21);
   const params = 1e13 * Math.sqrt(f.flops / 5.7e21);
-  const optical = state.era !== '2026';
+  const optical = true;
   $('computer-prose').innerHTML = `
     <p>The chips are spread through the film because a thin sheet can't carry heat sideways. Each chip uses only ${num(`${p.chipPower} W`)}, so its heat doesn't have to go anywhere: the film right around it radiates it into space. Thermally, the computing is almost free. The film has to get rid of all the sunlight it absorbs whether the chips are there or not, and the chips' share simply passes through them on the way out.</p>
     <details class="deep"><summary>What it would cost to gather the heat in one place</summary><p>The metal you would need to spread a chip's heat sideways grows with the square of its power: ${num('0.09 g/W')} at 0.1 W per chip, ${num('9.4 g/W')} at 10 W. The film sheds about ${num(`${Math.round(p.alpha * f.S)} W/m²`)} in all, and ${num(`${Math.round(f.s.sail.chipWm2 * f.S / f.s.sail.S)} W/m²`)} of that happens to pass through the chips first.</p></details>
@@ -628,15 +638,14 @@ function renderBuild() {
   else if (g.tRockOut != null) markers.push({ t: g.tRockOut, f: fForMass(state.table, g.builtAtYear(g.tRockOut)), label: 'rock exhausted' });
   state.chart = buildChart($('build-chart'), {
     main: state.curve,
-    others: ['2026', 'low', 'mid', 'high'].filter(e => e !== state.era).map(e => ({ pts: state.curves[e] })),
+    others: [],
     markers, xOf, tOf, seedYear: p.seedYear, span: SPAN,
     limit: { f: E.cap, label: `${limitOf(p, E)}: ${pct(E.cap, E.cap < 0.1 ? 1 : 0)}` },
     cursor: { t: state.t, f: a.f },
     describe: (t, f) => `<b>${Math.round(p.seedYear + t)}</b><br>${pct(f, 3)} of sunlight captured`,
     onPick: t => { state.t = t; renderYear(); },
   });
-  const label = h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions';
-  $('build-legend').innerHTML = `<span><i style="background:var(--sun-mark)"></i>${label}</span><span><i style="background:var(--ink-3)"></i>the other hardware presets</span><span><i style="background:var(--earth)"></i>the finished swarm</span>`;
+  $('build-legend').innerHTML = `<span><i style="background:var(--sun-mark)"></i>share of the Sun's light caught</span><span><i style="background:var(--earth)"></i>the Sun enclosed</span>`;
   updateYear(a);
 }
 
@@ -712,7 +721,7 @@ function renderEarth() {
 
   const sCap = h.swarmAt(p, E.cap);
   $('orbit-caption').innerHTML = p.earthPlacement === 'closed'
-    ? `<b>Where the sails fly, to scale,</b> seen from above, in a frame that turns with Earth so Earth stays put. In the plane of Earth's orbit the swarm is a closed ring just inside it; above and below that plane it wraps the Sun completely. Between the Sun and Earth the sails give way to a cap of cold mirrors, with a window for Earth's sunlight.`
+    ? `<b>Where the sails fly, to scale,</b> seen from above, in a frame that turns with Earth so Earth stays put. The swarm is a sphere just inside Earth's orbit, the same in every direction; here it is cut through the plane of Earth's orbit. The part Earth can see, round the line from the Sun to Earth, is flown by mirror sails with cold backs instead of compute sails, and catches the light all the same. The only opening is a window for Earth's sunlight, drawn here far larger than it is: ${num('20,000 km')} across, ${num('5×10⁻⁹')} of the sphere.`
     : `<b>Where the sails fly, to scale,</b> seen from above, in a frame that turns with Earth so Earth stays put. In the plane of Earth's orbit the swarm is a ring just inside it, open toward Earth${uniform ? ' and behind the Sun; above and below that plane it wraps the Sun in the same way' : ''}. A small sunshade sits at L1, between Earth and the Sun.`;
   orbitMap($('orbit-map'), p.earthPlacement === 'closed'
     ? { mode: 'closed', r: F.closedR, cone: 23, capR: F.capR, label: `the swarm: ${pct(E.cap, 0)} of the Sun's light` }
@@ -724,8 +733,11 @@ function renderEarth() {
   let kink = null;
   for (const r of state.table) if (h.swarmAt({ ...p, earthPlacement: 'shell' }, r.f).rSail > 1) { kink = r.f; break; }
   const name = { closed: 'the closed swarm, behind its mirror cap', uniform: 'the near-uniform swarm with dark fronts', farside: 'sails only beyond the Sun, dark fronts', cone: 'even with a gap, glass fronts', shell: 'the same even shell' }[p.earthPlacement];
+  // the symmetric sphere: identical compute sails everywhere would show Earth their 419 K backs over
+  // the part of the sphere it can see (0.344 of a Lambertian back's exitance, averaged over Earth)
+  const identical = f => f * p.epsBack * PHYS.SIGMA * h.closedFilmT(p, f) ** 4 * 0.344;
   earthChart($('earth-chart'), {
-    pts: state.table.map(r => [r.f, r.forcing]),
+    pts: state.table.map(r => [r.f, p.earthPlacement === 'closed' ? identical(r.f) : r.forcing]),
     pts2: state.table.map(r => [r.f, h.earthForcing(p, r.f).gross]),
     refs: [
       { v: EARTH.co2DoublingForcing, label: `${EARTH.co2DoublingForcing} W/m², doubling CO₂` },
@@ -733,7 +745,9 @@ function renderEarth() {
     ],
     marks: [{ f: E.cap, label: `finished swarm, ${pct(E.cap, E.cap < 0.1 ? 1 : 0)}`, color: 'var(--ink)', top: true, left: true }],
   });
-  $('earth-caption').innerHTML = `<b>Heat the swarm adds to Earth, against the share of the Sun's light it catches, before the sunshade.</b> Solid: sails spread evenly inside Earth's orbit with glass fronts, their infrared minus the sunlight they block.${kink ? ` The kink near ${pct(kink, 0)} is where so dense a shell has to retreat outside Earth's orbit to stay cool.` : ''} Dashed: ${name}. ${p.earthPlacement === 'closed' ? 'Narrowing the window by a hair' : 'The shade'} takes away whatever is above zero.`;
+  $('earth-caption').innerHTML = p.earthPlacement === 'closed'
+    ? `<b>Heat the sphere adds to Earth as it grows, before the window is narrowed to cancel it.</b> Solid: if every sail were a compute sail, Earth would see the hot backs of those between it and the Sun. Dashed: this sphere, with mirror sails in that part and fronts kept dark in the infrared while it is open. It peaks at half closed, when Earth sees the most of the far side through the gaps, and settles at the mirror sails' ${num('0.45 W/m²')}.`
+    : `<b>Heat the swarm adds to Earth, against the share of the Sun's light it catches, before the sunshade.</b> Solid: sails spread evenly inside Earth's orbit with glass fronts, their infrared minus the sunlight they block.${kink ? ` The kink near ${pct(kink, 0)} is where so dense a shell has to retreat outside Earth's orbit to stay cool.` : ''} Dashed: ${name}. ${p.earthPlacement === 'closed' ? 'Narrowing the window by a hair' : 'The shade'} takes away whatever is above zero.`;
 }
 
 function renderDesign() {
@@ -779,8 +793,8 @@ function renderStar() {
 
 function renderFuture() {
   const p26 = h.eraParams('2026');
-  const right = state.era === '2026' ? h.eraParams('mid') : state.params;
-  const rightLabel = state.era === '2026' ? h.ERAS.mid.label : (h.ERAS[state.era] ? h.ERAS[state.era].label : 'Your assumptions');
+  const right = state.params;
+  const rightLabel = state.era === 'custom' ? 'Your assumptions' : 'The swarm’s hardware';
   // the hardware itself, on its thermal orbit (the swarm's layout then adds its own costs)
   const a = h.swarmAt({ ...p26, earthPlacement: 'shell' }, 0.01), b = h.swarmAt({ ...right, earthPlacement: 'shell' }, 0.01);
   const f1 = x => `${(x * 100).toFixed(1)}%`;
@@ -833,8 +847,7 @@ const SOURCES = [
 ];
 
 function renderAll() {
-  renderWhen(); renderFigures(); renderSummary(); renderChoose(); renderSail(); renderComputer(); renderWhy(); renderMercury(); renderBuild(); renderEarth(); renderDesign(); renderStar(); renderFuture();
-  for (const b of document.querySelectorAll('.era button')) b.setAttribute('aria-pressed', String(b.dataset.era === state.era));
+  renderWhen(); renderFigures(); renderSummary(); renderSail(); renderComputer(); renderWhy(); renderMercury(); renderBuild(); renderStages(); renderEarth(); renderDesign(); renderStar(); renderFuture();
   renderDash(h.atYear(state.params, state.d, state.t));
 }
 function renderYear() {
@@ -845,18 +858,17 @@ function renderYear() {
 // --------------------------------------------------------------------------------- wiring
 
 let paramsUI;
-function setEra(era) {
-  state.era = era;
-  state.baseEra = era;
-  state.params = { ...h.eraParams(era) };
+function resetParams() {
+  state.params = { ...h.eraParams('mid') };
   paramsUI.rebind(state.params);
   recompute();
 }
 
 function init() {
   $('sources-list').innerHTML = SOURCES.map(([what, where]) => `<li>${what}: <code>${where}</code></li>`).join('');
-  paramsUI = renderParams($('params'), h.PARAMS, state.params, () => { state.era = 'custom'; recompute(); });
-  for (const b of document.querySelectorAll('.era button')) b.addEventListener('click', () => setEra(b.dataset.era));
+  // the sphere is the design: the layouts it replaced stay in the model, not in the drawer
+  const HIDE = new Set(['earthPlacement', 'farsideLat', 'spillInside', 'placement', 'rManual', 'shadeLimit', 'forcingLimit']);
+  paramsUI = renderParams($('params'), h.PARAMS.filter(q => !HIDE.has(q.key)), state.params, () => { state.era = 'custom'; recompute(); });
   $('year').addEventListener('input', e => { state.t = tOf(Number(e.target.value) / 1000); renderYear(); });
   let playing = false, loop = 0;
   $('play').addEventListener('click', () => {
@@ -876,11 +888,11 @@ function init() {
     };
     requestAnimationFrame(step);
   });
-  $('reset-params').addEventListener('click', () => setEra(state.baseEra));
+  $('reset-params').addEventListener('click', resetParams);
   wireExplainers();
   recompute();
   watchChapters();
-  window.__ledger = { state, recompute, setEra, setYear: t => { state.t = t; renderYear(); } };
+  window.__ledger = { state, recompute, setYear: t => { state.t = t; renderYear(); } };
 }
 
 init();

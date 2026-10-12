@@ -67,8 +67,8 @@ def build_far_sky(sc, cam, fwd, w, h, a):
     f, lat, rho, rho_film, dr, psi, lens, dmax, sky_width, seed. Returns the glow map."""
     fwd = np.asarray(fwd, dtype=float)
     R = getattr(a, 'r_layer', 1.0)                            # layer radius, AU
-    if getattr(a, 'mode', 'farside') == 'uniform':
-        FS.set_geometry('uniform', R, getattr(a, 'cone', 23.07))
+    if getattr(a, 'mode', 'farside') in ('uniform', 'sphere'):
+        FS.set_geometry(a.mode, R, getattr(a, 'cone', 23.07))
         tau = a.tau
     else:
         FS.set_geometry('farside')
@@ -108,7 +108,9 @@ def build_far_sky(sc, cam, fwd, w, h, a):
     t_out = gf['half_angle_hinge_edges_deg']
     edge_frac = gf['hinge_edge_area_fraction']
     F0_film = dsp['sail']['appearance_front']['glint']['F0']
-    R_glint = F0_film + MESH_R0
+    # the near-uniform swarm's fronts carry an aluminium mesh that mirrors 4 %; the sphere's fronts
+    # switch their infrared emittance instead and keep only the glass's own glint
+    R_glint = F0_film + (0.0 if getattr(a, 'mode', '') == 'sphere' else MESH_R0)
     L_sun = S / (math.pi * TH_SUN ** 2)                        # W/m^2/sr of the solar disc at 1 AU
     ang = np.degrees(np.arccos(np.clip(dirs[:, 0], -1, 1)))    # from the antisolar point (+X)
     gi = glint_intensity(ang, t_out, edge_frac, th_sun=TH_SUN)
@@ -245,6 +247,8 @@ def build_far_sky(sc, cam, fwd, w, h, a):
     S_E = FS.S0
     lam = (math.sin(alpha) + (math.pi - alpha) * math.cos(alpha)) / math.pi
     trans = math.exp(-tau / 2)                                 # through the inner half of the layer
+    if getattr(a, 'mode', '') == 'sphere':
+        trans *= math.exp(-tau)                                # and the mirror sails in front of Earth
     E_earth = S_E * 0.434 * (6371.0 / (dist_E * AU_KM)) ** 2 * lam * trans
     E_moon = S_E * 0.12 * (1737.4 / (dist_E * AU_KM)) ** 2 * lam * 0.75 * trans
     off = np.cross(dE, [0.0, 0.0, 1.0]); off /= np.linalg.norm(off)
@@ -351,7 +355,7 @@ def main(argv):
     ap.add_argument('--dmax', type=float, default=3000.0, help='km')
     ap.add_argument('--sky-width', type=int, default=4096)
     ap.add_argument('--seed', type=int, default=5)
-    ap.add_argument('--mode', choices=['farside', 'uniform'], default='farside')
+    ap.add_argument('--mode', choices=['farside', 'uniform', 'sphere'], default='farside')
     ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the layer')
     ap.add_argument('--r-layer', type=float, default=1.0, help='layer radius, AU (uniform: 0.95)')
     ap.add_argument('--cone', type=float, default=23.07, help='uniform: empty cone round the Sun-Earth line, deg')

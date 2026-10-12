@@ -264,11 +264,11 @@ test('closed: the default encloses the Sun at 0.95 AU, with a mirror cap 23° ro
   assert.ok(cap / s.mass < 0.01, 'cap share');
 });
 
-test('closed: all the heat leaves through the backs, so the film runs ~419 K (vs 332 K when sparse)', () => {
+test('closed: all the heat leaves through the backs, so the film runs ~419 K (382 K when sparse, fronts kept infrared-dark)', () => {
   const S = 1361 / 0.95 ** 2;
   near(h.closedFilmT(pC, 1), (S / ((1 - h.FIXED.capFrac) * pC.epsBack * 5.670374e-8)) ** 0.25, 0.5, 'closed');
   near(h.closedFilmT(pC, 1), 419, 1, 'closed');
-  near(h.closedFilmT(pC, 0.001), 332, 1, 'sparse');
+  near(h.closedFilmT(pC, 0.001), 382, 1, 'sparse');
   // catches 18 % more sunlight than the near-uniform swarm but computes ~5 % less
   const uRoom = h.swarmAt({ ...pC, earthPlacement: 'uniform' }, h.FIXED.uniformRoom);
   near(h.swarmAt(pC, 1).flops / uRoom.flops, 0.95, 0.02, 'closed vs near-uniform');
@@ -307,4 +307,17 @@ test('centuries of life: a 300-year rebuild losing 1 % needs ~1.2×10¹⁸ kg a 
   assert.ok(coreLeft / loss > 15000, `${coreLeft / loss} years`);
   // with today's life the core's silicon goes on replacements and the swarm never closes
   assert.ok(h.compute({ ...pC, coverage: 1, ...today, rockSource: 'whole' }).reachableCoverage < 0.95);
+});
+
+test('symmetric build: the night glow and Earth’s extra heat both go as f (1 − f), peaking at half closed', () => {
+  // glow from the far side's sunlit fronts through the near side's gaps: the same at 1 % and 99 %
+  near(h.skyLux(pC, 0.01), h.skyLux(pC, 0.99 * h.FIXED.closedRoom), 0.02 * h.skyLux(pC, 0.01), 'glow at 1 % and 99 %');
+  assert.ok(h.skyLux(pC, 0.5) > h.skyLux(pC, 0.1) && h.skyLux(pC, 0.5) > h.skyLux(pC, 0.9), 'brightest half closed');
+  assert.equal(h.skyLux(pC, h.FIXED.closedRoom), 0, 'black once closed');
+  // the far side's infrared-dark fronts through the gaps: ~8.6 W/m² at half closed, cancelled by
+  // narrowing Earth's window ~3.6 %
+  const half = h.earthForcing(pC, 0.5);
+  near(half.gross, 8.55, 0.3, 'heat at half closed');
+  near(half.sunlightCut, 0.036, 0.003, 'window narrowed');
+  near(h.earthForcing(pC, h.FIXED.closedRoom).gross, h.FIXED.capIR, 1e-9, 'closed: only the cap');
 });

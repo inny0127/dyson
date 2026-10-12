@@ -208,8 +208,10 @@ export function orbitMap(el, { mode, r = 0.95, cone = 23, l3 = 15, capR = 0.98, 
     // the closed swarm: compute sails all round at r, except a cap round the Sun-Earth line held by
     // co-orbiting mirrors at capR, with a window on the line itself
     const arc = (rr, a0, a1) => { const [x0, y0] = P(rr, a0), [x1, y1] = P(rr, a1); return `M${x0},${y0} A${rr * s},${rr * s} 0 ${a1 - a0 > 180 ? 1 : 0} 0 ${x1},${y1}`; };
+    // one continuous sphere: compute sails everywhere, mirror sails in the part Earth can see; the
+    // window is a pinhole (drawn enlarged)
     o += `<path d="${arc(r, cone, 360 - cone)}" style="fill:none;stroke:var(--swarm);stroke-width:6;stroke-opacity:0.85"/>`;
-    for (const [a0, a1] of [[-cone, -1.2], [1.2, cone]]) o += `<path d="${arc(capR, a0, a1)}" style="fill:none;stroke:var(--ink-2);stroke-width:2.5"/>`;
+    for (const [a0, a1] of [[-cone, -0.9], [0.9, cone]]) o += `<path d="${arc(r, a0, a1)}" style="fill:none;stroke:var(--ink-2);stroke-width:6"/>`;
     const [ex0, ey0] = P(1.0, 0);
     o += `<line x1="${cx + 10}" y1="${cy}" x2="${ex0 - 8}" y2="${ey0}" style="stroke:var(--sun-mark);stroke-width:1.5"/>`;
     // any other window is sails turning edge-on along the line: Mars, if it is given one
@@ -230,13 +232,14 @@ export function orbitMap(el, { mode, r = 0.95, cone = 23, l3 = 15, capR = 0.98, 
   const [ex, ey] = P(1, 0);
   o += `<circle cx="${ex}" cy="${ey}" r="6" style="fill:var(--earth);stroke:var(--paper);stroke-width:2"/><circle cx="${ex - 10}" cy="${ey}" r="2.5" style="fill:var(--ink)"/>`;
   o += txt(ex + 14, ey + 4, 'Earth', LB);
-  o += txt(ex + 14, ey + 22, mode === 'closed' ? 'its window in the mirror cap, 3 million km sunward' : 'sunshade at L1, 1.6 million km sunward');
+  o += txt(ex + 14, ey + 22, mode === 'closed' ? 'its window: sails on the line turn edge-on' : 'sunshade at L1, 1.6 million km sunward');
   o += txt(cx, cy + 26, 'Sun', LB, 'middle');
   { const [x, y] = P(0.723, 60); o += txt(x - 6, y + 16, 'Venus', LB2, 'end'); }
   { const [x, y] = P(0.387, 55); o += txt(x - 6, y + 16, 'Mercury', LB2, 'end'); }
   if (mode === 'closed') {
     { const [x, y] = P(r, 128); o += txt(x - 10, y - 10, label, LB, 'end'); }
-    { const [x, y] = P(capR, -cone); o += txt(x + 12, y + 18, `mirror cap at ${capR} AU, ${cone}° round the Sun–Earth line`, LB2); }
+    { const [x, y] = P(r, -cone); o += txt(x + 14, y + 20, 'mirror sails: the part of the sphere Earth can see', LB2); }
+    { const [x, y] = P(r, 0); o += txt(x - 10, y + 22, 'window (enlarged)', LB2, 'end'); }
     { const [x, y] = P(0.5, 0); o += txt(x, y - 8, 'sunlight for Earth', LB2, 'middle'); }
     { const [x, y] = P(1.524, 205); o += txt(x + 10, y + 18, 'Mars, if it is given a window', LB2); }
   } else if (mode === 'uniform') {

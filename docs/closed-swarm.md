@@ -12,7 +12,7 @@ It is the page's default (`earthPlacement: 'closed'`).
   - They fly in nested bands spread over 0.92–0.98 AU, so gaps in one band are covered by the next.
   - Every sail faces the Sun with an ordinary glass front. No infrared-dark mesh is needed: the
     fronts radiate into the cavity, and other fronts absorb it.
-- **A mirror cap fills the gap,** at 0.98 AU, keeping pace with Earth.
+- **Mirror sails fill the part Earth can see,** at 0.98 AU, keeping pace with Earth (the "cap").
   - Its areal mass is fixed by its orbit. To go round in a year at 0.98 AU, sunlight must carry
     β = 1 − 0.98³ = 0.059 of its weight: 26 g/m² for a mirror. Each element flies its own orbit,
     inclined so that it drifts north and south through the cap once a year, and the elements are
@@ -26,6 +26,45 @@ It is the page's default (`earthPlacement: 'closed'`).
   as the elements in its path turn and turn back. Any other window is made the same way.
 - **The mass:** 3.61×10²² kg finished, against 3.38×10²² kg from Mercury's crust and mantle. The
   last 7 % comes from the core (below).
+
+## Built symmetric, stage by stage
+
+The sphere is built up evenly: at every stage it is the same in every direction, only fuller. Its
+coverage f is the share of the Sun's light that hits a sail.
+
+- **From Earth**, just outside the sphere, every line of sight within ~72° of the Sun crosses the
+  near side, which shows Earth its sails' backs, and then the far side, which shows their sunlit
+  fronts.
+  - The night glow is the far side's lit share seen through the near side's gaps:
+    **L = f (1 − f) ρ S / π**, with ρ = 0.004 (all hardware) and S at 0.95 AU. It peaks at
+    f = ½ (45 cd/m², ~24 lux on the ground at the end of twilight) and is the same at f and 1 − f.
+  - Starlight from behind the sphere dims as (1 − f)²; the zodiacal dust and the planets outside
+    it are lit by what escapes, 1 − f.
+  - Earth's own sunlight is untouched: sails on the line from the Sun to Earth turn edge-on as they
+    cross it, at every stage.
+- **Earth's heat:** the part of the sphere Earth can see (23° round the Sun–Earth line) is flown
+  by mirror sails with cold backs from the start, at the same coverage as everywhere else.
+  - Through their gaps Earth sees the far side's fronts. The fronts are kept dark in the infrared
+    (switchable emittance, ε 0.1, as on spacecraft radiators today) while the sphere is open.
+  - Heat on Earth: f · 0.45 + f (1 − f) · 0.1 σ T(f)⁴ · 0.226 W/m², where 0.226 = sin²(72°) / 4
+    is a wall filling the 72° disc, averaged over Earth.
+  - It peaks at **8.6 W/m² at half closed** (2173). Earth's window is narrowed 3.6 % to cancel it,
+    which costs ~6 % of the world's rain unless the swarm supplies it (below).
+  - With identical compute sails everywhere, Earth would see the hot backs between it and the Sun:
+    f · 0.9 σ T⁴ · 0.344, over 500 W/m² once closed.
+- **The cost of dark fronts:** a lone sail with a dark front radiates only from its back, at
+  382 K instead of 332 K. That costs about a third of the computing while the sphere is sparse;
+  once it is closed the fronts face each other and the difference vanishes.
+- **The stages** (central assumptions):
+
+| Coverage | Year | Night glow (cd/m²) | Heat on Earth (W/m²) | Window narrowed |
+|---|---|---|---|---|
+| 10⁻⁶ | 2116 | 0.0002 (the dark sky's own) | 0.00003 | — |
+| 10⁻⁴ | 2129 | 0.018 | 0.003 | — |
+| 1 % | 2141 | 1.8 | 0.28 | 0.12 % |
+| 50 % | 2173 | 45 | 8.6 | 3.6 % |
+| 99 % | 2213 | 1.8 | 0.83 | 0.35 % |
+| closed | 2216 | 0 | 0.45 | 0.19 % |
 
 ## How complete the enclosure is
 
