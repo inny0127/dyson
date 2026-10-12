@@ -351,6 +351,7 @@ def render(sc, w, h, steps, chunk=60000):
             'lights_patches': [(load_lin('earth_night_lights_mideast_1km.jpg', 'L'), 20.0, 65.0, 5.0, 50.0, 0.855),
                                (load_lin('earth_night_lights_gulf_500m.jpg', 'L'), 44.0, 58.0, 22.0, 38.0, 0.855)]}
     moon_mask = np.zeros(N, bool)
+    T_all, L_all = np.ones((N, 3)), np.zeros((N, 3))
     for a in range(0, N, chunk):
         d = D[a:a + chunk]
         tg0, tg1, hitg = Scene.sphere(sc.P, d, RG)
@@ -382,9 +383,44 @@ def render(sc, w, h, steps, chunk=60000):
             bg[hitm] = moon_radiance(sc, Xm, d[hitm], maps['moon'])
         moon_mask[a:a + chunk] = hitm
         out[a:a + chunk] = bg * T + L
+        T_all[a:a + chunk], L_all[a:a + chunk] = T, L
         print('chunk', a // chunk + 1, '/', (N + chunk - 1) // chunk, flush=True)
+    cover = moon_mask.astype(float)
+    # The Moon is a few pixels across and a crescent can be thinner than one, so one ray per pixel
+    # can miss its lit edge: its pixels are redone with 8 x 8 rays each.
+    to_m = sc.moon_c - sc.P
+    dm = np.linalg.norm(to_m)
+    near = np.nonzero(D @ (to_m / dm) > math.cos(math.asin(R_MOON / dm) + 3.0 / sc.fpx))[0]
+    if len(near):
+        ss = 8
+        off = (np.arange(ss) + 0.5) / ss - 0.5
+        ox, oy = (v.ravel() for v in np.meshgrid(off, off))
+        row, col = near // w, near % w
+        X = (col + 0.5 - w / 2)[:, None] + ox[None]
+        Y = (h / 2 - row - 0.5)[:, None] - oy[None]
+        Ds = sc.fwd[None, None] * sc.fpx + sc.right[None, None] * X[..., None] + sc.upv[None, None] * Y[..., None]
+        Ds /= np.linalg.norm(Ds, axis=-1, keepdims=True)
+        dc = D[near]
+        sky_bg = SM.glow_radiance(dc, sc.sun, sc.glow)[:, None] * sc.glow_rgb[None]
+        if not sc.closed:
+            zod = SM.zodiacal(dc, sc.sun, sc.pole)[:, None] * A.SUN_RGB[None] / (A.SUN_RGB @ A.LUMA)
+            if sc.glow['kind'] == 'sphere':
+                zod = zod * ((1 - sc.glow['f']) * SM.sphere_transmission(dc, sc.sun, sc.glow))[:, None]
+            sky_bg = sky_bg + zod
+        flat = Ds.reshape(-1, 3)
+        tm0, _, hm = Scene.sphere(sc.P - sc.moon_c, flat, R_MOON)
+        hm &= tm0 > 0
+        Lm = np.zeros((len(flat), 3))
+        if hm.any():
+            Lm[hm] = moon_radiance(sc, sc.P + flat[hm] * tm0[hm][:, None], flat[hm], maps['moon'])
+        hm, Lm = hm.reshape(len(near), ss * ss), Lm.reshape(len(near), ss * ss, 3)
+        c = hm.mean(1)
+        bgm = Lm.sum(1) / ss ** 2 + (1 - c)[:, None] * sky_bg
+        sky_px = ~Scene.sphere(sc.P, dc, RG)[2]
+        out[near[sky_px]] = (bgm * T_all[near] + L_all[near])[sky_px]
+        cover[near[sky_px]] = c[sky_px]
     img = out.reshape(h, w, 3)
-    keep = ~moon_mask.reshape(h, w, 1)                        # the Moon hides what lies behind it
+    keep = 1 - cover.reshape(h, w, 1)                         # the Moon hides what lies behind it
     img += milky(sc, D, h, w) * keep
     img += star_layer(sc, w, h, steps) * keep
     return img
