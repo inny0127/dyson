@@ -213,7 +213,7 @@ export function orbitMap(el, { mode, r = 0.95, cone = 23, l3 = 15, capR = 0.98, 
     const [ex0, ey0] = P(1.0, 0);
     o += `<line x1="${cx + 10}" y1="${cy}" x2="${ex0 - 8}" y2="${ey0}" style="stroke:var(--sun-mark);stroke-width:1.5"/>`;
     // any other window is sails turning edge-on along the line: Mars, if it is given one
-    const [mx, my] = P(1.524, 150);
+    const [mx, my] = P(1.524, 205);
     o += `<line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" style="stroke:var(--sun-mark);stroke-width:1.2;stroke-dasharray:4 4"/>`;
     o += `<circle cx="${mx}" cy="${my}" r="4.5" style="fill:var(--heat)"/>`;
   } else if (mode === 'uniform') {
@@ -238,7 +238,7 @@ export function orbitMap(el, { mode, r = 0.95, cone = 23, l3 = 15, capR = 0.98, 
     { const [x, y] = P(r, 128); o += txt(x - 10, y - 10, label, LB, 'end'); }
     { const [x, y] = P(capR, -cone); o += txt(x + 12, y + 18, `mirror cap at ${capR} AU, ${cone}° round the Sun–Earth line`, LB2); }
     { const [x, y] = P(0.5, 0); o += txt(x, y - 8, 'sunlight for Earth', LB2, 'middle'); }
-    { const [x, y] = P(1.524, 150); o += txt(x + 10, y - 8, 'Mars, if it is given a window', LB2); }
+    { const [x, y] = P(1.524, 205); o += txt(x + 10, y + 18, 'Mars, if it is given a window', LB2); }
   } else if (mode === 'uniform') {
     { const [x, y] = P(r, 128); o += txt(x - 10, y - 10, label, LB, 'end'); }
     { const [x, y] = P(1.02, 0); o += txt(x + 14, y + 40, `no sails within ${cone}° of the Sun–Earth line`, LB2); }
