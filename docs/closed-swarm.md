@@ -94,8 +94,15 @@ coverage f is the share of the Sun's light that hits a sail.
     an hour in Earth's 40,600 km-wide window, then turns back.
   - Mirrors with smaller inclinations cross more slowly; the few within 0.008° of the line stay
     edge-on.
-  - The window can take any size or shape at any moment. It follows Earth, and the Moon's window
+  - The window can change size or shape within minutes. It follows Earth, and the Moon's window
     crosses the cap once a month.
+- **How a mirror turns.** Sunlight pushes 9.4 µN/m² on a mirror at 0.98 AU (0.74 N on a 279 m
+  element of 2.0 t); tilting it tilts the push, which is how it changes orbit. Light alone turns it
+  slowly: reflectivity-switching strips on 5 % of its area give 1.3 N·m, a 90° turn in ~2 h that
+  stalls near edge-on, where the light no longer pushes. So each mirror carries a flywheel, ~50 kg,
+  10 m across (rim 275 m/s), run by a small solar cell: a 10-minute flip needs 6.9×10⁴ N·m·s and
+  229 N·m peak, and the wheel ends at its starting speed. Light pressure on the strips unloads any
+  drift. A compute sail (15 t) needs ~200 kg for the same flip. No propellant anywhere.
 - **Earth's orbit is not a circle.** It runs from 0.983 to 1.017 AU. The cap's mirrors share
   Earth's eccentricity, so the cap stays about 3 million km sunward of Earth all year.
 - **Windows elsewhere:** compute sails on the line to a target turn edge-on as they pass through it.
