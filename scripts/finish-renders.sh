@@ -21,6 +21,10 @@ python3 render/post.py "$RAW/dusk_U.png" "$OUT/earth-dusk-swarm.jpg" --fov 104 -
 python3 render/post.py "$RAW/night_tonight.png" "$OUT/earth-night-tonight.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
 python3 render/post.py "$RAW/night_U.png" "$OUT/earth-night-swarm.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
 
+# Jenny Lake with the Sun enclosed (earth_sky --glow closed), at tonight's night exposure
+dev "$RAW/night_C.exr" "$RAW/night_C.png" "$(exposure_of night_tonight)"
+python3 render/post.py "$RAW/night_C.png" "$OUT/earth-night-closed.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
+
 # Pod: visible photograph, and the false-colour thermal frame (no optical effects)
 python3 render/post.py "$RAW/pod_hero.png" "$OUT/pod-visible.jpg" --fov 84 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/pod_hero_lwir.png" "$OUT/pod-lwir.jpg" --fov 84 --noise 0 --ca 0 --glare 0 --width 2400 --quality 90
@@ -48,14 +52,14 @@ done
 python3 render/post.py "$RAW/leo_U.png" "$OUT/leo-swarm-wide.jpg" --fov 113 --noise 0.8 --width 2400 --quality 88
 python3 render/post.py "$RAW/leo_U_tele.png" "$OUT/leo-swarm-tele.jpg" --fov 12 --noise 0.8 --width 2400 --quality 88
 # Europe from 4,000 km in July, today and with the dry-summer belt moved north (render/med_earth.py
-# makes the textures; leo_view --day-map/--cloud-map), one exposure for both
-for x in europe_today europe_med; do dev "$RAW/$x.exr" "$RAW/$x.png" -7.1; done
+# makes the textures; leo_view --day-map/--cloud-map, --tau 0, full sunlight), one exposure for both
+for x in europe_today europe_med_c; do dev "$RAW/$x.exr" "$RAW/$x.png" -7.1; done
 python3 render/post.py "$RAW/europe_today.png" "$OUT/europe-today.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
-python3 render/post.py "$RAW/europe_med.png" "$OUT/europe-mediterranean.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/europe_med_c.png" "$OUT/europe-mediterranean.jpg" --fov 74 --noise 0.6 --width 2400 --quality 88
 # North America's Pacific coast, cloud-free, today and Mediterranean, one exposure
-for x in na_today na_med; do dev "$RAW/$x.exr" "$RAW/$x.png" -7.1; done
+for x in na_today na_med_c; do dev "$RAW/$x.exr" "$RAW/$x.png" -7.1; done
 python3 render/post.py "$RAW/na_today.png" "$OUT/pacific-today.jpg" --fov 54 --noise 0.6 --width 2400 --quality 88
-python3 render/post.py "$RAW/na_med.png" "$OUT/pacific-mediterranean.jpg" --fov 54 --noise 0.6 --width 2400 --quality 88
+python3 render/post.py "$RAW/na_med_c.png" "$OUT/pacific-mediterranean.jpg" --fov 54 --noise 0.6 --width 2400 --quality 88
 # Mercury at the heat wall (render/mercury.py writes an AgX PNG at the pristine globe's exposure)
 python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=88)" \
   "$RAW/mercury_heatwall.png" "$OUT/mercury-heatwall.jpg"

@@ -49,6 +49,22 @@ exposure never changes the physics.
 - **Result:** see the captions on the page; the ground illuminance each frame receives is in its
   render log.
 
+## Jenny Lake with the Sun enclosed (`earth_sky.py --glow closed`)
+
+- **Same place, moment and exposure as tonight's night frame** (22 August, 22:06 MDT, Sun 18.5° below
+  the horizon at azimuth 308°; exposure 13.87).
+- **The closed swarm (`sky_map.py`, kind `closed`, `docs/closed-swarm.md`):** Earth sees only the mirror
+  cap's back, which covers the sky within 75.6° of the Sun: the cap's edge at 0.98 AU and 23.07°
+  from the Sun–Earth line, seen from 1 AU.
+  - The back is at ~176 K and reflects nothing visible, so it is drawn as black: stars and Milky Way
+    are removed within 75.6° of the Sun, with a 1° soft edge for the mirrors' yearly drift.
+  - There is no swarm glow, the zodiacal light is gone everywhere (the dust outside the shell is
+    unlit), and there are no planets.
+  - Airglow, twilight and the atmosphere's scattering are as tonight: they happen in front of the cap.
+- **Not shown:** the dusk and low-orbit views of the near-uniform swarm below are kept for that
+  layout; the page shows only this frame for the closed swarm, because by day and at dusk nothing
+  changes.
+
 ## The swarm from low Earth orbit (`leo_view.py`)
 
 A numpy renderer: the scene is a sphere, its air and the sky, so it is ray-cast and integrated
@@ -134,7 +150,9 @@ directly rather than path-traced.
   - Land above ~1,500 m (from the GEBCO relief, tied to Mont Blanc and the Paris basin) keeps its
     colours. Summer cloud over the new belt and its seas is cut by 75 %, over the drier edge by 40 %.
   - About 1.8 million km² changes to the Mediterranean palette and 1.2 million km² to steppe.
-- **Sunlight:** the L1 shade takes 19.6 %; both frames share one exposure, so the second is darker.
+- **Sunlight:** full in both frames (the closed swarm's window lets Earth's sunlight through), one
+  exposure for both. An earlier version rendered the second frame under the near-uniform swarm's L1
+  shade, 19.6 % darker.
 - **Not a climate-model result:** no model has run shading aimed this way; the picture shows one
   plausible outcome of the mechanism.
 
@@ -148,7 +166,7 @@ directly rather than path-traced.
   Cascades and the Sierra) takes the July colour distribution of the strip 5° further south, from
   32 to 58° N, blended between bands. Land above ~1,500 m keeps its colours. About 0.7 million km²
   changes.
-- **Sunlight:** the L1 shade takes 19.6 %; one exposure for both frames.
+- **Sunlight:** full in both frames; one exposure for both.
 
 ## Mercury today and at the heat wall (`mercury.py`)
 

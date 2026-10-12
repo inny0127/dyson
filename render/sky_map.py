@@ -15,9 +15,11 @@ Components (all in the repo's radiometric units, W/(m^2 sr); 93 lm/W converts to
   docs/data/earth_safe.json.
 - Natural night: the Milky Way (assets/milkyway_8k.jpg, calibrated), airglow (van Rhijn), zodiacal
   light (Leinert et al. 1998, simplified), catalogue stars V <= 8 as points (returned separately).
+- Closed swarm (kind closed): no glow, no zodiacal light, no planets; stars and Milky Way hidden
+  within cap_deg of the Sun by the mirror cap's cold back.
 
 Usage (system python): python3 render/sky_map.py spec.json out_prefix
-spec keys: lat, lst_deg, sun_alt, sun_az, width, h_cam, glow {kind: shell|farside, f, rho, r_au},
+spec keys: lat, lst_deg, sun_alt, sun_az, width, h_cam, glow {kind: shell|farside|uniform|mix|closed, ...},
            moon {alt, az, lux} (optional)
 """
 import json
@@ -289,6 +291,12 @@ def build(spec, out_prefix):
     k_sun = E_ref / E_model * spec.get('sun_scale', 1.0) if E_model > 0 else 0.0     # sun_scale: an L1 shade
     sky0 = sky_sun * k_sun
     g = spec.get('glow')
+    # closed: the Sun enclosed (docs/closed-swarm.md). Nothing glows; the mirror cap's cold back hides
+    # the sky within cap_deg of the Sun (75.6 deg from Earth), its edge softened by the cap mirrors'
+    # yearly north-south drift. The zodiacal dust and the planets are unlit.
+    closed = bool(g) and g['kind'] == 'closed'
+    if closed:
+        g, cap_cos = None, math.cos(math.radians(spec['glow'].get('cap_deg', 75.6)))
     glow_sources = []
     if g:
         if g['kind'] in ('farside', 'mix'):
@@ -315,8 +323,12 @@ def build(spec, out_prefix):
     direct = np.zeros((W * H, 3))
     if g:
         direct += glow_radiance(dirs, sun, g)[:, None] * GLOW_COLOUR
-    direct += zodiacal(dirs, sun, pole)[:, None] * A.SUN_RGB / (A.SUN_RGB @ A.LUMA)
-    direct += milky_way(dirs, M)
+    if closed:
+        open_sky = np.clip((cap_cos - dirs @ sun) / 0.01 + 0.5, 0, 1)            # ~1 deg soft edge
+        direct += milky_way(dirs, M) * open_sky[:, None]
+    else:
+        direct += zodiacal(dirs, sun, pole)[:, None] * A.SUN_RGB / (A.SUN_RGB @ A.LUMA)
+        direct += milky_way(dirs, M)
     # airglow is emitted at 90 km: only the lower atmosphere's extinction applies (~ T)
     direct += airglow(dirs)[:, None] * AIRGLOW_COLOUR
     total = sky.reshape(-1, 3) + direct * T
@@ -325,7 +337,10 @@ def build(spec, out_prefix):
     np.save(out_prefix + '_inscatter.npy', inscatter_source(total, W, H).astype(np.float32))
     np.save(out_prefix + '_trans.npy', T.reshape(H, W, 3)[::4, ::4].astype(np.float32))
     sd, sE, sT = stars(M)
-    if 'jd' in spec:
+    if closed:
+        keep = sd @ sun < cap_cos
+        sd, sE, sT = sd[keep], sE[keep], sT[keep]
+    elif 'jd' in spec:
         pd_, pE, pT = planets(M, spec['jd'])
         sd, sE, sT = np.concatenate([sd, pd_]), np.concatenate([sE, pE]), np.concatenate([sT, pT])
     # star extinction from the transmittance map (luminance channel)
@@ -335,6 +350,7 @@ def build(spec, out_prefix):
     info = {
         'k_sun': k_sun, 'twilight_lux_model': E_model, 'twilight_lux_ref': E_ref,
         'glow_peak_W_m2_sr': float(glow_radiance(sun[None, :], sun, g)[0]) if g and g['kind'] == 'shell' else None,
+        'closed_cap_deg': spec['glow'].get('cap_deg', 75.6) if closed else None,
         'glow_colour': GLOW_COLOUR.tolist(),
         'ground_lux_total': float(A.horizontal_illuminance(total, W, H) @ A.LUMA * LM),
         'ground_lux_sun_sky': E_ref,

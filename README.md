@@ -32,8 +32,8 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   spread through it and the film is its own radiator. That beats concentrating chips in
   radiator-cooled modules by 3–5× per kilogram, in every hardware era
   (`docs/architecture.md`). A few percent of chip power still goes to shielded pods.
-- **Today's hardware never flies.** Industry needs most of a century to reach Mercury's heat wall, and
-  sails are refreshed every 10–20 years, so almost everything is built with post-2095 hardware.
+- **Today's hardware never flies.** Industry needs most of a century to reach Mercury's heat wall
+  and another seventy years to close the Sun, so almost everything is built with post-2095 hardware.
   HBM is gone, chiplets carry non-volatile memory, optical lanes make each sail one machine, and
   silicon stays the only solar cell Mercury can supply. Energy per operation falls ~50×
   (`docs/future-tech.md`).
@@ -42,20 +42,29 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   almost nothing happens on the surface: rock is dug and thrown unrefined into low orbit at 3 km/s,
   and catapults, refineries and fabs work in orbit. With superconducting launchers at 99 % that
   leaves ~0.1 MJ/kg on the planet (0.3 at 95 %, ~2 for a full surface launch).
-- **Mercury's silicon sets the size.** The default swarm is everything Mercury can build: a
-  near-uniform swarm at 0.95 AU with a film thinned to half the design spec, finished around 2198 at
-  **83 % of the Sun's light** and 1.9×10⁴⁰ FLOP/s, just short of the 85 % its layout has room for.
-  With the design-spec film the rock runs out at ~41 %. The iron core is left: the film needs
-  silicon, and the core has little (`docs/full-swarm.md`).
-- **Earth keeps its temperature behind a shade.** Every sail carries an infrared-dark front and none
-  flies within 23° of the Sun–Earth line, so Earth sees no hot backs: 0.56 W/m² per 1 % of the
-  Sun's light, 47 W/m² for the finished swarm. A shade near L1 cancels it by taking 20 % of Earth's
-  sunlight. The price is about 30 % less rain (extrapolated, the least certain number here) and a
-  polar residual that a shade shaped by latitude and season can reduce. With glass fronts the same
-  sunlight cost allows only 20 % of the Sun. Without a shade, a 1 W/m² budget would allow 3.8 %
-  on the far side of the Sun or 0.53 % spread inside Earth's orbit (`docs/earth.md`). The night sky
-  is a consequence, not a limit: a disc of light 72° in radius round the Sun, about 86 lux on the
-  ground at the end of twilight.
+- **The default swarm encloses the Sun** (`docs/closed-swarm.md`). Compute sails tile the whole
+  sphere at 0.95 AU except a cap 23° round the Sun–Earth line, where co-orbiting mirrors at 0.98 AU
+  (26 g/m², the mass their orbit allows) return the sunlight to the swarm and hide its hot backs from
+  Earth. Windows are mirrors turned edge-on: Earth's lets its sunlight through in full.
+  - Closed in **2214**, at 1.9×10⁴⁰ FLOP/s.
+  - All the heat leaves through the backs, so the film runs at 419 K and the chips near 155 °C. Each
+    watt computes 19 % less than in a swarm left open toward Earth; catching all the light, it
+    computes about the same in total. Closure buys control, not computing.
+- **It takes Mercury's core.** The crust and mantle (3.4×10²² kg of spacecraft) run out at 93 %. The
+  core's ~6 % silicon, lifted at four times the heat per kilogram, closes the rest: 31 % of the
+  planet in all.
+- **Sails last centuries.** Every wear mechanism but solar-wind sputtering (0.02 nm a year) can be
+  repaired in place: cells annealed, wiring cut below the Blech length, resistive memory, crack-stopped
+  film. The model rebuilds each sail every 300 years, recycling 99 %. The finished swarm then loses
+  1.2×10¹⁸ kg a year, which the rest of the core covers for ~19,000 years.
+- **Earth keeps its sunlight; the night loses its stars round the Sun.** Earth sees only the cap's cold
+  back: 0.45 W/m², cancelled by narrowing the window 0.19 %, at a cost of 0.3 % of rain.
+  - At night the sky within 76° of the Sun is black.
+  - The zodiacal light and the planets are gone.
+  - The solar wind stops.
+  - The window is a whole-Earth climate dial.
+  - The near-uniform swarm, left open toward Earth, remains a choice: 85 % of the Sun, with an L1
+    shade taking 20 % of Earth's sunlight and about 30 % of its rain (`docs/full-swarm.md`).
 - **Regional climate control** is physically cheap but limited by aim and by the atmosphere: L1
   shades blur over 14,000 km, orbital mirrors at 1,000–10,000 km over 9–90 km. Temperature follows
   placed sunlight; winter rain does not (`docs/full-swarm.md`).
@@ -68,9 +77,9 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
 | `src/model/` | `hybrid.js` (model v4: sails, pods, eras, build-out), `model.js` (radiosity, logistics, Mercury, Earth), `sat2.js`, `constants.js` |
 | `src/ui/` | SVG charts and the assumptions drawer |
 | `test/` | `node --test` suites pinning the model |
-| `render/` | Blender scenes, each lit only by what the model says is there: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `pod.py` (1 MW pod, visible and LWIR), `swarm_field.py` (the sky inside the layout within Earth's orbit: sails as stars, the counter-sun and its glint halo), `farside_field.py` + `farside_sky.py` (the sky inside the far-side cloud: the layer's glow, the rest of the cloud seen through the inside of Earth's orbit, near sails as squares), `mercury.py` (globe), `earth_sky.py` (Jenny Lake at dusk and night, tonight vs with the far-side cloud), `leo_view.py` (the swarm from low Earth orbit: Earth's night side, the Moon, the planets). Support: `atmosphere.py` (multiple-scattering sky, Hillaire 2020) and `sky_map.py` (twilight, swarm glow, Milky Way, airglow, stars), `teton_prep.py` (lake bed, cobble beach), `ephem.py` (Sun and sidereal time), `lib.py` (physical sun, metering, materials), `develop.py` (EXR to photo: exposure, white balance, AgX), `glare.py` (lens glare), `post.py` (camera effects) |
+| `render/` | Blender scenes, each lit only by what the model says is there: `sail.py` + `sail_shot.py` (compute sail, visible and LWIR), `pod.py` (1 MW pod, visible and LWIR), `swarm_field.py` (the sky inside the layout within Earth's orbit: sails as stars, the counter-sun and its glint halo), `farside_field.py` + `farside_sky.py` (the sky inside the far-side cloud: the layer's glow, the rest of the cloud seen through the inside of Earth's orbit, near sails as squares), `mercury.py` (globe), `earth_sky.py` (Jenny Lake at dusk and night, tonight vs with the swarm, and with the Sun enclosed), `leo_view.py` (the swarm from low Earth orbit: Earth's night side, the Moon, the planets). Support: `atmosphere.py` (multiple-scattering sky, Hillaire 2020) and `sky_map.py` (twilight, swarm glow, Milky Way, airglow, stars), `teton_prep.py` (lake bed, cobble beach), `ephem.py` (Sun and sidereal time), `lib.py` (physical sun, metering, materials), `develop.py` (EXR to photo: exposure, white balance, AgX), `glare.py` (lens glare), `post.py` (camera effects) |
 | `renders/` | finished photographs used by the page |
-| `docs/` | `architecture.md`, `future-tech.md`, `earth.md`, and `data/` with every study's numbers and sources |
+| `docs/` | `architecture.md`, `future-tech.md`, `earth.md`, `full-swarm.md`, `closed-swarm.md`, and `data/` with every study's numbers and sources |
 | `assets/` | MESSENGER, Blue Marble, USGS terrain, star catalogue and Milky Way data with credits |
 | `scripts/` | report, numbers export, screenshot, artifact staging |
 

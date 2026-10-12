@@ -258,8 +258,10 @@ test('closed: the default encloses the Sun at 0.95 AU, with a mirror cap 23° ro
   const s = h.swarmAt(pC, 1);
   near(s.rOrbit, 0.95, 1e-12, 'radius');
   near(s.flops, 1.88e40, 0.02e40, 'FLOP/s');
-  // the cap: ten layers of foil, ~1 % of the swarm's mass
-  assert.ok(s.massSails > 0 && 3.24e20 / s.mass < 0.01, 'cap mass');
+  // the cap: 26 g/m², under 1 % of the swarm's mass
+  const cap = h.FIXED.capFrac * 4 * Math.PI * (0.98 * 1.495978707e11) ** 2 * h.FIXED.capKgM2;
+  near(cap, 2.8e20, 0.05e20, 'cap mass');
+  assert.ok(cap / s.mass < 0.01, 'cap share');
 });
 
 test('closed: all the heat leaves through the backs, so the film runs ~419 K (vs 332 K when sparse)', () => {
@@ -272,10 +274,10 @@ test('closed: all the heat leaves through the backs, so the film runs ~419 K (vs
   near(h.swarmAt(pC, 1).flops / uRoom.flops, 0.95, 0.02, 'closed vs near-uniform');
 });
 
-test('closed: Earth sees only the cap’s cold back (0.6 W/m²), no glow at night, full sunlight', () => {
+test('closed: Earth sees only the cap’s cold back (0.45 W/m²), no glow at night, full sunlight', () => {
   const E = h.earthLimits(pC, dC);
-  near(h.earthForcing(pC, 1).gross, 0.6, 1e-12, 'infrared');
-  near(E.forcing.sunlightCut, 0.0025, 0.0005, 'a shade of 0.25 % holds the temperature');
+  near(h.earthForcing(pC, 1).gross, 0.45, 1e-12, 'infrared');
+  near(E.forcing.sunlightCut, 0.0019, 0.0003, 'a shade of 0.2 % holds the temperature');
   assert.equal(h.skyLux(pC, 1), 0, 'no glow');
   assert.equal(E.binding, 'room');
 });

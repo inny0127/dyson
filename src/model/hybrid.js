@@ -174,8 +174,13 @@ export const FIXED = {
   // within acos r of the Earth direction); the cap redirects its sunlight into the swarm and leaves a
   // window for Earth and the Moon. All the Sun's power leaves through the compute sails' backs.
   closedR: 0.95, capFrac: (1 - Math.cos((23.07 * Math.PI) / 180)) / 2, capR: 0.98,
-  capIR: 0.6,              // W/m² on Earth from the cap's back: 10 layers of aluminised glass foil
-  capKgM2: 0.03,           // ten layers; light enough (β ≈ 0.05) to hold station with Earth at 0.98 AU
+  // The cap's areal mass is fixed by its orbit: to keep pace with Earth at 0.98 AU sunlight must
+  // carry β = 1 − 0.98³ = 0.059 of its weight, 26 g/m² for a mirror. That holds 20 layers of 1.3 g/m²
+  // silvered foil: the inner face reflects 99.5 % of sunlight and runs at ~440 K in the swarm's
+  // 419 K cavity; ε 0.02 per face leaks 1.1 W/m² out of the back, and Earth, seeing the cap over a
+  // disc 76° in radius, averages 0.40 of that (docs/closed-swarm.md).
+  capIR: 0.45,             // W/m² on Earth from the cap's back
+  capKgM2: 0.026,
   closedRoom: 0.999,       // all but the cap mirrors' absorption and the windows
   keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
   rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)
@@ -700,7 +705,7 @@ export function earthForcing(p, f) {
     gross = e.forcing;
     blocked = e.dimming * EARTH.absorbedSolar;
   } else if (p.earthPlacement === 'closed') {
-    gross = f > 0 ? FIXED.capIR : 0;                            // the cap is built first
+    gross = f * FIXED.capIR;                                    // the cap grows with the swarm it hides
   } else if (p.earthPlacement === 'uniform') {
     gross = f * FIXED.uniformIRPerF;
   } else if (p.earthPlacement === 'cone') {
@@ -785,7 +790,7 @@ export function atYear(p, d, year) {
     nPods: f > 0 ? s.podPower / p.podPower : 0,
     chipPower: f > 0 ? s.chipPower : 0,
     flops: f > 0 ? s.flops : 0,
-    tSail: s.sail.T,
+    tSail: s.closed ? s.filmT : s.sail.T,
     mercuryRemoved: mined / MERCURY.M,
     mercuryRadius: mercuryRadius(mined),
     mercurySurface: mercurySurfaceLayer(mined),

@@ -79,12 +79,13 @@ function sailFacts(p) {
   const side = SAIL_SIDE * Math.sqrt(p.sailArea / 69543);
   // with infrared-dark fronts the same sail flies farther out than its thermal orbit (0.95 AU, or
   // 1 AU on the far side): less sunlight per m², hotter chips (FIXED.farsideFlopFactor)
-  const dark = s.farside || s.uniform;
-  const kS = dark ? (s.rSail / s.rOrbit) ** 2 : 1;
+  // closed: the same sail at 0.95 AU with a plain glass front, cooler than on its thermal orbit
+  const dark = s.farside || s.uniform, closed = !!s.closed;
+  const kS = dark || closed ? (s.rSail / s.rOrbit) ** 2 : 1;
   const W = s.sail.chipWm2 * p.sailArea * kS;
-  const flops = (W / s.sail.jPerFlop) * (dark ? h.FIXED.farsideFlopFactor : 1);
+  const flops = (W / s.sail.jPerFlop) * (dark ? h.FIXED.farsideFlopFactor : closed ? h.closedFactor(p, 0.01, s.sail) : 1);
   return { s, side, diag: side * Math.SQRT2, MW: W / 1e6, chips: W / p.chipPower, flops, mass: p.sailArea * h.filmAreal(p),
-    farside: s.farside, uniform: s.uniform, dark, S: s.sail.S * kS, pitch: s.sail.chipPitch / Math.sqrt(kS) };
+    farside: s.farside, uniform: s.uniform, closed, dark, S: s.sail.S * kS, pitch: s.sail.chipPitch / Math.sqrt(kS) };
 }
 
 function recompute() {
@@ -114,6 +115,11 @@ function recompute() {
 
 /** What stops the swarm growing, as a label. */
 const LIMIT = { rock: "Mercury's rock", room: 'No room left', climate: "Earth's limit" };
+/** A share near 100 %, to as many places as it needs: 0.99 → 99%, 0.995 → 99.5%, 0.998 → 99.8%. */
+const pctNear1 = x => pct(x, x > 0.99 && x < 1 ? 2 : 0);
+const limitOf = (p, E) => (p.earthPlacement === 'closed' && E.binding === 'room' ? 'The Sun enclosed' : LIMIT[E.binding]);
+/** Share of Mercury's core dug for `mass` kg of spacecraft. */
+const coreShareOf = (p, mass) => Math.max(0, (h.minedFor(p, mass) - MERCURY.M_SHELL) / MERCURY.M_CORE);
 
 function renderFigures() {
   const p = state.params, E = state.earth;
@@ -127,7 +133,9 @@ function renderFigures() {
       ? [`${yr(p.seedYear + tCap)}`, `when it is finished, ${Math.max(0, Math.round(p.seedYear + tCap - now))} years from now`]
       : ['never', 'industry never finishes it'],
     [`${f.MW.toFixed(0)} MW`, `in one sail ${Math.round(f.diag)} m across`],
-    cut > 0.0005
+    p.earthPlacement === 'closed'
+      ? [pctNear1(1 - cut), "of Earth's sunlight still arrives, through a window the swarm leaves open"]
+      : cut > 0.0005
       ? [`−${pct(cut, cut < 0.1 ? 1 : 0)}`, "of Earth's sunlight, shaded away so the swarm's heat leaves Earth's temperature where it is"]
       : [`+${E.forcing.net.toFixed(1)} W/m²`, 'of extra heat on Earth, with no sunshade'],
   ];
@@ -147,9 +155,9 @@ function stageOf(a) {
   if (a.year < 0.5 || a.nSails < 1) return 'Before the first launch';
   if (a.f < 1e-7) return 'A few sails: invisible from Earth';
   if (a.year < g.tCap) return `Industry doubling every ${g.doublingYearsEff.toFixed(1)} years`;
-  if (a.f < E.cap * 0.98) return "Mercury's heat wall: steady growth";
+  if (a.f < E.cap * 0.98) return g.rockCore > 0 && g.tMantleOut != null && a.year > g.tMantleOut ? "Digging into Mercury's core" : "Mercury's heat wall: steady growth";
   if (g.tRockOut != null && a.year > g.tRockOut + 5) return 'The rock is gone: the fleet slowly wears down';
-  if (a.f < E.cap * 1.05) return E.binding === 'rock' ? 'Finished: the rock runs out' : E.binding === 'room' ? 'Finished: no room left' : "Earth's limit";
+  if (a.f < E.cap * 1.05) return E.binding === 'rock' ? 'Finished: the rock runs out' : E.binding === 'room' ? (p.earthPlacement === 'closed' ? 'Finished: the Sun is enclosed' : 'Finished: no room left') : "Earth's limit";
   return p.coverage < 1 ? 'Holding at the target' : "Past Earth's limit";
 }
 
@@ -168,7 +176,7 @@ function renderDash(a) {
   for (const e of [-6, -4, -2, 0]) svg += `<line x1="${L}" x2="${W - R}" y1="${Y(10 ** e)}" y2="${Y(10 ** e)}" stroke="var(--rule)" stroke-dasharray="1 3"/>`;
   svg += `<text x="${L}" y="${Y(1) - 2}" fill="var(--ink-3)" font-size="9">100% of the Sun</text><text x="${L}" y="${Y(1e-6) - 2}" fill="var(--ink-3)" font-size="9">0.0001%</text>`;
   svg += `<line x1="${L}" x2="${W - R}" y1="${Y(E.cap)}" y2="${Y(E.cap)}" stroke="var(--earth)" stroke-dasharray="4 3"/>`;
-  svg += `<text x="${W - R}" y="${Y(E.cap) + 10}" text-anchor="end" fill="var(--earth)" font-size="9">${LIMIT[E.binding]}: ${pct(E.cap, 0)}</text>`;
+  svg += `<text x="${W - R}" y="${Y(E.cap) + 10}" text-anchor="end" fill="var(--earth)" font-size="9">${limitOf(p, E)}: ${pct(E.cap, 0)}</text>`;
   svg += `<path d="${pts.map(([t, f], i) => `${i ? 'L' : 'M'}${X(t).toFixed(1)},${Y(f).toFixed(1)}`).join('')}" fill="none" stroke="var(--ink)" stroke-width="1.6"/>`;
   if (Number.isFinite(g.tCap) && g.tCap < tMax) svg += `<line x1="${X(g.tCap)}" x2="${X(g.tCap)}" y1="${H - B - 4}" y2="${H - B + 3}" stroke="var(--heat)" stroke-width="1.5"/><text x="${X(g.tCap)}" y="${H - 3}" text-anchor="middle" fill="var(--heat)" font-size="9">heat wall</text>`;
   svg += `<text x="${L}" y="${H - 3}" fill="var(--ink-3)" font-size="9">${p.seedYear}</text><text x="${W - R}" y="${H - 3}" text-anchor="end" fill="var(--ink-3)" font-size="9">${p.seedYear + Math.round(tMax)}</text>`;
@@ -238,10 +246,10 @@ function watchChapters() {
 // --------------------------------------------------------------------------------- explainers
 
 const EXPLAIN = {
-  what: `<p>A worked-out design for a Dyson swarm: a cloud of separate satellites around the Sun that catches part of its light and uses it to compute. It covers the satellites themselves, the factories on Mercury that make them, how fast they can be built, and what the swarm does to Earth.</p><p>Every number, chart and photograph on the page comes from one physics model. The photographs are not illustrations; they are rendered from the model's numbers, with every light in them at its true brightness.</p>`,
-  how: `<p>Eight research studies came first: computer chips and memory after 2095, the solar cells Mercury's rock can make, the satellite's structure and optics, manufacturing and recycling, what the swarm does to Earth's climate and night sky, and an adversarial review of the results. A ninth asked what really stops the swarm from filling the sky round the Sun. Their numbers are in the project repository.</p><p>They feed a model that runs in your browser and builds the swarm year by year: industry doubles until Mercury can't shed the heat any faster, sails wear out and are recycled, and the swarm stops when Mercury's rock runs out. The pictures come from Blender scenes and our own renderer, fed the same numbers.</p>`,
-  unsure: `<p>A lot. The hardware is seventy years beyond today's, and the swarm assumes a film half as heavy as the detailed design and launchers that waste only 1% of their energy. How Mercury gets rid of its heat is the least certain part of the build-out. On Earth, the rain lost to the sunshade is extrapolated far beyond anything climate models have run, and so is the idea of shaping climate region by region.</p><p>The buttons below switch between pessimistic and optimistic hardware, and every assumption can be changed at the bottom of the page. That energy is never the limit holds across all of them.</p>`,
-  change: `<p>Yes. The hardware buttons below switch eras. Near the end you can choose between four swarms, and at the very bottom every assumption has a slider. The text, the charts and the dashboard all recompute; only the photographs stay fixed, at the finished swarm.</p><p>As you scroll, the dashboard ${matchMedia('(min-width: 1200px)').matches ? 'on the right' : 'at the top'} follows the story year by year.</p>`,
+  what: `<p>A worked-out design for a Dyson swarm: a cloud of separate satellites around the Sun that catches its light and uses it to compute, until it encloses the Sun and lets sunlight out only through windows it chooses. It covers the satellites themselves, the factories on Mercury that make them, how fast they can be built, and what the swarm does to Earth.</p><p>Every number, chart and photograph on the page comes from one physics model. The photographs are not illustrations; they are rendered from the model's numbers, with every light in them at its true brightness.</p>`,
+  how: `<p>Eight research studies came first: computer chips and memory after 2095, the solar cells Mercury's rock can make, the satellite's structure and optics, manufacturing and recycling, what the swarm does to Earth's climate and night sky, and an adversarial review of the results. A ninth asked what really stops the swarm from filling the sky round the Sun, and a tenth what it takes to close it. Their numbers are in the project repository.</p><p>They feed a model that runs in your browser and builds the swarm year by year: industry doubles until Mercury can't shed the heat any faster, sails wear and are rebuilt, and the swarm stops when the Sun is enclosed or Mercury runs out. The pictures come from Blender scenes and our own renderer, fed the same numbers.</p>`,
+  unsure: `<p>A lot. The hardware is seventy years beyond today's, and the swarm assumes a film half as heavy as the detailed design and launchers that waste only 1% of their energy. How Mercury gets rid of its heat is the least certain part of the build-out, and the silicon in its core is known only to lie somewhere between 1% and 25%. Sails that last centuries assume every way they wear can be repaired in place. On Earth, shaping climate region by region is far beyond anything climate models have run.</p><p>The buttons below switch between pessimistic and optimistic hardware, and every assumption can be changed at the bottom of the page. That energy is never the limit holds across all of them.</p>`,
+  change: `<p>Yes. The hardware buttons below switch eras. Near the end you can choose between five swarms, and at the very bottom every assumption has a slider. The text, the charts and the dashboard all recompute; only the photographs stay fixed, at the finished swarm.</p><p>As you scroll, the dashboard ${matchMedia('(min-width: 1200px)').matches ? 'on the right' : 'at the top'} follows the story year by year.</p>`,
 };
 function wireExplainers() {
   const panel = $('explain-panel');
@@ -261,7 +269,9 @@ function wireExplainers() {
 // --------------------------------------------------------------------------------- choose your swarm
 
 const SWARMS = [
-  { key: 'full', title: 'Everything Mercury can build', blurb: "All round the Sun, every sail's front dark in the infrared, empty only round the line to Earth. A shade at L1 keeps Earth's temperature.",
+  { key: 'closed', title: 'The Sun enclosed', blurb: "Sails all the way round the Sun. Between it and Earth, a cap of cold mirrors with a window that lets Earth's sunlight through in full.",
+    params: { earthPlacement: 'closed', forcingLimit: 0, shadeLimit: 300 } },
+  { key: 'full', title: 'Open toward Earth', blurb: "All round the Sun except round the line to Earth, every sail's front dark in the infrared. A shade at L1 takes a fifth of Earth's sunlight to keep its temperature.",
     params: { earthPlacement: 'uniform', forcingLimit: 0, shadeLimit: 300 } },
   { key: 'far', title: 'Only beyond the Sun', blurb: "The same sails, but only on the far side of Earth's orbit, farthest from Earth. The shade again keeps Earth's temperature.",
     params: { earthPlacement: 'farside', spillInside: 'stop', farsideLat: 60, forcingLimit: 0, shadeLimit: 300 } },
@@ -277,7 +287,7 @@ function renderChoose() {
     const d = h.compute({ ...q, coverage: 1 });
     const E = h.earthLimits(q, d);
     const y = d.yearsToCoverage(E.cap * 0.995);
-    return { sw, E, y: Number.isFinite(y) ? y : d.growth.tPeak, fc: E.forcing, rock: (E.mass * d.minedPerDelivered) / MERCURY.M_SHELL, q };
+    return { sw, E, y: Number.isFinite(y) ? y : d.growth.tPeak, fc: E.forcing, dug: h.minedFor(q, E.mass) / MERCURY.M, q };
   });
   const active = SWARMS.find(sw => Object.entries(sw.params).every(([k, v]) => p[k] === v));
   $('choices').innerHTML = rows.map(({ sw, E }) => `<button data-swarm="${sw.key}" aria-pressed="${active && active.key === sw.key}"><b>${sw.title}</b><span>${sw.blurb}</span><span><b style="font:500 1rem/1 var(--sans)">${pct(E.cap, E.cap < 0.1 ? 1 : 0)}</b> of the Sun's light</span></button>`).join('');
@@ -292,16 +302,22 @@ function renderChoose() {
   const line = (k, f) => `<tr><td>${k}</td>${rows.map(r => `<td class="v">${f(r)}</td>`).join('')}</tr>`;
   $('choose-table').innerHTML = `<thead><tr><th></th>${rows.map(r => `<th>${r.sw.title}</th>`).join('')}</tr></thead><tbody>
     ${line("Share of the Sun's light", r => pct(r.E.cap, r.E.cap < 0.1 ? 1 : 0))}
-    ${line('What stops it', r => LIMIT[r.E.binding])}
-    ${line('Computing', r => `${sci(r.E.flops, 1)} FLOP/s`)}
+    ${line('What stops it', r => limitOf(r.q, r.E))}
+    ${line('Computing', r => `${sci(r.E.flops, 2)} FLOP/s`)}
     ${line('Finished around', r => yr(p.seedYear + r.y))}
-    ${line("The swarm's heat on Earth", r => `${r.fc.gross.toFixed(1)} W/m²`)}
+    ${line("The swarm's heat on Earth", r => `${r.fc.gross.toFixed(r.fc.gross < 1 ? 2 : 1)} W/m²`)}
     ${line('Sunlight on Earth', r => minus(r.fc.sunlightCut))}
     ${line("World's rainfall", r => minus(r.fc.rainCut))}
     ${line('Extra heat at the poles', r => (r.fc.polar > 0.05 ? `+${r.fc.polar.toFixed(1)} W/m²` : '—'))}
     ${line('Night sky, worst case', r => `${r.E.skyLuxAtCap < 10 ? r.E.skyLuxAtCap.toFixed(1) : Math.round(r.E.skyLuxAtCap)} lux`)}
-    ${line("Mercury's rock used", r => (r.E.binding === 'rock' ? 'all of it' : pct(Math.min(1, r.rock), 0)))}
+    ${line('Share of Mercury dug', r => pct(r.dug, 0))}
   </tbody>`;
+}
+
+/** Hours of the swarm's output that would pull Mercury apart against its own gravity. */
+function hoursToTakeApart(E) {
+  const n = Math.max(1, Math.round(MERCURY_BINDING_J / (E.cap * PHYS.L_SUN) / 3600));
+  return n === 1 ? 'about an hour' : `${n} hours`;
 }
 
 function renderSummary() {
@@ -311,31 +327,60 @@ function renderSummary() {
   const nSails = s.filmArea / p.sailArea;
   const yCap = state.moments.cap;
   const rock = Math.min(1, (E.mass * d.minedPerDelivered) / MERCURY.M_SHELL);
+  const core = coreShareOf(p, E.mass);
   const fc = E.forcing;
   const co2 = fc.gross / EARTH.co2DoublingForcing;
+  const closed = p.earthPlacement === 'closed';
+  const Tc = h.closedFilmT(p, E.cap);
   const where = {
+    closed: `All the way round the Sun at ${num('0.95 AU')}, just inside Earth's orbit, in nested bands that leave no gap. Only the part between the Sun and Earth, ${num('23°')} round the line joining them, is different: a cap of cold mirrors at ${num('0.98 AU')} that keeps pace with Earth. It hides the sails' hot backs from Earth, turns its share of sunlight back into the swarm, and has a window in the middle for Earth's own sunlight.`,
     uniform: `All round the Sun at ${num('0.95 AU')}, just inside Earth's orbit. Every sail's front is dark in the infrared, so the side Earth sees hardly glows. No sail flies within ${num('23°')} of the line from the Sun to Earth, where it would show Earth its hot back or cast a shadow.`,
     farside: `On Earth's own orbit, on the far side of the Sun, the part of the orbit farthest from Earth. Every sail's front is dark in the infrared.`,
     cone: `Spread evenly just inside Earth's orbit, empty round the line from the Sun to Earth, with ordinary glass fronts.`,
     shell: `Spread evenly just inside Earth's orbit, Earth's direction included, with ordinary glass fronts.`,
   }[p.earthPlacement];
-  const stops = E.binding === 'rock'
-    ? `It stops where Mercury's rock runs out${E.room < 1 ? `, just short of the ${num(pct(E.room, 0))} its layout has room for` : ''}. Energy is never short: the swarm could take the whole planet apart with ${num(`${Math.max(1, Math.round(MERCURY_BINDING_J / (E.cap * PHYS.L_SUN) / 3600))} hours`)} of its output.`
+  const stops = closed && E.binding === 'room'
+    ? `It stops when there is nothing left to catch. Energy is never short: the swarm could take the whole planet apart with ${num(hoursToTakeApart(E))} of its output.`
+    : E.binding === 'rock'
+    ? `It stops where Mercury's rock runs out${E.room < 1 ? `, just short of the ${num(pct(E.room, 0))} its layout has room for` : ''}. Energy is never short: the swarm could take the whole planet apart with ${num(hoursToTakeApart(E))} of its output.`
     : E.binding === 'room' ? `It stops when its layout is full.` : `It stops at the heat Earth is allowed to take.`;
   const items = [
-    ['What it is', `About ${num(words(nSails))} separate satellites. Each is a square of solar film ${num(`${Math.round(f.side)} m`)} on a side, thinner than paper, with ${num(words(f.chips))} tiny computer chips spread over its back. There is no shell or ring: every sail flies its own orbit around the Sun.`],
+    ['What it is', `About ${num(words(nSails))} separate satellites. Each is a square of solar film ${num(`${Math.round(f.side)} m`)} on a side, thinner than paper, with ${num(words(f.chips))} tiny computer chips spread over its back. ${closed ? 'Even closed, it is no solid shell' : 'There is no shell or ring'}: every sail flies its own orbit around the Sun.`],
     ['How big it gets', `${num(pct(E.cap, 0))} of all the light the Sun gives off. ${stops}`],
-    ['What it is made of', `Rock from Mercury, dug up, thrown into orbit and turned into film and chips there. This swarm uses ${E.binding === 'rock' ? num('all') : num(pct(rock, 0))} of Mercury's rock. The planet's iron core is left: the swarm needs silicon, and the core has little.`],
+    ['What it is made of', core > 0.001
+      ? `Mercury, dug up, thrown into orbit and turned into film and chips there: all of its rock, then ${num(pct(core, 0))} of its iron core for the silicon dissolved in it, ${num(pct(h.minedFor(p, E.mass) / MERCURY.M, 0))} of the planet in all. The rest of the core is kept for repairs.`
+      : `Rock from Mercury, dug up, thrown into orbit and turned into film and chips there. This swarm uses ${E.binding === 'rock' ? num('all') : num(pct(rock, 0))} of Mercury's rock. The planet's iron core is left: the swarm needs silicon, and the core has little.`],
     ['Where it flies', where],
-    ['What it does to Earth', fc.shade > 0
+    ['What it does to Earth', closed
+      ? `Nothing you would notice by day. Earth sees only the cold back of the mirror cap, which sends it ${num(`${fc.gross.toFixed(2)} W/m²`)}, ${pct(co2, 0)} of a CO₂ doubling, and its sunlight arrives in full through the window. Narrow the window and all of Earth dims; tilt the mirrors around it and Earth brightens.`
+      : fc.shade > 0
       ? `Its heat would warm Earth like ${num(co2 >= 1.5 ? `${Math.round(co2)} doublings` : 'a doubling')} of CO₂. A sunshade between Earth and the Sun cancels it by taking ${num(pct(fc.sunlightCut, 0))} of Earth's sunlight, so Earth keeps its temperature. The price is about ${num(pct(fc.rainCut, 0))} less rain worldwide and warmer poles, unless the shade is shaped.`
       : `It adds ${num(`${fc.net.toFixed(1)} W/m²`)} of heat to Earth${fc.net > 0 ? `, ${pct(fc.net / EARTH.co2DoublingForcing, 0)} of a CO₂ doubling` : ''}.`],
-    ['What it computes', `${num(`${sci(E.flops, 1)} calculations a second`)}, about ${num(words(E.flops / WORLD_AI_FLOPS_2025))} times all the AI chips on Earth in 2025. If building starts in ${num(p.seedYear)}, it is finished around ${num(yr(p.seedYear + yCap))}.`],
-    ['What you would see', p.earthPlacement === 'uniform'
+    ['What it computes', `${num(`${sci(E.flops, 2)} calculations a second`)}, about ${num(words(E.flops / WORLD_AI_FLOPS_2025))} times all the AI chips on Earth in 2025. If building starts in ${num(p.seedYear)}, it is finished around ${num(yr(p.seedYear + yCap))}.`],
+    ['What you would see', closed
+      ? `By day, nothing new. At night the sky within ${num('76°')} of the Sun is black: no stars and no Milky Way there, and no planets anywhere, since the swarm lights none of them. Inside the swarm it is daylight in every direction. From another star there is no Sun at all, only a dull infrared star ${num('1.9 AU')} across, at ${num(kelvin(Tc))}.`
+      : p.earthPlacement === 'uniform'
       ? `From Earth, a disc of light ${num('140°')} across round the Sun, as bright as the sky just after sunset, with a dark hole round the Sun itself. Most nights never get fully dark. From inside, an even glow in every direction, broken by two black windows. From another star, a Sun ${num(pct(E.cap, 0))} dimmer, outshone in the infrared by the swarm.`
       : `From Earth, a band or disc of light round the Sun after dusk. From another star, a Sun ${num(pct(E.cap, E.cap < 0.1 ? 1 : 0))} dimmer, with an infrared glow it never had before.`],
   ];
   $('summary-list').innerHTML = items.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+}
+
+/** Why the closed swarm sits at 0.95 AU: as far out as Earth allows (docs/closed-swarm.md). */
+function closedOrbitBox(p) {
+  const r0 = h.FIXED.closedR, dT = p.filmSpreadDT ?? 9, t0 = h.FIXED.film.pvT0;
+  const s0 = h.swarmAt(p, 1);
+  const k = T => (1 + p.pvTempCo * (T - t0)) / h.energyPenalty(T + dT - 273.15, p.hotLogicSlope);
+  const k0 = k(h.closedFilmT(p, 1, r0));
+  const tr = [0.85, 0.9, 0.95, 1.0].map(r => {
+    const T = h.closedFilmT(p, 1, r);
+    const b = r === r0, mark = x => (b ? `<b>${x}</b>` : x);
+    return `<tr><td>${mark(`${r.toFixed(2)} AU`)}${r >= 1 ? ', grazing Earth' : ''}</td><td class="v">${Math.round(T)} K</td><td class="v">${Math.round(T + dT - 273.15)} °C</td><td class="v">${(k(T) / k0).toFixed(2)}×</td><td class="v">${kg(s0.mass * (r / r0) ** 2)}</td><td class="v">${sci(s0.flops * k(T) / k0, 2)}</td></tr>`;
+  }).join('');
+  return `<p>A closed swarm catches all the sunlight at any distance, so the distance sets only two things. Farther out, each square metre catches less, so closing the sphere takes more film, as the square of the distance. But the backs then have more area to radiate from, so the film runs cooler, as one over the square root of the distance, and cool chips and cells compute more per watt.</p>
+    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Orbit</th><th>Film</th><th>Chips</th><th>Computing per watt</th><th>Mass to close it</th><th>FLOP/s</th></tr></thead><tbody>${tr}</tbody></table></div>
+    <p>So the farther out the better, up to where the swarm would crowd Earth. Earth has to stay outside: inside a closed swarm it would sit in a cavity at about ${num('330 K')}. And between the sails and Earth there has to be room for the mirror cap. At ${num('0.95 AU')} the sails' bands reach out to ${num('0.98 AU')}, the cap flies at 0.98, and Earth is at 1.</p>
+    <p class="note">Computing per watt is relative to 0.95 AU. Mass is for the finished swarm, scaled as the square of the distance; Mercury's rock and core supply ${kg(h.compute({ ...p, coverage: 1 }).growth.rockDeliverable)}.</p>`;
 }
 
 /** Why the near-uniform swarm flies at 0.95 AU: the same rock at other radii (h.orbitChoice). */
@@ -356,10 +401,19 @@ function renderSail() {
   const atLimit = h.swarmAt(p, state.earth.cap);
   const nSails = atLimit.filmArea / p.sailArea;
   const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
+  let closedText = '';
+  if (f.closed) {
+    const Tc = h.closedFilmT(p, 1), T0 = h.closedFilmT(p, 0.01);
+    const sC = h.swarmAt(p, 1), sU = h.swarmAt({ ...p, earthPlacement: 'uniform' }, h.FIXED.uniformRoom);
+    const perW = (sC.flops / sC.intercepted) / (sU.flops / sU.intercepted);
+    closedText = `<p>It flies at ${num('0.95 AU')}, just inside Earth's orbit, in one of several hundred nested bands that wrap the Sun without ever crossing and, when the swarm is finished, close round it completely. Its front is ordinary glass. In a closed swarm whatever a front radiates lands on another sail's front, so only the backs lose heat to space, and the finished swarm runs hotter than any lone sail: its film at ${num(kelvin(Tc))}, its chips near ${num(`${Math.round(Tc + p.filmSpreadDT - 273.15)} °C`)}.</p>
+      ${deep('Why a closed swarm runs hot, and what it costs', `<p>A lone sail radiates from both faces. Closed, the fronts all face into the same cavity, so whatever one radiates lands on another, and the Sun's whole output, ${num('3.8×10²⁶ W')}, has to leave through the backs. A sphere ${num('0.95 AU')} in radius, ${num('96%')} of it sails whose backs radiate ${num(pct(p.epsBack, 0))} as well as a perfect black body, does that at ${num(kelvin(Tc))}. A perfect black back would still run at ${num('408 K')}. The first, sparse sails sit at ${num(kelvin(T0))}.</p><p>So closing the swarm costs computing. Hot cells convert less and hot transistors need more energy per operation: each watt of sunlight computes ${num(pct(1 - perW, 0))} less than in a swarm left open toward Earth. Catching all the light rather than ${pct(h.FIXED.uniformRoom, 0)}, the closed swarm computes about the same in all, ${num(`${sci(sC.flops, 2)} FLOP/s`)} against ${num(sci(sU.flops, 2))}. What closing it buys is not computing but control: every photon that leaves the inner solar system leaves through a window the swarm opens.</p>`)}
+      ${deep('How the distance from the Sun was chosen', closedOrbitBox(p))}`;
+  }
   $('sail-prose').innerHTML = `
     <p>Each satellite is a square of solar film ${num(`${Math.round(f.side)} m`)} on a side, flown corner-first as a diamond ${num(`${Math.round(f.diag)} m`)} from tip to tip. The film is ${num(`${Math.round(80 * (p.filmThin ?? 1) / 5) * 5} µm`)} thick, ${(p.filmThin ?? 1) < 0.8 ? 'half the thickness of office paper' : 'a little thinner than office paper'}. Shrink the sail to the width of a room and it would be as thin as the wall of a soap bubble. It weighs ${num(kg(f.mass))}, which works only because out there nothing pushes on it except sunlight.</p>
     <p>Behind the solar cells sit ${num(words(f.chips))} tiny chips, one every ${num(length(f.pitch))}. Together they use ${num(`${f.MW.toFixed(1)} MW`)} and do ${num(`${sci(f.flops, 2)} calculations a second`)}, ${f.flops >= WORLD_AI_FLOPS_2025 ? `${num(`${(f.flops / WORLD_AI_FLOPS_2025).toFixed(1)} times`)}` : `${num(pct(f.flops / WORLD_AI_FLOPS_2025, 0))} of`} all the AI hardware on Earth in 2025. That is one sail. The finished swarm has about ${num(words(nSails))} of them.</p>
-    ${f.dark
+    ${f.closed ? closedText : f.dark
       ? `<p>${f.uniform
           ? `It flies at ${num('0.95 AU')}, just inside Earth's orbit, in one of several hundred nested bands that wrap the Sun without ever crossing. Its cover glass carries a fine aluminium mesh that makes its front dark in the infrared, so it sheds its heat from its back, away from the Sun.`
           : `It flies on Earth's own orbit, but on the far side of the Sun, between a quarter and three quarters of a turn away from Earth. From there a sail never passes between Earth and the Sun, and it can turn its warm back away from Earth.`}</p>
@@ -430,12 +484,20 @@ function renderMercury() {
   const Tr = radiatorTemp(p.mercuryHeatLimit);
   const bare = 0.9 * PHYS.SIGMA * 500 ** 4 * 4 * Math.PI * MERCURY.R ** 2;
   const rockUsed = E.mass * d.minedPerDelivered / MERCURY.M_SHELL;
+  const core = coreShareOf(p, E.mass), whole = p.rockSource === 'whole';
+  const mantleOut = g.tMantleOut != null ? Math.round(p.seedYear + g.tMantleOut) : null;
+  const apart = whole
+    ? `<details class="deep"><summary>Taking the planet apart</summary><p>The swarm needs silicon, not mass. The rock outside the core is a quarter silicon. The core is ${num(pct(MERCURY.M_CORE / MERCURY.M, 0))} of the planet, but it is iron with perhaps ${num('6%')} silicon dissolved in it (estimates run from under 1% to 25%), so every kilogram of spacecraft from it means lifting about four times as much, and leaving four times the heat on Mercury. So the core comes last.${mantleOut ? ` Once the crust and mantle are gone, in ${num(mantleOut)}, the launchers start on the core itself, molten at ${num('1,800–2,000 K')}, and lift it whole, so its heat leaves with it. The silicon is refined out in orbit, and the iron is kept for shielding and reaction mass.` : ''}</p><p>Energy is no obstacle. Pulling the whole planet apart against its own gravity takes ${num('1.8×10³⁰ J')}, a couple of hours of the finished swarm's output.</p></details>`
+    : `<details class="deep"><summary>Why not take the whole planet apart?</summary><p>It could be done. Pulling Mercury apart against its own gravity takes ${num('1.8×10³⁰ J')}, a couple of hours of the finished swarm's output, and the molten core would be thrown out hot, taking its own heat with it. But the swarm is short of silicon, not of mass. The rock outside the core is a quarter silicon. The core is ${num(pct(MERCURY.M_CORE / MERCURY.M, 0))} of the planet, but it is iron with perhaps ${num('4–8%')} silicon, so every kilogram of silicon from it comes with about 16 kg of iron to lift, and four times the heat on Mercury. Here the core is left as the swarm's reserve for repairs.</p></details>`;
+  const built = core > 0.001
+    ? `The finished swarm takes all of Mercury's rock and ${num(pct(core, 0))} of its core, ${num(pct(h.minedFor(p, E.mass) / MERCURY.M, 0))} of the planet. The rest of the core is its reserve for repairs.`
+    : `The finished swarm is built from ${num(pct(Math.min(1, rockUsed), rockUsed < 0.1 ? 1 : 0))} of Mercury's rock${rockOut ? `; the rest goes into replacing worn-out sails, and by ${num(rockOut)} all of it has been dug out` : ''}.`;
   $('mercury-prose').innerHTML = `
-    <p>Mercury is mostly iron. Its crust and mantle, the part worth mining, are ${num(pct(MERCURY.M_SHELL / MERCURY.M, 0))} of its mass. Surprisingly little happens on the surface: machines dig the rock, and electromagnetic launchers throw it, unrefined, into low orbit at about ${num('3 km/s')}. Everything else happens up there. Catapults in orbit speed it up to the ${num(`${(d.logistics.sail.vLaunch / 1e3).toFixed(1)} km/s`)} the sails need, and factories turn it into silicon, magnesium, aluminium and glass. About ${num(pct(p.yieldDelivered, 0))} of each kilogram ends up in spacecraft, and the oxygen becomes rocket propellant.</p>
+    <p>Mercury is mostly iron. Its crust and mantle, the part richest in silicon, are ${num(pct(MERCURY.M_SHELL / MERCURY.M, 0))} of its mass. Surprisingly little happens on the surface: machines dig the rock, and electromagnetic launchers throw it, unrefined, into low orbit at about ${num('3 km/s')}. Everything else happens up there. Catapults in orbit speed it up to the ${num(`${(d.logistics.sail.vLaunch / 1e3).toFixed(1)} km/s`)} the sails need, and factories turn it into silicon, magnesium, aluminium and glass. About ${num(pct(p.yieldDelivered, 0))} of each kilogram ends up in spacecraft, and the oxygen becomes rocket propellant.</p>
     <p>The reason is heat. Energy is not scarce, since the swarm can beam down as much as anyone wants. What is scarce is a way to get rid of it, and on a planet with no air or water the only way is to radiate it into space. Even paved with radiators heat-pumped to about ${num(`${(Math.round(Tr / 50) * 50).toLocaleString('en-US')} K`)}, Mercury can shed only ${num(`${sci(p.mercuryHeatLimit, 1)} W`)}. So the less heat each kilogram leaves behind, the faster the swarm can be built.</p>
     <details class="deep"><summary>Why a planet paved with radiators is the limit</summary><p>Bare ground at ${num('500 K')}, about the temperature of the machines, radiates only ${num(`${sci(bare, 1)} W`)} from the whole planet. Heat pumps lift the waste heat to about ${num(`${(Math.round(Tr / 50) * 50).toLocaleString('en-US')} K`)}, where each square metre radiates ${num(`${Math.round((Tr / 500) ** 4)} times`)} more. Going hotter helps only a little: at ${num('2,000 K')}, about as hot as a radiator can be built, the same planet sheds under ${num('10¹⁹ W')}, because the pumps' own work has to be radiated too.</p><p>What can still be changed is the heat each kilogram leaves behind. Digging and the first ${num('3 km/s')} leave about ${num(`${p.heatPerKg} MJ`)}${p.heatPerKg <= 0.15 ? `, with superconducting launchers that lose only 1% of the energy they give the rock. At 95% it would be ${num('0.3 MJ')}, and the swarm would finish smaller and about a century later` : ''}. Launching all the way from the ground would leave ${num('1.8 MJ')}, and refining on the ground tens of MJ.</p></details>
-    <details class="deep"><summary>Why not take the whole planet apart?</summary><p>It could be done. Pulling Mercury apart against its own gravity takes ${num('1.8×10³⁰ J')}, a couple of hours of the finished swarm's output, and the molten core would be thrown out hot, taking its own heat with it. But the swarm is short of silicon, not of mass. The rock outside the core is a quarter silicon. The core is ${num(pct(MERCURY.M_CORE / MERCURY.M, 0))} of the planet, but it is iron with perhaps ${num('4–8%')} silicon, so every kilogram of silicon from it comes with about 16 kg of iron to lift, and four times the heat on Mercury. So the core is left as the swarm's reserve for repairs once the rock is gone.</p></details>
-    <p>Industry copies itself every ${num(`${g.doublingYearsEff.toFixed(2)} years`)}, slowed by the chip fabs it has to build. In ${num(yr(p.seedYear + g.tCap))} it hits the <em>heat wall</em>, and exports stop growing at ${num(`${sci(g.capToSails * YEAR, 2)} kg`)} a year. By ${num(Math.round(now.calendarYear))}, ${num(pct(now.mercuryRemoved, 2))} of the planet has been taken apart. The finished swarm is built from ${num(pct(Math.min(1, rockUsed), rockUsed < 0.1 ? 1 : 0))} of Mercury's rock${rockOut ? `; the rest goes into replacing worn-out sails, and by ${num(rockOut)} all of it has been dug out` : ''}.</p>`;
+    ${apart}
+    <p>Industry copies itself every ${num(`${g.doublingYearsEff.toFixed(2)} years`)}, slowed by the chip fabs it has to build. In ${num(yr(p.seedYear + g.tCap))} it hits the <em>heat wall</em>, and exports stop growing at ${num(`${sci(g.capToSails * YEAR, 2)} kg`)} a year. By ${num(Math.round(now.calendarYear))}, ${num(pct(now.mercuryRemoved, 2))} of the planet has been taken apart. ${built}</p>`;
 }
 
 function readout(a) {
@@ -455,70 +517,74 @@ function readout(a) {
   return items.map(([k, v, over]) => `<div><span>${k}</span><b class="${over ? 'over' : ''}">${v}</b></div>`).join('');
 }
 
-/** How long a sail lasts, and how the model counts replacements. */
+/** How long a sail lasts, and how the model counts rebuilds (docs/closed-swarm.md). */
 function refreshBox(p, d, E) {
   const g = d.growth, L = p.serviceLife, rho = p.recycleFrac, Td = g.doublingYearsEff;
   if (!(L > 0)) return '';
   const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
   const grow = 2 ** (-L / Td);
-  const decay = (1 - rho) / L;
-  const Bss = g.capToSails * YEAR * L / Math.max(1e-9, 1 - rho);
-  // the wear clocks, for the near-uniform swarm's sails: 0.95 AU, film ~380 K, chips ~115 °C
+  const loss = E.mass * (1 - rho) / L;
+  // the wear clocks at this swarm's temperatures
+  const sCap = h.swarmAt(p, E.cap);
+  const Tf = sCap.closed ? sCap.filmT : sCap.uniform ? 380 : sCap.sail.T;
+  const chipC = Tf + (p.filmSpreadDT ?? 9) - 273.15;
   const k = 8.617e-5, Ea = 0.9;                                  // Cu electromigration, eV
   const em = (t1, t2) => Math.exp((Ea / k) * (1 / (t2 + 273.15) - 1 / (t1 + 273.15)));   // life at t2 vs t1
-  const chip = em(105, 115) * 10;                                // a chip built for 10 yr at 105 °C, full current
+  const chip = 40 * em(105, chipC);                              // built for 10 yr at 105 °C, at the 60 % clock (J ≈ ½)
   const dose = [142, 466].map(x => x * (0.92 / 0.95) ** 2);     // krad per decade, unshielded film chiplet
-  const cell = 0.08 * (0.92 / 0.95) ** 2;                        // fraction of output lost per decade
+  const cell = 0.08 * (0.92 / 0.95) ** 2;                        // fraction of output lost per decade, 20 µm glass
   const wear = [
-    ['Solar cells', 'protons from solar flares knock silicon atoms out of place', `${pct(cell, 1)} of output a decade`, `80% of new after about ${Math.round(0.2 / cell * 10)} years; the damage slows as it builds up, and some of it heals at the film's 107 °C`],
-    ['Chip wiring', 'electromigration: current slowly drags copper atoms along the wires, faster the hotter they are', `at 115 °C, ${em(115, 105).toFixed(0)}× as fast as at 105 °C and ${em(115, 85).toFixed(0)}× as fast as at 85 °C`, `about ${chip.toFixed(0)} years for a chip built to today's standard at full current; about ${Math.round(chip * 4 / 5) * 5} at the sail's 60% clock; about ${Math.round(chip * 16 / 10) * 10} with wires twice as wide`],
-    ['Memory', `radiation, ${Math.round(dose[0])}–${Math.round(dose[1])} krad a decade with no shielding`, 'magnetic RAM fails above about 1 Mrad, resistive RAM above 10–20 Mrad', `magnetic RAM ${Math.round(1000 / dose[1] * 10)}–${Math.round(1000 / dose[0] * 10)} years, resistive RAM centuries`],
-    ['Film and chiplets', 'dust grains punching through the film', '0.007–1.2% of the area a year, depending on whether a crack kills a whole tile', 'the 10% spare area lasts from 8 years to many centuries'],
-    ['Cover glass', 'hydrogen from the solar wind', 'saturates the surface within a year', 'a one-off loss of about 3% if the anti-reflection layer goes'],
-    ['Booms, tethers, vanes', 'nothing much: no day and night, no air, no plastics', 'very slow', 'many decades'],
+    ['Cover glass', 'the solar wind sputtering it away', 'about 0.02 nm a year', 'nothing needs to: 8 µm of glass lasts some 400,000 years'],
+    ['Solar cells', 'protons from solar flares knocking silicon atoms out of place', `${pct(cell, 1)} of output a decade behind 20 µm of glass, more behind thinner glass`, `the film's own ${Math.round(Tf - 273.15)} °C heals the lightest damage as it forms; the rest heals at 250–350 °C, which a patch of film reaches for an hour when the rest of the sail drives current through it`],
+    ['Chip wiring', 'electromigration: current dragging copper atoms along the wires, faster the hotter they are', `at ${Math.round(chipC)} °C, ${Math.round(1 / em(105, chipC))}× as fast as at 105 °C: wired as today's chips are, about ${chip < 10 ? chip.toFixed(1) : Math.round(chip)} years at the sail's clock`, 'wires cut into segments short enough (current density × length under about 3,000 A/cm for copper) that stress building up at their ends stops the drift altogether'],
+    ['Memory', `radiation, ${Math.round(dose[0])}–${Math.round(dose[1])} krad a decade with no shielding`, 'magnetic RAM fails above about 1 Mrad', 'resistive RAM survives 10–20 Mrad, centuries; its data is rewritten regularly, so holding it at high temperature is not the limit'],
+    ['Film and chiplets', 'dust grains punching through the film', '0.007–1.2% of the area a year, depending on whether a crack can spread', 'crack-stopped film keeps to the low end, about 2% in 300 years, patched in place'],
+    ['Booms, tethers, vanes', 'nothing much: no day and night, no air, no plastics', 'very slow', 'centuries'],
   ];
   const wearRows = wear.map(([a, b, c, e]) => `<tr><td>${a}</td><td>${b}</td><td>${c}</td><td>${e}</td></tr>`).join('');
   const astar = gy => Math.log(1 / rho) / Math.log(1 + gy);
-  const lives = [15, 20, 30, 50].map(Ly => {
+  const lives = [15, 50, 100, 300, 1000].map(Ly => {
     const q = { ...p, serviceLife: Ly };
     const dq = Ly === L ? d : h.compute({ ...q, coverage: 1 });
     const Eq = Ly === L ? E : h.earthLimits(q, dq);
-    return `<tr><td>${Ly} years${Ly === L ? ' (used here)' : ''}</td><td class="v">${pct(Eq.cap, 0)}${Eq.binding === 'room' ? ', room full' : ''}</td><td class="v">${sci(Eq.flops, 2)}</td><td class="v">${Math.round(Math.LN2 * Ly / (1 - rho))} years</td></tr>`;
+    const yq = dq.yearsToCoverage(Eq.cap * 0.995);
+    return `<tr><td>${Ly} years${Ly === L ? ' (used here)' : ''}</td><td class="v">${pct(Eq.cap, 0)}${Eq.binding === 'room' ? (p.earthPlacement === 'closed' ? ', closed' : ', room full') : ''}</td><td class="v">${Number.isFinite(yq) ? yr(p.seedYear + yq) : 'never'}</td><td class="v">${kg(Eq.mass * (1 - rho) / Ly)}</td></tr>`;
   }).join('');
-  return deep('How long a sail lasts, and how replacements are counted', `
-    <p>Two clocks decide when a sail is replaced: how fast it wears out, and how fast it falls behind newer chips.</p>
-    <p><b>Wearing out.</b> These are the rates for this swarm's sails, at 0.95 AU with the film at about 107 °C and the chips at about 115 °C:</p>
-    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Part</th><th>What wears it</th><th>How fast</th><th>How long it lasts</th></tr></thead><tbody>${wearRows}</tbody></table></div>
-    <p>The figure of 20 to 30 years in the studies came from the first two rows: cells that keep about 92% of their output after ten years, and chips built the way chips are built today. It is not a law of physics. Chips with wider wiring and resistive memory, at the cost of some chip area, would push the whole sail past 50 years, and then the cells set the pace, fading slowly rather than failing. The hot chips are this layout's price: in a shell at 85 °C the same wiring would last ten times longer.</p>
-    <p><b>Falling behind.</b> Replacing a sail early pays when what the new chips gain beats what recycling loses. That happens at an age of ln(1/ρ) ÷ ln(1 + g), where ρ is the share of the old sail recycled and g the yearly gain in computing per joule. With ${num(pct(rho, 0))} recycled, that is ${Math.round(astar(0.01))} years if chips still improve 1% a year, ${Math.round(astar(0.004))} at 0.4% and ${Math.round(astar(0.002))} at 0.2%. While the swarm is being built, around 2140–2200, chips are still creeping toward their floor, so the model uses ${num(`${L} years`)}. Once they stop improving, only wear matters, and sails could stay up much longer.</p>
-    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Service life</th><th>Finished swarm</th><th>FLOP/s</th><th>Half-life once the rock is gone</th></tr></thead><tbody>${lives}</tbody></table></div>
-    <p>A longer life helps twice. Less rock is lost to refreshes, so the swarm fills all the room it has; and once the rock is gone the fleet wears down far more slowly.</p>
-    <p><b>The refresh itself</b> is a swap. A depot craft brings new film rolls, chips already in them, and fits them onto the sail's existing hub, booms and vanes; the old film is rolled up and recycled in orbit.</p>
-    <p><b>The model counts it like this.</b> Every kilogram exported retires ${num(`${L} years`)} later, and ${num(pct(rho, 0))} of it goes back into production. While industry doubles every ${num(`${Td.toFixed(2)} years`)}, the sails retiring were built when industry was 2<sup>${L}/${Td.toFixed(2)}</sup> times smaller, so replacements take only ${num(pct(grow, grow < 0.01 ? 2 : 0))} of the output. After the heat wall, exports stop growing and replacements catch up, passing half of the output within one service life. Left alone, the fleet would level off where retirements balance exports, at export × life ÷ (1 − ρ) = ${num(kg(Bss))}. That is more than Mercury's rock can supply, so the rock runs out first. From then on every refresh loses ${num(pct(1 - rho, 0))} of a sail, and the fleet shrinks by ${num(pct(decay, 1))} a year, halving every ${num(`${Math.round(Math.LN2 / decay)} years`)}.</p>
-    <p class="note">Cells: 8% a decade at 0.92 AU behind 20 µm of glass (the hot-power study), scaled as 1/r². Wiring: Black's law, current density squared, activation energy 0.9 eV. Doses: the memory study's 10-year range at 0.92 AU. Dust: the thermal-mass study, from the Grün meteoroid flux. A once-in-a-millennium solar storm could deliver 10–100 times a decade's dose in days, which magnetic RAM would not survive.</p>`);
+  return deep('How long a sail lasts, and how rebuilds are counted', `
+    <p>Today's satellites are built for 10 to 30 years, and the studies behind this page first gave the sails 20 to 30. That figure came from cells that keep about 92% of their output after ten years and chips built the way chips are built today. It is not a limit set by physics. Here is what wears a sail of this swarm, with its film at about ${Math.round(Tf)} K and its chips near ${Math.round(chipC)} °C, and what stops each one:</p>
+    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Part</th><th>What wears it</th><th>How fast</th><th>What stops it</th></tr></thead><tbody>${wearRows}</tbody></table></div>
+    <p>Only the first row has no repair, and it needs none. Everything else can be healed, rebuilt in place or designed out. So the model gives each sail a full rebuild every ${num(`${L} years`)}, recycling ${num(pctNear1(rho))} of it, and in between depot craft anneal its cells, patch its film and swap chiplets. The rebuild is for slow damage that repair cannot reach: clusters of displaced atoms that heat does not undo, grains growing in the metal, patches on patches.</p>
+    <p><b>Falling behind.</b> Rebuilding early pays when what new chips gain beats what recycling loses, which happens at an age of ln(1/ρ) ÷ ln(1 + g), where ρ is the share recycled and g the yearly gain in computing per joule. With ${pctNear1(rho)} recycled that is ${Math.round(astar(0.01))} year${Math.round(astar(0.01)) === 1 ? '' : 's'} if chips still improve 1% a year, ${Math.round(astar(0.002))} at 0.2% and ${Math.round(astar(0.0001))} at 0.01%. Recycling that good makes rebuilding cheap, so while chips improve, sails are simply rebuilt more often. By the time the swarm is finished, chips have sat at their floor for a century, and only wear counts.</p>
+    <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Rebuilt every</th><th>Finished swarm</th><th>Finished in</th><th>Lost a year once finished</th></tr></thead><tbody>${lives}</tbody></table></div>
+    <p>A long life does two things. Less of Mercury goes on replacements, so the swarm can finish; and once it is finished, it needs very little: at ${num(`${L} years`)} it loses ${num(kg(loss))} a year, which Mercury's core can supply for a very long time.</p>
+    <p><b>The rebuild itself</b> is a swap. A depot craft brings new film rolls, chips already in them, and fits them onto the sail's existing hub, booms and vanes; the old film is rolled up and recycled in orbit.</p>
+    <p><b>The model counts it like this.</b> Every kilogram exported retires ${num(`${L} years`)} later, and ${num(pctNear1(rho))} of it goes back into production. While industry doubles every ${num(`${Td.toFixed(2)} years`)}, the sails retiring were built when industry was 2<sup>${L}/${Td.toFixed(2)}</sup> times smaller, so rebuilds take ${grow < 1e-4 ? 'almost none' : num(pct(grow, grow < 0.01 ? 2 : 0))} of the output. Once the swarm is finished, industry only replaces what rebuilds lose.</p>
+    <p class="note">Cells: 8% a decade at 0.92 AU behind 20 µm of glass (the hot-power study), scaled as 1/r². Wiring: Black's law, current density squared, activation energy 0.9 eV, for a chip built for ten years at 105 °C. Doses: the memory study's 10-year range at 0.92 AU. Dust: the thermal-mass study, from the Grün meteoroid flux. Sputtering: the solar wind at 0.95 AU, about 1 keV per proton, sputtering yield ~0.02. Annealing: phosphorus–vacancy centres in silicon anneal near 150 °C, divacancies at 250–300 °C and oxygen–vacancy centres at about 350 °C. A once-in-a-millennium solar storm could deliver 10–100 times a decade's dose in days, which magnetic RAM would not survive and resistive RAM would.</p>`);
 }
 
-/** After Mercury's rock: what could keep the swarm repaired. */
+/** After Mercury: what could keep the finished swarm repaired. */
 function afterRockBox(p, d, E) {
-  const L = p.serviceLife, rho = p.recycleFrac;
-  if (!(L > 0) || d.growth.tRockOut == null) return '';
+  const L = p.serviceLife, rho = p.recycleFrac, g = d.growth;
+  if (!(L > 0)) return '';
   const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
   const lossKg = E.mass * (1 - rho) / L;                 // spacecraft lost per year at the finished size
   const siYr = (lossKg / p.yieldDelivered) * 0.25;        // silicon to replace it (Mercury's rock is ~25 % Si)
   const yrs = si => { const y = si / siYr; return y < 20 ? `${y.toFixed(0)} years` : `${words(Math.round(Number(y.toPrecision(2))))} years`; };
+  const coreSiLeft = Math.max(0, (g.rockDeliverable - Math.max(E.mass, g.rockMantle)) / p.yieldDelivered * 0.25);
   const src = [
     ['The whole asteroid belt', '2.4×10²¹ kg', 2.4e21 * 0.12, 'almost none'],
-    ["Mercury's iron core", '2.5×10²³ kg', 1.5e22, '4.3 km/s'],
+    [p.rockSource === 'whole' ? "What is left of Mercury's core" : "Mercury's iron core", '2.5×10²³ kg', p.rockSource === 'whole' ? coreSiLeft : 1.5e22, '4.3 km/s'],
     ['The Moon', '7.3×10²² kg', 1.5e22, '2.4 km/s'],
     ['Mars', '6.4×10²³ kg', 1.0e23, '5.0 km/s'],
     ['Venus', '4.9×10²⁴ kg', 7e23, '10.4 km/s, under 90 bar of CO₂'],
   ];
   const rows = src.map(([n, m, si, v]) => `<tr><td>${n}</td><td class="v">${m}</td><td class="v">${sci(si, 2)} kg</td><td class="v">${v}</td><td class="v">${yrs(si)}</td></tr>`).join('');
-  return deep('After the rock: could asteroids keep the swarm going?', `
-    <p>Once Mercury's rock is gone, the swarm wears down. At its finished size, refreshes lose about ${num(`${sci(lossKg, 2)} kg`)} of spacecraft a year, and replacing that takes about ${num(`${sci(siYr, 2)} kg`)} of silicon a year.</p>
-    <p>Asteroids look like the obvious top-up. There is no gravity well to climb, mining spread over thousands of small bodies has no heat wall, and the trip to the swarm, about 11 km/s, is easy for a solar sail. But the whole main belt weighs only 2.4×10²¹ kg, about 3% of Mercury's rock. Ceres alone is 39% of it, and most of it is carbon-rich rock and ice with only 10–15% silicon. It would cover the swarm's repairs for a few years.</p>
+  const better = rho < 0.999 ? Math.min(0.999, 1 - (1 - rho) / 10) : null;
+  return deep('After Mercury: what keeps the swarm repaired?', `
+    <p>At its finished size the swarm loses about ${num(kg(lossKg))} of spacecraft a year to rebuilds, which takes about ${num(kg(siYr))} of silicon a year to replace.</p>
+    <p>Asteroids look like the obvious top-up. There is no gravity well to climb, mining spread over thousands of small bodies has no heat wall, and the trip to the swarm, about 11 km/s, is easy for a solar sail. But the whole main belt weighs only 2.4×10²¹ kg, about 3% of Mercury's rock. Ceres alone is 39% of it, and most of it is carbon-rich rock and ice with only 10–15% silicon.</p>
     <div class="tablewrap" style="margin:1rem 0"><table class="compare"><thead><tr><th>Source</th><th>Mass</th><th>Silicon</th><th>Escape speed</th><th>Repairs it covers</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p>What asteroids do offer is what Mercury lacks: hydrogen, carbon and nitrogen. Mercury has only about 5×10¹³ kg of hydrogen, which forces every factory to run on dry chemistry; Ceres alone probably holds around 10²⁰ kg of water. For bulk silicon, the next sources are Mercury's own core, then the Moon and Mars, each climbed out of with beamed power. Better recycling stretches all of them: at 99% instead of ${pct(rho, 0)}, the losses fall ${Math.round((1 - rho) / 0.01)}-fold.</p>
+    <p>What asteroids do offer is what Mercury lacks: hydrogen, carbon and nitrogen. Mercury has only about 5×10¹³ kg of hydrogen, which forces every factory to run on dry chemistry; Ceres alone probably holds around 10²⁰ kg of water. For bulk silicon, the next sources after Mercury's core are the Moon and Mars, each climbed out of with beamed power.${better ? ` Better recycling stretches all of them: at ${pctNear1(better)} instead of ${pctNear1(rho)}, the losses fall ${Math.round((1 - rho) / (1 - better))}-fold.` : ''}</p>
     <p class="note">Silicon: the core at ~6%, the Moon, Mars and Venus at ~20% of their rocky part, the belt at ~12%. Belt mass from Pitjeva and Pitjev 2018. Years at the finished swarm's loss rate.</p>`);
 }
 
@@ -532,30 +598,36 @@ function renderBuild() {
   const growthLine = reach.length
     ? `Growth is exponential until the heat wall, reaching ${reach.join(' and ')}.`
     : `Growth is exponential until the heat wall, but the swarm never reaches ${num('1%')} of the Sun's light.`;
+  const closedDone = p.earthPlacement === 'closed' && E.binding === 'room' && ceil >= E.room * 0.99;
+  const coreLate = g.rockCore > 0 && g.tMantleOut != null && g.tMantleOut < (Number.isFinite(yCap) ? yCap : g.tPeak);
+  const fMantle = coreLate ? fForMass(state.table, g.builtAtYear(g.tMantleOut)) : 1;
   const upkeep = g.reachedTarget && p.coverage < 1
     ? `It stops there because that is the target you set.`
+    : closedDone
+    ? `It stops because there is nothing left to catch: in ${num(yr(p.seedYear + state.moments.cap))} the last gap closes and the Sun is enclosed.${coreLate ? ` By then Mercury's crust and mantle are gone, dug out by ${num(yr(p.seedYear + g.tMantleOut))} with the swarm at ${num(pct(fMantle, 0))}. The rest is built from silicon in its core, more slowly, because each kilogram of spacecraft from the core means lifting four times as much.` : ''}`
     : g.tRockOut != null && g.tRockOut <= g.tPeak + 1
     ? `What stops it is Mercury itself. By ${num(yr(p.seedYear + g.tRockOut))} all of its rock has been dug out, and from then on the fleet slowly wears away.`
     : p.serviceLife > 0
     ? `The ceiling is set by upkeep, not by Mercury: sails wear out after ${num(`${p.serviceLife} years`)}, ${num(pct(p.recycleFrac, 0))} of each is recycled in orbit, and new exports only replace the rest.`
     : `With sails that never wear out, the swarm keeps growing at the heat-limited rate until it reaches its target or Mercury's rock runs out.`;
-  const earthLine = E.binding === 'rock' ? '' : Number.isFinite(yCap)
-    ? `${LIMIT[E.binding]}, the blue line, is reached in ${num(yr(p.seedYear + yCap))}.`
-    : `It never reaches ${LIMIT[E.binding].toLowerCase()}, the blue line.`;
-  $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} Then it tops out at ${num(pct(ceil, 1))}. ${upkeep} ${earthLine}</p>${refreshBox(p, d, E)}${afterRockBox(p, d, E)}`;
+  const earthLine = E.binding === 'rock' || closedDone ? '' : Number.isFinite(yCap)
+    ? `${limitOf(p, E)}, the blue line, is reached in ${num(yr(p.seedYear + yCap))}.`
+    : `It never reaches ${limitOf(p, E).toLowerCase()}, the blue line.`;
+  $('build-prose').innerHTML = `<p>For decades there is nothing to see, which is how exponential growth always looks from the inside. ${growthLine} ${closedDone ? '' : `Then it tops out at ${num(pct(ceil, 1))}. `}${upkeep} ${earthLine}</p>${refreshBox(p, d, E)}${afterRockBox(p, d, E)}`;
   const a = h.atYear(p, d, state.t);
   const markers = [
     { t: g.tCap, f: fForMass(state.table, g.builtAtYear(g.tCap)), label: `heat wall, ${yr(p.seedYear + g.tCap)}` },
     { t: y1, f: 0.01, label: `1%, ${yr(p.seedYear + y1)}` },
     { t: y10, f: 0.1, label: `10%, ${yr(p.seedYear + y10)}` },
-    { t: g.tPeak, f: ceil, label: `ceiling ${pct(ceil, 1)}` },
+    closedDone ? { t: state.moments.cap, f: ceil, label: `closed, ${yr(p.seedYear + state.moments.cap)}` } : { t: g.tPeak, f: ceil, label: `ceiling ${pct(ceil, 1)}` },
   ];
-  if (g.tRockOut != null) markers.push({ t: g.tRockOut, f: fForMass(state.table, g.builtAtYear(g.tRockOut)), label: 'rock exhausted' });
+  if (coreLate) markers.push({ t: g.tMantleOut, f: fMantle, label: `mantle gone, ${yr(p.seedYear + g.tMantleOut)}` });
+  else if (g.tRockOut != null) markers.push({ t: g.tRockOut, f: fForMass(state.table, g.builtAtYear(g.tRockOut)), label: 'rock exhausted' });
   state.chart = buildChart($('build-chart'), {
     main: state.curve,
     others: ['2026', 'low', 'mid', 'high'].filter(e => e !== state.era).map(e => ({ pts: state.curves[e] })),
     markers, xOf, tOf, seedYear: p.seedYear, span: SPAN,
-    limit: { f: E.cap, label: `${LIMIT[E.binding]}: ${pct(E.cap, E.cap < 0.1 ? 1 : 0)}` },
+    limit: { f: E.cap, label: `${limitOf(p, E)}: ${pct(E.cap, E.cap < 0.1 ? 1 : 0)}` },
     cursor: { t: state.t, f: a.f },
     describe: (t, f) => `<b>${Math.round(p.seedYear + t)}</b><br>${pct(f, 3)} of sunlight captured`,
     onPick: t => { state.t = t; renderYear(); },
@@ -570,6 +642,20 @@ function updateYear(a) {
   state.chart?.setCursor(state.t, a.f);
   $('build-readout').innerHTML = readout(a);
   $('year').value = String(Math.round(xOf(state.t) * 1000));
+}
+
+/** The Earth chapter for the closed swarm (docs/closed-swarm.md). */
+function earthClosedProse(p, E) {
+  const fc = E.forcing;
+  const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
+  const T = h.closedFilmT(p, E.cap);
+  return `<p>Every watt the sails catch leaves them again as heat, through their backs, at ${num(kelvin(T))}, and Earth sits just outside. If sails filled the sky right up to the line between the Sun and Earth, Earth would see their hot backs over a disc ${num('72°')} in radius round the Sun, and they would send it about ${num('540 W/m²')}, more than twice what it absorbs from the Sun. So the part of the swarm between the Sun and Earth, ${num('23°')} round the line joining them, is not made of compute sails. It is a cap of cold mirrors, ${num('3 million km')} sunward of Earth, that keeps pace with Earth all year.</p>
+    <p>The cap's inner face, silver under a dielectric coating, sends ${num('99.5%')} of the sunlight that reaches it back into the swarm, so the swarm still catches all of it. Behind it, twenty layers of silvered foil keep the back cold, about ${num('176 K')}. That back is all Earth sees of the swarm, and it sends Earth ${num(`${fc.gross.toFixed(2)} W/m²`)}, ${pct(fc.gross / EARTH.co2DoublingForcing, 0)} of what doubling CO₂ does. A window in the middle of the cap, ${num('20,300 km')} in radius, lets Earth's own sunlight through: just wide enough that every point on Earth sees the whole Sun. Narrowed by a hair, it takes ${num(pct(fc.sunlightCut, 2))} of the sunlight to cancel the cap's warmth, and Earth keeps its temperature with ${num(pctNear1(1 - fc.sunlightCut))} of its sunlight. That trade costs about ${num(pct(fc.rainCut, 1))} of the world's rain, against ${pct(h.earthForcing({ ...p, earthPlacement: 'uniform' }, h.FIXED.uniformRoom).rainCut, 0)} for a swarm left open toward Earth.</p>
+    ${deep('What holds the cap in place', `<p>Each mirror flies its own orbit round the Sun. At ${num('0.98 AU')} gravity alone would take it round in 0.97 years and it would drift ahead of Earth, so sunlight has to carry ${num('5.9%')} of its weight. That fixes how heavy the mirrors can be: ${num('26 g/m²')}, which holds the silver face and its twenty layers of foil. Mirrors above and below the plane of Earth's orbit fly tilted orbits and drift north and south through the cap once a year, phased so the cap always stays full. The whole cap weighs ${num('2.8×10²⁰ kg')}, under 1% of the swarm.</p><p>A window is just mirrors turned edge-on. The Moon gets one of its own, ${num('15,700 km')} in radius, which crosses the cap once a month as the mirrors in its path turn and turn back. Close it and the Moon goes dark.</p>`)}
+    ${deep("Doesn't a wall of mirrors trap Earth's own heat?", `<p>No. A mirror close to Earth would send Earth's heat straight back, but the cap is millions of kilometres away and curves away from Earth, like the outside of a ball. Earth's heat that reaches it is reflected out into space, and less than a millionth of it comes back. The cap blocks the sails' heat because it sits in front of them, not because it filters anything.</p>`)}
+    ${deep('What if the cap fails?', `<p>A hole in the cap would let Earth see into the swarm: past the Sun, the inner faces of the far side glow at ${num(kelvin(T))}. With the whole cap gone that would be about ${num('330 W/m²')}, and Earth would heat by tens of degrees within years. But the swarm can open faster than that. Sails turned edge-on stop absorbing sunlight and cool within minutes, and the inside of the swarm cools with them. Any hole in the cap can be matched by opening the sails behind it, at the cost of their computing.</p>`)}
+    <p>By day nothing changes: the sky is blue and the Sun as bright as ever. The change comes at night. The cap fills the sky within ${num('76°')} of the Sun, and it is black: no stars, no Milky Way. On a summer evening at mid-latitudes, once twilight ends, it reaches ${num('57°')} up the western sky. Through the night it swings round to the north and sinks. At midnight near the equator it is below the horizon; at mid-latitudes it still covers the lowest few degrees of the northern sky in winter and about half of it in June. Outside it the stars are as they are today, on a sky a little darker than it has ever been, because the zodiacal light is gone: the dust outside the swarm is unlit. So are the planets. Venus and Mercury are inside the swarm, and Mars, Jupiter and Saturn get the swarm's infrared instead of sunlight and reflect nothing you can see. The Moon shines only while its window is open.</p>
+    <p>The swarm also stops the solar wind. Only a thin column gets through Earth's window, and it spreads to about ${num('0.3%')} of today's flux before it arrives, so geomagnetic storms and most aurorae end. Beyond the swarm there is no solar wind left to hold back the galaxy's cosmic rays, so more reach Earth; its magnetic field and air still stop most of them.</p>`;
 }
 
 function renderEarth() {
@@ -611,17 +697,23 @@ function renderEarth() {
   const p4 = uniform
     ? `From Earth the swarm is a disc of light ${num('72°')} in radius round the Sun, about ${num(`${Math.round(discCd)} cd/m²`)}, as bright as the sky just after sunset, with a dark hole ${num('15°')} across round the Sun itself, where sails stay clear of the point behind it. By day it is lost in the blue. After sunset it stays up for hours: with the Sun ${num('18°')} below the horizon it still lights the ground at about ${num(`${Math.round(lux)} lux`)}, what the ground gets a few minutes after sunset. The sky gets dark only once the Sun is more than ${num('72°')} below the horizon, around midnight in the tropics and on winter nights at mid-latitudes. On summer nights it never does.`
     : `After sunset the swarm glows round the Sun's position, lighting the ground at up to ${num(`${lux < 10 ? lux.toFixed(1) : Math.round(lux)} lux`)}, ${lux / 0.25 >= 1.5 ? `${Math.round(lux / 0.25)} times` : 'about'} a full Moon.`;
-  $('earth-prose').innerHTML = `<p>${p1}</p>${slit}<p>${p2}</p>${noIR}${failsafe}${p3 ? `<p>${p3}</p>` : ''}${costs}<p>${p4}</p>`;
+  $('earth-prose').innerHTML = p.earthPlacement === 'closed' ? earthClosedProse(p, E)
+    : `<p>${p1}</p>${slit}<p>${p2}</p>${noIR}${failsafe}${p3 ? `<p>${p3}</p>` : ''}${costs}<p>${p4}</p>`;
 
   const sCap = h.swarmAt(p, E.cap);
-  orbitMap($('orbit-map'), uniform
+  $('orbit-caption').innerHTML = p.earthPlacement === 'closed'
+    ? `<b>Where the sails fly, to scale,</b> seen from above, in a frame that turns with Earth so Earth stays put. In the plane of Earth's orbit the swarm is a closed ring just inside it; above and below that plane it wraps the Sun completely. Between the Sun and Earth the sails give way to a cap of cold mirrors, with a window for Earth's sunlight.`
+    : `<b>Where the sails fly, to scale,</b> seen from above, in a frame that turns with Earth so Earth stays put. In the plane of Earth's orbit the swarm is a ring just inside it, open toward Earth${uniform ? ' and behind the Sun; above and below that plane it wraps the Sun in the same way' : ''}. A small sunshade sits at L1, between Earth and the Sun.`;
+  orbitMap($('orbit-map'), p.earthPlacement === 'closed'
+    ? { mode: 'closed', r: F.closedR, cone: 23, capR: F.capR, label: `the swarm: ${pct(E.cap, 0)} of the Sun's light` }
+    : uniform
     ? { mode: 'uniform', r: F.uniformR, cone: 23, l3: 15, label: `the swarm: ${pct(E.cap, 0)} of the Sun's light` }
     : p.earthPlacement === 'farside'
     ? { shellR: null, cloudLabel: `the swarm: ${pct(E.cap, E.cap < 0.1 ? 1 : 0)}`, latMax: p.farsideLat }
     : { shellR: Math.min(0.96, sCap.rSail), shellLabel: `the swarm: ${pct(E.cap, 0)}`, cloudLabel: '', spans: [] });
   let kink = null;
   for (const r of state.table) if (h.swarmAt({ ...p, earthPlacement: 'shell' }, r.f).rSail > 1) { kink = r.f; break; }
-  const name = { uniform: 'the near-uniform swarm with dark fronts', farside: 'sails only beyond the Sun, dark fronts', cone: 'even with a gap, glass fronts', shell: 'the same even shell' }[p.earthPlacement];
+  const name = { closed: 'the closed swarm, behind its mirror cap', uniform: 'the near-uniform swarm with dark fronts', farside: 'sails only beyond the Sun, dark fronts', cone: 'even with a gap, glass fronts', shell: 'the same even shell' }[p.earthPlacement];
   earthChart($('earth-chart'), {
     pts: state.table.map(r => [r.f, r.forcing]),
     pts2: state.table.map(r => [r.f, h.earthForcing(p, r.f).gross]),
@@ -635,11 +727,12 @@ function renderEarth() {
 }
 
 function renderDesign() {
-  const E = state.earth, fc = E.forcing;
+  const E = state.earth, fc = E.forcing, closed = state.params.earthPlacement === 'closed';
   const deep = (title, body) => `<details class="deep"><summary>${title}</summary>${body}</details>`;
   const swap = fc.swapped > 0.5;
   $('design-prose').innerHTML = `
-    <p>${swap ? `The shade above dims all of Earth evenly. It does not have to.` : `A shade does not have to dim Earth evenly.`} With the swarm's energy, adding or removing sunlight anywhere on Earth is almost free: adding ${num('50 W/m²')} of daylight to a million square kilometres takes ${num('5×10¹³ W')}, two ten-trillionths of the swarm's output, and about ten million tonnes of mirrors in Earth orbit. What limits it is how sharply light can be placed, and how the atmosphere answers.</p>
+    ${closed ? `<p>In a closed swarm all of Earth's sunlight already passes through a dial: its window. Narrowed, or with its mirrors part-turned, it dims the whole planet evenly; mirrors round it tilted toward Earth brighten it. But from ${num('3 million km')} each mirror's spot is ${num('28,000 km')} across, wider than Earth, so the cap can only set the sunlight of the whole planet at once. Placing light region by region takes shades and mirrors much closer in.</p>` : ''}
+    <p>${closed ? 'Those are cheap.' : swap ? `The shade above dims all of Earth evenly. It does not have to.` : `A shade does not have to dim Earth evenly.`} With the swarm's energy, adding or removing sunlight anywhere on Earth is almost free: adding ${num('50 W/m²')} of daylight to a million square kilometres takes ${num('5×10¹³ W')}, two ten-trillionths of the swarm's output, and about ten million tonnes of mirrors in Earth orbit. What limits it is how sharply light can be placed, and how the atmosphere answers.</p>
     <p>The Sun is half a degree across, so a shade or mirror blurs its shadow or spot over about a hundredth of its distance. From L1 that is ${num('14,000 km')}, more than Earth's diameter: a shade there can only shift its weight across Earth's disc, north against south, season by season. That is still useful. In climate models, sunlight cut by latitude and season leaves the worst-off region about a third less changed than an even cut, and four control points have held global temperature and both its north–south and equator-to-pole gradients at once. Mirrors and shades in orbits ${num('10,000 km')} up blur over ${num('90 km')}, enough to aim at a country; at ${num('1,000 km')}, ${num('9 km')}, enough for a valley. They turn edge-on when they are not over their target.</p>
     <div class="tablewrap" style="margin:1.4rem 0"><table class="compare"><thead><tr><th>Shade or mirror at</th><th>Blur</th><th>What it can steer</th></tr></thead><tbody>
       <tr><td>L1, 1.5 million km</td><td class="v">14,000 km</td><td>Earth's overall sunlight, north vs south, seasons</td></tr>
@@ -660,6 +753,11 @@ function renderStar() {
   sedChart($('sed-chart'), { f: a.f, T: a.tSail });
   $('sed-legend').innerHTML = `<span><i style="background:var(--sun-mark)"></i>sunlight that escapes</span><span><i style="background:var(--swarm)"></i>waste heat from the sails</span><span>energy per log-wavelength, as a share of the Sun's output, in ${Math.round(a.calendarYear)}</span>`;
   // λL_λ of a blackbody peaks at λT = 3670 µm·K (energy per log-wavelength, as plotted)
+  if (p.earthPlacement === 'closed' && a.f > 0.99) {
+    $('star-prose').innerHTML = `
+    <p>From another star the Sun would be gone by ${num(Math.round(a.calendarYear))}. All of its light leaves the swarm as the ${num(`${Math.round(a.tSail)} K`)} glow of the sails' backs, from a sphere ${num('1.9 AU')} across, peaking near ${num(`${(3.67e-3 / a.tSail * 1e6).toFixed(1)} µm`)} in the infrared. The only sunlight that still escapes goes out through the windows, aimed at Earth and the Moon, and misses every other star. A star that has vanished from visible light and reappeared in the infrared with the same power is exactly what surveys for Dyson spheres look for, and this one would be among the easiest they could find.</p>`;
+    return;
+  }
   $('star-prose').innerHTML = `
     <p>From another star the Sun would look ${num(pct(a.f, 2))} dimmer in ${num(Math.round(a.calendarYear))}. On its own that would be easy to miss, because nobody out there knows how bright the Sun is supposed to be. What gives the swarm away is a second source in the infrared, peaking near ${num(`${(3.67e-3 / a.tSail * 1e6).toFixed(1)} µm`)}, the ${num(`${Math.round(a.tSail)} K`)} glow of the sails. That hump carries exactly the energy missing from the sunlight, since every watt the swarm absorbs it has to radiate again. A star a little too faint with warm infrared to spare is what surveys for Dyson spheres look for.</p>`;
 }
@@ -672,7 +770,7 @@ function renderFuture() {
   const a = h.swarmAt({ ...p26, earthPlacement: 'shell' }, 0.01), b = h.swarmAt({ ...right, earthPlacement: 'shell' }, 0.01);
   const f1 = x => `${(x * 100).toFixed(1)}%`;
   $('future-prose').innerHTML = `
-    <p>Industry needs most of a century to reach the heat wall, and sails get new film every 10 to 20 years, so nearly every sail that ever flies carries hardware built after 2095. Today's memory chips, today's processors and the small lasers they would use to talk are long gone before the swarm is big enough to see.</p>
+    <p>Industry needs most of a century to reach the heat wall and decades more to finish, so nearly every sail that ever flies carries hardware built after 2095. Today's memory chips, today's processors and the small lasers they would use to talk are long gone before the swarm is big enough to see.</p>
     <p>The design itself outlives all of that. Spread-out sails still beat boxes, chips still run near 85 °C, and silicon is still the only solar cell Mercury's rock can make in bulk. What changes is how much each kilogram does. The table compares today's hardware with the hardware the swarm is actually built from.</p>`;
   const rows = [
     ['Energy per operation', `${sci(a.sail.jPerFlop, 2)} J`, `${sci(b.sail.jPerFlop, 2)} J`],
@@ -686,6 +784,12 @@ function renderFuture() {
   ];
   $('future-table').innerHTML = `<thead><tr><th></th><th>2026 hardware</th><th>${rightLabel}</th></tr></thead><tbody>${rows.map(([k, x, y]) => `<tr><td>${k}</td><td class="v">${x}</td><td class="v">${y}</td></tr>`).join('')}</tbody>`;
   const cpw = s => s.chipPower / s.intercepted;
+  const sL = h.swarmAt(right, right.earthPlacement === 'closed' ? 1 : right.earthPlacement === 'uniform' ? h.FIXED.uniformRoom : 0.01);
+  const back = 1 - (sL.flops / sL.intercepted) / (b.flops / b.intercepted);
+  const layoutCost = right.earthPlacement === 'closed'
+    ? `the closed swarm then gives about ${pct(back, 0)} of it back for running hot`
+    : right.earthPlacement === 'uniform' ? `the near-uniform swarm then gives about ${pct(back, 0)} back for its infrared-dark fronts and its hotter orbit`
+    : back > 0.02 ? `this layout then gives about ${pct(back, 0)} back` : 'this layout keeps it';
   const notes = [
     ['Energy per operation', `<p>The 2026 figure, ${num(`${sci(a.sail.jPerFlop, 2)} J`)}, is what today's AI accelerators spend per 8-bit operation, memory and links included, slowed to 60% of full clock speed where they are most efficient, at 85 °C. The mature figure follows each part of that energy forward. Transistors keep shrinking for another decade or two, but their supply voltage is stuck near 0.6 V, so each switch saves only a few times more. 4-bit arithmetic halves the work per operation. Memory stacked directly on the logic removes most of the energy spent moving data. By 2100 that reaches about ${num('1.4×10⁻¹⁵ J')}, twice the practical floor for ordinary logic at 85 °C (about 7×10⁻¹⁶ J, still 400 times the thermodynamic minimum per switch). Going further needs reversible logic, which costs chip area the film doesn't have; the optimistic era assumes some of it.</p>`],
     ['Memory per chiplet', `<p>A chiplet in the film has no shielding and takes 140–470 krad of radiation in ten years. DRAM fails at 2–100 krad, so the 2026 design had to use SRAM: 16 MB, which at 85 °C leaks 10–59% of the chip's power. Non-volatile memories shrug the dose off (magnetic RAM above 1 Mrad, resistive RAM 5–20 Mrad, ferroelectric RAM 10 Mrad) and can be stacked in layers on top of the logic. By about 2040 that gives 1–2 GB per 0.15 W chiplet, kept to the useful minimum because every gigabyte costs fab area. It holds its contents with no power, so the leakage disappears.</p>`],
@@ -694,7 +798,7 @@ function renderFuture() {
     ['Solar cell efficiency', `<p>Silicon is the only solar cell Mercury's rock can make in bulk: perovskites need iodine, and III-V cells indium and germanium, enough for a millionth of the swarm. Today's thin space silicon converts ${num(pct(p26.pvEta0, 0))} of sunlight above the atmosphere. Made without hydrogen, which Mercury lacks, mature cells reach about ${num('21.5%')}, against a theoretical 30%. The optimistic ${pct(h.eraParams('high').pvEta0, 0)} needs a top cell of silicon nanocrystals in glass, which works only in the lab so far. Thinner, better cells also lose less in the heat: 0.34% per kelvin instead of 0.42%.</p>`],
     ['Orbit at 1% coverage', `<p>A sail flies where its chips reach their 85 °C limit. Its temperature depends on how much sunlight it absorbs and how well it radiates, not on how efficient its cells are, because the chips turn all the electricity back into heat in the same sheet. Mature cells reflect the infrared that silicon can't use, so the film absorbs ${pct(right.alpha, 0)} of the sunlight instead of ${pct(p26.alpha, 0)}, runs cooler, and can fly nearer the Sun: ${b.rSail.toFixed(3)} AU instead of ${a.rSail.toFixed(3)}.</p>`],
     ['Swarm mass per watt', `<p>The film's weight per square metre, divided by the chip power each square metre carries, plus the pods' share. Nearer the Sun each square metre collects more, mature cells convert a little more, and pods shrink from ${pct(a.q, 0)} of the chip power to ${pct(b.q, 0)} as memory moves onto the film. Together that takes the swarm from ${(a.kgPerW * 1e3).toFixed(2)} to ${(b.kgPerW * 1e3).toFixed(2)} g/W${(right.filmThin ?? 1) < 1 ? `, with the film thinned to ${pct(right.filmThin, 0)} of the design spec` : ''}.</p>`],
-    ['Computing per watt of sunlight', `<p>The end-to-end figure. Of each watt of sunlight, about ${num(pct(cpw(a), 0))} becomes chip power in 2026 and ${num(pct(cpw(b), 0))} in the mature era, after the cells, the packing of the film and the power the sail keeps for itself. Each joule of chip power then does one operation per ${sci(a.sail.jPerFlop, 2)} J in 2026 and per ${sci(b.sail.jPerFlop, 2)} J later. Multiplied out, that is ${sci(a.flops / a.intercepted, 2)} and ${sci(b.flops / b.intercepted, 2)} operations per joule of sunlight, ${Math.round((b.flops / b.intercepted) / (a.flops / a.intercepted))} times more, almost all of it from cheaper operations. These are for the hardware on its own; the near-uniform swarm then gives about 40% back for its infrared-dark fronts and its hotter orbit.</p>`],
+    ['Computing per watt of sunlight', `<p>The end-to-end figure. Of each watt of sunlight, about ${num(pct(cpw(a), 0))} becomes chip power in 2026 and ${num(pct(cpw(b), 0))} in the mature era, after the cells, the packing of the film and the power the sail keeps for itself. Each joule of chip power then does one operation per ${sci(a.sail.jPerFlop, 2)} J in 2026 and per ${sci(b.sail.jPerFlop, 2)} J later. Multiplied out, that is ${sci(a.flops / a.intercepted, 2)} and ${sci(b.flops / b.intercepted, 2)} operations per joule of sunlight, ${Math.round((b.flops / b.intercepted) / (a.flops / a.intercepted))} times more, almost all of it from cheaper operations. These are for the hardware on its own, on its coolest orbit; ${layoutCost}.</p>`],
   ];
   $('future-notes').innerHTML = `<p class="notes-title">How these figures were obtained</p>${notes.map(([k, v]) => `<details class="deep"><summary>${k}</summary>${v}</details>`).join('')}`;
 }

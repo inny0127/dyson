@@ -826,7 +826,8 @@ def main(argv):
     ap.add_argument('out')
     ap.add_argument('--date', default='2026-08-22')
     ap.add_argument('--sun-alt', type=float, default=-9.0)
-    ap.add_argument('--glow', choices=['none', 'shell', 'farside', 'mix', 'uniform'], default='none')
+    ap.add_argument('--glow', choices=['none', 'shell', 'farside', 'mix', 'uniform', 'closed'], default='none')
+    ap.add_argument('--cap-deg', type=float, default=75.6, help='closed: sky hidden within this angle of the Sun')
     ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the swarm round the Sun')
     ap.add_argument('--f-in', type=float, default=0.0, help='mix: coverage inside Earth\'s orbit (r..r_out AU)')
     ap.add_argument('--sun-scale', type=float, default=1.0, help='sunlight reaching Earth past an L1 shade')
@@ -860,6 +861,8 @@ def main(argv):
             spec['glow'].update(f_far=a.f, f_in=a.f_in)
         if a.glow == 'uniform':
             spec['glow'].update(tau=a.tau)
+        if a.glow == 'closed':
+            spec['glow'] = {'kind': 'closed', 'cap_deg': a.cap_deg}
     spec['sun_scale'] = a.sun_scale
     prefix, info = sky_assets(spec)
     w, h = (int(v) for v in a.res.split('x'))
