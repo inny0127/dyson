@@ -93,7 +93,7 @@ coverage f is the share of the Sun's light that hits a sail.
 | 10⁻⁴ | 2129 | 0.018 | 0.003 | — |
 | 1 % | 2141 | 1.8 | 0.28 | 0.12 % |
 | 50 % | 2178 | 45 | 8.6 | 3.6 % |
-| 99 % | 2343 | 1.8 | 0.83 | 0.35 % |
+| 99 % | 2342 | 1.8 | 0.83 | 0.35 % |
 | closed | 2361 | 0 | 0.56 | 0.24 % |
 
 ## How complete the enclosure is
@@ -267,7 +267,7 @@ coverage f is the share of the Sun's light that hits a sail.
   - heat wall 2145;
   - half the Sun 2178;
   - crust and mantle dug out 2200, at 75 %;
-  - 99 % in 2343, closed in **2361**: from the core each kilogram of spacecraft means lifting four
+  - 99 % in 2342, closed in **2361**: from the core each kilogram of spacecraft means lifting four
     times as much, so the last quarter takes 160 years.
   - By then 93 % of Mercury has been taken apart. With the mantle alone the swarm stops at 75 %.
 
@@ -283,7 +283,7 @@ physics allows, with repair in place.
 | Electromigration in chip wiring | at 155 °C 25× faster than at 105 °C: a chip built as today's would last ~1.6 years at the sail's 60 % clock | wiring cut into segments shorter than the Blech length (current density × length under ~3,000 A/cm for copper), where back-stress stops migration altogether; it costs routing density, not lifetime |
 | Radiation dose in memory | 133–437 krad a decade, unshielded | resistive RAM survives 10–20 Mrad (centuries); data is scrubbed, so retention at 155 °C is not the limit |
 | Meteoroid holes | 0.007–1.2 % of the area a year, depending on crack arrest | crack-stopped film keeps the low end, ~2 % in 300 years, patched in place |
-| Obsolescence | refresh pays when the chips' yearly gain g exceeds ln(1/ρ) / L | by 2343 chips have long sat at their practical floor; g → 0 |
+| Obsolescence | refresh pays when the chips' yearly gain g exceeds ln(1/ρ) / L | by 2342 chips have long sat at their practical floor; g → 0 |
 
 - **So the model takes a rebuild every 300 years**, with 99 % of each sail recycled in orbit
   (sliders: 0–1,000 years, up to 99.9 %).

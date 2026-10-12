@@ -56,7 +56,7 @@ The page follows the swarm as it grows. At every stage it is the same symmetric 
 coverage f (formation bands a kilometre apart in radius, ~7,000 km in all), the part Earth can see
 flown by mirror sails at 0.98 AU at the same coverage, Earth's sunlight passing through its window.
 The stages are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from the model (2116,
-2129, 2141, 2178, 2343, 2361). `scripts/stage-renders.sh` makes them all.
+2129, 2141, 2178, 2342, 2361). `scripts/stage-renders.sh` makes them all.
 
 - **Jenny Lake (`earth_sky.py --glow sphere`; `sky_map.py` kind `sphere`):** the frame of tonight's
   night picture, 22 August at 22:06, Sun 18.5° down.
