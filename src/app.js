@@ -196,11 +196,11 @@ function renderDash(a) {
     ['Sunlight captured', pct(a.f, a.f < 0.01 ? 3 : 1), ''],
     ['Computing', `${sci(a.flops, 1)} FLOP/s`, vsAI >= 1 ? `${words(vsAI)} × all AI chips of 2025` : `${pct(vsAI, 0)} of all AI chips of 2025`],
     ['Sunlight on Earth', fc.sunlightCut > 0.0005 ? `−${pct(fc.sunlightCut, 1)}` : 'unchanged',
-      fc.net > p.forcingLimit + 1e-3 ? `+${fc.net.toFixed(2)} W/m² of heat left over` : fc.shade > 0 ? 'shaded to cancel the swarm’s heat' : '', fc.net > p.forcingLimit + 1e-3],
+      fc.net > p.forcingLimit + 1e-3 ? `+${fc.net.toFixed(2)} W/m² of heat left over` : fc.sunlightCut > 0.0005 ? (p.earthPlacement === 'closed' ? 'window narrowed to cancel the swarm’s heat' : 'shaded to cancel the swarm’s heat') : '', fc.net > p.forcingLimit + 1e-3],
     ['Rainfall', fc.rainCut > 0.0005 ? `−${pct(fc.rainCut, 1)}` : 'unchanged', ''],
     ['Mercury dug out', pct(a.mercuryRemoved, a.mercuryRemoved < 0.01 ? 3 : 1), ''],
     ["Mercury's radiators", Trad > 0 ? `${(Math.round(Trad / 10) * 10).toLocaleString('en-US')} K` : 'not needed', Trad > 0 ? glow : 'bare ground copes'],
-    ['Night sky, worst case', `${lux < 0.001 ? '<0.001' : lux.toFixed(lux < 0.1 ? 3 : 2)} lux`, 'full Moon 0.25'],
+    ['Night sky, Sun’s side', `${lux < 0.001 ? '<0.001' : lux.toFixed(lux < 0.1 ? 3 : 2)} lux`, 'full Moon 0.25'],
   ];
   $('dash-metrics').innerHTML = items.map(([k, v, sm, over]) => `<div class="${over ? 'over' : ''}"><dt>${k}</dt><dd>${v}${sm ? `<small>${sm}</small>` : ''}</dd></div>`).join('');
 }
