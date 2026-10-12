@@ -7,6 +7,7 @@ import { sci, pct, kelvin, kg, length } from './util/format.js';
 import { renderParams } from './ui/params.js';
 import { buildChart, earthChart, sedChart, orbitMap } from './ui/charts.js';
 import { sailAnatomy, heatPaths, lightPaths } from './ui/illustrations.js';
+import { windowSim } from './ui/windowSim.js';
 
 const { YEAR } = PHYS;
 const $ = id => document.getElementById(id);
@@ -672,6 +673,7 @@ function earthClosedProse(p, E) {
     <p>The swarm also stops the solar wind. Only a thin column gets through Earth's window, and it spreads to about ${num('0.3%')} of today's flux before it arrives, so geomagnetic storms and most aurorae end. Beyond the swarm there is no solar wind left to hold back the galaxy's cosmic rays, so more reach Earth; its magnetic field and air still stop most of them.</p>`;
 }
 
+let simApi = null;
 function renderEarth() {
   const p = state.params, E = state.earth;
   const F = h.FIXED;
@@ -716,6 +718,11 @@ function renderEarth() {
   $('earth-dek').textContent = closedHead
     ? 'Between the Sun and Earth the swarm is a cap of cold mirrors with a window in it. By day nothing changes. At night the sky round the Sun is black.'
     : 'Every watt the sails catch ends up as heat, and some of it reaches Earth. A sunshade cancels it, at a price paid in sunlight and rain. The photographs above show the default, the Sun enclosed.';
+  $('window-sim-fig').hidden = p.earthPlacement !== 'closed';
+  if (p.earthPlacement === 'closed') {
+    if (!simApi) simApi = windowSim($('window-sim'), { cut: E.forcing.sunlightCut });
+    else simApi.setCut(E.forcing.sunlightCut);
+  }
   $('earth-prose').innerHTML = p.earthPlacement === 'closed' ? earthClosedProse(p, E)
     : `<p>${p1}</p>${slit}<p>${p2}</p>${noIR}${failsafe}${p3 ? `<p>${p3}</p>` : ''}${costs}<p>${p4}</p>`;
 
