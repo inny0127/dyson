@@ -274,10 +274,10 @@ test('closed: all the heat leaves through the backs, so the film runs ~419 K (38
   near(h.swarmAt(pC, 1).flops / uRoom.flops, 0.95, 0.02, 'closed vs near-uniform');
 });
 
-test('closed: Earth sees only the cap’s cold back (0.45 W/m²), no glow at night, full sunlight', () => {
+test('closed: Earth sees only the cap’s cold back (0.56 W/m²), no glow at night, full sunlight', () => {
   const E = h.earthLimits(pC, dC);
-  near(h.earthForcing(pC, 1).gross, 0.45, 1e-12, 'infrared');
-  near(E.forcing.sunlightCut, 0.0019, 0.0003, 'a shade of 0.2 % holds the temperature');
+  near(h.earthForcing(pC, 1).gross, 0.56, 1e-12, 'infrared');
+  near(E.forcing.sunlightCut, 0.00235, 0.0003, 'a shade of 0.24 % holds the temperature');
   assert.equal(h.skyLux(pC, 1), 0, 'no glow');
   assert.equal(E.binding, 'room');
 });

@@ -25,18 +25,18 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell), 
 | 1 % of sunlight | 2305 | 2242 | 2141 | 2107 |
 | 10 % of sunlight | 2325 | 2257 | 2149 | 2112 |
 | Ceiling (refresh or rock, industry left alone) | 39% | 91% | 100% | 100% |
-| Computing at the ceiling | 1.6×10³⁸ FLOP/s | 6.9×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
+| Computing at the ceiling | 1.1×10³⁸ FLOP/s | 6.7×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
 | Crust and mantle dug out | 2392 | 2318 | 2200 | not within 6000 yr |
 | Core dug out too | 2645 | 2543 | not within 6000 yr | not within 6000 yr |
 | Share of Mercury dug for the finished swarm | 17% | 72% | 31% | 16% |
-| Film temperature, finished swarm | 378 K | 413 K | 419 K | 415 K |
+| Film temperature, finished swarm | 404 K | 416 K | 419 K | 415 K |
 | Finished swarm: share of the Sun | 39% (rock runs out) | 91% (rock runs out) | 100% (closed) | 100% (closed) |
-| Computing, finished swarm | 1.6×10³⁸ FLOP/s | 6.9×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
+| Computing, finished swarm | 1.1×10³⁸ FLOP/s | 6.7×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
 | Year finished | 2391 | 2539 | 2215 | 2142 |
-| Its infrared on Earth (the cap's back) | 0.18 W/m² | 0.41 W/m² | 0.45 W/m² | 0.45 W/m² |
-| Sunlight taken to cancel it | 0.074% | 0.17% | 0.19% | 0.19% |
-| Global rainfall | −0.13% | −0.31% | −0.34% | −0.34% |
-| Night sky, finished swarm (Sun 18° down) | 0.0 lux | 0.0 lux | 0.0 lux | 0.0 lux |
+| Its infrared on Earth (the cap's back) | 8.31 W/m² | 3.69 W/m² | 0.56 W/m² | 0.56 W/m² |
+| Sunlight taken to cancel it | 3.49% | 1.55% | 0.24% | 0.24% |
+| Global rainfall | −6.1% | −2.8% | −0.42% | −0.42% |
+| Night sky, finished swarm (Sun 18° down) | 23.2 lux | 8.1 lux | 0.0 lux | 0.0 lux |
 | For comparison, far side only (±60°) | 28%, 1×10³⁸ FLOP/s, −5.0% sunlight | 28%, 3×10³⁸ FLOP/s, −5.0% sunlight | 28%, 7×10³⁹ FLOP/s, −5.0% sunlight | 28%, 1×10⁴¹ FLOP/s, −5.0% sunlight |
 | For comparison, open toward Earth (near-uniform) | 39%, 1.4×10³⁸ FLOP/s, −9.1% sunlight, −15% rain | 85%, 7.7×10³⁸ FLOP/s, −20% sunlight, −30% rain | 85%, 2×10⁴⁰ FLOP/s, −20% sunlight, −30% rain | 85%, 2.8×10⁴¹ FLOP/s, −20% sunlight, −30% rain |
 
@@ -44,20 +44,20 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell), 
 
 | Year | Sunlight captured | FLOP/s | Sails | Mercury removed | Output replacing old sails | Sunlight taken to hold Earth's temperature | Night sky |
 |---|---|---|---|---|---|---|---|
-| 2070 | 4.2×10⁻¹²% | 1.8×10²⁷ | 1.5×10⁵ | 1.2×10⁻¹²% | 0% | 8×10⁻¹⁵% | 0.00 lux |
-| 2100 | 2.7×10⁻⁷% | 1.1×10³² | 9.3×10⁹ | 7.4×10⁻⁸% | 0% | 5.1×10⁻¹⁰% | 0.00 lux |
-| 2110 | 1.1×10⁻⁵% | 4.5×10³³ | 3.7×10¹¹ | 2.9×10⁻⁶% | 0% | 2.1×10⁻⁸% | 0.00 lux |
-| 2120 | 4.3×10⁻⁴% | 1.8×10³⁵ | 1.5×10¹³ | 1.2×10⁻⁴% | 0% | 8.2×10⁻⁷% | 0.00 lux |
-| 2130 | 0.017% | 7.2×10³⁶ | 6×10¹⁴ | 0.0047% | 0% | 3.3×10⁻⁵% | 0.00 lux |
-| 2150 | 12.27% | 4.8×10³⁹ | 4.2×10¹⁷ | 3.309% | 0% | 0.023% | 0.00 lux |
-| 2170 | 44.31% | 1.3×10⁴⁰ | 1.5×10¹⁸ | 11.79% | 0% | 0.084% | 0.00 lux |
-| 2200 | 93.56% | 1.8×10⁴⁰ | 3.1×10¹⁸ | 24.52% | 0% | 0.18% | 0.00 lux |
-| 2214 | 99.26% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 30.46% | 0% | 0.19% | 0.00 lux |
-| 2300 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 31.23% | 0% | 0.19% | 0.00 lux |
-| 2450 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 31.37% | 100% | 0.19% | 0.00 lux |
-| 2750 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 32.45% | 100% | 0.19% | 0.00 lux |
-| 3150 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 34.48% | 0% | 0.19% | 0.00 lux |
-| 3550 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 35.57% | 0% | 0.19% | 0.00 lux |
+| 2070 | 4.2×10⁻¹²% | 1.2×10²⁷ | 1.5×10⁵ | 1.2×10⁻¹²% | 0% | 5×10⁻¹³% | 0.00 lux |
+| 2100 | 2.7×10⁻⁷% | 7.6×10³¹ | 9.3×10⁹ | 7.4×10⁻⁸% | 0% | 3.2×10⁻⁸% | 0.00 lux |
+| 2110 | 1.1×10⁻⁵% | 3×10³³ | 3.7×10¹¹ | 2.9×10⁻⁶% | 0% | 1.3×10⁻⁶% | 0.00 lux |
+| 2120 | 4.3×10⁻⁴% | 1.2×10³⁵ | 1.5×10¹³ | 1.2×10⁻⁴% | 0% | 5.1×10⁻⁵% | 0.00 lux |
+| 2130 | 0.017% | 4.9×10³⁶ | 6×10¹⁴ | 0.0047% | 0% | 0.002% | 0.02 lux |
+| 2150 | 12.27% | 3.3×10³⁹ | 4.2×10¹⁷ | 3.309% | 0% | 1.33% | 10.53 lux |
+| 2170 | 44.31% | 1×10⁴⁰ | 1.5×10¹⁸ | 11.79% | 0% | 3.48% | 24.13 lux |
+| 2200 | 93.56% | 1.8×10⁴⁰ | 3.1×10¹⁸ | 24.52% | 0% | 1.20% | 5.89 lux |
+| 2214 | 99.26% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 30.46% | 0% | 0.35% | 0.72 lux |
+| 2300 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 31.23% | 0% | 0.24% | 0.00 lux |
+| 2450 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 31.37% | 100% | 0.24% | 0.00 lux |
+| 2750 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 32.45% | 100% | 0.24% | 0.00 lux |
+| 3150 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 34.48% | 0% | 0.24% | 0.00 lux |
+| 3550 | 100.00% | 1.9×10⁴⁰ | 3.3×10¹⁸ | 35.57% | 0% | 0.24% | 0.00 lux |
 
 ## What sets the ceiling: service life and recycling (central case)
 
@@ -107,6 +107,6 @@ The core (76% of the planet, ~6 % silicon) adds 2.5×10²² kg of spacecraft at 
 ## Earth
 
 Runaway-greenhouse limit: 282 W/m² absorbed (today 238). One CO₂ doubling: 3.93 W/m².
-Closed swarm (default): Earth sees only the mirror cap's back, 0.45 W/m² (20 layers of silvered foil, 26 g/m², inner face at ~440 K, ε 0.02 per face; Earth averages 0.40 of the back's 1.1 W/m²). Narrowing the window by 0.19 % cancels it. At night the sky within 75–85° of the Sun (by season) is black; the zodiacal light and the planets are gone; the solar wind stops. See `docs/closed-swarm.md`.
+Closed swarm (default): Earth sees only the mirror cap's back, 0.45 W/m² (20 layers of silvered foil, 26 g/m², inner face at ~440 K, ε 0.02 per face; Earth averages 0.40 of the back's 1.1 W/m²). Narrowing the window by 0.19 % cancels it. At night the sky within 75.6° of the Sun is black; the zodiacal light and the planets are gone; the solar wind stops. See `docs/closed-swarm.md`.
 
 Other layouts: an L1 shade cancels whatever heat the swarm sends, so Earth keeps its mean temperature. What Earth pays is the sunlight the shade takes (1 % per 2.38 W/m²), global rainfall (~0.76 % per W/m² swapped at small swaps, saturating) and a polar residual (+0.23 W/m² per W/m²) that a shade shaped by latitude and season can reduce. With infrared-dark fronts on every sail and no sail within 23° of the Sun–Earth line (so Earth sees no hot back), the near-uniform swarm sends Earth 0.563 W/m² per 1 %; the far-side cloud alone 0.42 at ±60°; an even swarm with glass fronts 2.2–2.7 even with the gap. The night sky is a consequence, not a limit: from Earth the near-uniform swarm is a disc of sunlit fronts out to 72° from the Sun, tau rho S / pi. See `docs/full-swarm.md` and `docs/earth.md`.

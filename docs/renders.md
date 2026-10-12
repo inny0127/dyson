@@ -95,7 +95,7 @@ are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from th
   cap's back. Every line of sight that meets the outer shell (0.98 AU) meets it inside the cap, so
   the black disc ends at the shell's limb, asin(0.98 / d): 75.6° on 22 August, when Earth is
   1.0116 AU from the Sun (74.6° in early July, 85.3° in early January).
-  - The back is at ~176 K and reflects nothing visible, so it is drawn as black: stars and Milky Way
+  - The back is at ~170 K and reflects nothing visible, so it is drawn as black: stars and Milky Way
     are removed inside the limb, with a soft edge about half a degree wide.
   - There is no swarm glow, the zodiacal light is gone everywhere (the dust outside the shell is
     unlit), and there are no planets.

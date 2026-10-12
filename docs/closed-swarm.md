@@ -18,8 +18,10 @@ It is the page's default (`earthPlacement: 'closed'`).
     inclined so that it drifts north and south through the cap once a year, and the elements are
     phased so the cap stays filled. Its edge is soft over about a degree.
   - 2.8×10²⁰ kg, under 1 % of the swarm.
-  - Its inner face (silver under a dielectric stack, 99.5 % reflective) returns sunlight into the
-    swarm. Behind it, 20 layers of 1.3 g/m² silvered foil insulate the cold back.
+  - Its inner face (aluminium under a dielectric stack, 96 % reflective) returns sunlight into the
+    swarm and radiates what it absorbs back inward. Behind it, 40 layers of 0.65 g/m² aluminium
+    foil (0.24 µm) insulate the cold back. Silver would reflect better, but silvering 10²² m² of foil
+    takes far more silver than Mercury holds (about 10¹⁶ kg); aluminium is 5–7 % of its crust.
 - **Windows are mirror elements turned edge-on.** Earth's is 20,300 km in radius: Earth's own
   radius plus the 0.27° spread of the Sun's disc over the 3.0 million km to Earth, so every point
   on Earth sees the whole Sun. The Moon gets its own, 15,700 km, which crosses the cap once a month
@@ -64,15 +66,15 @@ coverage f is the share of the Sun's light that hits a sail.
 | 1 % | 2141 | 1.8 | 0.28 | 0.12 % |
 | 50 % | 2173 | 45 | 8.6 | 3.6 % |
 | 99 % | 2213 | 1.8 | 0.83 | 0.35 % |
-| closed | 2216 | 0 | 0.45 | 0.19 % |
+| closed | 2216 | 0 | 0.56 | 0.24 % |
 
 ## How complete the enclosure is
 
 - **Everything is caught except what leaks out on purpose.**
   - Earth's window passes π (20,300 km)² of a sphere 0.98 AU in radius: **4.8×10⁻⁹** of the Sun's
     light. The Moon's adds 2.8×10⁻⁹.
-  - The cap's cold back sheds 1.1 W/m² over its 1.1×10²² m²: 3×10⁻⁵ of the Sun's output, as
-    176 K infrared. The model's `closedRoom` is 0.99997.
+  - The cap's cold back sheds 1.4 W/m² over its 1.1×10²² m²: 4×10⁻⁵ of the Sun's output, as
+    170 K infrared. The model's `closedRoom` is 0.99996.
 - **The cap is part of the enclosure, not a gap in it.** From 1 AU, Earth can see the outside of a
   0.95 AU sphere only within acos 0.95 = 18.2° of the Sun–Earth line. Anything in that region shows
   Earth its outer face.
@@ -165,9 +167,10 @@ coverage f is the share of the Sun's light that hits a sail.
   meets the outer shell (0.98 AU) meets it inside the cap, so the cap fills the sky out to the
   shell's limb, asin(0.98 / d) from the Sun with Earth d AU out: **78.5°** at 1 AU, 74.6° in early
   July and 85.3° in early January, when Earth passes 0.003 AU outside the shell.
-  - Its outer layer is at about 176 K. It leaks 1.1 W/m², and Earth, averaging over its globe,
-    receives 0.40 of that: **0.45 W/m²**.
-  - A shade of 0.19 % of the sunlight, or a window a hair smaller, cancels it.
+  - Its inner face absorbs 4 % of the sunlight and runs at ~500 K; ε 0.03 per foil face lets
+    1.4 W/m² through to the outer layer, at about 170 K. Earth, averaging over its globe, receives
+    0.40 of that: **0.56 W/m²**.
+  - A shade of 0.24 % of the sunlight, or a window a hair smaller, cancels it.
 - **Night:** the sky within that limb is black.
   - At mid-latitudes on a summer evening, at the end of twilight, the black reaches some 57° up the
     western sky. At midnight at 44° N it is still 52° up the northern sky in June and 16° up in
@@ -199,7 +202,7 @@ coverage f is the share of the Sun's light that hits a sail.
   (`docs/full-swarm.md`, "Shaping Earth's climate region by region"). Closure gives the global dial;
   the orbiting mirrors give the regional one.
 - **The swarm barely warms Earth,** so the sunlight-for-infrared swap that cost the near-uniform
-  swarm 30 % of the world's rain is down to 0.45 W/m², about 0.3 % of rain. Shading is now a
+  swarm 30 % of the world's rain is down to 0.56 W/m², about 0.4 % of rain. Shading is now a
   choice, not a cost.
 
 ## Other worlds

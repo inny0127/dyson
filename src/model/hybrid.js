@@ -175,20 +175,21 @@ export const FIXED = {
   // window for Earth and the Moon. All the Sun's power leaves through the compute sails' backs.
   closedR: 0.95, capFrac: (1 - Math.cos((23.07 * Math.PI) / 180)) / 2, capR: 0.98,
   // The cap's areal mass is fixed by its orbit: to keep pace with Earth at 0.98 AU sunlight must
-  // carry β = 1 − 0.98³ = 0.059 of its weight, 26 g/m² for a mirror. That holds 20 layers of 1.3 g/m²
-  // silvered foil: the inner face reflects 99.5 % of sunlight and runs at ~440 K in the swarm's
-  // 419 K cavity; ε 0.02 per face leaks 1.1 W/m² out of the back, and Earth, seeing the cap over a
-  // disc 78° in radius (asin 0.98), averages 0.40 of that (docs/closed-swarm.md).
-  capIR: 0.45,             // W/m² on Earth from the cap's back
+  // carry β = 1 − 0.98³ = 0.059 of its weight, 26 g/m² for a mirror. That holds 40 layers of 0.65 g/m²
+  // aluminium foil (0.24 µm; silver would need far more than Mercury holds): the inner face, aluminium
+  // under a dielectric stack, reflects 96 % of sunlight and runs at ~500 K in the swarm's 419 K
+  // cavity; ε 0.03 per face leaks 1.4 W/m² out of the back, and Earth, seeing the cap over a disc 78°
+  // in radius (asin 0.98), averages 0.40 of that (docs/closed-swarm.md).
+  capIR: 0.56,             // W/m² on Earth from the cap's back
   // While the sphere is open, Earth sees the far side's fronts through the gaps of the near side: a
   // disc 72° in radius round the Sun, which a Lambertian wall fills to sin²(72°) on a sunward plane,
   // 0.226 of it averaged over Earth. Fronts with switchable infrared emittance (as on spacecraft
   // radiators today) stay dark, ε 0.1, until the sphere closes.
   epsFrontBuild: 0.1, farWallG: Math.sin(Math.asin(0.95)) ** 2 / 4,
   capKgM2: 0.026,
-  // Everything is caught except what leaks: the cap's back sheds 1.1 W/m² over its 1.1e22 m²
-  // (3e-5 of the Sun), and Earth's window lets out 5e-9 (the Moon's 3e-9).
-  closedRoom: 0.99997,
+  // Everything is caught except what leaks: the cap's back sheds 1.4 W/m² over its 1.1e22 m²
+  // (4e-5 of the Sun), and Earth's window lets out 5e-9 (the Moon's 3e-9).
+  closedRoom: 0.99996,
   windowEarth: 4.8e-9,
   keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
   rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)

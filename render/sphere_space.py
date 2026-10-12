@@ -10,7 +10,8 @@ planets, looking at the Sun, in visible light (scene-linear EXR) and through a t
   behind everything the stars and the Milky Way.
 - Thermal: the backs radiate at the film temperature T(f) (eps 0.9); the fronts, dark in the
   infrared while the sphere is open (eps 0.1), are seen through the gaps. The patch in front of Earth
-  (23 deg round the Sun-Earth line) is flown by mirror sails whose backs are cold (~176 K).
+  (23 deg round the Sun-Earth line) is flown by mirror sails whose backs are cold (~170 K at ε 0.03; drawn as a 176 K blackbody,
+  black on the 150-450 K scale either way).
 - Earth: a point at its true brightness (lit through its window), 70 deg of longitude from the
   camera.
 - The visible frame is taken through a coronagraph: a disc 1.6 deg in radius over the Sun, as
