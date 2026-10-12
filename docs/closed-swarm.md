@@ -27,6 +27,68 @@ It is the page's default (`earthPlacement: 'closed'`).
 - **The mass:** 3.61×10²² kg finished, against 3.38×10²² kg from Mercury's crust and mantle. The
   last 7 % comes from the core (below).
 
+## How complete the enclosure is
+
+- **Everything is caught except what leaks out on purpose.**
+  - Earth's window passes π (20,300 km)² of a sphere 0.98 AU in radius: **4.8×10⁻⁹** of the Sun's
+    light. The Moon's adds 2.8×10⁻⁹.
+  - The cap's cold back sheds 1.1 W/m² over its 1.1×10²² m²: 3×10⁻⁵ of the Sun's output, as
+    176 K infrared. The model's `closedRoom` is 0.99997.
+- **The cap is part of the enclosure, not a gap in it.** From 1 AU, Earth can see the outside of a
+  0.95 AU sphere only within acos 0.95 = 18.2° of the Sun–Earth line. Anything in that region shows
+  Earth its outer face.
+  - Compute sails there would send Earth about 540 W/m² from their 419 K backs, more than twice the
+    sunlight it absorbs.
+  - Compute sails with insulated backs, radiating only into the cavity, would run at about 489 K.
+    That is wasted on chips that hot.
+  - Mirrors that hand their sunlight to the 419 K sails behind them lose nothing. So the cap is
+    made of mirrors.
+- **Why 23° and not 18°:** the sails' bands spread down to 0.92 AU, and acos 0.92 = 23°.
+
+## Windows in real time
+
+- **A window is mirrors turned edge-on while they cross a line of sight.**
+  - The cap's mirrors drift north and south through it once a year, on orbits inclined up to 23°.
+  - A mirror crossing the Sun–Earth line moves at up to 0.4° a day (12 km/s), so it spends about
+    an hour in Earth's 40,600 km-wide window, then turns back.
+  - Mirrors with smaller inclinations cross more slowly; the few within 0.008° of the line stay
+    edge-on.
+  - The window can take any size or shape at any moment. It follows Earth, and the Moon's window
+    crosses the cap once a month.
+- **Earth's orbit is not a circle.** It runs from 0.983 to 1.017 AU. The cap's mirrors share
+  Earth's eccentricity, so the cap stays about 3 million km sunward of Earth all year.
+- **Windows elsewhere:** compute sails on the line to a target turn edge-on as they pass through it.
+  - Mars, 0.57 AU beyond the swarm, needs a window 260,000 km in radius to see the whole Sun:
+    8×10⁻⁷ of the swarm's light (`Other worlds` below).
+  - A spacecraft or telescope needs a pinhole.
+
+## Steering climate
+
+- **The global dial:** Earth's window. Narrowed or part-turned, it dims all of Earth. Mirrors round it
+  tilted toward Earth add light.
+- **Placing light region by region:** no optical system can focus sunlight into a spot narrower than
+  its distance times the Sun's angular size, 0.53°. That is conservation of étendue (radiance): the
+  Sun is not a point.
+  - From the cap, 3 million km out, the smallest spot is 28,000 km across.
+  - Relay mirrors in Earth orbit, fed through a window widened to cover their orbits, do better:
+    90 km spots from 10,000 km up, 9 km from 1,000 km (`docs/full-swarm.md`).
+  - Laser light is not bound by the Sun's size. Sunlight converted to laser light at ~10 % and
+    beamed from a 1 km aperture 3 million km away makes a spot 2.44 λ d / D ≈ 7 m at 1 µm.
+  - 50 W/m² on a million km² is 5×10¹³ W of light, 5×10¹⁴ W of sunlight: about 10⁻¹² of the
+    Sun. Land and sea absorb laser lines as well as sunlight, and plants grow under red and blue.
+- **Water:** rain can be supplied as well as moved. Evaporating 1 m of sea water a year over
+  10⁷ km² is 10¹⁶ kg × 2.45 MJ/kg per year = 8×10¹⁴ W (2×10⁻¹² of the Sun). Heating the right
+  ocean upwind puts the moisture where the winds carry it.
+- **Chaos cuts both ways.** Weather cannot be forecast beyond about two weeks. For the same reason,
+  small, well-timed inputs can steer a chaotic system, if it is observed completely and the inputs
+  can be placed fast; that is the basis of chaos control (Ott, Grebogi and Yorke 1990). Nobody has
+  steered weather this way. Physics allows it; climate models have not tested it.
+- **What stays hard:**
+  - Knowing what you will get.
+  - Monsoons, which shading land weakens.
+  - Storm tracks, which light shifts only a few degrees.
+  - Water conservation: rain moved to one place is taken from another unless more is evaporated.
+
 ## Why it runs hot, and why 0.95 AU
 
 - **A closed surface sheds heat only from its outside.** All of the Sun's 3.8×10²⁶ W has to leave
@@ -159,4 +221,7 @@ physics allows, with repair in place.
   - `render/sky_map.py` kind `closed` (no glow, no zodiacal light, no planets; stars and Milky Way
     hidden within 75.6° of the Sun);
   - Jenny Lake at the end of twilight, with the same exposure as tonight;
+  - `render/leo_view.py --glow closed`: Earth's night side from 400 km before dawn, the black dome
+    and its rim against the Milky Way;
+  - `render/closed_inside.py`: inside the enclosure, 800 m sunward of the innermost sails;
   - the Mediterranean frames at full sunlight.

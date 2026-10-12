@@ -25,6 +25,17 @@ python3 render/post.py "$RAW/night_U.png" "$OUT/earth-night-swarm.jpg" --fov 104
 dev "$RAW/night_C.exr" "$RAW/night_C.png" "$(exposure_of night_tonight)"
 python3 render/post.py "$RAW/night_C.png" "$OUT/earth-night-closed.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
 
+# The Sun enclosed from low Earth orbit (leo_view --glow closed), wide and 35 mm, exposed for the stars
+for x in leo_C leo_C_tele; do
+  python3 render/glare.py "$RAW/$x.exr" "$RAW/${x}_g.exr"
+  dev "$RAW/${x}_g.exr" "$RAW/$x.png" 13
+done
+python3 render/post.py "$RAW/leo_C.png" "$OUT/leo-closed-wide.jpg" --fov 113 --noise 0.8 --width 2400 --quality 88
+python3 render/post.py "$RAW/leo_C_tele.png" "$OUT/leo-closed-tele.jpg" --fov 54 --noise 0.8 --width 2400 --quality 88
+# Inside the enclosure (render/closed_inside.py), exposed for the sky
+dev "$RAW/inside_C.exr" "$RAW/inside_C.png" -3.3
+python3 render/post.py "$RAW/inside_C.png" "$OUT/inside-closed.jpg" --fov 104 --noise 0.6 --width 2400 --quality 88
+
 # Pod: visible photograph, and the false-colour thermal frame (no optical effects)
 python3 render/post.py "$RAW/pod_hero.png" "$OUT/pod-visible.jpg" --fov 84 --noise 0.6 --width 2400 --quality 88
 python3 render/post.py "$RAW/pod_hero_lwir.png" "$OUT/pod-lwir.jpg" --fov 84 --noise 0 --ca 0 --glare 0 --width 2400 --quality 90

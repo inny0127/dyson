@@ -32,7 +32,7 @@ Hardware rows are for sails on their thermal orbits inside Earth's (the shell), 
 | Film temperature, finished swarm | 378 K | 413 K | 419 K | 415 K |
 | Finished swarm: share of the Sun | 39% (rock runs out) | 91% (rock runs out) | 100% (closed) | 100% (closed) |
 | Computing, finished swarm | 1.6×10³⁸ FLOP/s | 6.9×10³⁸ FLOP/s | 1.9×10⁴⁰ FLOP/s | 3×10⁴¹ FLOP/s |
-| Year finished | 2391 | 2539 | 2214 | 2142 |
+| Year finished | 2391 | 2539 | 2215 | 2142 |
 | Its infrared on Earth (the cap's back) | 0.18 W/m² | 0.41 W/m² | 0.45 W/m² | 0.45 W/m² |
 | Sunlight taken to cancel it | 0.074% | 0.17% | 0.19% | 0.19% |
 | Global rainfall | −0.13% | −0.31% | −0.34% | −0.34% |

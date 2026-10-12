@@ -139,6 +139,11 @@ class Scene:
         elif a.glow == 'uniform':
             g = {'kind': 'uniform', 'tau': a.tau, 'rho': a.rho, 'r_in': a.r, 'r_out': a.r_out}
             R_d = math.radians(80.0)
+        elif a.glow == 'closed':
+            # the Sun enclosed (docs/closed-swarm.md): nothing glows; the mirror cap's cold back hides
+            # the sky within cap_deg of the Sun; the zodiacal dust and the planets are unlit
+            g = {'kind': 'uniform', 'tau': 0.0, 'rho': a.rho, 'r_in': a.r, 'r_out': a.r_out}
+            R_d = math.radians(80.0)
         elif a.glow == 'mix':
             # the far-side band plus sails inside Earth's orbit outside a keep-out cone
             g = {'kind': 'mix', 'f_far': a.f, 'f_in': a.f_in, 'rho': a.rho, 'ecliptic_pole': self.pole,
@@ -148,6 +153,8 @@ class Scene:
             g = {'kind': 'shell', 'f': a.f, 'rho': a.rho, 'r_au': a.r, 'r_in': a.r, 'r_out': a.r_out}
             R_d = math.asin(min(a.r_out, 0.999))
         self.glow = g
+        self.closed = a.glow == 'closed'
+        self.cap_cos = math.cos(math.radians(a.cap_deg))
         self.glow_rgb = SM.GLOW_COLOUR
         # the glow as point sources for lighting the air and the ground
         self.src_dirs, self.src_omega = SM.cap_samples(self.sun, R_d, a.disc_samples)
@@ -358,7 +365,7 @@ def render(sc, w, h, steps, chunk=60000):
             ds = d[sky]
             g = SM.glow_radiance(ds, sc.sun, sc.glow)[:, None] * sc.glow_rgb[None]
             zod = (SM.zodiacal(ds, sc.sun, sc.pole))[:, None] * A.SUN_RGB[None] / (A.SUN_RGB @ A.LUMA)
-            bg[sky] = g + zod
+            bg[sky] = g + (0.0 if sc.closed else zod)
         if hitg.any():
             G = sc.P + d[hitg] * tg0[hitg][:, None]
             bg[hitg] = sc.ground(G, d[hitg], maps)
@@ -384,6 +391,8 @@ def milky(sc, D, h, w):
     mw = np.zeros((len(D), 3))
     sky = ~hitg
     mw[sky] = SM.milky_way(D[sky], sc.eq2ecef.T)
+    if sc.closed:                                              # the cap's edge, softened over ~1 deg
+        mw *= np.clip((sc.cap_cos - D @ sc.sun) / 0.01 + 0.5, 0, 1)[:, None]
     # transmittance for sky rays through the air (coarse: 24 steps; the Milky Way is faint)
     ta0, ta1, hita = Scene.sphere(sc.P, D, RT)
     sel = sky & hita
@@ -424,6 +433,8 @@ def star_layer(sc, w, h, steps):
     self_planet = np.r_[np.zeros(len(rows), bool), np.ones(len(pl), bool)]
     x, y, front = sc.project(d, w, h)
     ok = front & (x > -1) & (x < w) & (y > -1) & (y < h)
+    if sc.closed:                                              # no planets; no stars behind the cap
+        ok &= ~self_planet & (d @ sc.sun < sc.cap_cos)
     for (n, _, V, _), xi, yi, oki in zip(pl, x[-len(pl):], y[-len(pl):], ok[-len(pl):]):
         if oki:
             print('PLANET', n, 'V %.2f' % V, 'pixel', int(xi), int(yi), flush=True)
@@ -464,7 +475,8 @@ def main(argv):
     ap.add_argument('--el', type=float, default=-14.0)
     ap.add_argument('--roll', type=float, default=0.0)
     ap.add_argument('--lens', type=float, default=16.0)
-    ap.add_argument('--glow', choices=['shell', 'farside', 'mix', 'uniform'], default='shell')
+    ap.add_argument('--glow', choices=['shell', 'farside', 'mix', 'uniform', 'closed'], default='shell')
+    ap.add_argument('--cap-deg', type=float, default=75.6, help='closed: sky hidden within this angle of the Sun')
     ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the swarm round the Sun')
     ap.add_argument('--f-in', type=float, default=0.0, help='mix: coverage inside Earth\'s orbit (r..r_out AU)')
     ap.add_argument('--sun-scale', type=float, default=1.0, help='sunlight reaching Earth past an L1 shade')

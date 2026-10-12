@@ -181,7 +181,10 @@ export const FIXED = {
   // disc 76° in radius, averages 0.40 of that (docs/closed-swarm.md).
   capIR: 0.45,             // W/m² on Earth from the cap's back
   capKgM2: 0.026,
-  closedRoom: 0.999,       // all but the cap mirrors' absorption and the windows
+  // Everything is caught except what leaks: the cap's back sheds 1.1 W/m² over its 1.1e22 m²
+  // (3e-5 of the Sun), and Earth's window lets out 5e-9 (the Moon's 3e-9).
+  closedRoom: 0.99997,
+  windowEarth: 4.8e-9,
   keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
   rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)
   polarPerW: 0.23,         // extra polar heating per W/m² swapped

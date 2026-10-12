@@ -65,6 +65,33 @@ exposure never changes the physics.
   layout; the page shows only this frame for the closed swarm, because by day and at dusk nothing
   changes.
 
+## The Sun enclosed from low Earth orbit (`leo_view.py --glow closed`)
+
+- **Where and when:** 400 km over the Nile Delta, 00:54 UTC on 22 September 2128, the Sun 18° below
+  Earth's limb, so no twilight reaches the air above the limb and only airglow shows.
+- **Wide (12 mm, aimed 58° above the Sun):** Earth's night side with city lights (NASA Black Marble)
+  and the airglow layers. Above it the sky within 75.6° of the Sun is black: no stars, no Milky
+  Way. The zodiacal light and the planets are gone everywhere. The Moon, a waning crescent 30° from
+  the Sun, is lit through its own window and drawn as usual.
+- **Tele (35 mm, 74° from the Sun, 35° to the side):** the cap's rim crossing the Milky Way. The rim
+  is softened over about 1° for the cap mirrors' yearly drift.
+- **Exposure:** 13 for both, set for the stars, so the Moon and city lights are overexposed.
+
+## Inside the enclosure (`closed_inside.py`)
+
+- **A numpy ray caster.** The camera is 800 m sunward of the innermost band of sails at 0.92 AU,
+  looking across them with a 14 mm lens, 6° below the horizon.
+- **Sky:** the far side of the swarm, every sail showing its sunlit front, at the hardware's
+  averaged visible reflectance 0.004: 1.92 W/m²/sr, 190 cd/m². The mirror cap, seen from inside,
+  reflects the same wall.
+- **Floor:** the innermost band's sails, drawn covering a quarter of the plane.
+  - Each is a 279 m diamond of navy cells (albedo 0.0006) with lighter 25 mm hinge strips (0.08)
+    every 1.63 m, plus the hinge-edge glint halo round the antisolar point.
+  - Between them the deeper bands, unresolved, at the averaged 0.004.
+- **Vanes:** every vane within 400 km is tested for a flash at the camera; at 800 m none falls in
+  the frame, because a vane tilted at most 40° can throw the Sun no lower than 10° above the plane.
+- **Exposure:** set for the sky (log2(0.18 / L_sky)).
+
 ## The swarm from low Earth orbit (`leo_view.py`)
 
 A numpy renderer: the scene is a sphere, its air and the sky, so it is ray-cast and integrated
