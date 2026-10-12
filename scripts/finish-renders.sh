@@ -74,4 +74,29 @@ python3 render/post.py "$RAW/na_med_c.png" "$OUT/pacific-mediterranean.jpg" --fo
 # Mercury at the heat wall (render/mercury.py writes an AgX PNG at the pristine globe's exposure)
 python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=88)" \
   "$RAW/mercury_heatwall.png" "$OUT/mercury-heatwall.jpg"
+# The sphere, stage by stage (scripts/stage-renders.sh). Night frames: a millionth at tonight's
+# exposure, 1e-4 metered for the night, the rest metered for the glow; each caption gives the change.
+for f in 1e-6 1e-4 1e-2 0.5 0.99; do
+  python3 render/glare.py "$RAW/night_$f.exr" "$RAW/night_${f}_g.exr"
+  E=$(exposure_of night_$f); [ "$f" = "1e-6" ] && E=$(exposure_of night_tonight)
+  dev "$RAW/night_${f}_g.exr" "$RAW/night_$f.png" "$E"
+  python3 render/post.py "$RAW/night_$f.png" "$OUT/stage-night-$f.jpg" --fov 104 --noise 1.4 --glare 0.02 --width 2400 --quality 86
+done
+# low orbit, each exposed for the sphere's disc (leo_view's exposure_for_disc)
+for f in 1e-4 1e-2 0.5 0.99; do
+  python3 render/glare.py "$RAW/leo_$f.exr" "$RAW/leo_${f}_g.exr"
+  dev "$RAW/leo_${f}_g.exr" "$RAW/leo_$f.png" "$(grep -o '"exposure_for_disc": [-0-9.]*' "$RAW/leo_$f.log" | awk '{print $2}')"
+  python3 render/post.py "$RAW/leo_$f.png" "$OUT/stage-leo-$f.jpg" --fov 113 --noise 0.8 --width 2400 --quality 88
+done
+# from 3 AU: thermal frames as written; visible at half (exposed for the disc) and closed (for the stars)
+for f in 1e-2 0.5 0.99 1; do
+  python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=90)" \
+    "$RAW/space_${f}_ir.png" "$OUT/stage-space-ir-$f.jpg"
+done
+for s in 0.5:-1.0 1:12; do IFS=: read f E <<< "$s"
+  python3 render/glare.py "$RAW/space_${f}_vis.exr" "$RAW/space_${f}_g.exr"
+  dev "$RAW/space_${f}_g.exr" "$RAW/space_${f}_vis.png" "$E"
+  python3 render/post.py "$RAW/space_${f}_vis.png" "$OUT/stage-space-vis-$f.jpg" --fov 65 --noise 0.6 --width 2400 --quality 88
+done
+
 ls -la $OUT

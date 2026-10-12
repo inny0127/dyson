@@ -68,7 +68,7 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   1.2×10¹⁸ kg a year, which the rest of the core covers for ~19,000 years.
 - **Earth keeps its sunlight; the night loses its stars round the Sun.** Earth sees only the cap's cold
   back: 0.45 W/m², cancelled by narrowing the window 0.19 %, at a cost of 0.3 % of rain.
-  - At night the sky within 76° of the Sun is black.
+  - At night the sky within 75–85° of the Sun (by season) is black.
   - The zodiacal light and the planets are gone.
   - The solar wind stops.
   - The window is a whole-Earth climate dial.

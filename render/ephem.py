@@ -22,6 +22,12 @@ def sun_radec(jd):
     return ra, dec
 
 
+def sun_distance(jd):
+    """Earth-Sun distance, AU."""
+    g = math.radians((357.528 + 0.9856003 * (jd - 2451545.0)) % 360)
+    return 1.00014 - 0.01671 * math.cos(g) - 0.00014 * math.cos(2 * g)
+
+
 def lst(jd, lon_east):
     n = jd - 2451545.0
     return (280.46061837 + 360.98564736629 * n + lon_east) % 360

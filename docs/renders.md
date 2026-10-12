@@ -60,11 +60,16 @@ are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from th
 - **Jenny Lake (`earth_sky.py --glow sphere`; `sky_map.py` kind `sphere`):** the frame of tonight's
   night picture, 22 August at 22:06, Sun 18.5° down.
   - Glow: the far side's sunlit fronts through the near side's gaps, f (1 − f) ρ S / π with ρ 0.004,
-    over the disc the layer covers seen from 1 AU (full depth inside asin 0.92 = 67°, thinning out by
-    asin 0.98 = 78.5°). The atmosphere scatters it like any other light.
-  - Stars, Milky Way and zodiacal light behind it: × (1 − f) through the mirror sails (out to 75.6°)
-    and × (1 − f) again through the far side; the zodiacal dust and the planets are lit by the
-    sunlight that escapes, × (1 − f).
+    over the disc the layer covers (full depth inside asin(0.92 / d), thinning out by asin(0.98 / d)).
+    The atmosphere scatters it like any other light.
+  - Earth's true distance on the date sets the disc: on 22 August Earth is 1.0116 AU out, so the
+    full depth ends at 65.5° and the edge is at 75.6°.
+  - The sails are a random layer: sails in different orbits do not line up along a slanted line.
+    A line crossing a share s of the layer's depth on each side gets through (1 − f)^s each way,
+    and the glow is (1 − t) t ρ S / π with t = (1 − f)^s: f (1 − f) inside, and at high f a bright
+    ring just inside the edge, where the line crosses so few sails that the layer is half open.
+  - Stars, Milky Way and zodiacal light behind it: × t²; the zodiacal dust and the planets are lit by
+    the sunlight that escapes, × (1 − f) more.
   - Twilight: the Sun's sky scaled by the sunlight Earth's window lets through (1 − the cut that
     cancels the sphere's heat: 0.12 % at 1 %, 3.6 % at 50 %).
   - Each frame is developed at its own metered exposure; captions give the difference from tonight.
@@ -87,10 +92,11 @@ are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from th
 - **Same place, moment and exposure as tonight's night frame** (22 August, 22:06 MDT, Sun 18.5° below
   the horizon at azimuth 308°; exposure 13.87).
 - **The closed swarm (`sky_map.py`, kind `closed`, `docs/closed-swarm.md`):** Earth sees only the mirror
-  cap's back, which covers the sky within 75.6° of the Sun: the cap's edge at 0.98 AU and 23.07°
-  from the Sun–Earth line, seen from 1 AU.
+  cap's back. Every line of sight that meets the outer shell (0.98 AU) meets it inside the cap, so
+  the black disc ends at the shell's limb, asin(0.98 / d): 75.6° on 22 August, when Earth is
+  1.0116 AU from the Sun (74.6° in early July, 85.3° in early January).
   - The back is at ~176 K and reflects nothing visible, so it is drawn as black: stars and Milky Way
-    are removed within 75.6° of the Sun, with a 1° soft edge for the mirrors' yearly drift.
+    are removed inside the limb, with a soft edge about half a degree wide.
   - There is no swarm glow, the zodiacal light is gone everywhere (the dust outside the shell is
     unlit), and there are no planets.
   - Airglow, twilight and the atmosphere's scattering are as tonight: they happen in front of the cap.
@@ -103,11 +109,11 @@ are f = 10⁻⁶, 10⁻⁴, 1 %, 50 %, 99 % and closed; their years come from th
 - **Where and when:** 400 km over the Nile Delta, 00:54 UTC on 22 September 2128, the Sun 18° below
   Earth's limb, so no twilight reaches the air above the limb and only airglow shows.
 - **Wide (12 mm, aimed 58° above the Sun):** Earth's night side with city lights (NASA Black Marble)
-  and the airglow layers. Above it the sky within 75.6° of the Sun is black: no stars, no Milky
-  Way. The zodiacal light and the planets are gone everywhere. The Moon, a waning crescent 30° from
+  and the airglow layers. Above it the sky out to the sphere's limb is black: 77.4° from the Sun, as
+  Earth is 1.0043 AU out that night. No stars, no Milky Way. The zodiacal light and the planets are gone everywhere. The Moon, a waning crescent 30° from
   the Sun, is lit through its own window and drawn as usual.
-- **Tele (35 mm, 74° from the Sun, 35° to the side):** the cap's rim crossing the Milky Way. The rim
-  is softened over about 1° for the cap mirrors' yearly drift.
+- **Tele (35 mm, 76° from the Sun, 35° to the side):** the limb crossing the Milky Way, softened
+  over about half a degree.
 - **Exposure:** 13 for both, set for the stars, so the Moon and city lights are overexposed.
 
 ## Inside the enclosure (`closed_inside.py`)

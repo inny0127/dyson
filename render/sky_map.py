@@ -16,7 +16,7 @@ Components (all in the repo's radiometric units, W/(m^2 sr); 93 lm/W converts to
 - Natural night: the Milky Way (assets/milkyway_8k.jpg, calibrated), airglow (van Rhijn), zodiacal
   light (Leinert et al. 1998, simplified), catalogue stars V <= 8 as points (returned separately).
 - Closed swarm (kind closed): no glow, no zodiacal light, no planets; stars and Milky Way hidden
-  within cap_deg of the Sun by the mirror cap's cold back.
+  within cap_deg of the Sun (the outer shell's limb) by the mirror cap's cold back.
 
 Usage (system python): python3 render/sky_map.py spec.json out_prefix
 spec keys: lat, lst_deg, sun_alt, sun_az, width, h_cam, glow {kind: shell|farside|uniform|mix|closed, ...},
@@ -89,34 +89,46 @@ def cap_samples(centre, radius, n):
     return pts, 2 * math.pi * (1 - math.cos(radius)) / n
 
 
+R_CAP = 0.98                                                         # AU: the outer shell, where the mirror cap flies
+
+
 def sphere_depth(dirs, sun, g):
-    """The symmetric sphere (docs/closed-swarm.md): how much of the shell a line of sight from Earth
-    crosses on each side, 0..1. Sails fill r_in..r_out AU, so inside asin(r_in) of the Sun a line
-    crosses the whole layer twice; beyond, near and far halves thin out until asin(r_out)."""
+    """The symmetric sphere (docs/closed-swarm.md): the share of the shell's depth a line of sight
+    from Earth crosses on each side of its closest approach to the Sun, 0..1. Sails fill r_in..r_out
+    AU and Earth is d AU from the Sun, so inside asin(r_in / d) a line crosses the whole layer twice;
+    beyond, both halves thin out until asin(r_out / d), the sphere's limb."""
     ang = np.arccos(np.clip(dirs @ sun, -1, 1))
-    b = np.where(ang < math.pi / 2, np.sin(ang), 2.0)
+    b = np.where(ang < math.pi / 2, g.get('d', 1.0) * np.sin(ang), 2.0)
     return np.clip((g['r_out'] - b) / (g['r_out'] - g['r_in']), 0, 1)
 
 
+def sphere_half(dirs, sun, g):
+    """Light one half of such a line lets through. Sails in different orbits are uncorrelated along a
+    slanted line, so the shell is a random layer: (1 - f) to the power of the share of depth crossed,
+    whatever the slant (for sun-facing plates the slant cancels)."""
+    return (1.0 - g['f']) ** sphere_depth(dirs, sun, g)
+
+
 def sphere_transmission(dirs, sun, g):
-    """Starlight through the sphere at coverage f: the mirror sails in front of Earth (out to
-    cap_deg from the Sun) and, inside the disc, the far side as well."""
-    f = g['f']
-    ang = np.degrees(np.arccos(np.clip(dirs @ sun, -1, 1)))
-    cap = np.clip((g.get('cap_deg', 75.6) - ang) / 1.0 + 0.5, 0, 1)
-    far = sphere_depth(dirs, sun, g)
-    return (1 - f * cap) * (1 - f * far)
+    """Starlight through the sphere at coverage f: in through the near half and out through the far."""
+    return sphere_half(dirs, sun, g) ** 2
+
+
+def closed_cap_deg(d):
+    """From Earth d AU from the Sun, the closed sphere hides the sky out to its limb, asin(R_CAP / d):
+    74.6 deg in early July, 85.3 deg in early January."""
+    return math.degrees(math.asin(min(R_CAP / d, 0.999)))
 
 
 def glow_radiance(dirs, sun, g):
     """Radiance of the swarm glow above the atmosphere (W/m^2/sr, luminance channel)."""
     cosang = dirs @ sun
     if g['kind'] == 'sphere':
-        # the far side's sunlit fronts, seen through the gaps of the near side: f (1 - f) rho S / pi
-        f, rho = g['f'], g['rho']
-        frac = sphere_depth(dirs, sun, g)
+        # the far half's sunlit fronts, seen through the gaps of the near half: inside asin(r_in / d)
+        # f (1 - f) rho S / pi; toward the limb both halves thin, so at high f the glow peaks in a ring
+        t = sphere_half(dirs, sun, g)
         r = 0.5 * (g['r_in'] + g['r_out'])
-        return f * frac * (1 - f * frac) * rho * S0 / r ** 2 / math.pi
+        return (1 - t) * t * g['rho'] * S0 / r ** 2 / math.pi
     if g['kind'] == 'uniform':
         # near-uniform swarm (docs/full-swarm.md): sun-facing sails between r_in and r_out AU all round
         # the Sun, filled to tau, empty within acos(r_in) of the Sun-Earth line (so every line of sight
@@ -317,11 +329,12 @@ def build(spec, out_prefix):
     sky0 = sky_sun * k_sun
     g = spec.get('glow')
     # closed: the Sun enclosed (docs/closed-swarm.md). Nothing glows; the mirror cap's cold back hides
-    # the sky within cap_deg of the Sun (75.6 deg from Earth), its edge softened by the cap mirrors'
-    # yearly north-south drift. The zodiacal dust and the planets are unlit.
+    # the sky within cap_deg of the Sun (the sphere's limb, closed_cap_deg), its edge softened over
+    # about a degree by the cap's radial spread. The zodiacal dust and the planets are unlit.
     closed = bool(g) and g['kind'] == 'closed'
     if closed:
-        g, cap_cos = None, math.cos(math.radians(spec['glow'].get('cap_deg', 75.6)))
+        cap_deg = spec['glow'].get('cap_deg') or closed_cap_deg(spec['glow'].get('d', 1.0))
+        g, cap_cos = None, math.cos(math.radians(cap_deg))
     glow_sources = []
     if g:
         if g['kind'] in ('farside', 'mix'):
@@ -387,7 +400,8 @@ def build(spec, out_prefix):
     info = {
         'k_sun': k_sun, 'twilight_lux_model': E_model, 'twilight_lux_ref': E_ref,
         'glow_peak_W_m2_sr': float(glow_radiance(sun[None, :], sun, g)[0]) if g and g['kind'] == 'shell' else None,
-        'closed_cap_deg': spec['glow'].get('cap_deg', 75.6) if closed else None,
+        'closed_cap_deg': cap_deg if closed else None,
+        'earth_sun_au': spec['glow'].get('d') if spec.get('glow') else None,
         'glow_colour': GLOW_COLOUR.tolist(),
         'ground_lux_total': float(A.horizontal_illuminance(total, W, H) @ A.LUMA * LM),
         'ground_lux_sun_sky': E_ref,

@@ -141,7 +141,7 @@ class Scene:
             R_d = math.radians(80.0)
         elif a.glow == 'sphere':
             # the symmetric sphere at coverage f (docs/closed-swarm.md): f (1 - f) glow, stars dimmed
-            g = {'kind': 'sphere', 'f': a.f, 'rho': a.rho, 'r_in': a.r, 'r_out': a.r_out, 'cap_deg': a.cap_deg}
+            g = {'kind': 'sphere', 'f': a.f, 'rho': a.rho, 'r_in': a.r, 'r_out': a.r_out, 'd': ephem.sun_distance(self.jd)}
             R_d = math.radians(80.0)
         elif a.glow == 'closed':
             # the Sun enclosed (docs/closed-swarm.md): nothing glows; the mirror cap's cold back hides
@@ -158,7 +158,7 @@ class Scene:
             R_d = math.asin(min(a.r_out, 0.999))
         self.glow = g
         self.closed = a.glow == 'closed'
-        self.cap_cos = math.cos(math.radians(a.cap_deg))
+        self.cap_cos = math.cos(math.radians(a.cap_deg or SM.closed_cap_deg(ephem.sun_distance(self.jd))))
         self.glow_rgb = SM.GLOW_COLOUR
         # the glow as point sources for lighting the air and the ground
         self.src_dirs, self.src_omega = SM.cap_samples(self.sun, R_d, a.disc_samples)
@@ -487,7 +487,7 @@ def main(argv):
     ap.add_argument('--roll', type=float, default=0.0)
     ap.add_argument('--lens', type=float, default=16.0)
     ap.add_argument('--glow', choices=['shell', 'farside', 'mix', 'uniform', 'closed', 'sphere'], default='shell')
-    ap.add_argument('--cap-deg', type=float, default=75.6, help='closed: sky hidden within this angle of the Sun')
+    ap.add_argument('--cap-deg', type=float, default=None, help='closed: sky hidden within this angle of the Sun (default: the sphere\'s limb on the date)')
     ap.add_argument('--tau', type=float, default=0.881, help='uniform: fill of the swarm round the Sun')
     ap.add_argument('--f-in', type=float, default=0.0, help='mix: coverage inside Earth\'s orbit (r..r_out AU)')
     ap.add_argument('--sun-scale', type=float, default=1.0, help='sunlight reaching Earth past an L1 shade')

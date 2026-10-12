@@ -161,14 +161,16 @@ coverage f is the share of the Sun's light that hits a sail.
 
 - **Daylight is unchanged.** Earth gets its full sunlight through its window. The near-uniform swarm
   had to dim it by 19.6 %.
-- **The cap's back is the only part of the swarm Earth sees.** From Earth the cap fills the sky
-  within **75.6°** of the Sun.
+- **The cap's back is the only part of the swarm Earth sees.** Every line of sight from Earth that
+  meets the outer shell (0.98 AU) meets it inside the cap, so the cap fills the sky out to the
+  shell's limb, asin(0.98 / d) from the Sun with Earth d AU out: **78.5°** at 1 AU, 74.6° in early
+  July and 85.3° in early January, when Earth passes 0.003 AU outside the shell.
   - Its outer layer is at about 176 K. It leaks 1.1 W/m², and Earth, averaging over its globe,
     receives 0.40 of that: **0.45 W/m²**.
   - A shade of 0.19 % of the sunlight, or a window a hair smaller, cancels it.
-- **Night:** the sky within 75.6° of the Sun is black.
+- **Night:** the sky within that limb is black.
   - At mid-latitudes on a summer evening, at the end of twilight, the black reaches some 57° up the
-    western sky. At midnight at 44° N it is still 53° up the northern sky in June and 6° up in
+    western sky. At midnight at 44° N it is still 52° up the northern sky in June and 16° up in
     December; near the equator at the equinox it is below the horizon.
   - Elsewhere the stars and the Milky Way are as they are today.
   - The zodiacal light and the gegenschein are gone everywhere: the dust outside the shell is unlit.
@@ -265,7 +267,7 @@ physics allows, with repair in place.
 - Tests: `test/hybrid.test.js`, the closed-swarm section.
 - Renders:
   - `render/sky_map.py` kind `closed` (no glow, no zodiacal light, no planets; stars and Milky Way
-    hidden within 75.6° of the Sun);
+    hidden out to the sphere's edge, asin(0.98 / d) from the Sun for Earth d AU out);
   - Jenny Lake at the end of twilight, with the same exposure as tonight;
   - `render/leo_view.py --glow closed`: Earth's night side from 400 km before dawn, the black dome
     and its rim against the Milky Way;

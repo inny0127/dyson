@@ -178,7 +178,7 @@ export const FIXED = {
   // carry β = 1 − 0.98³ = 0.059 of its weight, 26 g/m² for a mirror. That holds 20 layers of 1.3 g/m²
   // silvered foil: the inner face reflects 99.5 % of sunlight and runs at ~440 K in the swarm's
   // 419 K cavity; ε 0.02 per face leaks 1.1 W/m² out of the back, and Earth, seeing the cap over a
-  // disc 76° in radius, averages 0.40 of that (docs/closed-swarm.md).
+  // disc 78° in radius (asin 0.98), averages 0.40 of that (docs/closed-swarm.md).
   capIR: 0.45,             // W/m² on Earth from the cap's back
   // While the sphere is open, Earth sees the far side's fronts through the gaps of the near side: a
   // disc 72° in radius round the Sun, which a Lambertian wall fills to sin²(72°) on a sunward plane,
