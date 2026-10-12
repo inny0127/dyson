@@ -100,8 +100,8 @@ export const PARAMS = [
     help: 'Net, after the L1 shade. 0 holds Earth’s average temperature where it is; doubling CO₂ is 3.9.' },
   { key: 'shadeLimit', group: 'Earth', label: 'Most the L1 shade may cancel', unit: 'W/m²', min: 0, max: 300, step: 0.5, value: 300,
     help: 'The shade swaps sunlight for the swarm’s infrared: Earth keeps its temperature but gets 0.42 % less sunlight and 0.76 % less rain per W/m². 300 is no limit.' },
-  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['uniform', 'farside', 'cone', 'shell'], value: 'uniform',
-    help: 'uniform: all round the Sun at 0.95 AU, infrared-dark fronts on every sail, empty only within 23° of the Sun–Earth line and 15° of L3. farside: only on Earth’s orbit beyond the Sun. cone and shell: inside Earth’s orbit with ordinary fronts, with and without the empty cone.' },
+  { key: 'earthPlacement', group: 'Earth', label: 'Where the sails fly', unit: '', options: ['closed', 'uniform', 'farside', 'cone', 'shell'], value: 'closed',
+    help: 'closed: the Sun enclosed at 0.95 AU; a cap of cold mirrors between the Sun and Earth hides the swarm from Earth and lets sunlight through a window. uniform: all round the Sun at 0.95 AU, infrared-dark fronts on every sail, empty only within 23° of the Sun–Earth line and 15° of L3. farside: only on Earth’s orbit beyond the Sun. cone and shell: inside Earth’s orbit with ordinary fronts, with and without the empty cone.' },
   { key: 'farsideLat', group: 'Earth', label: 'Far-side cloud reaches', unit: '° from Earth’s orbital plane', min: 30, max: 70, step: 5, value: 60,
     help: 'More room higher up, but tilted orbits drift along Earth’s orbit (±20° at 60°), which eats into it: 18 % at 30°, 28 % at 60°, 29 % at 70°.' },
   { key: 'spillInside', group: 'Earth', label: 'When the far side is full', unit: '', options: ['inside', 'stop'], value: 'inside',
@@ -109,15 +109,17 @@ export const PARAMS = [
   // industry
   { key: 'yieldDelivered', group: 'Industry', label: 'Spacecraft kg per kg of rock', unit: '', min: 0.2, max: 0.9, step: 0.01, value: 0.42,
     help: 'Oxides reduced to Si, Mg, Al, Ca; the oxygen becomes glass and ion-thruster propellant. 0.5 would need ~100 % Si recovery.' },
+  { key: 'rockSource', group: 'Industry', label: 'What of Mercury is mined', unit: '', options: ['whole', 'mantle'], value: 'whole',
+    help: 'mantle: crust and mantle, 24 % of the planet. whole: then the iron core for its ~6 % silicon, at ~4× the heat per kilogram of spacecraft; the core is lifted whole and refined in orbit, and its iron kept for shielding and reaction mass.' },
   { key: 'seedMass', group: 'Industry', label: 'Seed factory mass on Mercury', unit: 'kg', min: 1e4, max: 1e9, log: true, value: 1e6 },
   { key: 'doublingYears', group: 'Industry', label: 'Industrial doubling time (before fab tooling)', unit: 'yr', min: 0.25, max: 5, step: 0.05, value: 1 },
   { key: 'fabToolIntensity', group: 'Industry', label: 'Fab tool mass per m²/yr of chip die', unit: 'kg·yr/m²', min: 0, max: 500, step: 1, value: 40,
     help: '2026 leading-edge fab ≈ 250; space-native vacuum wafer fab ≈ 40; speculative panel imprint + self-assembly ≈ 3–15.' },
   { key: 'dieMm2PerW', group: 'Industry', label: 'Chip die per W on the film', unit: 'mm²/W', min: 5, max: 100, step: 0.5, value: 22,
     help: '2026 SRAM chiplets: 40 mm²/W. With non-volatile memory sized to the useful minimum (1–2 GB): ~22.' },
-  { key: 'serviceLife', group: 'Industry', label: 'Service life before refresh', unit: 'yr', min: 0, max: 50, step: 1, value: 15,
-    help: '0 = never retired. Sails are re-skinned on their frames every 10–20 years.' },
-  { key: 'recycleFrac', group: 'Industry', label: 'Mass recycled in orbit at refresh', unit: '', min: 0, max: 0.99, step: 0.01, value: 0.94,
+  { key: 'serviceLife', group: 'Industry', label: 'Service life before a rebuild', unit: 'yr', min: 0, max: 1000, step: 5, value: 300,
+    help: '0 = never retired. Repaired in place between rebuilds: cells annealed, chiplets swapped, holes patched. The one wear nothing repairs, solar-wind sputtering, takes ~0.03 nm a year off the glass. Today’s designs: 10–30 years.' },
+  { key: 'recycleFrac', group: 'Industry', label: 'Mass recycled in orbit at a rebuild', unit: '', min: 0, max: 0.999, step: 0.001, value: 0.99,
     help: 'The standing fleet levels off at export × life / (1 − recycled). Without recycling a 10-year fleet stalls near 1 % coverage.' },
   { key: 'heatPerKg', group: 'Industry', label: 'Waste heat left on Mercury per kg mined', unit: 'MJ/kg', min: 0.05, max: 20, log: true, value: 0.1,
     help: 'Digging (~0.05) plus a surface launch only to low orbit at 3 km/s: 0.1 with superconducting launchers at 99 %, 0.3 at 95 %. Catapults in orbit add the rest and shed their losses to space. Refining on the surface and a full-speed launch: ~2–5.' },
@@ -166,10 +168,23 @@ export const FIXED = {
   // the same layout at other radii (sails spread ±0.03 AU, cone acos(r − 0.03); at 1 AU a 14°
   // cone keeps them off Earth's doorstep): [r, cone°, sky share, IR W/m² per unit coverage]
   uniformByR: [[0.90, 29.5, 0.918, 53.1], [0.92, 27.1, 0.928, 54.2], [0.95, 23.1, 0.943, 56.3], [0.98, 18.2, 0.958, 59.9], [1.00, 14.0, 0.968, 64.2]],
+  // Closed swarm (docs/closed-swarm.md): compute sails tile the whole sphere at 0.95 AU except a cap of
+  // acos(0.92) = 23° round the Sun–Earth line, which holds a co-orbiting cap of layered mirrors at
+  // ~0.98 AU. Earth sees only the cap's cold back (a sphere's outer surface is visible from 1 AU only
+  // within acos r of the Earth direction); the cap redirects its sunlight into the swarm and leaves a
+  // window for Earth and the Moon. All the Sun's power leaves through the compute sails' backs.
+  closedR: 0.95, capFrac: (1 - Math.cos((23.07 * Math.PI) / 180)) / 2, capR: 0.98,
+  capIR: 0.6,              // W/m² on Earth from the cap's back: 10 layers of aluminised glass foil
+  capKgM2: 0.03,           // ten layers; light enough (β ≈ 0.05) to hold station with Earth at 0.98 AU
+  closedRoom: 0.999,       // all but the cap mirrors' absorption and the windows
   keepoutIR: 0.5,          // a keep-out cone of acos(r) (24.5° at 0.91 AU) hides every hot back: IR ×0.5
   rainPerW: 0.0076,        // global rainfall lost per W/m² of sunlight swapped for infrared (small swaps)
   polarPerW: 0.23,         // extra polar heating per W/m² swapped
   horizon: 6000,           // yr simulated
+  // Mercury's core: Fe-Ni with ~6 % Si (estimates 1-25 %; Margot et al. 2018), against ~25 % in the
+  // rock. A kilogram of spacecraft from the core means lifting ~4x as much, at ~4x the heat left on
+  // the planet; it is refined in orbit and the iron kept for shielding and reaction mass.
+  coreSi: 0.06, rockSi: 0.25,
 };
 
 const interp = (tab, x) => {
@@ -209,6 +224,27 @@ export function orbitChoice(p, E) {
     return { r, cone, chipC: 370 / Math.sqrt(r) + (p.filmSpreadDT ?? 9) - 273.15, perWatt: k / k0, filmPerW: (r / FIXED.uniformR) ** 2,
       room, f, roomBound: f >= room - 1e-9, flops: E.flops * (f / E.cap) * (k / k0), heat: f * irPerF };
   });
+}
+
+/**
+ * Film temperature of the closed swarm at coverage f (K). Sparse, a glass-fronted sail sheds heat from
+ * both faces and reflects its sub-bandgap light away; closed, nothing escapes but through the backs:
+ * ε_back σ T⁴ = S / (1 − cap). Between, T⁴ is interpolated in f (a simple model of a cavity whose
+ * gaps close).
+ */
+export function closedFilmT(p, f, r = FIXED.closedR) {
+  const S = flux(r);
+  const open = (p.alpha * S) / ((p.epsFront + p.epsBack) * SIGMA);
+  const shut = S / ((1 - FIXED.capFrac) * p.epsBack * SIGMA);
+  return (open + Math.min(1, f) * (shut - open)) ** 0.25;
+}
+
+/** Computing per watt of the closed swarm's sails vs the same hardware on its thermal orbit. */
+export function closedFactor(p, f, ref) {
+  const T = closedFilmT(p, f), dt = p.filmSpreadDT ?? 9, t0 = FIXED.film.pvT0;
+  const cells = (1 + p.pvTempCo * (T - t0)) / (1 + p.pvTempCo * (ref.T - t0));
+  const logic = energyPenalty(ref.tjC, p.hotLogicSlope) / energyPenalty(T + dt - 273.15, p.hotLogicSlope);
+  return cells * logic;
 }
 
 /** Coverage on the far side and inside Earth's orbit, for total coverage f. */
@@ -323,6 +359,24 @@ function swarmCore(p, fIn) {
  */
 export function swarmAt(p, fIn) {
   const f = Math.min(1, Math.max(1e-20, fIn));
+  if (p.earthPlacement === 'closed') {
+    // the sparse swarm's hardware, moved to 0.95 AU; the film per watt falls as the cap's light is
+    // redirected onto it, and the swarm runs hotter as it closes
+    const fr = Math.min(f, 0.01), k = f / fr;
+    const a = swarmCore(p, fr);
+    const r = FIXED.closedR;
+    const kM = (r / a.rSail) ** 2 * (1 - FIXED.capFrac * f);
+    const kF = closedFactor(p, f, a.sail);
+    const cap = f * FIXED.capFrac * 4 * Math.PI * (FIXED.capR * AU) ** 2 * FIXED.capKgM2;
+    const chipPower = a.chipPower * k, massSails = a.massSails * k * kM + cap, massPods = a.massPods * k * kM;
+    return {
+      ...a, f, farside: false, closed: true, rOrbit: r, areaFactor: kM, fFar: 0, fIn: 0, filmT: closedFilmT(p, f),
+      intercepted: f * L_SUN, chipPower, sailPower: a.sailPower * k, podPower: a.podPower * k,
+      massSails, massPods, mass: massSails + massPods, kgPerW: chipPower > 0 ? (massSails + massPods) / chipPower : Infinity,
+      filmArea: a.filmArea * k * kM,
+      flopsSails: a.flopsSails * k * kF, flopsPods: a.flopsPods * k * kF, flops: (a.flopsSails + a.flopsPods) * k * kF,
+    };
+  }
   if (p.earthPlacement === 'uniform') {
     // infrared-dark fronts all but remove the cavity effect (a front absorbs ~1.5 % more from the
     // swarm's inner wall than from the Sun alone), so every sail carries a sparse swarm's hardware
@@ -392,7 +446,10 @@ export function simulateBuild(p, targetMass, rateCap, chipAreaPerKg) {
   const capYr = rateCap * YEAR;                                     // kg/yr delivered
   const toolShare = (p.fabToolIntensity || 0) * chipAreaPerKg / FIXED.toolLife;
   const capToSails = capYr / (1 + toolShare);
-  const rock = MERCURY.M_SHELL * p.yieldDelivered;                  // kg deliverable from crust + mantle
+  const rockMantle = MERCURY.M_SHELL * p.yieldDelivered;            // kg deliverable from crust + mantle
+  const coreHeat = FIXED.rockSi / FIXED.coreSi;
+  const rockCore = p.rockSource === 'whole' ? MERCURY.M_CORE * p.yieldDelivered / coreHeat : 0;
+  const rock = rockMantle + rockCore;
   const tWall = Math.max(0, Td * Math.log2(capToSails / (p.seedMass * k)));
   // export capacity integrated over [t0, t1], exact for the exponential part
   const capInt = (t0, t1) => {
@@ -419,7 +476,10 @@ export function simulateBuild(p, targetMass, rateCap, chipAreaPerKg) {
     const t1 = tt + dt;
     const retired = Number.isFinite(L) ? Math.max(0, GcAt(t1 - L) - GcAt(tt - L)) : 0;
     const fleet = B[B.length - 1];
-    let exp = Math.min(capInt(tt, t1), Math.max(0, rock - Dc[Dc.length - 1]));
+    // the mantle first; the core's silicon at the same heat delivers 1 / coreHeat as much
+    const avail = capInt(tt, t1), done = Dc[Dc.length - 1];
+    const fromMantle = Math.min(avail, Math.max(0, rockMantle - done));
+    let exp = fromMantle + Math.min((avail - fromMantle) / coreHeat, Math.max(0, rock - done - fromMantle));
     let gross = exp + rho * retired;
     if (fleet + gross - retired > targetMass) {
       // at the target: produce only what holds the fleet there, recycling first
@@ -455,11 +515,13 @@ export function simulateBuild(p, targetMass, rateCap, chipAreaPerKg) {
     return Infinity;
   };
   const iRock = Dc.findIndex(x => x >= rock * (1 - 1e-9));
+  const iMantle = rockCore > 0 ? Dc.findIndex(x => x >= rockMantle * (1 - 1e-9)) : iRock;
   return {
     doublingYearsEff: Td, fabPenaltyYears: fabYears, tCap: tWall, rateCap, capToSails: capToSails / YEAR,
     serviceLife: L, recycleFrac: rho, refresh: Number.isFinite(L),
     steadyMass: Number.isFinite(L) ? capToSails * L / (1 - rho) : Infinity,
-    peakMass: peak, tPeak, rockDeliverable: rock, tRockOut: iRock >= 0 ? t[iRock] : null,
+    peakMass: peak, tPeak, rockDeliverable: rock, rockMantle, rockCore, tRockOut: iRock >= 0 ? t[iRock] : null,
+    tMantleOut: iMantle >= 0 ? t[iMantle] : null,
     reachedTarget: peak >= targetMass * (1 - 1e-6),
     yearsForMass,
     yearsToEnd: yearsForMass(0.95 * peak),
@@ -469,6 +531,13 @@ export function simulateBuild(p, targetMass, rateCap, chipAreaPerKg) {
     retiringAt: time => interp(R, time) / YEAR,
     samples: { t, B, Dc },
   };
+}
+
+/** Kilograms of Mercury dug for `mass` kg of spacecraft: the rock first, then the core. */
+export function minedFor(p, mass) {
+  const fromRock = MERCURY.M_SHELL * p.yieldDelivered;
+  if (mass <= fromRock || p.rockSource !== 'whole') return mass / p.yieldDelivered;
+  return MERCURY.M_SHELL + ((mass - fromRock) / p.yieldDelivered) * (FIXED.rockSi / FIXED.coreSi);
 }
 
 /** The whole swarm for parameters p: the finished target, and the build-out toward it. */
@@ -527,9 +596,9 @@ export function compute(p) {
     chipletsTotal: sailPower / p.chipPower,
     sunlightUse: intercepted > 0 ? chipPower / intercepted : 0,
     flopsPerWsun: intercepted > 0 ? s.flops / intercepted : 0,
-    massMined: mass * minedPerDelivered, minedPerDelivered,
-    fracMercury: (mass * minedPerDelivered) / MERCURY.M,
-    fracRock: (mass * minedPerDelivered) / MERCURY.M_SHELL,
+    massMined: minedFor(p, mass), minedPerDelivered,
+    fracMercury: minedFor(p, mass) / MERCURY.M,
+    fracRock: Math.min(1, minedFor(p, mass) / MERCURY.M_SHELL),
     logistics: { sail: lnSail, pod: lnPod, deliveredRateCap, minedRateCap },
     growth, reachableMass, reachableCoverage, yearsToCoverage, buildCoverage: fBuild,
     industry,
@@ -603,6 +672,7 @@ export function skyLux(p, f) {
       * discGroundFactor(Math.asin(Math.min(0.9999, s.rSail)));
   };
   if (p.earthPlacement === 'shell') return shellLux(f);
+  if (p.earthPlacement === 'closed') return 0;                 // Earth sees only the cap's dark back
   if (p.earthPlacement === 'uniform') {
     // a disc of sunlit fronts out to asin(0.95) = 72° round the Sun, at the local fill f / share
     const r = FIXED.uniformR, fl = Math.min(0.999, f / FIXED.uniformShare);
@@ -629,6 +699,8 @@ export function earthForcing(p, f) {
     const e = earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S);
     gross = e.forcing;
     blocked = e.dimming * EARTH.absorbedSolar;
+  } else if (p.earthPlacement === 'closed') {
+    gross = f > 0 ? FIXED.capIR : 0;                            // the cap is built first
   } else if (p.earthPlacement === 'uniform') {
     gross = f * FIXED.uniformIRPerF;
   } else if (p.earthPlacement === 'cone') {
@@ -652,6 +724,7 @@ export function earthForcing(p, f) {
 
 /** Most of the Sun's light the layout has room for. */
 export function roomOf(p) {
+  if (p.earthPlacement === 'closed') return FIXED.closedRoom;
   if (p.earthPlacement === 'uniform') return FIXED.uniformRoom;
   if (p.earthPlacement === 'farside' && p.spillInside === 'stop') return farsideRoom(p);
   return 1;
@@ -700,7 +773,7 @@ export function atYear(p, d, year) {
   const built = builtAt(p, d, year);
   const f = coverageForMass(p, built);
   const s = swarmAt(p, f);
-  const mined = g.deliveredBy(year) * d.minedPerDelivered;
+  const mined = minedFor(p, g.deliveredBy(year));
   const dt = 0.25;
   const exportRate = Math.max(0, (g.deliveredBy(year + dt) - g.deliveredBy(year)) / (dt * YEAR));
   const retireRate = g.retiringAt(year);
@@ -720,7 +793,7 @@ export function atYear(p, d, year) {
     retireRate,
     replacementShare: gross > 0 ? Math.min(1, retireRate / gross) : 0,
     processingPower: gross * p.energyPerKg * 1e6,
-    heatOnMercury: exportRate * d.minedPerDelivered * p.heatPerKg * 1e6,
+    heatOnMercury: ((minedFor(p, g.deliveredBy(year + dt)) - mined) / (dt * YEAR)) * p.heatPerKg * 1e6,
     heatLimited: year > g.tCap && exportRate > 0.98 * g.capToSails,
     earth: earthImpact(filmOptics(p), s.rSail, f, s.sail.T, s.sail.S),
     forcing: earthForcing(p, f),
@@ -748,7 +821,7 @@ export const ERAS = {
     params: {
       jPerFlop85: 3.25e-14 / 0.6, hotLogicSlope: 0.006, pvEta0: 0.20, alpha: 0.85, packing: 0.9,
       filmAreal: 0.205, laserKgPerW: 1.7e-5, podFrac: 0.15, wingAreal: 0.125, podKgPerKW: 1.2,
-      yieldDelivered: 0.38, fabToolIntensity: 120, dieMm2PerW: 40, serviceLife: 10, recycleFrac: 0.90,
+      yieldDelivered: 0.38, fabToolIntensity: 120, dieMm2PerW: 40, serviceLife: 50, recycleFrac: 0.95,
       energyPerKg: 2500,
     },
   },
@@ -758,7 +831,7 @@ export const ERAS = {
     params: {
       jPerFlop85: 1.25e-16 / 0.6, pvEta0: 0.25, pvTempCo: -0.00256, alpha: 0.78, epsBack: 0.93, packing: 0.93,
       filmAreal: 0.17, laserKgPerW: 3.7e-6, podFrac: 0.011, wingAreal: 0.12, podKgPerKW: 1.0,
-      yieldDelivered: 0.5, fabToolIntensity: 5, dieMm2PerW: 21.6, serviceLife: 20, recycleFrac: 0.97,
+      yieldDelivered: 0.5, fabToolIntensity: 5, dieMm2PerW: 21.6, serviceLife: 1000, recycleFrac: 0.995,
       energyPerKg: 850,
     },
   },

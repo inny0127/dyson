@@ -8,14 +8,17 @@ import { MERCURY } from '../src/model/constants.js';
 
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b} ±${tol}`);
 // Hardware is pinned on the shell (sails on their thermal orbits inside Earth's) with the design-spec
-// film. The page's default (pU) is the near-uniform swarm: the same hardware with infrared-dark
-// fronts and a film thinned to 0.52, all round the Sun except a cone round the Sun–Earth line.
-// pFar: the far-side cloud.
+// film. pU is the near-uniform swarm: the same hardware with infrared-dark fronts and a film thinned
+// to 0.52, all round the Sun except a cone round the Sun–Earth line. pFar: the far-side cloud. These
+// keep today's service life (15 years, 94 % recycled) and Mercury's rock only. The page's default
+// (pC) is the closed swarm with sails that last centuries and the core's silicon (closed-swarm tests).
+const today = { serviceLife: 15, recycleFrac: 0.94, rockSource: 'mantle' };
 const shell = p => ({ ...p, earthPlacement: 'shell', filmThin: 1 });
 const p26 = shell(h.eraParams('2026'));
-const pMid = shell(h.eraParams('mid'));
-const pU = h.eraParams('mid');
+const pMid = shell({ ...h.eraParams('mid'), ...today });
+const pU = { ...h.eraParams('mid'), ...today, earthPlacement: 'uniform' };
 const pFar = { ...pU, earthPlacement: 'farside' };
+const pC = h.eraParams('mid');
 
 // ---------------------------------------------------------------- 2026 hardware (v3 physics)
 
@@ -242,4 +245,64 @@ test('Earth limits: the L1 shade holds Earth’s temperature; Mercury’s rock s
   // the shade cannot block more sunlight than reaches Earth
   const big = h.earthForcing({ ...pMid, placement: 'manual', rManual: 0.99 }, 0.9);
   assert.ok(big.swapped <= 238.5 && big.net > 0, `swap ${big.swapped}, net ${big.net}`);
+});
+
+// ---------------------------------------------------------------- closed swarm (docs/closed-swarm.md)
+
+const dC = h.compute({ ...pC, coverage: 1 });
+
+test('closed: the default encloses the Sun at 0.95 AU, with a mirror cap 23° round the Sun–Earth line', () => {
+  assert.equal(pC.earthPlacement, 'closed');
+  near(h.FIXED.capFrac, 0.04, 0.001, 'the cap is 4 % of the sphere');
+  near(dC.reachableCoverage, 1, 1e-6, 'all the sunlight');
+  const s = h.swarmAt(pC, 1);
+  near(s.rOrbit, 0.95, 1e-12, 'radius');
+  near(s.flops, 1.88e40, 0.02e40, 'FLOP/s');
+  // the cap: ten layers of foil, ~1 % of the swarm's mass
+  assert.ok(s.massSails > 0 && 3.24e20 / s.mass < 0.01, 'cap mass');
+});
+
+test('closed: all the heat leaves through the backs, so the film runs ~419 K (vs 332 K when sparse)', () => {
+  const S = 1361 / 0.95 ** 2;
+  near(h.closedFilmT(pC, 1), (S / ((1 - h.FIXED.capFrac) * pC.epsBack * 5.670374e-8)) ** 0.25, 0.5, 'closed');
+  near(h.closedFilmT(pC, 1), 419, 1, 'closed');
+  near(h.closedFilmT(pC, 0.001), 332, 1, 'sparse');
+  // catches 18 % more sunlight than the near-uniform swarm but computes ~5 % less
+  const uRoom = h.swarmAt({ ...pC, earthPlacement: 'uniform' }, h.FIXED.uniformRoom);
+  near(h.swarmAt(pC, 1).flops / uRoom.flops, 0.95, 0.02, 'closed vs near-uniform');
+});
+
+test('closed: Earth sees only the cap’s cold back (0.6 W/m²), no glow at night, full sunlight', () => {
+  const E = h.earthLimits(pC, dC);
+  near(h.earthForcing(pC, 1).gross, 0.6, 1e-12, 'infrared');
+  near(E.forcing.sunlightCut, 0.0025, 0.0005, 'a shade of 0.25 % holds the temperature');
+  assert.equal(h.skyLux(pC, 1), 0, 'no glow');
+  assert.equal(E.binding, 'room');
+});
+
+test('closed timeline: heat wall ~2145, half ~2173, mantle gone ~2200, closed ~2214 from the core’s silicon', () => {
+  const g = dC.growth;
+  near(g.tCap + pC.seedYear, 2145, 3, 'heat wall');
+  near(dC.yearsToCoverage(0.5) + pC.seedYear, 2173, 4, 'half');
+  near(g.tMantleOut + pC.seedYear, 2200, 4, 'crust and mantle dug out');
+  near(dC.yearsToCoverage(0.99) + pC.seedYear, 2214, 5, 'closed');
+  near(g.rockCore, MERCURY.M_CORE * 0.06 / 0.25 * pC.yieldDelivered, 1e9, 'core silicon as rock');
+  // with the mantle alone the swarm stops at ~93 %
+  near(h.compute({ ...pC, coverage: 1, rockSource: 'mantle' }).reachableCoverage, 0.933, 0.01, 'mantle only');
+  // what is dug: all the rock and ~9 % of the core; never more than the planet
+  near(dC.fracMercury, 0.31, 0.01, 'share of Mercury dug');
+  for (const y of [100, 200, 1000, 5900]) assert.ok(h.atYear(pC, dC, y).mercuryRemoved <= 1, `year ${y}`);
+  const a = h.atYear(pC, dC, 160);
+  assert.equal(a.mercurySurface, 'core');
+  const b = h.atYear(pC, dC, 100).heatOnMercury;                 // the mantle at the wall (less the fabs' share)
+  near(a.heatOnMercury, b, 0.01 * b, 'the core is dug at the same heat wall');
+});
+
+test('centuries of life: a 300-year rebuild losing 1 % needs ~1.2×10¹⁸ kg a year, ~19,000 years of the core', () => {
+  const loss = dC.mass * (1 - pC.recycleFrac) / pC.serviceLife;
+  near(loss, 1.2e18, 0.05e18, 'kg a year');
+  const coreLeft = dC.growth.rockCore - (dC.mass - dC.growth.rockMantle);
+  assert.ok(coreLeft / loss > 15000, `${coreLeft / loss} years`);
+  // with today's life the core's silicon goes on replacements and the swarm never closes
+  assert.ok(h.compute({ ...pC, coverage: 1, ...today, rockSource: 'whole' }).reachableCoverage < 0.95);
 });
