@@ -385,4 +385,131 @@ export const FIGURES = {
       return s;
     }));
   },
+
+  // ---------------------------------------------------------------- closing the sphere
+  /** The shell, the cap and Earth, drawn to true scale on the Sun's side of Earth. */
+  sphereLayout(el) {
+    const sx = 60, sy = 235, k = 420;                     // px per AU
+    const pt = (r, deg) => [sx + r * k * Math.cos((deg * Math.PI) / 180), sy - r * k * Math.sin((deg * Math.PI) / 180)];
+    const arc = (r, a0, a1) => { const [x0, y0] = pt(r, a0), [x1, y1] = pt(r, a1); return `M${x0.toFixed(1)},${y0.toFixed(1)} A${r * k},${r * k} 0 0 0 ${x1.toFixed(1)},${y1.toFixed(1)}`; };
+    const tan = (Math.acos(0.95) * 180) / Math.PI, cap = 23.07;
+    put(el, svg(720, 474, 'The layout to true scale: the compute shell at 0.95 AU, the mirror cap at 0.98 AU spanning 23 degrees either side of the line to Earth, and Earth at 1 AU. Lines from Earth just touching the shell meet it 18 degrees from the Sun–Earth line: inside that, Earth would see the outer faces of compute sails, so that part is mirrors', id => {
+      let s = '';
+      s += Circ(sx, sy, 9, { fill: 'sun', stroke: 'none' }) + T(sx, sy + 26, 'Sun', { a: 'middle', c: 'sun', w: 500 });
+      s += Path(arc(0.95, -33, 33), { stroke: 'swarm', sw: 3 });
+      s += Path(arc(0.98, -cap, -0.6), { stroke: 'ink2', sw: 3 }) + Path(arc(0.98, 0.6, cap), { stroke: 'ink2', sw: 3 });
+      const [ex, ey] = pt(1, 0);
+      s += Circ(ex, ey, 5, { fill: 'earth', stroke: 'none' });
+      // the Sun–Earth line and the cap's edges
+      s += Ln(sx + 12, sy, ex - 7, sy, { c: 'ink3', w: 0.75, dash: '3 4' });
+      for (const sg of [1, -1]) { const [x, y] = pt(1.02, sg * cap); s += Ln(sx, sy, x, y, { c: 'ink3', w: 0.75, dash: '3 4' }); }
+      // lines from Earth just touching the shell
+      for (const sg of [1, -1]) { const [x, y] = pt(0.95, sg * tan); s += Ln(ex, ey, x, y, { c: 'earth', w: 1.2 }) + Circ(x, y, 3, { fill: 'earth', stroke: 'none' }); }
+      // labels
+      const [lx1, ly1] = pt(0.95, 30); s += T(lx1 - 8, ly1 + 4, 'compute shell, 0.95 AU', { a: 'end', c: 'swarm', w: 600 });
+      const [lx2, ly2] = pt(0.98, cap); s += T(lx2 + 10, ly2 - 4, 'mirror cap, 0.98 AU', { c: 'ink', w: 600 }) + T(lx2 + 10, ly2 + 12, '23° either side of Earth', { sz: 11.5 });
+      s += T(ex + 10, ey + 4, 'Earth, 1 AU', { c: 'earth', w: 600 });
+      s += T(ex + 10, ey + 20, 'window', { sz: 11.5 });
+      const [tx, ty] = pt(0.95, -tan); s += T(tx + 14, ty + 30, 'Earth’s sight lines touch the shell', { sz: 11.5 }) + T(tx + 14, ty + 45, '18° from the Sun–Earth line: inside', { sz: 11.5 }) + T(tx + 14, ty + 60, 'that, Earth sees the outer face', { sz: 11.5 });
+      s += T(20, 462, 'True scale. The two layers are 4.5 million km apart; Earth is 3 million km beyond the mirrors.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** Bands on a sphere, rendered pixel by pixel: random orbits leave gaps; bands sharing an axis close it. */
+  bandsRender(el) {
+    const N = 6, hw = Math.PI / (2 * N);                 // six bands of total width π
+    let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const randAxis = () => { const z = 2 * rnd() - 1, ph = 2 * Math.PI * rnd(), r = Math.sqrt(1 - z * z); return [r * Math.cos(ph), r * Math.sin(ph), z]; };
+    const sets = [
+      { title: 'Six orbits, at random', axes: Array.from({ length: N }, randAxis) },
+      { title: 'Six orbits sharing an axis', axes: Array.from({ length: N }, (_, i) => [Math.cos((i * Math.PI) / N), Math.sin((i * Math.PI) / N), 0]) },
+    ];
+    const css = getComputedStyle(document.documentElement);
+    const rgb = v => { const c = document.createElement('canvas').getContext('2d'); c.fillStyle = css.getPropertyValue(v).trim() || '#888'; const hx = c.fillStyle; return [1, 3, 5].map(i => parseInt(hx.slice(i, i + 2), 16)); };
+    const paper = rgb('--paper'), swarm = rgb('--swarm'), sun = rgb('--sun');
+    const gap = sun.map((c, j) => paper[j] + (c - paper[j]) * 0.3);
+    const S = 300, dpr = Math.min(2, window.devicePixelRatio || 1), n = Math.round(S * dpr);
+    const tilt = (25 * Math.PI) / 180, ct = Math.cos(tilt), st = Math.sin(tilt);
+    el.innerHTML = `<div class="bands">${sets.map((q, i) => `<div><canvas width="${n}" height="${n}" aria-label="${q.title}"></canvas><p><b>${q.title}</b><span id="bands-${i}"></span></p></div>`).join('')}</div>
+      <div class="legend" style="margin-top:0.9rem;justify-content:center"><span><i style="background:rgb(${gap.map(Math.round)});height:8px;width:12px"></i>gap: sunlight escapes</span><span><i style="background:rgb(${swarm});opacity:0.35;height:8px;width:12px"></i>one layer</span><span><i style="background:rgb(${swarm});opacity:0.7;height:8px;width:12px"></i>two</span><span><i style="background:rgb(${swarm});height:8px;width:12px"></i>three or more: idle sails</span></div>`;
+    el.querySelectorAll('canvas').forEach((cv, i) => {
+      const ctx = cv.getContext('2d'), img = ctx.createImageData(n, n), d = img.data, axes = sets[i].axes;
+      let cov = 0, tot = 0;
+      for (let py = 0; py < n; py++) for (let px = 0; px < n; px++) {
+        const x = (2 * (px + 0.5)) / n - 1, y = 1 - (2 * (py + 0.5)) / n, r2 = x * x + y * y, o = 4 * (py * n + px);
+        if (r2 > 1) { d[o + 3] = 0; continue; }
+        const z = Math.sqrt(1 - r2);
+        // view from 25° above the equator: rotate about x
+        const v = [x, y * ct + z * st, -y * st + z * ct];
+        let c = 0;
+        for (const a of axes) if (Math.abs(a[0] * v[0] + a[1] * v[1] + a[2] * v[2]) < Math.sin(hw)) c++;
+        tot++; if (c) cov++;
+        const shade = 0.75 + 0.25 * z;
+        const col = c === 0 ? gap : c === 1 ? swarm.map((s, j) => paper[j] + (s - paper[j]) * 0.35) : c === 2 ? swarm.map((s, j) => paper[j] + (s - paper[j]) * 0.7) : swarm;
+        d[o] = col[0] * shade; d[o + 1] = col[1] * shade; d[o + 2] = col[2] * shade; d[o + 3] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+      // the share of the whole sphere covered, by sampling it evenly
+      let hit = 0; const M = 20000;
+      for (let k = 0; k < M; k++) { const zz = 1 - (2 * (k + 0.5)) / M, rr = Math.sqrt(1 - zz * zz), ph = k * 2.399963; const v = [rr * Math.cos(ph), rr * Math.sin(ph), zz]; if (axes.some(a => Math.abs(a[0] * v[0] + a[1] * v[1] + a[2] * v[2]) < Math.sin(hw))) hit++; }
+      el.querySelector(`#bands-${i}`).textContent = ` covers ${Math.round((100 * hit) / M)}% of the sky`;
+    });
+  },
+
+  /** The closed sphere in cross-section: light goes out to the shell, the fronts trade it, heat leaves through the backs. */
+  sphereFlow(el) {
+    const cx = 200, cy = 210, r = 140;
+    put(el, svg(720, 420, 'The closed sphere in cross-section, not to scale: sunlight travels out to the shell; light and heat that a front gives off cross the hollow middle to other fronts, so they are not lost; the only way out is through the sails’ backs, and through the window, where mirrors in the cap turn edge-on', id => {
+      let s = '';
+      s += Circ(cx, cy, r, { stroke: 'swarm', sw: 5 });
+      s += Arc(cx, cy, r + 12, -23, 23, { stroke: 'ink2', sw: 5 });
+      s += Circ(cx, cy, 16, { fill: 'sun', stroke: 'none' });
+      for (const a of [60, 110, 160, 200, 250, 300]) {
+        const c = Math.cos((a * Math.PI) / 180), sn = Math.sin((a * Math.PI) / 180);
+        s += Ln(cx + 22 * c, cy + 22 * sn, cx + (r - 8) * c, cy + (r - 8) * sn, { c: 'sun', w: 1.6, arrow: id });
+        s += Ln(cx + (r + 6) * c, cy + (r + 6) * sn, cx + (r + 50) * c, cy + (r + 50) * sn, { c: 'heat', w: 2.2, arrow: id });
+      }
+      // fronts trade light across the middle
+      s += Path(`M${cx - 104},${cy - 104} Q${cx - 20},${cy - 40} ${cx + 30},${cy + 144}`, { stroke: 'heat', sw: 1.2, dash: '3 3', arrow: id });
+      s += Path(`M${cx - 140},${cy + 50} Q${cx},${cy + 30} ${cx + 120},${cy - 88}`, { stroke: 'heat', sw: 1.2, dash: '3 3', arrow: id });
+      // the window
+      s += Ln(cx + 24, cy, cx + r + 48, cy, { c: 'sun', w: 2, arrow: id });
+      s += Circ(cx + r + 66, cy, 7, { fill: 'earth', stroke: 'none' }) + T(cx + r + 66, cy + 24, 'Earth', { a: 'middle', c: 'earth', w: 500 });
+      s += T(cx + r + 20, cy - 70, 'mirror cap', { c: 'ink', w: 500, sz: 11.5 });
+      // labels
+      const L = 500;
+      s += Ln(L - 8, 66, L - 30, 66, { c: 'sun', w: 2 }) + T(L, 70, 'Sunlight goes out to the shell', { c: 'ink', w: 500 });
+      s += Ln(L - 8, 110, L - 30, 110, { c: 'heat', w: 1.2, dash: '3 3' }) + T(L, 106, 'What a front gives off crosses', { c: 'ink', w: 500 }) + T(L, 122, 'the middle to another front', { c: 'ink', w: 500 });
+      s += Ln(L - 8, 162, L - 30, 162, { c: 'heat', w: 2.2 }) + T(L, 158, 'So all the heat leaves', { c: 'ink', w: 500 }) + T(L, 174, 'through the backs: 419 K', { c: 'ink', w: 500 });
+      s += Ln(L - 8, 214, L - 30, 214, { c: 'ink2', w: 5 }) + T(L, 210, 'Mirrors return their light', { c: 'ink', w: 500 }) + T(L, 226, 'and show Earth a cold back', { c: 'ink', w: 500 });
+      s += T(L, 270, 'Only Earth’s window lets light out:', { sz: 11.5 }) + T(L, 286, '5 billionths of the Sun’s output.', { sz: 11.5 });
+      s += T(20, 410, 'Not to scale.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** Why Earth's window is 20,300 km in radius: Earth's own size plus the Sun's width over 3 million km. */
+  windowGeometry(el) {
+    put(el, svg(720, 260, 'Why Earth’s window is 20,300 km in radius: every point on Earth must see the whole Sun through it, so the window is Earth’s radius plus the spread of the Sun’s half-degree disc over the 3 million km from the cap to Earth', id => {
+      let s = '';
+      const sunX = 70, capX = 470, eX = 650, cy = 130;
+      s += Circ(sunX, cy, 60, { fill: 'sun', stroke: 'none', op: 0.85 }) + T(sunX, cy + 84, 'the Sun', { a: 'middle', c: 'sun', w: 500 });
+      s += Circ(eX, cy, 22, { fill: 'earth', stroke: 'none', op: 0.85 }) + T(eX, cy + 46, 'Earth', { a: 'middle', c: 'earth', w: 500 });
+      // the cap with its window
+      const wR = 54;
+      s += Ln(capX, 14, capX, cy - wR, { c: 'ink2', w: 5 }) + Ln(capX, cy + wR, capX, 246, { c: 'ink2', w: 5 });
+      for (let y = cy - wR + 6; y < cy + wR; y += 12) s += Ln(capX - 5, y, capX + 5, y, { c: 'ink3', w: 1.5 });
+      s += T(capX - 8, 24, 'the cap', { a: 'end', c: 'ink', w: 500 });
+      // rays: the Sun's top edge to Earth's bottom, the bottom edge to the top
+      s += Ln(sunX, cy - 60, eX, cy + 22, { c: 'sun', w: 1.2 }) + Ln(sunX, cy + 60, eX, cy - 22, { c: 'sun', w: 1.2 });
+      s += Ln(sunX, cy - 60, eX, cy - 22, { c: 'sun', w: 0.6, dash: '3 4' }) + Ln(sunX, cy + 60, eX, cy + 22, { c: 'sun', w: 0.6, dash: '3 4' });
+      // dimensions
+      s += Ln(capX + 16, cy, capX + 16, cy - wR, { c: 'ink', w: 1, arrow: id, both: true }) + Ln(capX + 16, cy - wR / 2, capX + 40, 52, { c: 'ink3', w: 0.75 }) + T(capX + 44, 44, 'window radius 20,300 km', { c: 'ink', w: 600 });
+      s += Ln(capX, 236, eX, 236, { c: 'ink3', w: 1, arrow: id, both: true }) + T((capX + eX) / 2, 228, '3 million km', { a: 'middle', sz: 11.5 });
+      s += T(capX + 44, 60, '= Earth’s radius, 6,400 km', { sz: 11.5 }) + T(capX + 44, 75, '+ 0.27° × 3 million km', { sz: 11.5 });
+      s += T(20, 254, 'Not to scale: the Sun’s width is exaggerated so the rays can be seen.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
 };
