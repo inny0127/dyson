@@ -243,10 +243,10 @@ const CHARTS = {
     const fc = f => h.earthForcing(P, f * h.FIXED.closedRoom);
     lineChart(el, {
       x: { min: 0, max: 1, ticks: [0, 0.2, 0.4, 0.6, 0.8, 1], fmt: v => `${Math.round(v * 100)}%`, title: 'share of the Sun caught' },
-      y: { min: 0, max: 10, ticks: [0, 2, 3.93, 6, 8, 10], fmt: v => `${v}`, title: 'Extra heat on Earth, W/m², before the window narrows' },
+      y: { min: 0, max: 10, ticks: [0, 2, 4, 6, 8, 10], fmt: v => `${v}`, title: 'Extra heat on Earth, W/m², before the window narrows' },
       series: [{ pts: fs.map(f => [f, fc(f).gross]), color: 'var(--heat)', label: '' }],
       hlines: [{ y: 3.93, label: 'one CO₂ doubling, 3.93 W/m²', left: true }, { y: h.FIXED.capIR, label: `closed: the cap’s back, ${h.FIXED.capIR} W/m²` }],
-      points: [{ x: 0.5, y: fc(0.5).gross, label: `peak at half: ${fc(0.5).gross.toFixed(1)} W/m²`, dy: -10 }],
+      points: [{ x: 0.5, y: fc(0.5).gross, label: `half built: ${fc(0.5).gross.toFixed(1)} W/m²`, dy: -10, left: true }],
       tip: f => { const q = fc(f); return `${lead(`${(f * 100).toFixed(1)}% caught`)}<br>heat ${q.gross.toFixed(2)} W/m²<br>window narrowed ${pct(q.sunlightCut, 2)} · rain −${pct(q.rainCut, 1)}`; },
       legend: false,
     });
