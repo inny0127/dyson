@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Compute Sail</title>
-<meta name="description" content="One satellite of the Dyson swarm, layer by layer: a 279 m sheet of solar film that is also the computer. Size, film stack, chiplets, temperature, structure, steering, links, launch, damage and lifetime.">
+<meta name="description" content="One satellite of the Dyson swarm, explained: a 279 m sheet of solar film that is also the computer. What it is made of, where it can fly and why, how big it is and why, how it is steered, packed and repaired.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="notes.124ac92a45.css">
+<link rel="stylesheet" href="notes.56bc68e832.css">
 </head>
 <body>
 <header class="nb"><div class="nb-in"><a class="nb-home" href="../index.html">A Dyson Swarm, Made Real</a><details><summary>Technical notes</summary><ol id="notes-menu"></ol></details></div></header>
@@ -18,212 +18,176 @@
 <header class="head">
   <div class="kicker" id="note-no">Technical note</div>
   <h1>The compute sail</h1>
-  <p class="dek">Every satellite in the swarm is the same thing: a square of solar film 279 metres on a side, thinner than paper, with a hundred million small chips printed on its back. It is a power plant, a radiator and a computer in one sheet.</p>
-  <p class="byline">Numbers from the page’s model, central assumptions, and the design study in <code>docs/data/design_spec.json</code> · October 2026</p>
+  <p class="dek">Every satellite in the swarm is the same thing: a square of solar film 279 metres on a side, thinner than a sheet of paper, with a hundred million tiny chips on its back. It is a power station, a radiator and a computer, all in one sheet.</p>
+  <p class="byline">Numbers from the page’s model (central assumptions) and the design study in <code>docs/data/design_spec.json</code> · October 2026</p>
 </header>
 <details class="toc-m" id="toc-m"></details>
 
 <section class="summary">
   <h2>In short</h2>
   <ul>
-    <li><b>One sheet does everything.</b> The film catches sunlight, turns about a sixth of it into electricity, spends that electricity in chiplets of 0.15 W spread every 2.5 cm across its back, and radiates all the heat from its own surface. There are no pipes, pumps or radiators.</li>
-    <li><b>The chips decide where it flies.</b> The film’s temperature is set by sunlight alone, and the chips must stay near 85 °C, so a lone sail flies at 0.862 AU. In the finished sphere every sail sits at 0.95 AU and runs much hotter, because the sails face each other instead of space.</li>
-    <li><b>279 m is a compromise.</b> The largest model the film is meant to train must fit on one sheet as one unbroken mesh, the fixed hardware must be a small share of the mass, and the folded sail must fit one launch package.</li>
-    <li><b>It lasts centuries with repair.</b> Meteoroids punch holes that do not grow, sunlight anneals radiation damage at the film’s temperature, and chip wiring can be cut short enough not to wear out. The model rebuilds each sail every 300 years and recycles 99% of it.</li>
+    <li><b>One sheet does everything.</b> The film turns sunlight into electricity, spends it in chips spread across its back, and radiates the heat from its own surface. There are no pipes, pumps or radiators.</li>
+    <li><b>Heat decides where it can fly.</b> Sunlight alone sets the film’s temperature, and the chips must stay near 85 °C, so a lone sail sits at 0.862 AU from the Sun. In the finished sphere the sails face each other instead of open space, and run much hotter.</li>
+    <li><b>279 m is a balance.</b> Big enough that the largest job fits on one sheet and the fixed hardware weighs little; small enough to fold into one launch.</li>
+    <li><b>It lasts centuries if it is repaired.</b> Dust punches holes that never grow, the film’s own warmth heals radiation damage, and chip wiring can be made not to wear out. The model rebuilds each sail every 300 years.</li>
   </ul>
   <div class="keys">
-    <div><b>279 m</b><span>side of the square, 395 m corner to corner; 69,543 m² of film</span></div>
-    <div><b>101 g/m²</b><span>the film as the model books it for the mature era (191 g/m² in the 2026 reference)</span></div>
-    <div><b>~15 MW</b><span>of chips per sail, about 10⁸ chiplets of 0.15 W</span></div>
-    <div><b>0.43 g/W</b><span>sail mass per watt of chips on its own orbit</span></div>
-    <div><b>7.7×10²¹</b><span>FLOP/s per sail in the sparse sphere; 5.7×10²¹ closed</span></div>
-    <div><b>300 yr</b><span>between rebuilds, with annealing and patching in between</span></div>
+    <div><b>279 m</b><span>on a side; 69,543 m² of film</span></div>
+    <div><b>101 g/m²</b><span>the film’s weight per square metre</span></div>
+    <div><b>~15 MW</b><span>of chips per sail, about 10⁸ of them</span></div>
+    <div><b>7.8 t</b><span>one sail, on its own orbit</span></div>
+    <div><b>7.7×10²¹</b><span>operations a second, per sail</span></div>
+    <div><b>300 yr</b><span>between rebuilds</span></div>
   </div>
 </section>
 
 <figure>
   <div class="plate"><img src="../renders/sail-hero.1b0231393b.jpg" alt="A near-black diamond-shaped solar sail against black space, with a line of bright glints across it" width="2560" height="1440" loading="lazy"></div>
-  <figcaption>One compute sail, seen from a kilometre away at the Sun’s true brightness. It is nearly black because it is a good solar cell: light it reflects is power it did not collect. The bright line is the Sun’s reflection in the cover glass, broken where each 1.63 m fold panel curls slightly beside its hinge.<span class="how">Path traced in Blender Cycles from the design spec. Front luminous albedo about 0.002; see <a href="pictures.html">How the pictures were made</a>.</span></figcaption>
+  <figcaption>One sail seen from a kilometre away, at the Sun’s true brightness. It looks almost black because it is a good solar cell: any light it reflected would be power it failed to collect. The bright line is the Sun reflected in the cover glass, broken into dashes where the fold panels curl slightly at their hinges.<span class="how">Path traced in Blender from the design study. See <a href="pictures.html">How the pictures were made</a>.</span></figcaption>
 </figure>
 
-<h2 id="what">What one sail is</h2>
-<p>A sail is a square of film 279 metres on a side, flown corner-first like a diamond, so that it measures 395 metres from tip to tip. Its front faces the Sun. Behind it, four booms run from a small hub at the centre out to the four corners and hold the film taut. Four small mirror vanes at the corners steer it. That is all: no box of electronics, no fluid, no moving parts beyond the vanes’ gimbals and the flywheel described below.</p>
-<p>The film itself is a crystalline silicon solar cell under a thin cover glass. On its back, one chiplet sits in the middle of every 25 mm tile of cell. Each chiplet takes the 0.15 W its own tile makes, computes with it, and turns it into heat right where the heat is made. Because the chips are spread as thinly as the sunlight that feeds them, the film’s own back is all the radiator they need.</p>
-<p>Sails never touch. While the swarm is sparse they are kilometres apart; in the finished sphere they fly side by side in bands tens of thousands of kilometres wide, but each is still a separate spacecraft with only laser links to its neighbours. They treat each other the way computers in different buildings do: closely enough to share work, not closely enough to act as one machine. Inside a sail, light guided through the film links every chiplet to every other within a couple of microseconds, so one sail is one computer.</p>
+<h2 id="what">What a sail is</h2>
+<p>Picture a square of dark film the size of ten football pitches, flown point-first like a kite, always facing the Sun. Four thin booms behind it run from a small hub in the middle out to the corners and hold it taut. Four small mirrors at the corners steer it. That is the whole spacecraft.</p>
+<p>The film is a silicon solar cell. On its back, one small chip sits in the middle of every 2.5 cm square of cell. Each chip takes the 0.15 W its own square produces, computes with it, and turns it into heat on the spot. Because the chips are spread out as thinly as the sunlight that feeds them, the film around each chip can radiate its heat straight into space. Nothing has to be carried anywhere.</p>
+<p>Sails never touch each other. Each is a separate spacecraft that talks to its neighbours by laser. Inside one sail, though, light guided through the film links every chip to every other within a couple of millionths of a second, so the whole sheet works as one computer.</p>
 <figure class="drawing">
   <div data-draw="anatomy"></div>
-  <figcaption>The sail, drawn to scale, as flown in the sparse sphere at 0.95 AU. Booms behind the film hold it taut at the corners, and four mirror vanes steer it. The insets enlarge the back of the film and its cross-section.<span class="how">Drawn by the page’s own code from the model’s numbers.</span></figcaption>
+  <figcaption>The sail, drawn to scale. Booms behind the film hold it taut at the corners, and four mirror vanes steer it. The insets enlarge the back of the film and its cross-section.<span class="how">Drawn by the page’s code from the model’s numbers, for a sail at 0.95 AU.</span></figcaption>
 </figure>
 
-<h2 id="size">Why 279 metres</h2>
-<p>The size comes from three pulls that point in different directions.</p>
-<ul>
-  <li><b>The largest job must fit on one sheet.</b> The design study sized the sail so that the biggest model it is meant to train, about 10⁸ chiplets, is one contiguous mesh: 1.03×10⁸ sites including 3% spares. Between sails, links are a thousand times slower than within one, so a model split across two sails runs at the speed of the gap.</li>
-  <li><b>Fixed hardware must be a small share.</b> The hub, vanes and tensioners weigh about the same whatever the sail’s size, roughly a third of a tonne. On an 82 m sail, a tenth of the area, that would be a fifth of the mass; at 279 m it is 2.4%.</li>
-  <li><b>It must fit one launch.</b> Folded and rolled, the reference sail is a package of 14.4 tonnes, 7.7 × 3.4 × 2.1 metres, sized for one shot of a mass driver at 100 g.</li>
-</ul>
-<div class="tablewrap"><table class="data">
-  <caption>The size trade in the design study (2026 film at 0.92 AU). Fixed mass is the hub, vanes and tensioners; the umbra is the length of the full shadow behind the sail. The trade used a slightly heavier film than the final design, so its masses run about 10% high; the final 279 m sail, with spares, is 14.4 t.</caption>
-  <thead><tr><th>Chiplets</th><th class="v">Side</th><th class="v">Mass</th><th class="v">Power</th><th class="v">Fixed mass</th><th class="v">Umbra</th></tr></thead>
-  <tbody>
-    <tr><td>10⁷</td><td class="v">82 m</td><td class="v">1.9 t</td><td class="v">1.5 MW</td><td class="v">19%</td><td class="v">8 km</td></tr>
-    <tr><td>3×10⁷</td><td class="v">142 m</td><td class="v">5.0 t</td><td class="v">4.5 MW</td><td class="v">7.4%</td><td class="v">14 km</td></tr>
-    <tr><td>10⁸ (the design)</td><td class="v">260 m</td><td class="v">15.6 t</td><td class="v">15 MW</td><td class="v">2.4%</td><td class="v">26 km</td></tr>
-    <tr><td>3×10⁸</td><td class="v">450 m</td><td class="v">46 t</td><td class="v">45 MW</td><td class="v">0.8%</td><td class="v">45 km</td></tr>
-    <tr><td>10⁹</td><td class="v">822 m</td><td class="v">152 t</td><td class="v">150 MW</td><td class="v">0.2%</td><td class="v">81 km</td></tr>
-  </tbody>
-</table></div>
-<p>Above 279 m the fixed mass is already negligible and nothing more is gained, while the package grows past what one launch carries and the shadow behind each sail lengthens, which constrains how closely bands can fly. Later hardware with denser memory could fit one training replica on a 62 m sail, but the other two pulls keep the optimum near 279 m, so each sail simply holds several replicas (<a href="hardware.html">Hardware after 2095</a>).</p>
-
-<h2 id="film">The film, layer by layer</h2>
-<p>From the Sun inward, the film is an anti-reflection coating, a cover glass, the silicon absorber with all its contacts on the back, a thin dielectric, a magnesium heat spreader, an enamel that radiates in the infrared, and the chiplets. Every layer is made from elements Mercury has in bulk.</p>
-<div class="tablewrap"><table class="data">
-  <caption>The film stack. The reference is the design study’s 2026 stack; the mature era thins the silicon, the glass and the enamel. The model books the thinned film at 0.52 of the reference’s 195 g/m², 101 g/m², which leaves about 12 g/m² of margin over these layers (<code>filmThin</code>).</caption>
-  <thead><tr><th>Layer</th><th>What it does</th><th class="v">2026 reference</th><th class="v">Mature era</th></tr></thead>
-  <tbody>
-    <tr><td>Porous silica and TiO₂ anti-reflection, 55–110 nm</td><td>Lets light into the glass and the silicon</td><td class="v">0.3 g/m²</td><td class="v">0.3 g/m²</td></tr>
-    <tr><td>Cover glass, SiO₂-rich Mg-aluminosilicate</td><td>Stops solar protons; expands like silicon</td><td class="v">20 µm, 50 g/m²</td><td class="v">8 µm, ~20 g/m²</td></tr>
-    <tr><td>Crystalline silicon absorber, textured, back-contacted</td><td>The solar cell</td><td class="v">30 µm, 70 g/m²</td><td class="v">10 µm, light-trapped, ~23 g/m²</td></tr>
-    <tr><td>Rear aluminium contacts and tile wiring</td><td>Collects current with nothing on the front</td><td class="v">4 g/m²</td><td class="v">4 g/m²</td></tr>
-    <tr><td>Rear dielectric, 0.5 µm SiO₂</td><td>Insulates the cell from the spreader</td><td class="v">1.1 g/m²</td><td class="v">1.1 g/m²</td></tr>
-    <tr><td>Magnesium spreader, 13 µm, patterned per tile</td><td>Carries each chip’s heat a few centimetres</td><td class="v">22.6 g/m²</td><td class="v">22.6 g/m²</td></tr>
-    <tr><td>Back emitter enamel, Fe/Mg/Ca silicate, microtextured</td><td>Radiates the heat (ε ≈ 0.9)</td><td class="v">15 µm, 40.5 g/m²</td><td class="v">6 µm, ~16 g/m²</td></tr>
-    <tr><td>Chiplets and their mesh wiring</td><td>The computer</td><td class="v">2 g/m²</td><td class="v">2 g/m²</td></tr>
-    <tr class="total"><td>Film</td><td></td><td class="v">191 g/m²</td><td class="v">89 g/m²</td></tr>
-  </tbody>
-</table></div>
-<h3>The cell</h3>
-<p>Silicon is the only solar cell Mercury can make at this scale. Perovskite cells need iodine and III-V cells need indium and germanium; Mercury holds enough of those for a swarm catching a hundred-thousandth of the Sun at most. A silicon cell made without hydrogen, as it must be on a planet with almost none, is expected to reach 21–22% under sunlight in space, against a theoretical limit near 30%. The model takes 21.5%, less 5% for the thinner absorber, losing 0.34% of its output for every kelvin above 28 °C.</p>
-<p>All the contacts are on the back (an interdigitated back-contact cell), so nothing on the front shades it and the front is a single dark surface. Each 25 mm tile is two half-cells in series, giving about 1 volt; nothing on the production film ever sees more than 1.17 V, which matters because solar arrays in space arc when a meteoroid strikes a string held at 80 volts or more. A switched-capacitor converter on each chiplet steps the tile’s volt down to the half volt its logic runs on, at 93% efficiency, and tracks the cell’s maximum power point.</p>
-<p>One trick earns a lot. About a quarter of sunlight lies at wavelengths longer than silicon can use. Absorbed, it only heats the film. A cover-glass coating that reflects it lowers the film’s absorptance from 0.90 to 0.80, and the sail can fly closer to the Sun for the same temperature: 0.86 AU instead of 0.92, with 14% more sunlight per square metre.</p>
-<h3>What it looks like</h3>
-<p>The front reflects about 0.2% of visible light, almost all of it from the anti-reflection coating, which leaves a faint magenta-blue residual. To the eye the film is a very dark navy. The 25 mm hinge strips, every 1.63 m, are a slightly lighter satin; individual tiles show only from a few metres away. A sail far away is a dark diamond whose only bright feature is the mirror vanes.</p>
-<figure>
-  <div class="pair">
-    <div class="plate"><img src="../renders/sail-corner.a3c0a3e608.jpg" alt="Close view of one corner of the sail: a tensioner, tethers and a tilted mirror vane over the dark film" width="2400" height="1350" loading="lazy"></div>
-    <div class="plate"><img src="../renders/sail-swarm-counter-sun.202cc869c5.jpg" alt="One corner of a sail from just above it, with the counter-sun shining beyond its tip" width="2400" height="1600" loading="lazy"></div>
-  </div>
-  <figcaption>One corner of a sail. Left, from 28 m: the tensioner that keeps the film taut, its tethers, and a mirror vane used for steering. Right, from 30 m above the corner looking away from the Sun: the dark film, its bright fold lines, and beyond the tip the counter-sun, the Sun mirrored back by every sail farther out along that one line.<span class="how">The right frame is rendered for a swarm whose fronts carry an infrared-dark aluminium mesh, which reflects about 4% like a mirror. The closed sphere’s plain glass fronts reflect less.</span></figcaption>
+<h2 id="film">What the film is made of</h2>
+<p>The film is a stack of six thin layers, about 40 micrometres in all, half the thickness of a human hair. Light comes in through the front; heat leaves through both faces.</p>
+<figure class="drawing">
+  <div data-draw="sailStack"></div>
+  <figcaption>The film in cross-section. Sunlight passes the anti-reflection coating and the glass and is absorbed in the silicon. About a sixth of it becomes electricity, which the chiplet on the back spends. All of it, in the end, becomes heat, which the magnesium layer spreads and both faces radiate away.<span class="how">The mature film; thicknesses drawn to scale with each other.</span></figcaption>
 </figure>
+<p>Every layer is made from elements Mercury has plenty of: silicon, oxygen, magnesium, aluminium, iron and calcium. That rules out most of the solar cells used in space today. Mercury has too little iodine for perovskite cells and too little indium and germanium for the high-efficiency cells on satellites, so the cell is plain crystalline silicon, made without hydrogen because Mercury has almost none. Such a cell should convert about 21–22% of sunlight in space.</p>
+<p>The cell has all its electrical contacts on the back, so nothing on the front casts a shadow. Each 2.5 cm square is wired as its own little power supply at about 1 volt, and nothing on the film ever sees more than 1.2 volts. That matters more than it sounds: solar panels in space can arc and burn when a dust grain strikes a string held at 80 volts or more.</p>
+<p>One trick earns a lot. About a quarter of sunlight is at wavelengths too long for silicon to use. Absorbed, it would only heat the film. A coating on the glass reflects it instead, which lets the sail fly closer to the Sun at the same temperature, where each square metre catches 14% more light.</p>
+<details class="deep"><summary>Layer by layer, with masses</summary>
+<div class="tablewrap"><table class="data">
+  <caption>The film stack. The 2026 reference is the design study’s; the mature film thins the silicon, the glass and the enamel. The model books the mature film at 101 g/m², which leaves about 12 g/m² of margin over the layers listed.</caption>
+  <thead><tr><th>Layer</th><th class="v">2026 reference</th><th class="v">Mature film</th></tr></thead>
+  <tbody>
+    <tr><td>Anti-reflection coating (porous silica, titania)</td><td class="v">0.3 g/m²</td><td class="v">0.3 g/m²</td></tr>
+    <tr><td>Cover glass (magnesium aluminosilicate)</td><td class="v">20 µm, 50 g/m²</td><td class="v">8 µm, 20 g/m²</td></tr>
+    <tr><td>Silicon cell, back-contacted</td><td class="v">30 µm, 70 g/m²</td><td class="v">10 µm, 23 g/m²</td></tr>
+    <tr><td>Aluminium contacts and wiring</td><td class="v">4 g/m²</td><td class="v">4 g/m²</td></tr>
+    <tr><td>Insulating layer</td><td class="v">1.1 g/m²</td><td class="v">1.1 g/m²</td></tr>
+    <tr><td>Magnesium heat spreader</td><td class="v">13 µm, 23 g/m²</td><td class="v">13 µm, 23 g/m²</td></tr>
+    <tr><td>Emitter enamel (iron-magnesium-calcium silicate)</td><td class="v">15 µm, 41 g/m²</td><td class="v">6 µm, 16 g/m²</td></tr>
+    <tr><td>Chiplets and their wiring</td><td class="v">2 g/m²</td><td class="v">2 g/m²</td></tr>
+    <tr class="total"><td>Film</td><td class="v">191 g/m²</td><td class="v">89 g/m²</td></tr>
+  </tbody>
+</table></div></details>
+<p>To the eye the front is a very dark navy. It reflects about 0.2% of visible light, most of it from the anti-reflection coating, which leaves a faint magenta-blue sheen. The hinge strips, every 1.63 m, are a slightly lighter satin. From far away a sail is a dark diamond whose only bright parts are its four mirror vanes.</p>
 
-<h2 id="chips">The chiplets on the back</h2>
-<p>Each chiplet is a die about 2.5 mm square and 50 µm thick, bonded to the back of the film at the centre of its tile. It draws 0.15 W. That figure is chosen, not given: a thin sheet carries heat sideways so poorly that the metal needed to spread a chip’s heat grows with the square of its power. At 0.1 W per chip the spreader costs 0.09 g per watt; at 1 W, 0.94 g/W; at 10 W, 9.4 g/W, more than the whole rest of the sail. At 0.15 W the die runs only 7–10 K above the film around it, and the film’s silicon absorber carries about two thirds of the heat.</p>
-<p>The spacing follows from the power. A square metre of film on the sail’s own orbit delivers about 260 W to its chips, so one 0.15 W chiplet fits every 24 mm. At 0.95 AU, where the sphere is built, sunlight is weaker and the pitch opens to 26.5 mm. A sail there carries about 10⁸ chiplets and 15 MW of chips.</p>
-<p>The chiplets are wired to their four neighbours through the rear metal layer, crossing the hinge strips on flexible jumpers. With 2026 parts that electrical mesh is the only network, and a bit crossing the whole sail costs 220–1,465 pJ. The mature design adds optical lanes, light guided in the film between chiplets, which bring that to 0.03–2 pJ and let a signal cross the sail in about two microseconds. That is what makes one sail one machine.</p>
-<p>Memory moves onto the chiplets themselves. Today’s design would hold a chiplet’s working data in 16 MB of SRAM, which leaks badly when hot. The mature design stacks 1–2 GB of non-volatile memory (resistive, magnetic or ferroelectric) on each chiplet. It draws nothing when idle, shrugs off the radiation an unshielded film collects, and survives brownouts. <a href="compute.html">Chips in the film</a> explains what such a mesh can and cannot compute.</p>
+<h2 id="chips">The chips on the back</h2>
+<p>Why such small chips? Because a thin sheet is bad at carrying heat sideways. A chip has to hand its heat to enough film to radiate it, and the bigger the chip, the farther the heat must travel and the thicker the metal that carries it. The metal needed grows with the square of the chip’s power: 0.09 g of spreader per watt at 0.1 W per chip, 0.94 g at 1 W, 9.4 g at 10 W, more than the whole rest of the sail. At 0.15 W per chip, the die runs only 7–10 °C warmer than the film around it.</p>
+<p>So the chip spacing follows the sunlight. On the sail’s own orbit a square metre feeds about 260 W to its chips, enough for one 0.15 W chip every 24 mm. At 0.95 AU, where the sphere is built, the light is weaker and the spacing opens to 26.5 mm. Either way a sail carries about a hundred million chips and 15 MW of computing power, the electricity of a small town.</p>
+<p>The chips talk to their four neighbours through wiring in the film. That alone would make a sail a loose patchwork, because a message crossing the sheet hop by hop is slow and costly. So the mature design also lays light guides through the film, which carry a signal across the whole sail in about two microseconds. Each chip also carries one to two gigabytes of memory of a kind that keeps its data without power and shrugs off radiation. <a href="compute.html">Chips in the film</a> covers what this computer can run.</p>
 <figure>
   <div class="pair">
     <div class="plate"><img src="../renders/sail-back-lwir-macro.3afad38ca6.jpg" alt="False-colour thermal image of the back of the film: a fine grid of warm dots with a cold truss in front" width="1920" height="1080" loading="lazy"></div>
     <div class="plate"><img src="../renders/sail-hub-lwir.73fa56d9d5.jpg" alt="Thermal image of the hub seen from behind: a cold octagon with laser terminals over a glowing film" width="1920" height="1080" loading="lazy"></div>
   </div>
-  <figcaption>The back of the sail through a thermal camera. Left, from half a metre: each warm dot is one chiplet, a few kelvin above the film. The dark bars are a boom, cold because it sees only deep space. Right, the hub and its laser terminals.<span class="how">8–14 µm radiance on a fixed false-colour scale from 320 K to 350 K. The reference design at 0.92 AU, film at 348 K.</span></figcaption>
+  <figcaption>The back of the sail through a thermal camera. Left, from half a metre: each warm dot is one chip, a few degrees warmer than the film. The dark bars are a boom, cold because it sees only deep space. Right, the hub and its laser terminals.<span class="how">Heat radiation at 8–14 µm on a fixed false-colour scale from 320 K to 350 K. The 2026 reference sail at 0.92 AU.</span></figcaption>
 </figure>
 
-<h2 id="temperature">Temperature, and where a sail can fly</h2>
-<p>A sail in sunlight settles where the heat it radiates from both faces equals the sunlight it absorbs:</p>
-<p class="eq"><i>α S</i> = (<i>ε</i><sub>front</sub> + <i>ε</i><sub>back</sub>) <i>σ T</i>⁴</p>
-<p>Here <i>α</i> = 0.80 is the share of sunlight absorbed, <i>S</i> the sunlight per square metre, and the emissivities are 0.85 for the glass front and 0.90 for the enamel back. Notice what is missing: the efficiency of the cells. The electricity they make is spent in chips in the same sheet and leaves as heat from the same surface, so a better cell makes more computing at the same temperature. Only the absorbed sunlight sets the temperature, and with it the distance.</p>
-<p>The chips are held near 85 °C, where logic is most efficient per joule (<a href="hardware.html#hot">Hardware after 2095</a>). With the chips 9 K above the film, that puts the film at 349 K and a lone sail at 0.862 AU, in 1,832 W/m² of sunlight. Closer in, the chips would overheat; farther out, the same film would catch less.</p>
+<h2 id="temperature">Where a sail can fly</h2>
+<p>A sail in sunlight warms up until it radiates heat as fast as it absorbs light. What sets that temperature is how much light it absorbs and how freely its two faces radiate. Strikingly, the efficiency of the solar cell plays no part: the electricity is spent in chips on the same sheet, so it comes out as heat from the same surface. A better cell gives more computing at the same temperature.</p>
+<p>The temperature then sets the distance. Logic chips work best near 85 °C (<a href="hardware.html#hot">Hardware after 2095</a> explains why), and the chips run about 9 °C above the film. So a lone sail flies where its film settles at 76 °C: 0.862 AU from the Sun, in about 1,830 W of sunlight per square metre. Closer in, the chips would overheat. Farther out, the same film would catch less light.</p>
+<figure class="drawing">
+  <div data-draw="threeSails"></div>
+  <figcaption>Where the heat can go sets the temperature. A lone sail with a glass front radiates from both faces. While the sphere is being built, the sails’ fronts are made dark in the infrared, so that Earth does not see them glow; they then radiate almost only from their backs and run warmer. In the closed sphere every front faces another front across the hollow middle, so no heat escapes that way at all.</figcaption>
+</figure>
+<p>The sphere does not let each sail choose its distance. Every sail flies at 0.95 AU, for reasons to do with Earth and with how much rock Mercury has (<a href="sphere.html#why095">Closing the sphere</a>). While the sphere is sparse, the fronts are switched to radiate poorly in the infrared, so the film runs at 382 K and the chips at about 118 °C. As the sphere closes, it can only shed heat outward, through the sails’ backs, and the film climbs to 419 K, with chips near 155 °C. Hot cells convert less and hot chips spend more energy per operation, so each watt of sunlight then computes about half what it would at 85 °C. That is the price of enclosing the Sun.</p>
 <figure>
   <div class="chart" data-chart="filmTemp"></div>
-  <figcaption>The chips’ temperature on a lone sail against its distance from the Sun. With a glass front the sail radiates from both faces and reaches the 85 °C limit at 0.862 AU. While the sphere is being built, every sail carries a front that is dark in the infrared, to keep its heat away from Earth, and runs hotter. Once the sphere closes, the sails face each other, can only shed heat outward, and run hotter still.<span class="how">Computed live from the model (<code>sailAt</code>, <code>closedFilmT</code>). Hover for values.</span></figcaption>
+  <figcaption>The chips’ temperature on a lone sail against its distance from the Sun. With a glass front it reaches the 85 °C limit at 0.862 AU; with a dark front it runs about 50 °C hotter everywhere. The ring marks the closed sphere.<span class="how">Computed live from the model (<code>sailAt</code>, <code>closedFilmT</code>). Hover for values.</span></figcaption>
 </figure>
-<p>In the sphere, every sail flies at 0.95 AU, not at its own best distance, for reasons that have to do with Earth and with how much of Mercury there is (<a href="sphere.html#why095">Closing the sphere</a>). While the sphere is sparse, each sail’s front is switched to a low infrared emissivity, 0.1, the way spacecraft radiators can be today, so Earth does not see warm fronts through the gaps; the film then runs at 382 K and the chips at about 118 °C. As the sphere closes, the fronts face other fronts across the cavity instead of space, and all of the Sun’s power has to leave through the backs. The film reaches 419 K and the chips about 155 °C. Hot cells convert less and hot logic spends more per operation, so each watt of sunlight computes about half what it would at 85 °C. That is the price of enclosing the Sun, and the sphere note explains why it is paid.</p>
+<details class="deep"><summary>The arithmetic</summary>
+<p>In balance, the sunlight absorbed equals the heat radiated from both faces:</p>
+<p class="eq"><i>α S</i> = (<i>ε</i><sub>front</sub> + <i>ε</i><sub>back</sub>) <i>σ T</i>⁴</p>
+<p>Here <i>α</i> = 0.80 is the share of sunlight absorbed, <i>S</i> the sunlight per square metre, <i>σ</i> the Stefan–Boltzmann constant, and the emissivities (how readily each face radiates, from 0 to 1) are 0.85 for the glass front and 0.90 for the enamel back. At 0.862 AU, <i>S</i> = 1,832 W/m² and <i>T</i> = 349 K. With a dark front (<i>ε</i> = 0.1) at 0.95 AU, <i>T</i> = 382 K. Closed, only the backs radiate: <i>ε</i><sub>back</sub> <i>σ T</i>⁴ = <i>S</i> ÷ 0.96 at 0.95 AU, which gives 419 K.</p></details>
 
-<h2 id="structure">Holding it flat</h2>
-<p>The film is held at a tension of only 0.1 N per metre, about the weight of a paperclip per metre of edge. That is enough. The only steady load is sunlight, which pushes on the whole sail with about a third of a newton, and the membrane, stressed at 1.25 kPa, bows by less than two hundredths of a degree under it.</p>
-<p>Four booms carry the tension to the hub. Each is a triangular truss 199 m long and 2.6 m across, built from thin magnesium-alloy tubes 16 mm across with iron-nickel wire diagonals, and weighs 109 kg. It carries a compressive load of 141 N with a safety factor of three. The booms sit 0.3 m behind the film, which touches them nowhere; constant-force spring reels at the corners take up any slack, and two redundant tethers run to each corner. The edges between corners hang as shallow curves (11 m of sag in 279 m), so the tension spreads evenly and no edge flutters.</p>
-<details class="deep"><summary>Why the sail does not spin</summary><p>Solar sails are often spun so that rotation keeps them flat. The study rejected it. The torque a sail’s vanes can supply to precess a spinning disc limits the spin period to 45 minutes or longer, and at that rate rotation gives only 0.6–10 mN/m of tension. The film’s edges would then bend over 1–3 m, so its 1.63 m fold panels would curl. A static frame with booms and tensioners holds the film flat at a fraction of the cost.</p></details>
-<p>The hardest flatness problem is inside the film. The magnesium spreader expands differently from the silicon, so any temperature change curls the free edges of each fold panel. The film is laminated stress-free at its working temperature, which keeps the curl at the hinge lines below 3.7°. The tilted edges cover about a fifth of the film and cost less than 0.2% of its power.</p>
-<div class="tablewrap"><table class="data">
-  <caption>Structure of the reference sail.</caption>
-  <thead><tr><th>Part</th><th>What it is</th><th class="v">Mass</th></tr></thead>
-  <tbody>
-    <tr><td>Booms, four</td><td>199 m triangular magnesium trusses, 76 bays</td><td class="v">437 kg</td></tr>
-    <tr><td>Hub</td><td>3.4 m octagonal prism: boom deployers, avionics, star trackers, beacon</td><td class="v">250 kg</td></tr>
-    <tr><td>Hinge strips, 243</td><td>25 mm dark-enamelled glass cloth with aluminium jumpers</td><td class="v">67 kg</td></tr>
-    <tr><td>Corner vanes, four</td><td>9.3 m squares of aluminium-coated glass cloth on gimbals</td><td class="v">65 kg</td></tr>
-    <tr><td>Tensioners, doublers, sensors</td><td>Spring reels, corner reinforcement, sun sensors</td><td class="v">27 kg</td></tr>
-    <tr><td>Edge cables and tape</td><td>1.2 mm iron-nickel wire in a glass-cloth hem</td><td class="v">13 kg</td></tr>
-    <tr class="total"><td>Structure</td><td>6% of the reference sail</td><td class="v">859 kg</td></tr>
-  </tbody>
-</table></div>
+<h2 id="size">Why 279 metres</h2>
+<p>Three things pull on the size, in different directions.</p>
+<p>First, the biggest job a sail is meant to do must fit on one sheet. The design study sized it so that the largest model it trains, using about a hundred million chips, is one unbroken mesh. Split across two sails, a model would run only as fast as the laser link between them, a thousand times slower than the film.</p>
+<p>Second, the parts every sail needs whatever its size, the hub, vanes and tensioners, weigh about a third of a tonne. On a small sail that is a large share of the mass; on a big one it hardly counts.</p>
+<p>Third, the folded sail must fit one launch. Packed, the 279 m sail is a bundle of 14.4 tonnes about the size of a shipping container.</p>
+<figure>
+  <div class="chart" data-chart="sizeTrade"></div>
+  <figcaption>How much of a sail’s mass is fixed hardware, by its size. Below about 150 m it costs a lot; above 279 m there is little left to gain, while the package outgrows one launch and the shadow behind each sail lengthens.<span class="how">From the design study’s size trade. Hover for the length of each size’s full shadow.</span></figcaption>
+</figure>
+<p>Later hardware with denser memory could fit one training job on a sail a quarter the size. The other two pulls keep the best size near 279 m anyway, so a sail of the mature era simply holds several jobs at once.</p>
 
-<h2 id="steering">Pointing and steering</h2>
-<p>A sail must face the Sun to within a fraction of a degree, and from time to time turn edge-on to it. Small asymmetries in the film’s reflectance, 1% from one side to the other, would twist it with about 0.12 N·m. The four corner vanes, each 87 m² of aluminium-coated cloth on a two-axis gimbal 6.7 m beyond the film’s tip, can push back with 0.35 N·m on every axis, three times the largest disturbance. They steer by tilting, which moves the point where sunlight pushes; no propellant is used.</p>
-<p>The same push moves the sail’s orbit. Sunlight carries about a third of a percent of the reference sail’s weight, and more of a thinned sail’s. Tilting the whole sail tilts that push, and over months it reshapes the orbit. That is how the sails of a band hold formation: each tilts 3–4°, which costs 0.2% of its light, to stay up to 35,000 km off the great circle its band follows round the Sun (<a href="sphere.html#bands">Closing the sphere</a>).</p>
-<p>Turning edge-on is a different matter. In the sphere, a sail that passes behind another, or through a window cut for Earth, turns edge-on so that it neither blocks light nor traps the lit sail’s heat. Vanes are too slow for that, and sunlight stops pushing once a sail is edge-on. So each sail carries a flywheel run from its own film. Spinning the wheel up turns the sail the other way; a ten-minute flip of the 14-tonne reference sail needs a wheel of about 200 kg, and the wheel ends at the speed it started with. Sunlight on the vanes unloads any slow drift. The mirror sails in front of Earth do the same with 50 kg wheels, and their flips are animated on the <a href="../index.html#window-sim-fig">main page</a>.</p>
+<h2 id="structure">Holding it flat, and turning it</h2>
+<p>The film is held at a tension of only 0.1 newtons per metre, roughly the weight of a paperclip per metre of edge. That is enough because almost nothing pulls on it. Sunlight pushes on the whole sail with about a third of a newton, and under that push the film bows by less than two hundredths of a degree.</p>
+<p>The booms are triangular trusses of thin magnesium tubing, 199 m long and 2.6 m across, weighing 109 kg each. They sit 30 cm behind the film without touching it, and spring reels at the corners keep the tension even. The edges between the corners hang in shallow curves, so the pull spreads evenly and no edge flutters.</p>
+<details class="deep"><summary>Why the sail does not spin</summary><p>Solar sails are often spun so that rotation keeps them flat. The study rejected it. A spinning sail would have to turn slowly, once every 45 minutes or longer, for its vanes to be able to steer it, and at that rate rotation gives a tenth or less of the tension the booms provide. The film’s edges would then curl over a metre or more, and the 1.63 m fold panels would not lie flat.</p></details>
+<p>A sail turns in two ways. For steady pointing, each corner vane can tilt, which shifts where sunlight pushes and makes a small twisting force. The vanes can push back three times harder than the largest disturbance, a 1% difference in reflectance from one side of the film to the other. For fast turns, a flywheel in the hub does the work.</p>
+<figure class="drawing">
+  <div data-draw="steering"></div>
+  <figcaption>Two ways a sail turns. Tilting a corner vane moves the point where sunlight pushes, which twists the sail slowly. Spinning up a flywheel turns the whole sail the other way, fast; spinning it down again stops the turn.</figcaption>
+</figure>
+<p>Fast turns matter in the sphere. Once orbits begin to cross, a sail that passes behind another, or through a window cut for Earth, must turn edge-on to the Sun so that it neither blocks light nor traps its neighbour’s heat. Once edge-on, sunlight no longer pushes on it, so the vanes cannot do the job. A flywheel of about 200 kg flips the 14-tonne reference sail in ten minutes and ends at the speed it started with, so no energy is spent beyond friction. No sail carries any propellant.</p>
+<p>The same push of sunlight also moves the orbit. Tilting the whole sail tilts the push, and over months that reshapes the path. That is how the sails of a band hold formation round the Sun: each leans by 3–4°, at a cost of 0.2% of its light (<a href="sphere.html#bands">Closing the sphere</a>).</p>
 
-<h2 id="links">Links</h2>
-<p>The reference sail carries 60 laser terminals on the back of the film, one for each 32.5 m patch, each a 10 cm telescope on a two-axis gimbal at the top of a 0.6 m mast, with four more at the boom tips that see past the film’s edge. They are Starlink-class: 0.1–0.4 Tbps to anything within 3,000 km. Each draws 60–80 W from its own square metre of film wired as a 24 V string, well under the 80 V at which arcs start.</p>
-<p>Mature hardware needs fewer and better terminals: about twelve per sail, eight of 10 cm and four of 30 cm, at 50–400 Tbps each. Inside the sail the optical lanes in the film carry everything; the terminals are only for traffic between sails, to the mirror cap’s laser stations, and to the few concentrated pods.</p>
-<p>The gaps between sails set what the swarm can do as a whole. The laser links between sails carry far less than the film carries inside one, and it is that bandwidth, more than the light-time, that stops tensor parallelism, splitting one layer of a model across chips, at the edge of a sail. Sails cooperate the way data centres do now, by exchanging results and averaged updates, not by acting as one chip.</p>
+<h2 id="links">Lasers between sails</h2>
+<p>A sail talks to other spacecraft through laser terminals on its back: small telescopes on gimbals. The 2026 reference carries 60 of them, each like those Starlink satellites use, sending a fraction of a terabit a second to anything within 3,000 km. Mature hardware needs about a dozen far better ones, each carrying 50–400 terabits a second. Even so, the lasers between sails carry far less than the light guides inside one, and that is what makes the sail, not the swarm, the unit that computes as one machine.</p>
 
-<h2 id="launch">Folding, launch and deployment</h2>
-<p>The laminate can be rolled but never creased: rolled to a radius of 34 mm or more, no layer strains more than 0.1%. All the folding happens in the hinge strips. The film is folded like an accordion along its 243 hinge lines into a strip 1.63 m wide and 395 m long, 242 layers thick at the middle, then rolled from both tips toward the centre into two rolls 2.2 m across. With the hub between them, the package measures 7.7 × 3.4 × 2.1 m and weighs 14.4 tonnes.</p>
-<p>It leaves the factory, on Mercury at first and in orbit later, on a mass driver at 100 g, and a small electric kick stage running on oxygen takes it to its orbit. Deployment then runs in five steps:</p>
-<ol>
-  <li>The kick stage circularises the orbit and separates.</li>
-  <li>The two booms along the fold extend, carrying the rolls outward, which pay out under a brake.</li>
-  <li>The other two booms extend; their tips pull the outermost accordion panels out to the remaining corners, and the panels unfold.</li>
-  <li>The tensioners take up the slack to 0.1 N/m, the vanes unfurl on their own small booms, and the terminals rise on their masts.</li>
-  <li>The vanes point the sail at the Sun, the chiplets test themselves, and the film’s network starts up region by region.</li>
-</ol>
+<h2 id="launch">Folding it for launch</h2>
+<p>The film can be rolled but never creased. All the folding happens along the 243 hinge strips, narrow bands of glass cloth that run across the sail every 1.63 m.</p>
+<figure class="drawing">
+  <div data-draw="foldSequence"></div>
+  <figcaption>How a sail is packed. The square is folded like an accordion along its hinge lines into a long narrow strip, then rolled from both ends toward the hub. The package fits one launch.</figcaption>
+</figure>
+<p>The package leaves the factory on a mass driver, an electric catapult, at 100 g, and a small electric kick stage running on oxygen takes it to its orbit. There the booms extend and carry the rolls outward, which unroll under a brake; the other two booms pull the accordion open; the tensioners take up the slack; the vanes and terminals unfold; and the chips test themselves and start up, region by region.</p>
 
 <h2 id="damage">Damage, wear and repair</h2>
-<p>At 0.92 AU interplanetary dust strikes at about 21 km/s. Almost every grain makes a small hole, and the film is far too thin to stop any of them. What saves it is that holes do not grow. At the film’s low stress, a crack would have to be about a hundred kilometres long before it could spread on its own, and the hinge strips stop tears from handling. A hit kills at most the tile it lands on, a single 0.15 W chiplet and its cell.</p>
+<p>Interplanetary dust hits the sail at about 21 km/s. The film is far too thin to stop any of it, so almost every grain makes a hole: about 264,000 holes of a tenth of a millimetre per sail per year, and a hole a centimetre across once every 33 years. What saves the sail is that the holes do not grow. The film is under so little tension that a crack would have to be about a hundred kilometres long before it could spread by itself. A hit kills at most the 2.5 cm square it lands on, one chip and its cell.</p>
+<p>All told, a sail loses roughly a tenth of a per cent of its chips a year to dust. It carries 10% spare area, and repair craft patch it in place.</p>
+<p>How long can a sail last? Designs of today’s kind give 10–30 years. But the swarm is meant to last for centuries, so the question is what physics allows when repair is part of the plan. The answer is centuries:</p>
 <div class="tablewrap"><table class="data">
-  <caption>Meteoroid holes in one reference sail at 0.92 AU (Grün flux at 20.9 km/s).</caption>
-  <thead><tr><th>Hole</th><th class="v">Particle</th><th class="v">Per m² per year</th><th class="v">Per sail per year</th></tr></thead>
+  <caption>What wears a sail out in the closed sphere, and what stops it.</caption>
+  <thead><tr><th>Wear</th><th>How fast</th><th>What stops it</th></tr></thead>
   <tbody>
-    <tr><td>0.1 mm</td><td class="v">50 µm</td><td class="v">3.9</td><td class="v">264,000</td></tr>
-    <tr><td>0.3 mm</td><td class="v">150 µm</td><td class="v">0.2</td><td class="v">13,700</td></tr>
-    <tr><td>1 mm</td><td class="v">0.5 mm</td><td class="v">0.0033</td><td class="v">224</td></tr>
-    <tr><td>3 mm</td><td class="v">1.5 mm</td><td class="v">5×10⁻⁵</td><td class="v">3.5</td></tr>
-    <tr><td>1 cm</td><td class="v">5 mm</td><td class="v">5×10⁻⁷</td><td class="v">one every 33 years</td></tr>
+    <tr><td>Solar wind eroding the glass</td><td>About 0.02 nm a year</td><td>Nothing needs to: 8 µm of glass lasts about 400,000 years</td></tr>
+    <tr><td>Proton damage in the cells</td><td>About 7.5% of output a decade</td><td>At 146 °C the film heals the commonest defects as it goes; a patch can be heated to 250–350 °C for an hour to heal the rest</td></tr>
+    <tr><td>Chip wiring wearing out</td><td>25 times faster at 155 °C than at 105 °C</td><td>Wiring cut into segments short enough that the metal cannot drift</td></tr>
+    <tr><td>Radiation in the memory</td><td>133–437 krad a decade</td><td>Resistive memory tolerates 10–20 Mrad, centuries of dose</td></tr>
+    <tr><td>Dust holes</td><td>Up to 1% of the area a year</td><td>Crack-stopped film keeps to the low end, about 2% in 300 years, patched in place</td></tr>
+    <tr><td>Going out of date</td><td>Only while chips keep improving</td><td>By the time the sphere closes, chips have long since stopped improving</td></tr>
   </tbody>
 </table></div>
-<p>The film loses about 0.13% of its chiplets a year, depending on how far the damage around each hole reaches (0.02–1.2%). The sail carries 10% spare area, so even the worst case leaves it working for years, and repair craft patch it in place.</p>
-<p>How long a sail lasts was first set by 2026 designs, which give 10–30 years. The closed swarm asks what physics allows when repair is part of the design, and the answer is centuries.</p>
-<div class="tablewrap"><table class="data">
-  <caption>What wears a sail out in the closed swarm (film 419 K, chips about 155 °C), and what stops it.</caption>
-  <thead><tr><th>Wear</th><th>Rate</th><th>What stops it</th></tr></thead>
-  <tbody>
-    <tr><td>Solar wind sputtering the cover glass</td><td>About 0.02 nm a year</td><td>Nothing needs to: 8 µm of glass lasts about 400,000 years</td></tr>
-    <tr><td>Proton damage in the cells</td><td>7.5% of output a decade behind 20 µm of glass, more behind 8 µm</td><td>At 146 °C the film anneals the commonest defects continuously; the rest anneal at 250–350 °C, which a patch reaches for an hour when the sail drives current through it</td></tr>
-    <tr><td>Electromigration in chip wiring</td><td>25× faster at 155 °C than at 105 °C: a chip built as today’s would last under two years</td><td>Wires cut into segments shorter than the Blech length, where back-stress stops the drift altogether; it costs routing density, not lifetime</td></tr>
-    <tr><td>Radiation dose in memory</td><td>133–437 krad a decade, unshielded</td><td>Resistive memory survives 10–20 Mrad, centuries of dose; data is scrubbed continuously</td></tr>
-    <tr><td>Meteoroid holes</td><td>0.007–1.2% of the area a year, depending on crack arrest</td><td>Crack-stopped film keeps to the low end, about 2% in 300 years, patched in place</td></tr>
-    <tr><td>Obsolescence</td><td>Worth replacing while chips improve faster than recycling loses material</td><td>By the time the sphere closes, chips have long reached their practical floor</td></tr>
-  </tbody>
-</table></div>
-<p>So the model rebuilds each sail every 300 years and recycles 99% of it in orbit. Between rebuilds, depot craft anneal, patch and swap chiplets. The rebuild is for the slow damage that repair in place cannot reach: clusters of displaced atoms, grain growth, accumulated patches. Pessimistic hardware gets 50 years and 95% recycling, optimistic 1,000 years and 99.5%, and today’s hardware 10 years and 90%. How much that matters for the size of the swarm is in <a href="mercury.html#refresh">Taking Mercury apart</a>.</p>
+<p>So the model rebuilds each sail every 300 years, recycling 99% of it in orbit, and in between, repair craft heal, patch and swap chips. Why that matters for the size of the swarm is in <a href="mercury.html#refresh">Taking Mercury apart</a>.</p>
 
-<h2 id="mass">The mass ledger</h2>
+<h2 id="mass">What a sail weighs</h2>
 <div class="tablewrap"><table class="data">
-  <caption>Mass of one sail. The reference is the design study’s, with 2026 film at 0.92 AU; the mature column is the model’s central case on the sail’s own orbit, 0.862 AU.</caption>
-  <thead><tr><th></th><th class="v">2026 reference</th><th class="v">Mature era</th></tr></thead>
+  <caption>Mass of one sail. The 2026 reference flies at 0.92 AU; the mature sail is the model’s central case on its own orbit.</caption>
+  <thead><tr><th></th><th class="v">2026 reference</th><th class="v">Mature sail</th></tr></thead>
   <tbody>
     <tr><td>Film</td><td class="v">13,250 kg</td><td class="v">7,050 kg</td></tr>
-    <tr><td>Spare area and structure</td><td class="v">859 kg structure</td><td class="v">+10%: 705 kg</td></tr>
+    <tr><td>Structure, or spare area</td><td class="v">859 kg structure</td><td class="v">+10%: 705 kg</td></tr>
     <tr><td>Laser terminals</td><td class="v">320 kg</td><td class="v">~80 kg</td></tr>
     <tr class="total"><td>Sail</td><td class="v">14.4 t</td><td class="v">7.8 t</td></tr>
-    <tr><td>Chip power</td><td class="v">14.8 MW</td><td class="v">18.1 MW</td></tr>
+    <tr><td>Power to the chips</td><td class="v">14.8 MW</td><td class="v">18.1 MW</td></tr>
     <tr><td>Mass per watt of chips</td><td class="v">0.98 g/W</td><td class="v">0.43 g/W</td></tr>
   </tbody>
 </table></div>
-<p>Most of the gain comes from the thinner film; the rest from a sail that flies closer to the Sun and converts more of what it catches, 260 W of chips per square metre against 213. The sail itself is only part of the swarm’s mass. Pods add more per watt (<a href="compute.html">Chips in the film</a>); in the sphere the film sits at 0.95 AU rather than 0.862, so each watt needs 21% more of it; and once orbits begin to cross, some sails are always idle behind others. The finished swarm weighs 1.0 g per watt of chips, 5.67×10²² kg in all.</p>
+<p>Most of the gain comes from the thinner film; the rest from a sail that flies a little closer to the Sun and converts more of what it catches. The whole swarm weighs more per watt than its sails do, about 1.0 g, because it also carries a few concentrated pods, flies its sails a little farther out than their best distance, and keeps some sails idle behind others once orbits begin to cross.</p>
 
 <section class="sources">
   <h2>Sources and code</h2>
   <ul>
-    <li>Design study: <code>docs/data/design_spec.json</code>, with its scripts in <code>docs/data/design_scripts/</code> (structure, optics, layout, clustering, sensitivity).</li>
+    <li>Design study: <code>docs/data/design_spec.json</code>, with its scripts in <code>docs/data/design_scripts/</code>.</li>
     <li>Architecture studies: <code>docs/architecture.md</code>, <code>docs/data/architecture_thermal_mass.json</code>, <code>docs/data/architecture_skeptic.json</code>.</li>
-    <li>Future hardware: <code>docs/future-tech.md</code> and <code>docs/data/future/*.json</code>; lifetimes: <code>docs/closed-swarm.md</code> and <code>docs/full-swarm.md</code>.</li>
-    <li>Model: <code>src/model/hybrid.js</code> (<code>sailAt</code>, <code>closedFilmT</code>, <code>closedFactor</code>), tested in <code>test/hybrid.test.js</code>.</li>
+    <li>Future hardware: <code>docs/future-tech.md</code>, <code>docs/data/future/*.json</code>; lifetimes: <code>docs/closed-swarm.md</code>, <code>docs/full-swarm.md</code>.</li>
+    <li>Model: <code>src/model/hybrid.js</code> (<code>sailAt</code>, <code>closedFilmT</code>, <code>closedFactor</code>), tested in <code>test/hybrid.test.js</code>. Diagrams: <code>notes/figures.js</code>.</li>
     <li>Grün, Zook, Fechtig and Giese (1985), the interplanetary meteoroid flux; SPENVIS ballistic-limit equations.</li>
-    <li>JAXA and NASA Glenn measurements of impact-induced arcing on solar arrays (sustained arcs at 80–183 V).</li>
-    <li>Thin crystalline silicon efficiency against thickness: arXiv:1505.03985. LONGi’s 27.81% silicon cell (2025).</li>
+    <li>JAXA and NASA Glenn measurements of impact-induced arcing on solar arrays.</li>
+    <li>Thin crystalline silicon efficiency against thickness, arXiv:1505.03985.</li>
     <li>Miller, “Attojoule optoelectronics”, J. Lightwave Technology 35(3), 2017, arXiv:1609.05510.</li>
     <li>Blech (1976), electromigration threshold in short conductors.</li>
   </ul>
@@ -231,6 +195,6 @@
 <nav class="onward" id="onward"></nav>
 </article>
 </div>
-<script type="module" src="notes.9988ee64e6.js"></script>
+<script type="module" src="notes.1c66f4187b.js"></script>
 </body>
 </html>
