@@ -174,6 +174,22 @@ const CHARTS = {
       legend: false,
     });
   },
+  // Doubling time of industry against the mass of fab tools per square metre of chips a year.
+  fabDoubling(el) {
+    // m² of chips per kg of swarm, as the model's build uses it (its fab penalty at P.fabToolIntensity)
+    const a = model().growth.fabPenaltyYears / (Math.LN2 * P.fabToolIntensity);
+    const Td = I => P.doublingYears + Math.LN2 * I * a;
+    const xs = range(Math.log(2), Math.log(400), 100).map(Math.exp);
+    lineChart(el, {
+      x: { min: 2, max: 400, log: true, ticks: [3, 10, 40, 100, 250], fmt: v => `${v}`, title: 'kg of fab tools per m² of chips made a year' },
+      y: { min: 0, max: 8, ticks: [0, 1, 2, 4, 6, 8], fmt: v => `${v} yr`, title: 'Time for the whole industry to double' },
+      series: [{ pts: xs.map(x => [x, Td(x)]), color: 'var(--ink-2)', label: '' }],
+      points: [{ x: 250, y: Td(250), label: `today’s fabs: ${Td(250).toFixed(1)} yr`, left: true, dy: -10 }, { x: 40, y: Td(40), label: `a vacuum fab in space: ${Td(40).toFixed(2)} yr`, dy: -12, left: true }, { x: 5, y: Td(5), label: `imprint, if it works: ${Td(5).toFixed(1)} yr`, dy: -12 }],
+      hlines: [{ y: 1, label: 'copying everything else alone: 1 yr' }],
+      tip: x => `${lead(`${Math.round(x)} kg`)} of tools per m²/yr<br>doubling every ${Td(x).toFixed(2)} years`,
+      legend: false,
+    });
+  },
   // Mass of the swarm per watt of chips against the share of chip power put in pods.
   podShare(el) {
     const qs = range(0, 0.3, 60);

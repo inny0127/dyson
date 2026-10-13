@@ -237,4 +237,78 @@ export const FIGURES = {
       return s;
     }));
   },
+
+  // ---------------------------------------------------------------- hardware after 2095
+  /** When the swarm is built, against the hardware generations. */
+  eraTimeline(el) {
+    const d = h.compute({ ...P }), g = d.growth;
+    const yr = f => Math.round(P.seedYear + d.yearsToCoverage(Math.min(f, 0.9999) * h.FIXED.closedRoom));
+    const x0 = 40, x1 = 690, a = 2020, b = 2400, X = y => x0 + ((y - a) / (b - a)) * (x1 - x0), ax = 136;
+    put(el, svg(720, 270, 'A timeline from 2020 to 2400: the first factory lands in 2050, but the swarm reaches a millionth of the Sun only in 2116 and closes in 2361, so almost all of it is built with hardware from after 2100', id => {
+      let s = '';
+      const gens = [[2026, 2040], [2040, 2070], [2070, 2100]];
+      gens.forEach(([p0, p1], i) => { s += Rect(X(p0), 176, X(p1) - X(p0) - 2, 24, { fill: 'ink3', stroke: 'none', op: 0.14 + i * 0.07, rx: 3 }); });
+      s += T((X(2026) + X(2100)) / 2, 192, 'earlier', { a: 'middle', sz: 11.5 });
+      s += Rect(X(2100), 176, X(2400) - X(2100), 24, { fill: 'swarm', stroke: 'none', op: 0.25, rx: 3 });
+      s += T((X(2100) + X(2400)) / 2, 192, 'mature hardware, from 2100', { a: 'middle', c: 'ink', w: 600, sz: 11.5 });
+      s += T(x0, 168, 'Hardware generations', { c: 'ink3', sz: 11.5, w: 500 });
+      s += Ln(x0, ax, x1, ax, { c: 'ink3', w: 1 });
+      for (const t of [2050, 2100, 2150, 2200, 2250, 2300, 2350, 2400]) s += Ln(X(t), ax - 4, X(t), ax + 4, { c: 'ink3', w: 1 }) + T(X(t), 222, t, { a: 'middle', sz: 11.5, c: 'ink3' });
+      const tiers = [104, 76, 48];
+      const ev = [[2050, 'first factory', 0], [yr(1e-6), 'a millionth', 2], [yr(0.01), '1%', 0, 'end'], [Math.round(P.seedYear + g.tCap), 'heat wall', 1], [yr(0.5), 'half', 0], [2361, 'closed', 0]];
+      ev.forEach(([t, lab, k, anchor = 'middle']) => {
+        const top = tiers[k], tx = X(t) + (anchor === 'end' ? -5 : 0);
+        s += Ln(X(t), ax - 4, X(t), top + 4, { c: 'ink3', w: 0.75 });
+        s += Circ(X(t), ax, 4, { fill: 'var(--paper)', stroke: 'ink', sw: 2 });
+        s += T(tx, top - 2, lab, { a: anchor, c: 'ink', w: 500, sz: 11.5 }) + T(tx, top - 16, t, { a: anchor, sz: 11 });
+      });
+      s += T(x0, 256, 'Everything built before 2100 is under a millionth of the finished swarm, so the page shows mature hardware.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** Radiation each memory survives, against the dose it would get on the film and in a pod. */
+  memoryRad(el) {
+    const mems = [['DRAM and HBM', 2, 100, 'pod'], ['3D NAND flash', 10, 50, 'pod'], ['Magnetic RAM', 1000, 3000, 'film', true], ['Ferroelectric RAM', 8000, 12000, 'film'], ['Resistive RAM', 5000, 20000, 'film']];
+    const x0 = 160, x1 = 590, lo = 0.3, hi = 30000, X = v => x0 + (Math.log10(v / lo) / Math.log10(hi / lo)) * (x1 - x0);
+    put(el, svg(720, 300, 'Radiation tolerance of memory types on a logarithmic scale: DRAM and flash fail far below the dose an unshielded film collects in a decade, so they stay in shielded pods; magnetic, ferroelectric and resistive memory survive it, and resistive memory survives centuries', id => {
+      let s = '';
+      // dose bands
+      s += Rect(X(0.4), 30, X(3.3) - X(0.4), 200, { fill: 'earth', stroke: 'none', op: 0.12 });
+      s += T((X(0.4) + X(3.3)) / 2, 24, 'in a pod, a decade', { a: 'middle', c: 'earth', sz: 11.5, w: 500 });
+      s += Rect(X(142), 30, X(466) - X(142), 200, { fill: 'heat', stroke: 'none', op: 0.14 });
+      s += T((X(142) + X(466)) / 2, 24, 'on the film, a decade', { a: 'middle', c: 'heat', sz: 11.5, w: 500 });
+      s += Rect(X(4260), 30, X(13980) - X(4260), 200, { fill: 'heat', stroke: 'heat', op: 0.05, dash: '4 3', sw: 0.75 });
+      s += T((X(4260) + X(13980)) / 2, 24, '300 years on the film', { a: 'middle', c: 'heat', sz: 11.5, w: 500 });
+      mems.forEach(([name, a, b, where, open], i) => {
+        const y = 62 + i * 34;
+        s += T(x0 - 10, y + 4, name, { a: 'end', c: 'ink', w: 500 });
+        s += Rect(X(a), y - 6, X(b) - X(a), 12, { fill: where === 'pod' ? 'ink3' : 'swarm', stroke: 'none', op: 0.9, rx: 3 });
+        if (open) s += Ln(X(b), y, X(b) + 18, y, { c: 'swarm', w: 2, arrow: id });
+        s += T(604, y + 4, where === 'pod' ? 'stays in pods' : 'flies on the film', { sz: 11.5, c: where === 'pod' ? 'ink2' : 'swarm', w: 500 });
+      });
+      for (const v of [1, 10, 100, 1000, 10000]) s += Ln(X(v), 230, X(v), 236, { c: 'ink3', w: 1 }) + T(X(v), 252, v >= 1000 ? `${v / 1000} Mrad` : `${v} krad`, { a: 'middle', sz: 11.5, c: 'ink3' });
+      s += Ln(x0, 230, x1, 230, { c: 'ink3', w: 1 });
+      s += T(x1, 276, 'radiation dose a memory survives (logarithmic)', { a: 'end', sz: 11.5 });
+      s += T(604, 44, 'where it goes', { c: 'ink3', sz: 11.5, w: 500 });
+      return s;
+    }));
+  },
+
+  /** The refresh balance: what is built, what retires, what is recycled. */
+  refreshLoop(el) {
+    put(el, svg(720, 236, 'The refresh balance: industry adds new sails to the fleet; every year a share of the fleet retires; most of that is recycled back into industry and the rest is lost. The fleet stops growing when the loss equals what industry can add', id => {
+      let s = '';
+      s += Rect(30, 90, 150, 64, { fill: 'var(--wash)', stroke: 'ink', rx: 8 }) + T(105, 118, 'Industry', { a: 'middle', c: 'ink', w: 600 }) + T(105, 136, 'limited by heat', { a: 'middle', sz: 11.5 });
+      s += Rect(285, 80, 170, 84, { fill: 'swarm', stroke: 'swarm', op: 0.14, rx: 8 }) + T(370, 114, 'The standing fleet', { a: 'middle', c: 'ink', w: 600 }) + T(370, 132, 'B kg of sails', { a: 'middle', sz: 11.5 });
+      s += Ln(184, 112, 280, 112, { c: 'ink', w: 2, arrow: id }) + T(232, 104, 'new sails, D', { a: 'middle', sz: 11.5, c: 'ink', w: 500 });
+      s += Ln(460, 122, 560, 122, { c: 'ink', w: 2, arrow: id }) + T(510, 114, 'retire, B ÷ L', { a: 'middle', sz: 11.5, c: 'ink', w: 500 }) + T(510, 140, 'each year', { a: 'middle', sz: 11 });
+      s += Rect(565, 100, 120, 44, { fill: 'var(--wash)', stroke: 'ink3', rx: 8 }) + T(625, 126, 'Retired sails', { a: 'middle', c: 'ink', w: 500 });
+      s += Path('M625,148 C625,200 105,200 105,158', { stroke: 'earth', sw: 2, arrow: id }) + T(365, 214, 'recycled in orbit: a share ρ', { a: 'middle', c: 'earth', sz: 11.5, w: 500 });
+      s += Ln(625, 96, 625, 40, { c: 'heat', w: 2, arrow: id }) + T(632, 50, 'lost: 1 − ρ', { c: 'heat', sz: 11.5, w: 500 });
+      s += T(30, 30, 'Growth stops when the loss equals what industry adds:', { c: 'ink', sz: 12.5 });
+      s += T(30, 50, 'B = D × L ÷ (1 − ρ)', { c: 'ink', sz: 14, w: 600 });
+      return s;
+    }));
+  },
 };
