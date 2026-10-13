@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hardware After 2095</title>
+<meta name="description" content="The swarm takes three centuries to build and is refreshed as it goes, so it is made of hardware that does not exist yet. Logic, hot chips, memory, links, solar cells, chip fabs and refresh, from eight studies and an adversarial review.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+<header class="nb"><div class="nb-in"><a class="nb-home" href="../index.html">A Dyson Swarm, Made Real</a><details><summary>Technical notes</summary><ol id="notes-menu"></ol></details></div></header>
+<div class="page">
+<nav class="toc" id="toc" aria-label="Contents"></nav>
+<article class="note">
+<header class="head">
+  <div class="kicker" id="note-no">Technical note</div>
+  <h1>Hardware after 2095</h1>
+  <p class="dek">The first sails fly in the 2050s, but the swarm does not reach one per cent of the Sun until the 2140s, and every part of it is rebuilt as it ages. Almost nothing that flies is built with today’s parts. Which of today’s conclusions survive, and which flip?</p>
+  <p class="byline">From eight sequential studies and an adversarial review in <code>docs/data/future/</code>, summarised in <code>docs/future-tech.md</code>, and the page’s model · October 2026</p>
+</header>
+<details class="toc-m" id="toc-m"></details>
+
+<section class="summary">
+  <h2>In short</h2>
+  <ul>
+    <li><b>The architecture survives and gets simpler.</b> The swarm stays almost all compute sails. High-bandwidth memory never flies, pods shrink from 15% of chip power to a few per cent, and each sail becomes one tightly coupled machine through light guides in its film.</li>
+    <li><b>Chips stay cool.</b> Every transistor that switches by thermal emission pays energy growing as the square of its temperature. Hot chips buy almost nothing per kilogram and cost a fifth to two fifths of the computing per joule of sunlight.</li>
+    <li><b>Silicon is the only solar cell Mercury can supply,</b> at 21–22% in space when made without hydrogen. Reflecting the light silicon cannot use is worth more than any exotic cell.</li>
+    <li><b>Chip fabs set the pace before Mercury’s heat does.</b> The build needs 10¹¹ times today’s wafer output. A vacuum fab in space, running dry chemistry because Mercury has no hydrogen, gives an industrial doubling of 1.9 years.</li>
+    <li><b>Refresh sets the size.</b> A fleet that retires every L years and recycles a share ρ levels off at export × L ÷ (1 − ρ). Short lives and poor recycling stop the swarm at a few per cent of the Sun; the central case, 300 years and 99%, lets it close.</li>
+  </ul>
+  <div class="keys">
+    <div><b>1.4×10⁻¹⁵ J</b><span>per operation on a sail, after 2095 (7.8×10⁻¹⁴ in 2026)</span></div>
+    <div><b>1–2 GB</b><span>of non-volatile memory on each 0.15 W chiplet (16 MB of SRAM in 2026)</span></div>
+    <div><b>~12</b><span>laser terminals per sail, 50–400 Tbps each (64 small ones in 2026)</span></div>
+    <div><b>21.5%</b><span>silicon cell efficiency in space, made without hydrogen</span></div>
+    <div><b>1.88 yr</b><span>industrial doubling, with fabs grown in space</span></div>
+    <div><b>10¹⁴</b><span>FLOP per joule of sunlight (1.6×10¹² in 2026)</span></div>
+  </div>
+</section>
+
+<h2 id="when">When the swarm is built</h2>
+<p>Industry doubles from a seed factory on Mercury in 2050 until Mercury’s surface cannot shed the waste heat of mining any faster, which in the central case happens in 2145 (<a href="mercury.html#wall">Taking Mercury apart</a>). The swarm passes a millionth of the Sun in 2116, one per cent in 2141 and half in 2178. Since every part of it is refreshed as it ages, the fleet flying at any moment is young. The scenario study’s cohort simulation found that more than 99.99999% of everything ever built is hardware from after 2100.</p>
+<p>So the page shows one mature era by default, with today’s hardware as a comparison, and two bundles around the central one: pessimistic and optimistic. They are coherent sets of assumptions, not joint percentiles. The model does not animate hardware improving over time, because the swarm is invisible while its hardware is still changing.</p>
+<div class="tablewrap"><table class="data">
+  <caption>The four hardware eras in the model. Hardware rows are for a sail on its own orbit at 1% coverage; build rows are for the closed swarm.</caption>
+  <thead><tr><th></th><th class="v">2026</th><th class="v">Pessimistic</th><th class="v">Central</th><th class="v">Optimistic</th></tr></thead>
+  <tbody>
+    <tr><td>Energy per operation (sail)</td><td class="v">7.8×10⁻¹⁴ J</td><td class="v">3.3×10⁻¹⁴ J</td><td class="v">1.4×10⁻¹⁵ J</td><td class="v">1.3×10⁻¹⁶ J</td></tr>
+    <tr><td>Sail orbit</td><td class="v">0.919 AU</td><td class="v">0.888 AU</td><td class="v">0.862 AU</td><td class="v">0.844 AU</td></tr>
+    <tr><td>Chiplet pitch</td><td class="v">26.8 mm</td><td class="v">26.0 mm</td><td class="v">24.0 mm</td><td class="v">21.2 mm</td></tr>
+    <tr><td>Chip power per sail</td><td class="v">14.6 MW</td><td class="v">15.5 MW</td><td class="v">18.1 MW</td><td class="v">23.2 MW</td></tr>
+    <tr><td>Sail mass per watt</td><td class="v">0.92 g/W</td><td class="v">0.54 g/W</td><td class="v">0.43 g/W</td><td class="v">0.30 g/W</td></tr>
+    <tr><td>Pods’ share of chip power</td><td class="v">15%</td><td class="v">15%</td><td class="v">6%</td><td class="v">1.1%</td></tr>
+    <tr><td>FLOP per joule of sunlight</td><td class="v">1.6×10¹²</td><td class="v">3.9×10¹²</td><td class="v">1.0×10¹⁴</td><td class="v">1.4×10¹⁵</td></tr>
+    <tr><td>Service life / recycled</td><td class="v">10 yr / 90%</td><td class="v">50 yr / 95%</td><td class="v">300 yr / 99%</td><td class="v">1,000 yr / 99.5%</td></tr>
+    <tr><td>Industrial doubling, with fabs</td><td class="v">5.2 yr</td><td class="v">3.9 yr</td><td class="v">1.9 yr</td><td class="v">1.2 yr</td></tr>
+    <tr><td>1% of the Sun</td><td class="v">2305</td><td class="v">2241</td><td class="v">2141</td><td class="v">2107</td></tr>
+    <tr><td>Where it stops</td><td class="v">36%, rock</td><td class="v">73%, rock</td><td class="v">closed, 2361</td><td class="v">closed, 2166</td></tr>
+    <tr><td>Computing, finished</td><td class="v">9.9×10³⁷ FLOP/s</td><td class="v">5.7×10³⁸</td><td class="v">1.9×10⁴⁰</td><td class="v">3×10⁴¹</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="logic">Logic: energy per operation</h2>
+<p>The model counts energy per dense 8-bit operation at the level of the whole system, at 85 °C, with chips run at 60% of full clock (below full clock, voltage and energy per operation fall). The logic study traced it era by era:</p>
+<div class="tablewrap"><table class="data">
+  <caption>Energy per operation on a sail, central and range.</caption>
+  <thead><tr><th>Era</th><th class="v">Central</th><th class="v">Range</th><th>What drives it</th></tr></thead>
+  <tbody>
+    <tr><td>2026</td><td class="v">7.8×10⁻¹⁴ J</td><td class="v">4×10⁻¹⁴–1.6×10⁻¹³</td><td>Today’s accelerators, system level</td></tr>
+    <tr><td>2040</td><td class="v">1.0×10⁻¹⁴ J</td><td class="v">2.8×10⁻¹⁵–8.2×10⁻¹⁴</td><td>Device scaling (×3.5 on the IRDS roadmap), 4-bit arithmetic, memory stacked on logic</td></tr>
+    <tr><td>2070</td><td class="v">2.6×10⁻¹⁵ J</td><td class="v">3.1×10⁻¹⁶–3.9×10⁻¹⁴</td><td>Supply voltage near its floor; locality</td></tr>
+    <tr><td>2100+</td><td class="v">1.4×10⁻¹⁵ J</td><td class="v">—</td><td>Approaching the practical floor for irreversible logic, about 7×10⁻¹⁶ J at 358 K</td></tr>
+  </tbody>
+</table></div>
+<p>The floors are far below that. The Landauer limit, the least energy needed to erase a bit, is <i>kT</i> ln 2 = 3.4×10⁻²¹ J at 358 K; counted per gate in an operation it is about 1.7×10⁻¹⁸ J. Practical irreversible logic stops a few hundred times above it, because supply voltages are stuck near 0.6 V without steep-slope devices, which the IRDS roadmap does not expect.</p>
+<details class="deep"><summary>Adiabatic and superconducting logic</summary>
+<p><b>Adiabatic (reversible) logic</b> recovers most of the energy stored in each switched node. It could add 1.5–4.1 times by 2070 and 2–10 times after 2100. But it trades energy for area: a gain g costs about 2.4 g² more silicon per watt. That caps it near 6 times at 10% coverage and 20 times for a full shell, and multiplies the leading-edge wafers needed per megawatt by 9–110. It may pay after Mercury’s heat wall, when fabs have caught up; the model leaves it out.</p>
+<p><b>Superconducting logic</b> at 4.2 K, with the 200–375 watts of cooling it needs per watt, reaches parity with silicon around 2070 at about 3×10⁻¹⁵ J per operation, but weighs 6–38 g per watt with its cryocoolers. That is 20–30 times less computing per kilogram than the film, and it gains nothing from a colder orbit.</p></details>
+<p>Falling energy per operation does not change the case for the film against pods, because heat transport sets that. It does raise each sail’s computing 8–250 times over today, and with it the traffic each sail must move, which is what forces optical lanes in the film and bigger laser terminals.</p>
+
+<h2 id="hot">Why the chips stay cool</h2>
+<p>A tempting idea is to run the chips hot. Hotter film radiates more per square metre, so the same sail could fly closer to the Sun, catch more light, and need less film per watt. The study found it does not pay.</p>
+<p>Every transistor that switches by thermal emission over a barrier, whether silicon, silicon carbide, gallium nitride, gallium oxide or diamond, obeys the same Boltzmann floor: it takes at least ln 10 · <i>kT</i>/<i>q</i> of gate voltage to change its current tenfold. That is 71 mV at 85 °C, 114 mV at 300 °C and 153 mV at 500 °C. Switching energy goes as the square of voltage, so it grows as <i>T</i>²: 1.12 times at 105 °C, 2.6 times at 300 °C, 4.7 times at 500 °C, even for perfect devices. The model uses an exponential fit, +0.56% per kelvin for mature logic.</p>
+<figure>
+  <div class="chart" data-chart="hotLogic"></div>
+  <figcaption>Energy per operation against the chips’ junction temperature, relative to 85 °C. Marked: a sail on its own orbit, and the sphere’s sails while it is sparse and when it is closed.<span class="how">Computed live from the model (<code>energyPenalty</code>). The dashed curve is 2026 logic re-optimised for heat, from the hot-silicon study.</span></figcaption>
+</figure>
+<p>Against that cost, the gain is small. A hotter sail flies closer to the Sun:</p>
+<div class="tablewrap"><table class="data">
+  <caption>Where a lone sail flies by its chips’ temperature, and what it buys (central hardware, 1% coverage).</caption>
+  <thead><tr><th>Chips at</th><th class="v">Sail orbit</th><th class="v">Sail mass per W</th><th class="v">FLOP/s per kg</th><th class="v">FLOP per J of sunlight</th></tr></thead>
+  <tbody>
+    <tr><td>85 °C</td><td class="v">0.862 AU</td><td class="v">0.43 g/W</td><td class="v">1.7×10¹⁸</td><td class="v">1.0×10¹⁴</td></tr>
+    <tr><td>105 °C</td><td class="v">0.771 AU</td><td class="v">0.38 g/W</td><td class="v">1.7×10¹⁸</td><td class="v">8.4×10¹³</td></tr>
+    <tr><td>125 °C</td><td class="v">0.694 AU</td><td class="v">0.34 g/W</td><td class="v">1.7×10¹⁸</td><td class="v">7.0×10¹³</td></tr>
+    <tr><td>150 °C</td><td class="v">0.613 AU</td><td class="v">0.30 g/W</td><td class="v">1.7×10¹⁸</td><td class="v">5.4×10¹³</td></tr>
+  </tbody>
+</table></div>
+<p>Computing per kilogram stays flat: the lighter sail is exactly offset by the energy each operation costs. Computing per joule of sunlight falls steadily, by 17% at 105 °C and 31% at 125 °C, because hot cells convert less and hot logic spends more. A swarm built from Mercury eventually catches all the sunlight it can, so sunlight, not mass, is what it runs short of, and cool chips win. Even an ideal hot film, with cells at their theoretical limit and logic at the Boltzmann floor, would gain only 1.3–1.6 times per kilogram at 200–300 °C and lose 2–4 times in sunlight efficiency.</p>
+<p>Two more things cap the temperature. Wide-bandgap logic that tolerates heat is still about five times worse per operation even after 2100. And dense memory stops near 150 °C. So chips are designed for about 85 °C. The closed sphere runs them at about 155 °C anyway, because enclosing the Sun leaves its sails no cooler place to be, and pays roughly half of its computing per watt for it (<a href="sphere.html#why095">Closing the sphere</a>).</p>
+
+<h2 id="memory">Memory</h2>
+<p>High-bandwidth memory, the stacked DRAM beside every AI accelerator today, is gone before the first sail launches. Pods move to memory bonded directly on logic: custom HBM bases around 2027, three-dimensional DRAM in 2030–2040. The last HBM-like part on the KAIST roadmap, around 2038, holds 200–240 GB at 180 W per stack.</p>
+<p>The film needs no DRAM at all. Radiation decides what can fly where:</p>
+<ul>
+  <li>A film chiplet at 0.92 AU absorbs 142–466 krad in ten years, mostly from solar particle events. Local shields saturate around 20–100 krad.</li>
+  <li>DRAM and HBM (2–100 krad), 3D NAND flash (10–50 krad) and probably oxide-semiconductor DRAM stay in pods behind 5 g/cm² of shielding, where the dose is 0.4–3.3 krad a decade.</li>
+  <li>Magnetic RAM (1 Mrad or more), resistive RAM (5–20 Mrad), hafnium-zirconium ferroelectric RAM (10 Mrad) and SRAM live on the film.</li>
+</ul>
+<p>Stacking those radiation-tolerant memories on each 0.15 W chiplet lifts its capacity from 16 MB today to about 1 GB in 2040, 1–32 GB in 2070 and 4–256 GB after 2100. SRAM shrinks to 1–2 MB of working buffer, and its leakage falls from 10–59% of chip power at 85 °C to 1–10%. Because these memories draw nothing when idle, survive brownouts and do not flip bits when struck, they also make the film far more robust.</p>
+<p>Mercury limits which memories can be built at swarm scale. It lacks indium, platinum, ruthenium, tungsten and tellurium in any quantity, and eventually hafnium. Memory must be made of silicon or titanium oxide resistive cells, zirconium-based ferroelectrics, iron and magnesium-oxide magnetic junctions, indium-free oxides, and glass for archives. Even zirconium runs short: it caps 32 GB chiplets at 12–25% coverage.</p>
+<p>The state of a training replica, a model of the 10²⁸-FLOP class with its optimiser, stays around 1.1–1.4 PB, because bytes per parameter fall as sparsity rises. With dense memory on every chiplet, a frontier model that needed a 17–30 m patch of film to serve fits in 3–12 m, and a training replica that needed a whole 279 m sail fits on about 62 m. So a sail holds many replicas, and its size goes back to its structural optimum, 150–300 m.</p>
+
+<h2 id="links">Links</h2>
+<p>A wire on a chip has about 2 pF of capacitance per centimetre, and charging it costs ¼<i>CV</i>². That energy falls only with the square of the supply voltage, which has nearly stopped falling. So on-chip wires stay at about 9–42 fJ per bit per millimetre, and an electrical mesh across a 279 m sail stays at hundreds of picojoules per bit. Light does not pay per millimetre. Optical input and output fall from 5.6 pJ per bit in 2026 products to about 0.4 pJ in 2040, 0.1 in 2070 and 0.03 after 2100. Hence the optical lanes in the film, plausible from about 2050–2070 (<a href="compute.html#film-computer">Chips in the film</a>).</p>
+<p>Between sails, laser terminals improve from 0.1–0.4 Tbps in Starlink-class parts today to about 50 Tbps in 2040, 200 in 2070 and 400 after 2100, at 3.4, 0.75 and 0.21 pJ per bit. They are limited by spectrum, not by photons. A 10 cm telescope reaches 330–360 km, every neighbour a sail has; a 30 cm one reaches 3,000–5,000 km, enough for pods. About twelve per sail (6–30) cost 0.2–2.7% of its mass and under 0.05% of its power. Today’s 10 cm terminals, scaled to a mature sail’s traffic, would weigh 17–524% of it.</p>
+
+<h2 id="pv">Solar cells</h2>
+<p>Silicon is the only solar cell Mercury can make in swarm quantities. Perovskite cells need iodine, of which Mercury holds enough for a swarm catching a hundred-thousandth of the Sun. Cells of III-V semiconductors need indium and germanium, enough for three millionths, or three thousandths under thousandfold concentration that the film cannot use.</p>
+<p>The theoretical limit for one silicon junction in sunlight above the atmosphere is 30.2% at 28 °C, 23.6% at 200 °C and 14.5% at 500 °C. The best silicon cell on Earth reached 27.8% in 2025, under ground sunlight and with hydrogen passivating its surfaces. A cell made without hydrogen, as Mercury requires, is expected at about 21–22% in space; the model uses 21.5%, less 5% for the thinner absorber of the mature film. Calibrated to that efficiency, a thin back-contact cell loses 0.34% of its output per kelvin (today’s thicker cells, 0.42%). Its output falls to zero near 575–600 K.</p>
+<p>The cell’s efficiency does not set the film’s temperature, because the chips spend the electricity in the same sheet. What does is absorptance. About a quarter of sunlight lies beyond silicon’s band gap and only heats the film; reflecting it (absorptance 0.90 → 0.80) moves sails from 0.92 to 0.86 AU and is the single largest optical gain. Heat engines and thermophotovoltaics, the alternatives that like heat, cost 2.3–3.7 times the film’s mass per watt once their chips are cooled.</p>
+
+<h2 id="fabs">Chip fabs</h2>
+<p>Fabs, not Mercury, are the first wall. At the export rate Mercury’s heat allows, the swarm needs about 10¹⁸ m² of chip die a year, 1.6–6.2×10¹⁹ wafers of 300 mm: about 10¹¹ times the whole world’s output in 2025, and 10¹² times its output at 7 nm and below.</p>
+<p>The problem is not making one fab but growing them as fast as everything else. Today a fab holds about 250 kg of tools for every square metre of die it makes in a year. An industry that must build its own fabs as it grows pays for that in doubling time. If each kilogram of swarm carries <i>a</i> square metres of die and each square metre a year takes <i>I</i> kilograms of tools, the doubling time grows from <i>T</i><sub>d</sub> to</p>
+<p class="eq"><i>T</i><sub>d</sub>′ = <i>T</i><sub>d</sub> + ln 2 · <i>I</i> · <i>a</i></p>
+<p>With today’s tools a one-year doubling becomes 5–18 years. The central case assumes a vacuum wafer fab built in space, about 40 kg of tools per square metre a year. With 22 mm² of die per watt and 0.69 g of swarm per watt, <i>a</i> is 0.032 m² per kilogram, and the doubling grows from 1 year to 1.88. Only a speculative large-panel imprint process with inorganic self-assembly, at 9–15 nm, approaches a year. Imprinting by the roll is cheap per square metre, but its 50–100 nm devices need about 50 times the area and 30 times the energy per operation.</p>
+<h3>Dry chemistry</h3>
+<p>Hydrogen is the one hard wall. Mercury holds about 5×10¹³ kg of it; processing with water would use about 10²² kg a year, and organic photoresists alone 6×10¹⁴. So the fab runs dry:</p>
+<ul>
+  <li>Silicon is reduced from molten oxide by electrolysis or by other metals, and purified to nine nines through a chlorine loop with zinc or magnesium.</li>
+  <li>Etching uses chlorine and oxygen plasmas; oxides are deposited from vapour; patterning uses no organic resists.</li>
+  <li>No water, organics, nitrogen or fluorine. Carbon, chlorine and sulphur come up with the rock.</li>
+</ul>
+<p>Space helps. Free vacuum removes about 60% of a fab’s electricity and a third or more of its equipment; there is no building, clean air or water. Making a kilogram of swarm takes about 1,150 MJ, mostly in the chips, yet that is only 3–5% of the swarm’s own output. At one per cent of the Sun the swarm already intercepts about 3×10¹⁴ kg of solar-wind hydrogen a year, and the closed sphere nearly all of it, which could ease the hydrogen wall; the model does not count on it.</p>
+
+<h2 id="refresh">Refresh and the ceiling</h2>
+<p>Sails retire. Whatever is built must keep being rebuilt, and a fleet levels off where what industry can deliver balances what retires. If export runs at <i>D</i> kilograms a year, each sail lasts <i>L</i> years and a share <i>ρ</i> of each retired sail is recycled, the standing fleet tends to</p>
+<p class="eq"><i>B</i> = <i>D</i> · <i>L</i> ÷ (1 − <i>ρ</i>)</p>
+<p>That ceiling is a ratio of assumptions, not a law of physics, and it is very sensitive to them:</p>
+<div class="tablewrap"><table class="data">
+  <caption>The ceiling by service life and recycling, central hardware, closed swarm.</caption>
+  <thead><tr><th>Service life</th><th class="v">Recycled</th><th class="v">Ceiling</th><th class="v">Closed in</th><th class="v">Lost a year, finished</th></tr></thead>
+  <tbody>
+    <tr><td>10 yr</td><td class="v">0%</td><td class="v">15%</td><td class="v">never</td><td class="v">5.7×10²¹ kg</td></tr>
+    <tr><td>10 yr</td><td class="v">90%</td><td class="v">62%</td><td class="v">never</td><td class="v">5.7×10²⁰ kg</td></tr>
+    <tr><td>15 yr</td><td class="v">94%</td><td class="v">74%</td><td class="v">never</td><td class="v">2.3×10²⁰ kg</td></tr>
+    <tr><td>30 yr</td><td class="v">97%</td><td class="v">97%</td><td class="v">never</td><td class="v">5.7×10¹⁹ kg</td></tr>
+    <tr><td>100 yr</td><td class="v">99%</td><td class="v">100%</td><td class="v">2345</td><td class="v">5.7×10¹⁸ kg</td></tr>
+    <tr><td>300 yr (central)</td><td class="v">99%</td><td class="v">100%</td><td class="v">2343</td><td class="v">1.9×10¹⁸ kg</td></tr>
+    <tr><td>1,000 yr</td><td class="v">99.5%</td><td class="v">100%</td><td class="v">2343</td><td class="v">2.8×10¹⁷ kg</td></tr>
+  </tbody>
+</table></div>
+<p>When is a refresh worth it at all? Replacing a sail early pays when the new chips’ gain outruns the material lost in recycling. With chips improving by a fraction <i>g</i> a year and a share ρ recovered, the economic life is about</p>
+<p class="eq"><i>a</i>* = ln(1/<i>ρ</i>) ÷ ln(1 + <i>g</i>)</p>
+<p>With ρ = 0.94 that is 6 years at 1% a year, 15 at 0.4%, 31 at 0.2%. While chips still improve, sails are refreshed every decade or two, and by 2300 about 98% of industrial output would only replace retired sails. Once chips reach their practical floor, <i>g</i> goes to zero and only wear decides. The sail note shows why wear, with repair, allows centuries (<a href="sail.html#damage">The compute sail</a>). That is why the central case takes 300 years and 99%: it is what physics allows once improvement stops, not what today’s designs give.</p>
+
+<h2 id="open">What could still change the picture</h2>
+<ul>
+  <li><b>The back enamel’s emissivity.</b> A 15 µm enamel’s infrared emissivity has not been measured; it decides whether the film is 0.17 or 0.19 kg/m².</li>
+  <li><b>Hydrogen-free silicon above 22%.</b> And whether the solar wind’s hydrogen can be harvested for processing.</li>
+  <li><b>Adiabatic logic after the heat wall.</b> Worth 1.7–2.4 times per kilogram if fab output allows.</li>
+  <li><b>Fab productivity and recycling in orbit.</b> These two set both the pace and the ceiling.</li>
+</ul>
+<aside class="box"><b class="t">What the adversarial review changed</b><p>The review judged the scenario study “partly refuted”. The architecture held: film far ahead of pods, silicon-only cells, the sail as the unit, no HBM on the film, cool chips. The headline numbers did not: the first synthesis bundled several speculative choices into its central case (an imprint fab, a thin high-emissivity film, 25% cells without hydrogen, 1% pods, a 50% yield) and its proposed code had real bugs, among them no limit on Mercury’s rock. The model’s central case now follows the review where it mattered most: a space wafer fab at 40 kg per m²/yr rather than imprint, cells at 21.5% rather than 25%, a 42% yield, and finite rock. Pods at 6% sit between the synthesis’s 1% and the review’s 15%.</p></aside>
+
+<section class="sources">
+  <h2>Sources and code</h2>
+  <ul>
+    <li>Project studies: <code>docs/data/future/logic.json</code>, <code>memory.json</code>, <code>interconnect.json</code>, <code>hot_power.json</code>, <code>workloads.json</code>, <code>manufacturing.json</code>, <code>scenarios.json</code>, <code>skeptic.json</code>; summary in <code>docs/future-tech.md</code>. Every number comes from a script in the study folders; each result file lists 40–80 sources.</li>
+    <li>Model: <code>src/model/hybrid.js</code> (<code>ERAS</code>, <code>energyPenalty</code>, <code>simulateBuild</code>); <code>NUMBERS.md</code> for every era’s row.</li>
+    <li>IRDS 2024, More Moore. Ho, Erdil and Besiroglu, “Limits to the energy efficiency of CMOS microprocessors”, arXiv:2312.08595. Epoch AI, ML hardware energy-efficiency trend. Tolpygo (NIST), superconducting logic.</li>
+    <li>JEDEC HBM4; SK hynix and KAIST HBM roadmaps; monolithic 3D DRAM programmes; radiation data for MRAM, RRAM and ferroelectric memory.</li>
+    <li>Miller, arXiv:1609.05510; Nozaki et al., Nature Photonics 2019; Timurdogan et al. 2014 (0.9 fJ/bit modulator); ultra-low-loss silicon nitride waveguides; Google Suncatcher, arXiv:2511.19468.</li>
+    <li>ASTM E-490 spectrum and detailed-balance limits; LONGi 27.81% silicon cell (2025); NASA Glenn 500 °C silicon-carbide JFET ICs.</li>
+    <li>SEMI World Fab Forecast 2025; ASML NXE:3800E and EXE:5200B throughput; TechInsights fab energy; Evans et al. 2015, chlorine on Mercury; IEA PVPS Task 12 (recycling).</li>
+  </ul>
+</section>
+<nav class="onward" id="onward"></nav>
+</article>
+</div>
+<script type="module" src="notes.js"></script>
+</body>
+</html>

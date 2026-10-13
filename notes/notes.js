@@ -57,6 +57,7 @@ const AX = 'stroke:var(--rule);stroke-width:1';
 const TK = 'fill:var(--ink-3);font:12px var(--sans)';
 const LB = 'fill:var(--ink-2);font:12px var(--sans)';
 const TT = 'fill:var(--ink);font:500 12.5px var(--sans)';
+const HALO = ';paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round';   // labels stay legible over lines
 
 /**
  * A line chart: one x scale, one y scale (either may be logarithmic), hairline grid, labelled
@@ -73,8 +74,8 @@ function lineChart(el, { W = 720, H = 360, x, y, series, marks = [], hlines = []
   s += `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" style="stroke:var(--ink-3);stroke-width:1"/>`;
   s += `<text x="${L}" y="${T - 14}" style="${TT}">${y.title}</text>`;
   s += `<text x="${W - R}" y="${H - 6}" text-anchor="end" style="${LB}">${x.title}</text>`;
-  for (const m of hlines) s += `<line x1="${L}" x2="${W - R}" y1="${Y(m.y)}" y2="${Y(m.y)}" style="stroke:${m.color || 'var(--ink-3)'};stroke-width:1;stroke-dasharray:4 4"/><text x="${m.left ? L + 6 : W - R - 4}" y="${Y(m.y) - 6}" text-anchor="${m.left ? 'start' : 'end'}" style="${LB}">${m.label}</text>`;
-  for (const m of marks) s += `<line x1="${X(m.x)}" x2="${X(m.x)}" y1="${T}" y2="${H - B}" style="stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 4"/><text x="${X(m.x) + (m.right ? -5 : 5)}" y="${T + 12 + (m.dy || 0)}" text-anchor="${m.right ? 'end' : 'start'}" style="${LB}">${m.label}</text>`;
+  for (const m of hlines) s += `<line x1="${L}" x2="${W - R}" y1="${Y(m.y)}" y2="${Y(m.y)}" style="stroke:${m.color || 'var(--ink-3)'};stroke-width:1;stroke-dasharray:4 4"/><text x="${m.left ? L + 6 : W - R - 4}" y="${Y(m.y) - 6}" text-anchor="${m.left ? 'start' : 'end'}" style="${LB}${HALO}">${m.label}</text>`;
+  for (const m of marks) s += `<line x1="${X(m.x)}" x2="${X(m.x)}" y1="${T}" y2="${H - B}" style="stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 4"/><text x="${X(m.x) + (m.right ? -5 : 5)}" y="${T + 12 + (m.dy || 0)}" text-anchor="${m.right ? 'end' : 'start'}" style="${LB}${HALO}">${m.label}</text>`;
   for (const sr of series) {
     // points outside the y range break the line rather than being drawn along its edge
     let d = '', pen = false;
@@ -85,7 +86,7 @@ function lineChart(el, { W = 720, H = 360, x, y, series, marks = [], hlines = []
     }
     s += `<path d="${d}" style="fill:none;stroke:${sr.color};stroke-width:2;stroke-linejoin:round${sr.dash ? ';stroke-dasharray:6 4' : ''}"/>`;
   }
-  for (const pt of points) s += `<circle cx="${X(pt.x)}" cy="${Y(pt.y)}" r="4" style="fill:var(--paper);stroke:${pt.color || 'var(--ink)'};stroke-width:2"/><text x="${X(pt.x) + (pt.left ? -8 : 8)}" y="${Y(pt.y) + (pt.dy ?? -8)}" text-anchor="${pt.left ? 'end' : 'start'}" style="${LB}">${pt.label}</text>`;
+  for (const pt of points) s += `<circle cx="${X(pt.x)}" cy="${Y(pt.y)}" r="4" style="fill:var(--paper);stroke:${pt.color || 'var(--ink)'};stroke-width:2"/><text x="${X(pt.x) + (pt.left ? -8 : 8)}" y="${Y(pt.y) + (pt.dy ?? -8)}" text-anchor="${pt.left ? 'end' : 'start'}" style="${LB}${HALO}">${pt.label}</text>`;
   s += `<line class="xh" y1="${T}" y2="${H - B}" style="stroke:var(--ink-3);stroke-width:1" visibility="hidden"/></svg>`;
   el.innerHTML = s + (legend ? `<div class="legend">${series.filter(sr => sr.label).map(sr => `<span><i class="${sr.dash ? 'dash' : ''}" style="background:${sr.color};color:${sr.color}"></i>${sr.label}</span>`).join('')}</div>` : '');
   if (!tip) return;
@@ -109,6 +110,8 @@ const P = h.eraParams('mid');
 let D = null;
 const model = () => (D ??= h.compute({ ...P }));
 const yearOf = f => { const t = model().yearsToCoverage(Math.min(f, 0.9999) * h.FIXED.closedRoom); return Math.round(P.seedYear + t); };
+// the year the sphere closes, as the main page counts it (app.js state.moments.cap)
+const closedYear = () => Math.round(P.seedYear + model().yearsToCoverage(h.earthLimits(P, model()).cap * (1 - 1e-5)));
 const sigma = 5.670374419e-8;
 const fluxAt = r => 1361 / r ** 2;
 const sharePct = f => pct(f, 2);
@@ -179,7 +182,26 @@ const CHARTS = {
         { pts: ys.map(yr => [yr, f(yr)]), color: 'var(--sun)', label: 'Share of the Sun’s light caught' },
         { pts: ys.map(yr => [yr, merc(yr)]), color: 'var(--ink-2)', label: 'Share of Mercury taken apart', dash: true },
       ],
-      marks: [{ x: P.seedYear + g.tCap, label: `heat wall ${Math.round(P.seedYear + g.tCap)}`, right: true }, { x: P.seedYear + g.tMantleOut, label: `crust and mantle gone ${Math.round(P.seedYear + g.tMantleOut)}`, dy: 120 }, { x: P.seedYear + g.tPeak, label: `closed ${Math.round(P.seedYear + g.tPeak)}`, right: true, dy: 150 }],
+      marks: [{ x: P.seedYear + g.tCap, label: `heat wall ${Math.round(P.seedYear + g.tCap)}`, right: true }, { x: P.seedYear + g.tMantleOut, label: `crust and mantle gone ${Math.round(P.seedYear + g.tMantleOut)}`, dy: 120 }, { x: closedYear(), label: `closed ${closedYear()}`, right: true, dy: 150 }],
+      tip: yr => `${lead(Math.round(yr))}<br>Sun caught: ${sharePct(f(yr))}<br>Mercury taken apart: ${sharePct(merc(yr))}`,
+    });
+  },
+  // After the wall: the same two shares on a linear scale, from the wall to closure.
+  fill(el) {
+    const d = model(), g = d.growth, M = 3.3011e23;
+    const ys = range(2130, 2400, 540);
+    const f = yr => h.coverageForMass(P, g.builtAtYear(yr - P.seedYear));
+    const merc = yr => h.minedFor(P, g.deliveredBy(yr - P.seedYear)) / M;
+    const mantle = P.seedYear + g.tMantleOut;
+    lineChart(el, {
+      x: { min: 2130, max: 2400, ticks: [2150, 2200, 2250, 2300, 2350, 2400], fmt: v => `${v}`, title: 'year' },
+      y: { min: 0, max: 1, ticks: [0, 0.25, 0.5, 0.75, 1], fmt: v => `${v * 100}%`, title: 'Share' },
+      series: [
+        { pts: ys.map(yr => [yr, f(yr)]), color: 'var(--sun)', label: 'Share of the Sun’s light caught' },
+        { pts: ys.map(yr => [yr, merc(yr)]), color: 'var(--ink-2)', label: 'Share of Mercury taken apart', dash: true },
+      ],
+      marks: [{ x: P.seedYear + g.tCap, label: 'heat wall', dy: 0 }, { x: mantle, label: 'rock gone; the core from here', dy: 150 }, { x: closedYear(), label: `closed ${closedYear()}`, right: true, dy: 150 }],
+      points: [{ x: mantle, y: f(mantle), label: `${Math.round(f(mantle) * 100)}% in ${Math.round(mantle)}`, dy: -10 }],
       tip: yr => `${lead(Math.round(yr))}<br>Sun caught: ${sharePct(f(yr))}<br>Mercury taken apart: ${sharePct(merc(yr))}`,
     });
   },
