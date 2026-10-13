@@ -217,7 +217,7 @@ const CHARTS = {
         { pts: Fs.map(F => [F, rnd(F)]), color: 'var(--ink-3)', label: 'Independent orbits, overlapping at random', dash: true },
       ],
       hlines: [{ y: Math.PI / 2, label: 'π/2 = 1.57, closed', left: true }],
-      points: [0.1, 0.5, 0.9, 0.99].map(F => ({ x: F, y: band(F), label: `${band(F).toFixed(2)}`, dy: 18 })),
+      points: [0.1, 0.5, 0.9, 0.99].map(F => ({ x: F, y: band(F), label: `${band(F).toFixed(2)}`, dy: F > 0.95 ? -10 : 18, left: F > 0.95 })),
       tip: F => `${lead(`${(F * 100).toFixed(1)}% caught`)}<br>bands: ${band(F).toFixed(3)}× · random: ${rnd(F).toFixed(2)}×`,
     });
   },
@@ -228,7 +228,7 @@ const CHARTS = {
     const cool = f => at(0.01).flops * (f / 0.01);
     lineChart(el, {
       x: { min: 0, max: 1, ticks: [0, 0.2, 0.4, 0.6, 0.8, 1], fmt: v => `${Math.round(v * 100)}%`, title: 'share of the Sun caught' },
-      y: { min: 0, max: 4e40, ticks: [0, 1e40, 2e40, 3e40, 4e40], fmt: v => (v ? `${v / 1e40}×10⁴⁰` : '0'), title: 'Computing, FLOP/s' },
+      y: { min: 0, max: 3e40, ticks: [0, 1e40, 2e40, 3e40], fmt: v => (v ? `${v / 1e40}×10⁴⁰` : '0'), title: 'Computing, FLOP/s' },
       series: [
         { pts: fs.map(f => [f, at(f).flops]), color: 'var(--swarm)', label: 'Closed swarm: the sails run hotter as the gaps close' },
         { pts: fs.map(f => [f, cool(f)]), color: 'var(--ink-3)', label: 'If every sail stayed as cool as in a sparse swarm', dash: true },
