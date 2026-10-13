@@ -7,7 +7,7 @@ import { sci, pct, kelvin, kg, length } from './util/format.49a4deeddc.js';
 import { renderParams } from './ui/params.acfe71e741.js';
 import { buildChart, earthChart, sedChart, orbitMap } from './ui/charts.035d089fd9.js';
 import { sailAnatomy, heatPaths, lightPaths } from './ui/illustrations.a26f456297.js';
-import { windowSim } from './ui/windowSim.971c547df0.js';
+import { windowSim } from './ui/windowSim.c4466fbd45.js';
 
 const { YEAR } = PHYS;
 const $ = id => document.getElementById(id);

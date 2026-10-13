@@ -159,6 +159,11 @@ aside.box b.t { display: block; font: 600 0.875rem/1.4 var(--sans); margin-botto
 .sim-slider input { width: 100%; accent-color: var(--ink); margin: 0; }
 .sim-readout { margin: 0; width: 100%; color: var(--ink-2); }
 .sim-readout b { color: var(--ink); font-weight: 600; }
+.sim-explain { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 0.4rem 1.25rem; align-items: center; width: 100%; padding: 0.9rem 1rem; border: 1px solid var(--rule); border-radius: 8px; box-sizing: border-box; }
+.sim-explain[hidden] { display: none; }
+.sim-explain svg { width: 100%; height: auto; display: block; }
+.sim-explain p { margin: 0; font: 400 0.875rem/1.5 var(--sans); color: var(--ink-2); }
+@media (max-width: 640px) { .sim-explain { grid-template-columns: minmax(0, 1fr); } }
 
 /* sources and the way on */
 .sources { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--ink); font: 400 0.875rem/1.55 var(--sans); color: var(--ink-2); }

@@ -4,7 +4,7 @@
 import * as h from '../src/model/hybrid.0f62e10acb.js';
 import { sci, sup, pct } from '../src/util/format.49a4deeddc.js';
 import { sailAnatomy, heatPaths, lightPaths } from '../src/ui/illustrations.a26f456297.js';
-import { windowSim } from '../src/ui/windowSim.971c547df0.js';
+import { windowSim } from '../src/ui/windowSim.c4466fbd45.js';
 import { FIGURES } from './figures.e0f7e69b72.js';
 
 export const NOTES = [
