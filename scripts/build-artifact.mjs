@@ -1,6 +1,7 @@
 // Stage the app for publishing as a claude.ai Artifact: the host wraps the page in its own
 // <!doctype>/<html>/<head>/<body>, so strip ours and keep everything else as-is. With --site, keep
 // the whole document, for a static host such as GitHub Pages.
+// The technical notes in notes/ are published beside it as pages of their own.
 // Usage: node scripts/build-artifact.mjs <outDir> [--site]
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, copyFileSync, rmSync } from 'node:fs';
 import { join, dirname, relative, resolve } from 'node:path';
@@ -52,20 +53,42 @@ function nameOf(rel) {
   named.set(rel, name);
   return name;
 }
-const app = nameOf('src/app.js');
-html = html.replace('src="src/app.js"', `src="${app}"`);
-// photographs the page shows
-for (const name of readdirSync(join(root, 'renders'))) {
-  if (!name.endsWith('.jpg')) continue;
-  const buf = readFileSync(join(root, 'renders', name));
-  const stamped = join('renders', name.replace(/\.jpg$/, `.${hash(buf)}.jpg`));
-  if (!html.includes(`renders/${name}"`)) continue;            // only what the page uses
-  html = html.split(`renders/${name}"`).join(`${stamped}"`);
-  mkdirSync(join(out, 'renders'), { recursive: true });
-  copyFileSync(join(root, 'renders', name), join(out, stamped));
-  files[stamped] = join(out, stamped);
+/** A file copied under a content-stamped name (renders/x.jpg -> renders/x.3f2a9c1b0d.jpg). */
+function stampCopy(rel) {
+  const buf = readFileSync(join(root, rel));
+  const stamped = rel.replace(/(\.[a-z]+)$/, `.${hash(buf)}$1`);
+  if (!files[stamped]) {
+    mkdirSync(dirname(join(out, stamped)), { recursive: true });
+    copyFileSync(join(root, rel), join(out, stamped));
+    files[stamped] = join(out, stamped);
+  }
+  return stamped;
 }
+/** Point a page's photographs at their stamped copies; `up` is the page's path back to the root. */
+function stampRenders(page, up) {
+  for (const name of readdirSync(join(root, 'renders'))) {
+    if (!name.endsWith('.jpg') || !page.includes(`${up}renders/${name}"`)) continue;   // only what the page uses
+    page = page.split(`${up}renders/${name}"`).join(`${up}${stampCopy(`renders/${name}`)}"`);
+  }
+  return page;
+}
+const app = nameOf('src/app.js');
+html = stampRenders(html.replace('src="src/app.js"', `src="${app}"`), '');
 writeFileSync(join(out, 'index.html'), html);
+
+// The technical notes (notes/*.html): whole documents in both modes, since only the main page is
+// wrapped by the artifact host. Their stylesheet, script and photographs are stamped like the rest.
+const css = stampCopy('notes/notes.css').replace(/^notes\//, '');
+const js = nameOf('notes/notes.js').replace(/^notes\//, '');
+for (const name of readdirSync(join(root, 'notes'))) {
+  if (!name.endsWith('.html')) continue;
+  let page = readFileSync(join(root, 'notes', name), 'utf8')
+    .replace('href="notes.css"', `href="${css}"`)
+    .replace('src="notes.js"', `src="${js}"`);
+  page = stampRenders(page, '../');
+  writeFileSync(join(out, 'notes', name), page);
+  files[`notes/${name}`] = join(out, 'notes', name);
+}
 if (site) writeFileSync(join(out, '.nojekyll'), '');                // serve files as they are
 else writeFileSync(join(out, 'files.json'), JSON.stringify(files, null, 2));
 console.log(`staged ${Object.keys(files).length + 1} files in ${out}`);

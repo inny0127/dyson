@@ -7,6 +7,14 @@ path traced in Blender at the Sun's true brightness for the orbit.
 
 **Live:** https://inny0127.github.io/dyson/
 
+**Technical notes** (`notes/`): seven long-form pages behind the main essay, after the research
+supplements of ai-2027.com, each with its derivations, the studies' numbers, sources, and charts
+drawn live by the same model: [the compute sail](notes/sail.html), [chips in the film](notes/compute.html),
+[hardware after 2095](notes/hardware.html), [taking Mercury apart](notes/mercury.html),
+[closing the sphere](notes/sphere.html), [Earth inside the swarm](notes/earth.html) and
+[how the pictures were made](notes/pictures.html). `scripts/build-artifact.mjs` publishes them beside
+the page with content-stamped assets.
+
 ## Run it
 
 No build step. Serve the folder and open it in a browser:
@@ -36,7 +44,7 @@ See [NUMBERS.md](NUMBERS.md) for the tables and `docs/` for the research. The sh
   radiator-cooled modules by 3–5× per kilogram, in every hardware era
   (`docs/architecture.md`). A few percent of chip power still goes to shielded pods.
 - **Today's hardware never flies.** Industry needs most of a century to reach Mercury's heat wall
-  and another seventy years to close the Sun, so almost everything is built with post-2095 hardware.
+  and two more to close the Sun, so almost everything is built with post-2095 hardware.
   HBM is gone, chiplets carry non-volatile memory, optical lanes make each sail one machine, and
   silicon stays the only solar cell Mercury can supply. Energy per operation falls ~50×
   (`docs/future-tech.md`).
