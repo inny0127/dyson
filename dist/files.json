@@ -8,7 +8,7 @@
   "src/ui/charts.035d089fd9.js": "/home/user/dyson/dist/src/ui/charts.035d089fd9.js",
   "src/ui/illustrations.a26f456297.js": "/home/user/dyson/dist/src/ui/illustrations.a26f456297.js",
   "src/ui/windowSim.971c547df0.js": "/home/user/dyson/dist/src/ui/windowSim.971c547df0.js",
-  "src/app.455fcbe001.js": "/home/user/dyson/dist/src/app.455fcbe001.js",
+  "src/app.629deb4627.js": "/home/user/dyson/dist/src/app.629deb4627.js",
   "renders/earth-night-closed.4c254dacbb.jpg": "/home/user/dyson/dist/renders/earth-night-closed.4c254dacbb.jpg",
   "renders/earth-night-tonight.2ee28643f3.jpg": "/home/user/dyson/dist/renders/earth-night-tonight.2ee28643f3.jpg",
   "renders/europe-mediterranean.6942018ec7.jpg": "/home/user/dyson/dist/renders/europe-mediterranean.6942018ec7.jpg",
@@ -41,5 +41,14 @@
   "renders/stage-space-ir-1.dbe3035978.jpg": "/home/user/dyson/dist/renders/stage-space-ir-1.dbe3035978.jpg",
   "renders/stage-space-ir-1e-2.75385fe26b.jpg": "/home/user/dyson/dist/renders/stage-space-ir-1e-2.75385fe26b.jpg",
   "renders/stage-space-vis-0.5.0c8478a18c.jpg": "/home/user/dyson/dist/renders/stage-space-vis-0.5.0c8478a18c.jpg",
-  "renders/stage-space-vis-1.313d11a508.jpg": "/home/user/dyson/dist/renders/stage-space-vis-1.313d11a508.jpg"
+  "renders/stage-space-vis-1.313d11a508.jpg": "/home/user/dyson/dist/renders/stage-space-vis-1.313d11a508.jpg",
+  "notes/notes.124ac92a45.css": "/home/user/dyson/dist/notes/notes.124ac92a45.css",
+  "notes/notes.9988ee64e6.js": "/home/user/dyson/dist/notes/notes.9988ee64e6.js",
+  "notes/compute.html": "/home/user/dyson/dist/notes/compute.html",
+  "notes/earth.html": "/home/user/dyson/dist/notes/earth.html",
+  "notes/hardware.html": "/home/user/dyson/dist/notes/hardware.html",
+  "notes/mercury.html": "/home/user/dyson/dist/notes/mercury.html",
+  "notes/pictures.html": "/home/user/dyson/dist/notes/pictures.html",
+  "notes/sail.html": "/home/user/dyson/dist/notes/sail.html",
+  "notes/sphere.html": "/home/user/dyson/dist/notes/sphere.html"
 }

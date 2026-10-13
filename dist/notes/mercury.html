@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taking Mercury Apart</title>
+<meta name="description" content="Where the swarm's material comes from: Mercury's layers, what a kilogram of rock yields, the heat wall that sets the pace of mining, the growth of industry from one factory in 2050, the planet's iron core, and the reserve left for repairs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.124ac92a45.css">
+</head>
+<body>
+<header class="nb"><div class="nb-in"><a class="nb-home" href="../index.html">A Dyson Swarm, Made Real</a><details><summary>Technical notes</summary><ol id="notes-menu"></ol></details></div></header>
+<div class="page">
+<nav class="toc" id="toc" aria-label="Contents"></nav>
+<article class="note">
+<header class="head">
+  <div class="kicker" id="note-no">Technical note</div>
+  <h1>Taking Mercury apart</h1>
+  <p class="dek">The swarm weighs 5.7×10²² kg, about a sixth of Mercury. Getting it off the planet takes 93% of Mercury in the end, because most of the planet is iron. The energy is easy. What sets the pace is getting rid of the heat that mining leaves behind.</p>
+  <p class="byline">From <code>docs/full-swarm.md</code>, <code>docs/closed-swarm.md</code>, the manufacturing study and the page’s model · October 2026</p>
+</header>
+<details class="toc-m" id="toc-m"></details>
+
+<section class="summary">
+  <h2>In short</h2>
+  <ul>
+    <li><b>Mercury is a ball of iron with a rocky skin.</b> Its crust and mantle, 24% of the planet, are about a quarter silicon and yield 3.4×10²² kg of spacecraft. The iron core holds a few per cent silicon and yields 2.5×10²² kg more, at four times the digging per kilogram.</li>
+    <li><b>Heat is the wall.</b> Each kilogram mined and thrown into low orbit leaves about 0.1 MJ of waste heat on the planet. Paved with radiators held at 1,650 K by heat pumps, Mercury can shed 5×10¹⁸ W. That caps export at 5.9×10²⁰ kg of spacecraft a year.</li>
+    <li><b>Industry doubles every 1.9 years until it hits the wall,</b> from one factory of a thousand tonnes in 2050 to the wall in 2145. After that the swarm grows by a fixed mass a year: half the Sun by 2178, the rock gone by 2200, the Sun enclosed in 2361.</li>
+    <li><b>Energy is not a limit.</b> Mercury’s gravitational binding energy is about 1.3 hours of the finished swarm’s output.</li>
+    <li><b>What is left covers repairs for about 1,200 years.</b> After that the swarm needs better recycling or material from elsewhere.</li>
+  </ul>
+  <div class="keys">
+    <div><b>8.0×10²² kg</b><span>Mercury’s crust and mantle, 24% of the planet</span></div>
+    <div><b>0.42</b><span>kg of spacecraft per kg of rock</span></div>
+    <div><b>5×10¹⁸ W</b><span>the most heat Mercury’s surface can shed</span></div>
+    <div><b>0.1 MJ/kg</b><span>heat left on Mercury per kilogram mined</span></div>
+    <div><b>2145</b><span>the heat wall: export capped at 5.9×10²⁰ kg a year</span></div>
+    <div><b>93%</b><span>of Mercury taken apart by the time the Sun is enclosed</span></div>
+  </div>
+</section>
+
+<h2 id="planet">The planet</h2>
+<p>Mercury is the obvious quarry. It is the closest planet to the Sun, so sunlight there is five to eleven times as strong as at Earth and power is plentiful. It has no air, so nothing slows a launch and nothing stands between a radiator and the sky. Its escape velocity is 4.25 km/s, under two fifths of Earth’s. And it is rich in exactly what the film is made of: silicon, oxygen, magnesium and iron.</p>
+<p>The model fits a three-layer planet to Mercury’s mass, radius and measured moment of inertia (Margot et al. 2018):</p>
+<div class="tablewrap"><table class="data">
+  <caption>Mercury’s layers in the model.</caption>
+  <thead><tr><th>Layer</th><th class="v">Thickness</th><th class="v">Density</th><th class="v">Mass</th><th class="v">Silicon</th></tr></thead>
+  <tbody>
+    <tr><td>Crust</td><td class="v">35 km</td><td class="v">2,900 kg/m³</td><td class="v">7.5×10²¹ kg</td><td class="v">~25%</td></tr>
+    <tr><td>Mantle</td><td class="v">381 km</td><td class="v">3,103 kg/m³</td><td class="v">7.3×10²² kg</td><td class="v">~25%</td></tr>
+    <tr><td>Core, iron-nickel-silicon</td><td class="v">2,024 km radius</td><td class="v">7,188 kg/m³</td><td class="v">2.5×10²³ kg</td><td class="v">~6% (1–25%)</td></tr>
+    <tr class="total"><td>Mercury</td><td class="v">2,440 km radius</td><td class="v"></td><td class="v">3.3×10²³ kg</td><td class="v"></td></tr>
+  </tbody>
+</table></div>
+<p>Mercury is also short of some things, and they shape the design more than its abundances do:</p>
+<ul>
+  <li><b>Hydrogen,</b> about 5×10¹³ kg in all. No water, no organic chemistry, no hydrogen-passivated cells. Fabs must run dry (<a href="hardware.html#fabs">Hardware after 2095</a>).</li>
+  <li><b>Potassium,</b> about 3.5×10¹⁹ kg, too little for sodium-potassium coolant at scale. Pods use sulphur dioxide.</li>
+  <li><b>Iodine, indium, germanium, platinum-group metals, tungsten, tellurium:</b> too little for any exotic solar cell or memory at swarm scale. Cells are silicon; memory is silicon, titanium and zirconium oxides and iron-magnesium-oxide junctions.</li>
+  <li><b>Silver,</b> about 10¹⁶ kg, far too little to silver the mirrors in front of Earth; they use aluminium, which is 5–7% of the crust.</li>
+</ul>
+
+<h2 id="yield">From rock to spacecraft</h2>
+<p>A sail is mostly silicon and glass. The mature film carries about 23 g/m² of crystalline silicon, 20 g/m² of cover glass, 23 g/m² of magnesium and 16 g/m² of iron-magnesium-calcium silicate enamel. Silicon is the element that binds: Mercury’s rock is about a quarter silicon by mass, and once the silicon is used up, the rest of the rock is of little use to the film.</p>
+<p>The model takes 0.42 kg of finished spacecraft per kilogram of rock (pessimistic 0.38, optimistic 0.5). So the crust and mantle can deliver 3.4×10²² kg of spacecraft, and the rest of the rock, mostly oxygen, magnesium, iron and calcium, is either used in structure and enamel or thrown away.</p>
+<p>How much of the Sun that rock can cover depends on the film’s mass per square metre more than anything else. With the 2026 reference film, 191 g/m², the rock would run out at about two fifths of the Sun. The thinned mature film, half as heavy, takes the closed sphere to three quarters, crossing orbits included. The last quarter, and the extra sails the crossing orbits need (<a href="sphere.html#overlap">Closing the sphere</a>), come from the core.</p>
+
+<h2 id="wall">The heat wall</h2>
+<p>Every kilogram dug up and thrown off Mercury leaves some energy behind as heat: the crusher’s and conveyor’s losses, and the launcher’s. That heat has to be radiated from Mercury’s surface. The surface can radiate only so much, so the rate of mining has a ceiling. This is the swarm’s real speed limit.</p>
+<h3>How much heat each kilogram leaves</h3>
+<div class="tablewrap"><table class="data">
+  <caption>Waste heat left on Mercury per kilogram of rock.</caption>
+  <thead><tr><th>Step</th><th class="v">Heat left</th></tr></thead>
+  <tbody>
+    <tr><td>Digging and crushing</td><td class="v">~0.05 MJ</td></tr>
+    <tr><td>Launch to low orbit, 3 km/s (4.5 MJ/kg of kinetic energy), superconducting launcher at 99%</td><td class="v">~0.045 MJ</td></tr>
+    <tr class="total"><td>Model (<code>heatPerKg</code>)</td><td class="v">0.1 MJ</td></tr>
+    <tr><td>The same launch at 95%</td><td class="v">0.23 MJ</td></tr>
+    <tr><td>Launching all the way from the surface at 95%</td><td class="v">~1.8 MJ</td></tr>
+    <tr><td>Refining on the surface</td><td class="v">tens of MJ</td></tr>
+  </tbody>
+</table></div>
+<p>The lesson of the table is to do as little as possible on the planet. Rock is dug, crushed and thrown into low orbit, and everything else happens in orbit, where waste heat can be radiated freely: catapults there add the rest of the launch, and reduction, refining and the fabs all work in space. The launcher matters most. Linear motors with superconducting coils and silicon-carbide power electronics at 99% leave a third of the heat a 95% launcher would, and so triple the ceiling.</p>
+<h3>How much heat the planet can shed</h3>
+<p>Bare ground at 500 K, over Mercury’s 7.5×10¹³ m², radiates 2.4×10¹⁷ W. That is far too little. The answer is to pave the planet with radiators and run them much hotter than the heat source, with heat pumps doing the lifting. A radiator at 1,650 K glows orange and sheds 380 kW per square metre. Covering the planet (with corridors between the fields), the radiators emit 2.8×10¹⁹ W. Of that, 5×10¹⁸ W is the mining’s waste heat and the rest is the pumps’ own work at half of Carnot efficiency, supplied by power beamed from the swarm.</p>
+<p>Hotter radiators help less than one might think. At 2,000 K the same arithmetic gives about 9×10¹⁸ W, and refractory radiators cannot go much hotter. At 1,650 K sunlight adds only 2.4% to what a radiator has to get rid of, so the fields work by day as well as by night.</p>
+<figure>
+  <div class="pair">
+    <div class="plate"><img src="../renders/mercury-pristine.ad5100007d.jpg" alt="Mercury from orbit, grey and cratered, less than half lit" width="1600" height="1600" loading="lazy"></div>
+    <div class="plate"><img src="../renders/mercury-heatwall.2b2a5b8bf9.jpg" alt="The same view of Mercury glowing evenly orange all over, night side as bright as day" width="1600" height="1600" loading="lazy"></div>
+  </div>
+  <figcaption>Mercury today, and at the heat wall, at the same exposure. Paved with radiators at 1,650 K, the night side shines as brightly as the day side, and the planet gives off 170 times the energy it receives from the Sun.<span class="how">MESSENGER albedo and elevation data. The radiators’ glow is the photopic integral of a 1,650 K grey body (ε 0.9), about 31,000 cd/m², against 21,500 cd/m² for sunlit regolith.</span></figcaption>
+</figure>
+<p>Dividing one by the other: 5×10¹⁸ W ÷ 0.1 MJ/kg is 5×10¹³ kg of rock a second, 2.1×10¹³ kg of spacecraft a second. A share goes to building the fab tools that industry keeps replacing, which leaves 5.9×10²⁰ kg of spacecraft a year for the swarm.</p>
+<details class="deep"><summary>Could the outgoing rock carry the heat away?</summary><p>It is tempting to dump the waste heat into the rock being launched, so that it leaves the planet with it. It does not work for the launcher, whose coils must stay cold: the rock would have to be heated through a heat pump, which costs more than it removes. The core is different. It is already molten at 1,800–2,000 K, so it is launched hot, and the heat it holds leaves with it.</p></details>
+
+<h2 id="growth">How fast it grows</h2>
+<p>The build starts with one factory of a thousand tonnes landed on Mercury in 2050. Industry that builds copies of itself grows exponentially. In the model the copying alone would take a year; growing the chip fabs alongside adds 0.88 years, so the industry doubles every 1.88 years (<a href="hardware.html#fabs">Hardware after 2095</a>).</p>
+<p>From 10⁶ kg to the wall’s 5.9×10²⁰ kg a year is about 50 doublings, 95 years. For most of that time there is nothing to see: the first sails fly in the 2050s, but a millionth of the Sun is reached only in 2116. Then the end of the exponential arrives quickly. One in ten thousand in 2129, one per cent in 2141, and the heat wall in 2145. After the wall the swarm grows by a fixed mass each year, and each further step takes longer.</p>
+<figure>
+  <div class="chart" data-chart="timeline"></div>
+  <figcaption>The share of the Sun’s light caught, and the share of Mercury taken apart, by year, on a logarithmic scale. The straight rise is the doubling industry, from one factory in 2050; it bends at the heat wall.<span class="how">Computed live from the model (<code>simulateBuild</code>, <code>coverageForMass</code>, <code>minedFor</code>), central assumptions. Hover for values.</span></figcaption>
+</figure>
+<figure>
+  <div class="chart" data-chart="fill"></div>
+  <figcaption>The same two shares after the heat wall, on a linear scale. The swarm now grows by a fixed mass a year, so each step costs as much as the last but adds less. Once the crust and mantle are gone, every kilogram comes from the iron core at four times the digging, and the last quarter takes 160 years.<span class="how">Computed live from the model. Hover for values.</span></figcaption>
+</figure>
+<div class="tablewrap"><table class="data">
+  <caption>Milestones, central case.</caption>
+  <thead><tr><th>Year</th><th>What happens</th><th class="v">Sun caught</th></tr></thead>
+  <tbody>
+    <tr><td>2050</td><td>First factory lands on Mercury</td><td class="v">—</td></tr>
+    <tr><td>2116</td><td>A millionth of the Sun</td><td class="v">10⁻⁶</td></tr>
+    <tr><td>2129</td><td>One part in ten thousand: a glow visible from Earth at night</td><td class="v">10⁻⁴</td></tr>
+    <tr><td>2141</td><td>One per cent</td><td class="v">1%</td></tr>
+    <tr><td>2145</td><td>Heat wall: export capped</td><td class="v">~4%</td></tr>
+    <tr><td>2149</td><td>Ten per cent</td><td class="v">10%</td></tr>
+    <tr><td>2178</td><td>Half the Sun</td><td class="v">50%</td></tr>
+    <tr><td>2200</td><td>Crust and mantle used up; the core from now on</td><td class="v">75%</td></tr>
+    <tr><td>2342</td><td>Ninety-nine per cent</td><td class="v">99%</td></tr>
+    <tr><td>2361</td><td>The Sun enclosed</td><td class="v">100%</td></tr>
+  </tbody>
+</table></div>
+<p>Two things keep the pace from being faster. Before the wall, it is the fabs: with today’s tool intensity each doubling would take 5–18 years. After it, it is the heat. Neither is the energy. Making a kilogram of spacecraft takes about 1,150 MJ, mostly in the chips, but by the time industry is large that is a few per cent of what the swarm already collects.</p>
+<p>Other estimates of how fast Mercury could be taken apart are quicker. Armstrong and Sandberg (2013) estimate about 31 years. That figure comes to us from secondary summaries of their paper, not its text, and it does not appear to include waste heat on Mercury, which here is what sets the pace.</p>
+
+<h2 id="core">The core</h2>
+<p>Mercury’s core is three quarters of the planet. It is iron and nickel with some silicon dissolved in it: published estimates span under 1% to 25% (see the reviews cited below), and the model takes 6%. Against about 25% in the rock, each kilogram of spacecraft from the core means lifting about four times as much material, with four times the heat left on the planet.</p>
+<p>So the model counts the core as rock at a quarter of the yield: 2.5×10²³ kg × 0.42 × 0.06 ÷ 0.25 = 2.5×10²² kg of spacecraft. It is dug and launched at the same heat wall. The core is lifted whole, still molten, and refined in orbit, where its iron is kept for shielding, structure and reaction mass.</p>
+<p>The closed swarm needs 5.67×10²² kg. The crust and mantle provide 3.38×10²² kg and run out in 2200, with the sphere three quarters closed. Every sail since is built from the core’s silicon. That is why the last quarter is the slow part: from 75% in 2200 to 99% in 2342 and closure in 2361. By then 93% of Mercury has been taken apart, and 91% of the core.</p>
+<p>Without the core the swarm would stop at 75% of the Sun. That number is the most sensitive to the least known input in the model: the core’s silicon content is uncertain by more than a factor of ten.</p>
+
+<h2 id="refresh">Repair and the reserve</h2>
+<p>A finished swarm still consumes material. Each sail is rebuilt every 300 years and 1% of it is lost each time, so the closed swarm loses 1.9×10¹⁸ kg a year. Whatever is left of Mercury after closure, mostly core, covers that for about 1,200 years. With 99.9% recycling it would be 12,000 years.</p>
+<p>With today’s practice, a 15-year life and 94% recycling, the loss would be 2.3×10²⁰ kg a year, and the core’s silicon would go on replacements before the sphere could close: the swarm would stop near three quarters (<a href="hardware.html#refresh">Hardware after 2095</a>). Long-lived sails are not a refinement. They are what makes enclosure possible with one planet.</p>
+<h3>After Mercury</h3>
+<div class="tablewrap"><table class="data">
+  <caption>Other sources of silicon, and how long each would cover the repairs of a swarm losing 7×10¹⁹ kg of silicon a year (the near-uniform swarm with 15-year sails; the closed swarm, with 300-year sails, loses about 60 times less).</caption>
+  <thead><tr><th>Source</th><th class="v">Silicon</th><th class="v">Years</th><th class="v">Escape velocity</th></tr></thead>
+  <tbody>
+    <tr><td>Main asteroid belt (2.4×10²¹ kg, 39% Ceres)</td><td class="v">~3×10²⁰ kg</td><td class="v">~4</td><td class="v">none</td></tr>
+    <tr><td>Mercury’s core</td><td class="v">~1.5×10²² kg</td><td class="v">~200</td><td class="v">4.3 km/s</td></tr>
+    <tr><td>The Moon</td><td class="v">~1.5×10²² kg</td><td class="v">~200</td><td class="v">2.4 km/s</td></tr>
+    <tr><td>Mars</td><td class="v">~10²³ kg</td><td class="v">~1,400</td><td class="v">5.0 km/s</td></tr>
+    <tr><td>Venus, under 90 bar of air</td><td class="v">~7×10²³ kg</td><td class="v">~9,500</td><td class="v">10.4 km/s</td></tr>
+  </tbody>
+</table></div>
+<p>Asteroids are worth more for what Mercury lacks than for silicon. Ceres probably holds about 10²⁰ kg of water, with some 10¹⁹ kg of hydrogen in it, two hundred thousand times what Mercury has.</p>
+
+<h2 id="energy">Energy is not the limit</h2>
+<p>The energy needed to pull Mercury apart against its own gravity, its binding energy, is about 1.8×10³⁰ J. The finished swarm catches 3.8×10²⁶ W. So unbinding the planet costs about 1.3 hours of its output, and lifting every kilogram the swarm needs is a small fraction of that. Making the hardware, at 1,150 MJ/kg, is 6.5×10³¹ J for the whole swarm, two days of its output. Over the centuries it takes to build, energy is never what holds it back.</p>
+<p>What holds it back is the rate at which heat can leave Mercury, the rate at which fabs can be grown, and, for the size of the finished swarm, how much silicon Mercury holds and how long each sail lasts.</p>
+
+<h2 id="open">Open questions</h2>
+<ul>
+  <li><b>The core’s silicon.</b> 1–25% in the literature. At the low end the swarm stops near three quarters of the Sun; at the high end the core alone could build it.</li>
+  <li><b>Launcher efficiency.</b> 99% triples the ceiling over 95%. Superconducting linear launchers at that scale are unbuilt.</li>
+  <li><b>Radiator temperature and life.</b> Fields at 1,650 K covering a planet, built from Mercury’s own refractories, for centuries.</li>
+  <li><b>Yield.</b> 0.42 kg of spacecraft per kg of rock assumes most of the silicon reaches the film.</li>
+</ul>
+
+<section class="sources">
+  <h2>Sources and code</h2>
+  <ul>
+    <li>Project notes: <code>docs/full-swarm.md</code> (Mercury’s silicon, heat on Mercury, asteroids), <code>docs/closed-swarm.md</code> (the core, centuries of repair), <code>docs/data/future/manufacturing.json</code>, <code>NUMBERS.md</code> (Mercury section).</li>
+    <li>Model: <code>src/model/constants.js</code> (<code>MERCURY</code>), <code>src/model/hybrid.js</code> (<code>simulateBuild</code>, <code>minedFor</code>, <code>compute</code>); tested in <code>test/hybrid.test.js</code>.</li>
+    <li>Margot, Hauck, Mazarico, Padovan and Peale (2018), “Mercury’s internal structure”, in <i>Mercury: The View after MESSENGER</i>; Genova et al. (2019); Hauck et al. (2013).</li>
+    <li>Chemical composition of Mercury, arXiv:1712.02187; The elusive origin of Mercury, arXiv:1712.08234.</li>
+    <li>Evans et al. (2015), chlorine on Mercury’s surface (MESSENGER).</li>
+    <li>Pitjeva and Pitjev (2018), masses of the main asteroid belt, arXiv:1811.05191.</li>
+    <li>Armstrong and Sandberg (2013), “Eternity in six hours”, Acta Astronautica 89.</li>
+    <li>MESSENGER MDIS albedo mosaic and USGS 665 m elevation model, for the renders.</li>
+  </ul>
+</section>
+<nav class="onward" id="onward"></nav>
+</article>
+</div>
+<script type="module" src="notes.9988ee64e6.js"></script>
+</body>
+</html>

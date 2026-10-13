@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Closing the Sphere</title>
+<meta name="description" content="How the swarm encloses the Sun: why orbits that cover a sphere must cross, the theorem that sets the cost, formation bands, why a closed sphere runs hot and sits at 0.95 AU, the mirror cap in front of Earth, and windows cut by turning mirrors edge-on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.124ac92a45.css">
+</head>
+<body>
+<header class="nb"><div class="nb-in"><a class="nb-home" href="../index.html">A Dyson Swarm, Made Real</a><details><summary>Technical notes</summary><ol id="notes-menu"></ol></details></div></header>
+<div class="page">
+<nav class="toc" id="toc" aria-label="Contents"></nav>
+<article class="note">
+<header class="head">
+  <div class="kicker" id="note-no">Technical note</div>
+  <h1>Closing the sphere</h1>
+  <p class="dek">A swarm that catches part of the Sun is easy to picture. One that catches all of it has to solve three problems: sails on orbits that must cross, a sphere that can only shed heat outward, and a planet that still needs its sunlight.</p>
+  <p class="byline">From <code>docs/closed-swarm.md</code> and the page’s model (<code>earthPlacement: 'closed'</code>) · October 2026</p>
+</header>
+<details class="toc-m" id="toc-m"></details>
+
+<section class="summary">
+  <h2>In short</h2>
+  <ul>
+    <li><b>Two layers.</b> Compute sails tile the sphere at 0.95 AU, except for a cap 23° in radius round the line from the Sun to Earth. There, mirror sails at 0.98 AU keep pace with Earth, hand their sunlight back to the compute sails, and show Earth only their cold backs.</li>
+    <li><b>Orbits must cross, and that costs π/2.</b> Every orbit round the Sun traces a great circle, and any two great circles meet. A theorem proved in 2017 says bands covering a sphere need total width at least half its circumference, so closing it takes π/2 times the sails that would tile it. Sails behind an overlap turn edge-on and idle.</li>
+    <li><b>A closed sphere runs hot.</b> All of the Sun’s 3.8×10²⁶ W must leave through the sails’ backs. At 0.95 AU the film reaches 419 K and the chips about 155 °C, so each watt computes about half what it would in a sparse swarm. 0.95 AU is as far out as the shell can go without enclosing Earth.</li>
+    <li><b>Closure is for control, not computing.</b> The closed sphere computes 1.9×10⁴⁰ FLOP/s, a little less than an open swarm that leaves a gap round Earth. What it buys is that every photon leaving the inner solar system leaves through a window the swarm chooses to open.</li>
+    <li><b>Windows are mirrors turned edge-on.</b> Earth’s is 20,300 km in radius and follows it round its orbit. Each mirror crossing it flips edge-on in about ten minutes, turned by a 50 kg flywheel.</li>
+  </ul>
+  <div class="keys">
+    <div><b>0.95 AU</b><span>radius of the compute shell; mirror cap at 0.98 AU</span></div>
+    <div><b>π/2</b><span>sails flown for every sail lit, once closed</span></div>
+    <div><b>~6,400</b><span>formation bands, each about 70,000 km wide</span></div>
+    <div><b>419 K</b><span>film temperature once closed (382 K sparse)</span></div>
+    <div><b>5.67×10²² kg</b><span>the finished swarm; the cap is 4.4×10²⁰ kg of it</span></div>
+    <div><b>4.8×10⁻⁹</b><span>of the Sun’s light passes Earth’s window</span></div>
+  </div>
+</section>
+
+<figure>
+  <div class="pair">
+    <div class="plate"><img src="../renders/stage-space-vis-1.313d11a508.jpg" alt="From far away: a black disc hiding the stars, a bright point beside it" width="2400" height="1600" loading="lazy"></div>
+    <div class="plate"><img src="../renders/stage-space-ir-1.dbe3035978.jpg" alt="Thermal image: a uniformly glowing disc with one dark patch at its edge" width="2400" height="1600" loading="lazy"></div>
+  </div>
+  <figcaption>The closed sphere from 3 AU, in visible light and through a thermal camera. In visible light it is a black disc hiding the stars; the point at its edge is Earth, lit through its window. In the infrared it is a ball 1.9 AU across glowing evenly at 419 K, with one cold patch: the mirror cap in front of Earth.<span class="how">25° above the plane of the planets, 28 mm lens. Thermal: 8–14 µm on a fixed scale from 150 K to 450 K.</span></figcaption>
+</figure>
+
+<h2 id="layout">The layout</h2>
+<p>The compute sails described in <a href="sail.html">the sail note</a> tile the whole sphere at 0.95 AU, except a cap round the line from the Sun to Earth, 23.07° in radius (the angle whose cosine is 0.92), 4.0% of the sphere. They fly in nested bands spread over a thin layer, so that the gaps in one band are covered by the next. Every sail faces the Sun.</p>
+<p>The cap is a second layer, at 0.98 AU, of mirror sails that keep pace with Earth. Their inner faces reflect 96% of the sunlight that reaches them back into the swarm, where the compute sails catch it. Their outer faces, the only part of the swarm Earth can see once it is closed, are cold.</p>
+<p>Earth gets its sunlight through a window: a hole in the cap where the mirrors in Earth’s line of sight have turned edge-on. The Moon gets its own. Any other world, spacecraft or telescope can be given one the same way.</p>
+<div class="tablewrap"><table class="data">
+  <caption>The finished sphere, central assumptions.</caption>
+  <thead><tr><th></th><th class="v">Value</th></tr></thead>
+  <tbody>
+    <tr><td>Compute shell radius</td><td class="v">0.95 AU, about 7,000 km thick</td></tr>
+    <tr><td>Mirror cap</td><td class="v">0.98 AU, 23° round the Sun–Earth line</td></tr>
+    <tr><td>Sails flown</td><td class="v">5.2×10¹⁸, of which a third idle at any moment</td></tr>
+    <tr><td>Pods</td><td class="v">3.3×10¹⁸ MW-class, 6% of chip power</td></tr>
+    <tr><td>Mass</td><td class="v">5.67×10²² kg (sails 4.1×10²², pods 1.6×10²²)</td></tr>
+    <tr><td>Film temperature</td><td class="v">419 K; chips about 155 °C</td></tr>
+    <tr><td>Computing</td><td class="v">1.9×10⁴⁰ FLOP/s</td></tr>
+    <tr><td>Light leaving on purpose</td><td class="v">Earth’s window 4.8×10⁻⁹, the Moon’s 2.8×10⁻⁹</td></tr>
+    <tr><td>Light leaving as the cap’s back glow</td><td class="v">4×10⁻⁵, as 170 K infrared</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="why">Why close it at all</h2>
+<p>An open swarm can be large without enclosing anything. The page’s earlier default left the sky round the Sun–Earth line and round L3 empty, so Earth never saw a sail’s hot back, and caught 83% of the Sun. It worked, at two costs. Earth absorbed 47 W/m² of the swarm’s infrared, twelve CO₂ doublings, which a shade at L1 had to cancel by taking a fifth of Earth’s sunlight. And trading sunlight for infrared costs rain: the swap would have cut global rainfall by about 30% (<a href="earth.html#heat">Earth inside the swarm</a>).</p>
+<p>Closing the sphere removes both. Earth sees only the cap’s cold back, 0.56 W/m², cancelled by narrowing its window by a quarter of a per cent. And it keeps its full sunlight. The computing is about the same: the closed sphere catches 18% more light but its hotter chips compute 19% less per watt, so it ends 5% below the open swarm, 1.88×10⁴⁰ FLOP/s against 1.98×10⁴⁰.</p>
+<p>So closure is not for computing. It is for control. Once closed, every photon that leaves the inner solar system leaves through a window the swarm chooses to open, and Earth’s sunlight becomes a dial.</p>
+
+<h2 id="overlap">Orbits must cross</h2>
+<p>Seen from the Sun, every orbit traces a great circle on the sky, and any two great circles cross at two points. So sails that cover every direction must pass one another somewhere. Where they do, they fly at slightly different distances from the Sun, and the one behind is in the other’s shadow.</p>
+<p>A shaded sail cannot just stay face-on. It would waste nothing, since it gets no light, but it would sit in front of the lit sail’s back and trap its heat. So a sail behind an overlap turns edge-on and idles until it is past, the same trick that opens Earth’s window. The cost is the sails themselves: more must be flown than are lit at any moment.</p>
+<h3>The least it can cost</h3>
+<p>Fly the sails as bands in formation, each band following a great circle round the Sun. How much band area does it take to cover a sphere? The answer is a theorem. László Fejes Tóth conjectured in 1973 that zones covering a sphere (a zone is the band between two parallel planes equally far from the centre) must have angular widths adding up to at least π. Zilin Jiang and Alexandr Polyanskii proved it in 2017. Their area is then at least</p>
+<p class="eq">2π<i>R</i>² · π = (π/2) · 4π<i>R</i>²</p>
+<p>that is, π/2 times the sphere’s area. Bands whose centre lines all pass through the same two poles, like lines of longitude, meet the bound exactly: they tile the equator without overlapping and overlap only toward the poles.</p>
+<details class="deep"><summary>Along the way: how many sails are idle at partial coverage</summary>
+<p>Bands sharing an axis that cover a share <i>f</i>₀ of the equator cover a share</p>
+<p class="eq"><i>F</i> = <i>f</i>₀ · arccos <i>f</i>₀ + 1 − √(1 − <i>f</i>₀²)</p>
+<p>of the sphere, with total area π<i>f</i>₀/2 of it. The model inverts this numerically (<code>bandArea</code>). Sails flown for every sail lit: 1.02 at 10%, 1.13 at half, 1.36 at 90%, 1.51 at 99%, π/2 = 1.57 closed.</p>
+<p>Independent orbits, overlapping at random, would do far worse. If each new sail lands at a random spot, the share covered after flying area <i>A</i> is 1 − e<sup>−<i>A</i></sup>, so covering <i>F</i> needs −ln(1 − <i>F</i>) times the sphere: 4.6 times at 99%, and about 10 times to close to within the last ten-thousandth.</p></details>
+<figure>
+  <div class="chart" data-chart="overlap"></div>
+  <figcaption>Sails flown for every sail lit, against the share of the Sun caught. Formation bands meet the theorem’s bound; independent orbits would need several times as many sails to close.<span class="how">Computed live from the model (<code>bandArea</code>). Hover for values.</span></figcaption>
+</figure>
+<p>What it costs: 57% more sails at closure, 5.2×10¹⁸ flown against 3.3×10¹⁸ lit, and 5.67×10²² kg in all. The computing is unchanged, because the same light reaches the same number of lit chips. The idle sails carry chips too, so chips per kilogram are unchanged, and so is the pace of the fabs. The extra mass is why Mercury’s core is needed (<a href="mercury.html#core">Taking Mercury apart</a>).</p>
+
+<h2 id="bands">Bands in formation</h2>
+<p>Each band is a formation of sails on parallel orbits. A sail on its own would follow its own great circle; to hold a band tens of thousands of kilometres wide, the sails off its centre line tilt by 3–4°, so that sunlight pushes them slightly out of their orbital planes. That costs 0.2% of their light. The bands are about 70,000 km wide, so half the circumference at 0.95 AU, π × 0.95 AU, takes about 6,400 of them.</p>
+<p>Crossing bands fly at radii about a kilometre apart, so the compute shell is about 7,000 km thick at 0.95 AU, about 0.005% of its radius. Thinness matters for three reasons:</p>
+<ul>
+  <li><b>Gaps line up.</b> While the sphere is partly built, a line of sight that passes a gap in one band must pass the matching gap in the others. In a thin shell they line up for slanted lines too, so each band dims what lies behind by (1 − <i>f</i>), not more.</li>
+  <li><b>The Sun is not a point.</b> Light from the Sun’s edge arrives 0.27° off radial. Across a 7,000 km layer that shifts a shadow by about 30 km, small against bands 70,000 km wide.</li>
+  <li><b>Every lit sail’s back still sees open space</b> while the sphere is open, so it can radiate.</li>
+</ul>
+<p>The model does not simulate the formation flying itself: collision avoidance between bands a kilometre apart, the timing of each sail’s turn as it passes behind another, and the drift of a band over centuries. Those are engineering problems of a familiar kind, scaled up enormously, and they are listed among the open questions below.</p>
+
+<h2 id="why095">Why it runs hot, and why 0.95 AU</h2>
+<p>An open sail sheds heat from both faces. A closed sphere sheds heat only from its outside: the fronts face other fronts across the cavity and trade radiation back and forth, so in balance all of the Sun’s power leaves through the backs:</p>
+<p class="eq"><i>L</i><sub>☉</sub> = 4π<i>r</i>² (1 − cap) · <i>ε</i><sub>back</sub> <i>σ T</i>⁴</p>
+<p>With <i>L</i><sub>☉</sub> = 3.828×10²⁶ W, <i>r</i> = 0.95 AU, the cap’s 4% and <i>ε</i><sub>back</sub> = 0.9, that gives <b>419 K</b>. A perfect black back would still run at 408 K. A sail alone at the same distance runs much cooler: 332 K with a glass front that radiates too, 382 K with the infrared-dark front the sails carry while the sphere is open. Between sparse and closed the model interpolates <i>T</i>⁴ linearly in coverage, as a cavity whose gaps close.</p>
+<figure>
+  <div class="chart" data-chart="cavity"></div>
+  <figcaption>The closed swarm’s computing against the share of the Sun caught. Each sail added makes every other sail hotter, so computing grows more slowly than the light caught: the last half of the sphere adds only 36%.<span class="how">Computed live from the model (<code>swarmAt</code>, <code>closedFilmT</code>, <code>closedFactor</code>). Hover for the film and chip temperatures.</span></figcaption>
+</figure>
+<p>Farther out would be cooler, since temperature falls as <i>r</i><sup>−½</sup>. But the shell cannot reach Earth’s orbit. Enclosing Earth would put it inside a cavity at about 330 K. The shell must also leave room outside it for the cap and for its own thickness, and Earth comes within 0.983 AU of the Sun. So 0.95 AU is as far out as it can go, and it pays for being there: chips at about 155 °C, cells converting over a quarter less than at 85 °C, logic spending half as much again per operation. Each watt of sunlight computes 48% of what it would on a cool sail.</p>
+<p>A colder outer layer, a second shell catching the inner one’s heat (a Matrioshka brain), could run at 100 K from 15.6 AU or 50 K from 62 AU. It is a different machine with far more mass, and it is not in the model.</p>
+
+<h2 id="stages">Built symmetric, stage by stage</h2>
+<p>The page shows the sphere at seven stages. At every one it is the same sphere, equally full in every direction, at coverage <i>f</i>: the share of the Sun’s light that hits a sail. That choice keeps Earth’s view simple at every stage, and it is how a swarm limited by its rate of production would most naturally grow.</p>
+<ul>
+  <li><b>The cap is mirrors from the start,</b> flown at the same coverage as everywhere else, so Earth never sees a compute sail’s back.</li>
+  <li><b>Earth’s sunlight is untouched at every stage:</b> any sail crossing the line from the Sun to Earth turns edge-on as it passes.</li>
+  <li><b>While the sphere is open, the fronts are dark in the infrared</b> (switchable emittance, ε 0.1, as spacecraft radiators can do today), because Earth sees the far side’s fronts through the gaps. Once closed, the fronts face each other and are switched back.</li>
+</ul>
+<div class="tablewrap"><table class="data">
+  <caption>The stages the page shows. Heat on Earth is before the window narrows to cancel it.</caption>
+  <thead><tr><th>Coverage</th><th class="v">Year</th><th class="v">Sails flown</th><th class="v">Film</th><th class="v">Computing</th><th class="v">Heat on Earth</th></tr></thead>
+  <tbody>
+    <tr><td>10⁻⁶</td><td class="v">2116</td><td class="v">3.4×10¹²</td><td class="v">382 K</td><td class="v">2.8×10³⁴ FLOP/s</td><td class="v">0.00003 W/m²</td></tr>
+    <tr><td>10⁻⁴</td><td class="v">2129</td><td class="v">3.4×10¹⁴</td><td class="v">382 K</td><td class="v">2.8×10³⁶</td><td class="v">0.003</td></tr>
+    <tr><td>1%</td><td class="v">2141</td><td class="v">3.5×10¹⁶</td><td class="v">382 K</td><td class="v">2.8×10³⁸</td><td class="v">0.28</td></tr>
+    <tr><td>50%</td><td class="v">2178</td><td class="v">1.9×10¹⁸</td><td class="v">402 K</td><td class="v">1.1×10⁴⁰</td><td class="v">8.6</td></tr>
+    <tr><td>99%</td><td class="v">2342</td><td class="v">4.9×10¹⁸</td><td class="v">418 K</td><td class="v">1.9×10⁴⁰</td><td class="v">0.94</td></tr>
+    <tr><td>Closed</td><td class="v">2361</td><td class="v">5.2×10¹⁸</td><td class="v">419 K</td><td class="v">1.9×10⁴⁰</td><td class="v">0.56</td></tr>
+  </tbody>
+</table></div>
+<p>What each stage looks like from Earth, and what the heat does to Earth’s climate, is in <a href="earth.html">Earth inside the swarm</a>.</p>
+
+<h2 id="cap">The mirror cap</h2>
+<h3>Why the part Earth sees must be mirrors</h3>
+<p>From 1 AU, Earth can see the outside of a sphere of radius 0.95 AU only within arccos 0.95 = 18.2° of the line toward the Sun. Whatever flies there shows Earth its outer face. With compute sails there, that face is their 419 K backs, and Earth would receive about 540 W/m², more than twice the sunlight it absorbs. Compute sails with insulated backs, radiating only inward, would run at about 489 K, far too hot for chips. Mirrors that hand their sunlight on to the compute sails behind them lose nothing: the light is caught anyway, just one bounce later.</p>
+<p>The cap is 23° rather than 18° because Earth moves. Its orbit reaches 1.017 AU, from where arccos(0.95/1.017) = 21° of the shell is in view, and 23° leaves room for the mirrors’ drift.</p>
+<h3>An orbit that sets the material</h3>
+<p>The cap must keep pace with Earth, going round the Sun once a year at 0.98 AU. A body there on a circular orbit would go round faster. It slows to Earth’s pace only if sunlight carries part of its weight: a share</p>
+<p class="eq"><i>β</i> = 1 − 0.98³ = 0.059</p>
+<p>For a mirror that fixes its areal mass at 26 g/m². Each element flies its own orbit, inclined so that it drifts north and south through the cap once a year, and the elements are phased so that the cap stays full. Its edge is soft over about a degree. The cap’s mirrors share Earth’s eccentricity, so the cap stays about 3 million km sunward of Earth all year.</p>
+<h3>Aluminium, not silver</h3>
+<p>The inner face is aluminium under a dielectric stack, 96% reflective. Silver would reflect more, but silvering 10²² m² takes far more silver than Mercury holds, about 10¹⁶ kg; aluminium is 5–7% of the crust. The whole 26 g/m² is 40 layers of aluminium foil, each 0.24 µm thick and 0.65 g/m²: the innermost carries the mirror coating and the rest insulate.</p>
+<p>The mirror absorbs 4% of the sunlight and its inner face runs at about 500 K. Each foil face has an emissivity of 0.03, so only 1.4 W/m² leaks through the stack to the outer layer, which sits at about 170 K. Earth, seeing the cap over a disc 78° in radius, receives on average 0.40 of that: <b>0.56 W/m²</b>. The cap weighs 2.8×10²⁰ kg, 4.4×10²⁰ kg with its share of the overlap, under 1% of the swarm.</p>
+
+<h2 id="windows">Windows</h2>
+<p>A window is a set of mirrors turned edge-on while they cross a line of sight. Earth’s is 20,300 km in radius: Earth’s own radius, 6,371 km, plus the spread of the Sun’s disc, 0.27° either side, over the 3.0 million km from the cap to Earth. With that margin every point on Earth sees the whole Sun. The Moon’s window is 15,700 km in radius and crosses the cap once a month.</p>
+<figure>
+  <div data-draw="windowsim"></div>
+  <figcaption>The window, simulated. From the side, not to scale: mirrors drift across the line from the Sun to Earth, turning edge-on as they enter and face-on as they leave. From Earth, to scale except for the mirrors: the window is a hole in a black ceiling. Leave some mirrors facing the Sun and all of Earth dims evenly; tilt the ones round the window and they bend extra sunlight onto it.<span class="how">The same simulation as on the main page (<code>src/ui/windowSim.js</code>). Each mirror is 279 m across, so the window is 145,000 mirrors wide and about 17 billion are edge-on at any moment.</span></figcaption>
+</figure>
+<h3>How fast mirrors cross</h3>
+<p>The cap’s mirrors drift north and south through it once a year on orbits inclined by up to 23°. A mirror crossing the Sun–Earth line moves across it at up to 0.4° a day, 12 km/s, so it spends about an hour in Earth’s 40,600 km window, then turns back. Mirrors on flatter orbits cross more slowly; the few within 0.008° of the line stay edge-on for good. The window can change size or shape within minutes.</p>
+<h3>How a mirror turns</h3>
+<p>Sunlight pushes on a mirror at 0.98 AU with 9.4 µN/m², 0.74 N on a 279 m element of 2.0 tonnes. Tilting the mirror tilts the push, which is how it steers its orbit. Light alone turns it only slowly: strips that switch their reflectivity, on 5% of its area, give 1.3 N·m, a 90° turn in about two hours, and the torque fades near edge-on, where the light stops pushing.</p>
+<p>So each mirror carries a flywheel, about 50 kg and 10 m across with its rim at 275 m/s, driven by a small solar cell. Spinning the wheel up turns the mirror the other way. A ten-minute flip needs 6.9×10⁴ N·m·s of angular momentum and 229 N·m at its peak, and the wheel ends at its starting speed, so no energy is lost beyond friction. Light pressure on the reflectivity strips unloads any slow drift. No propellant is used anywhere. Each mirror starts turning before it reaches the window’s edge and finishes as it enters.</p>
+<h3>Windows elsewhere</h3>
+<p>Compute sails on the line to any target turn edge-on as they pass through it. Mars, 0.57 AU beyond the shell, needs a window 260,000 km in radius to see the whole Sun: 8×10⁻⁷ of the swarm’s light. A spacecraft or a telescope needs a pinhole. Habitats near Earth’s orbit can each have a window; habitats farther out are better served by lasers (<a href="earth.html#habitats">Earth inside the swarm</a>).</p>
+
+<h2 id="complete">How complete the enclosure is</h2>
+<p>Everything is caught except what leaks out on purpose:</p>
+<ul>
+  <li>Earth’s window passes π × (20,300 km)² of a sphere 0.98 AU in radius: 4.8×10⁻⁹ of the Sun’s light. The Moon’s adds 2.8×10⁻⁹.</li>
+  <li>The cap’s back sheds 1.4 W/m² over its 1.1×10²² m²: 4×10⁻⁵ of the Sun’s output, as 170 K infrared.</li>
+</ul>
+<p>So the model takes the closed swarm to catch 0.99996 of the Sun’s light. The cap is part of the enclosure, not a gap in it: its mirrors return what they catch to the compute sails.</p>
+
+<h2 id="shade">The alternative: a shade near Earth</h2>
+<p>What Earth needs is that every line of sight from it toward the swarm ends on something cold. The cap does that inside the swarm. A shade close to Earth does it too, and its area falls with the square of its distance from Earth. Is it better?</p>
+<ul>
+  <li><b>Where it sits.</b> The swarm’s infrared, about 1,400 W/m² from a 419 K sphere filling 73° of Earth’s sky, pushes on a reflecting shade with 6.8 µN/m². On the cap’s 26 g/m² foil, that balances Earth’s pull, less the Sun’s tide, about 1.02 million km sunward of Earth. The centre hovers under active control; the edges, beyond Earth’s Hill sphere, co-orbit like the cap.</li>
+  <li><b>Size.</b> It must hide the 0.95 AU sphere, 71.8° from Earth in every direction: a radius of about 3.1 million km, 3.0×10¹⁹ m², 7.9×10¹⁷ kg. That is about 500 times lighter than the cap with its overlap.</li>
+  <li><b>Holes.</b> Earth’s sunlight needs a hole of about 11,000 km radius at that distance; the Moon needs a moving one. Through the hole Earth glimpses the hot swarm over about a degree, about 0.1 W/m².</li>
+  <li><b>Finer control.</b> A shadow cast from 1 million km blurs over 9,400 km, against 28,000 km from the cap.</li>
+  <li><b>The swarm behind it</b> sees the shade fill 19% of its view along the Sun–Earth line; reflected straight back, its own heat would warm those sails by about 22 K, unless the shade’s facets are tilted about 40° to throw it past the swarm’s edge.</li>
+</ul>
+<p>The page keeps the cap for one reason. The shade is opaque, and it has to be up by the time the swarm catches 0.1–1% of the Sun, before the hot backs facing Earth add several W/m². From then on Earth’s sky within 72° of the Sun would be black for most of the build, where with the cap it glows (<a href="earth.html#night">Earth inside the swarm</a>). Mass is roughly a wash: the shade saves the cap’s mirrors, but whatever fills the cap’s place in the shell then weighs more per square metre than mirrors do, unless it too is plain mirrors.</p>
+<details class="deep"><summary>Why a filter that passes sunlight and reflects infrared does not work</summary><p>A shade transparent to visible light and reflecting the swarm’s infrared would let Earth keep its sunlight without a window. Low-emissivity coatings reflect about 97% of 3–40 µm light. The 3% they absorb, about 43 W/m², heats the filter, which radiates from both faces equally: about 21 W/m² toward Earth, about 7 W/m² averaged over Earth’s surface, more than a CO₂ doubling. More layers would insulate it but kill the transparency. It would need about 99.9% reflection over 3–40 µm with no visible loss. A filter close to Earth that turns infrared away would also turn back Earth’s own 10 µm emission along the same paths.</p></details>
+
+<h2 id="worlds">The rest of the solar system</h2>
+<ul>
+  <li><b>Venus</b> sits inside the cavity. It can no longer cool to space: it radiates into a sky at about 419 K. Its effective temperature rises from about 230 K to about 428 K, and its surface, already 737 K, heats further. Venus needs a window or a sunshade of its own to stay as it is.</li>
+  <li><b>Mars</b> gets the shell’s infrared, 586 W/m², the same energy as its sunlight today. Its dust absorbs infrared better than sunlight, so it warms from about 213 K to 225 K (equilibrium values). A window adds sunlight on top: about 261 K, twice today’s energy.</li>
+  <li><b>Icy moons</b> absorb infrared far better than sunlight: Europa’s equilibrium temperature rises from about 93 K to about 122 K.</li>
+  <li><b>The solar wind stops,</b> absorbed by the shell everywhere except the windows, and with it the heliosphere. Galactic cosmic rays reach 1 AU with the spectrum Voyager measured outside it (<a href="earth.html#wind">Earth inside the swarm</a>).</li>
+  <li><b>Mercury,</b> inside the shell, is mostly gone.</li>
+</ul>
+
+<h2 id="open">Open questions</h2>
+<ul>
+  <li><b>Formation flying at this scale.</b> Thousands of bands a kilometre apart, each sail turning edge-on at the right moment, for centuries; collision avoidance and the capture of dead sails.</li>
+  <li><b>The cap’s orbits.</b> Phasing billions of inclined elements so the cap stays full and its edge soft, under Earth’s and the Moon’s pull.</li>
+  <li><b>Switchable infrared fronts</b> over 10²³ m² of film while the sphere is open.</li>
+  <li><b>The cavity model.</b> The model interpolates <i>T</i>⁴ in coverage between sparse and closed; a radiosity calculation of the partly built sphere would refine the middle stages.</li>
+</ul>
+
+<section class="sources">
+  <h2>Sources and code</h2>
+  <ul>
+    <li>Project note: <code>docs/closed-swarm.md</code>; the earlier open layouts in <code>docs/full-swarm.md</code> and <code>docs/earth.md</code>.</li>
+    <li>Model: <code>src/model/hybrid.js</code> (<code>bandArea</code>, <code>swarmAt</code>, <code>closedFilmT</code>, <code>closedFactor</code>, <code>FIXED.capFrac</code>, <code>capKgM2</code>, <code>capIR</code>, <code>closedRoom</code>); tested in <code>test/hybrid.test.js</code>, closed-swarm section. The window simulation: <code>src/ui/windowSim.js</code>.</li>
+    <li>Jiang and Polyanskii (2017), “Proof of László Fejes Tóth’s zone conjecture”, Geometric and Functional Analysis 27, arXiv:1703.10550.</li>
+    <li>Fejes Tóth (1973), “Exploring a planet”, American Mathematical Monthly 80.</li>
+    <li>Ott, Grebogi and Yorke (1990), “Controlling chaos”, Physical Review Letters 64.</li>
+    <li>Solar luminosity: IAU 2015 Resolution B3 (3.828×10²⁶ W).</li>
+  </ul>
+</section>
+<nav class="onward" id="onward"></nav>
+</article>
+</div>
+<script type="module" src="notes.9988ee64e6.js"></script>
+</body>
+</html>
