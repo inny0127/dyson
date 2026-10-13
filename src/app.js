@@ -8,6 +8,7 @@ import { renderParams } from './ui/params.js';
 import { buildChart, earthChart, sedChart, orbitMap } from './ui/charts.js';
 import { sailAnatomy, heatPaths, lightPaths } from './ui/illustrations.js';
 import { windowSim } from './ui/windowSim.js';
+import { siteChrome } from './ui/nav.js';
 
 const { YEAR } = PHYS;
 const $ = id => document.getElementById(id);
@@ -904,6 +905,7 @@ function init() {
   });
   $('reset-params').addEventListener('click', resetParams);
   wireExplainers();
+  siteChrome({ notesBase: 'notes/' });
   recompute();
   watchChapters();
   window.__ledger = { state, recompute, setYear: t => { state.t = t; renderYear(); } };

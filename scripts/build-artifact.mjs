@@ -89,6 +89,9 @@ for (const name of readdirSync(join(root, 'notes'))) {
   writeFileSync(join(out, 'notes', name), page);
   files[`notes/${name}`] = join(out, 'notes', name);
 }
-if (site) writeFileSync(join(out, '.nojekyll'), '');                // serve files as they are
+if (site) {
+  writeFileSync(join(out, '.nojekyll'), '');                        // serve files as they are
+  copyFileSync(join(root, 'renders', 'sail-hero.jpg'), join(out, 'og.jpg'));   // link previews (og:image)
+}
 else writeFileSync(join(out, 'files.json'), JSON.stringify(files, null, 2));
 console.log(`staged ${Object.keys(files).length + 1} files in ${out}`);

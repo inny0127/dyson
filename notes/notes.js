@@ -6,23 +6,15 @@ import { sci, sup, pct } from '../src/util/format.js';
 import { sailAnatomy, heatPaths, lightPaths } from '../src/ui/illustrations.js';
 import { windowSim } from '../src/ui/windowSim.js';
 import { FIGURES } from './figures.js';
+import { NOTES, siteChrome } from '../src/ui/nav.js';
 
-export const NOTES = [
-  ['sail.html', 'The compute sail', 'One satellite, layer by layer'],
-  ['compute.html', 'Chips in the film', 'Why the computer is spread through the panel'],
-  ['hardware.html', 'Hardware after 2095', 'What the swarm is actually built with'],
-  ['mercury.html', 'Taking Mercury apart', 'Rock, heat and the pace of the build'],
-  ['sphere.html', 'Closing the sphere', 'Orbits, overlap, heat and windows'],
-  ['earth.html', 'Earth inside the swarm', 'Heat, night sky and a climate by design'],
-  ['pictures.html', 'How the pictures were made', 'Light, air and cameras'],
-];
+export { NOTES };
+
 const here = location.pathname.split('/').pop() || 'index.html';
 
 // ------------------------------------------------------------------------- navigation
 function navigation() {
-  const menu = document.getElementById('notes-menu');
-  if (menu) menu.innerHTML = NOTES.map(([file, title, dek]) =>
-    `<li><a href="${file}"${file === here ? ' aria-current="page"' : ''}>${title}<span>${dek}</span></a></li>`).join('');
+  siteChrome({ notesBase: '', current: here });
   const i = NOTES.findIndex(n => n[0] === here);
   const on = document.getElementById('onward');
   if (on && i >= 0) {
@@ -30,8 +22,21 @@ function navigation() {
     on.innerHTML = (prev ? `<a href="${prev[0]}"><span>Previous note</span><b>${prev[1]}</b></a>` : '<a href="../index.html"><span>Back to</span><b>A Dyson Swarm, Made Real</b></a>')
       + (next ? `<a class="next" href="${next[0]}"><span>Next note</span><b>${next[1]}</b></a>` : '<a class="next" href="../index.html"><span>Back to</span><b>A Dyson Swarm, Made Real</b></a>');
   }
+  // the kicker: which note, and how long it takes to read (about 230 words a minute)
   const kick = document.getElementById('note-no');
-  if (kick && i >= 0) kick.textContent = `Technical note ${i + 1} of ${NOTES.length}`;
+  const words = (document.querySelector('.note')?.innerText ?? '').split(/\s+/).length;
+  if (kick && i >= 0) kick.textContent = `Technical note ${i + 1} of ${NOTES.length} · ${Math.max(1, Math.round(words / 230))} min read`;
+}
+
+/** A link on each section heading, to copy and share. */
+function anchors() {
+  for (const h2 of document.querySelectorAll('.note h2[id]:not(.plain)')) {
+    const a = document.createElement('a');
+    a.className = 'anchor'; a.href = `#${h2.id}`; a.textContent = '#';
+    a.setAttribute('aria-label', `Link to “${h2.textContent}”`);
+    a.addEventListener('click', () => { navigator.clipboard?.writeText(location.href.split('#')[0] + a.getAttribute('href')).catch(() => {}); });
+    h2.appendChild(a);
+  }
 }
 
 function contents() {
@@ -372,6 +377,7 @@ const DRAWINGS = {
 
 navigation();
 contents();
+anchors();
 for (const el of document.querySelectorAll('[data-chart]')) {
   try { CHARTS[el.dataset.chart](el); } catch (e) { console.error(e); el.textContent = 'This chart could not be drawn.'; }
 }

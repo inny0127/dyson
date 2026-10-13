@@ -32,7 +32,14 @@ a:hover { text-decoration-color: var(--ink); }
 button, input { font: inherit; color: inherit; }
 
 /* ---------------- top bar */
-.nb { position: sticky; top: 0; z-index: 30; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.nb { position: sticky; top: 0; z-index: 30; background: var(--paper); border-bottom: 1px solid var(--rule); transition: transform 0.25s; }
+.nb.away { transform: translateY(-100%); }
+.nav-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none; }
+.nav-progress i { display: block; height: 100%; width: 0; background: var(--sun-mark); }
+.nb summary::after { content: ''; display: inline-block; width: 0.35rem; height: 0.35rem; margin-left: 0.5rem; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-0.2rem) rotate(45deg); }
+.note h2 .anchor { margin-left: 0.45rem; font: 400 0.7em/1 var(--sans); color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity 0.15s; }
+.note h2:hover .anchor, .note h2 .anchor:focus { opacity: 1; }
+@media (hover: none) { .note h2 .anchor { opacity: 0.5; } }
 .nb-in { max-width: 72rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; font: 400 0.875rem/1.3 var(--sans); }
 .nb-home { font: 500 1.05rem/1.2 var(--serif); text-decoration: none; }
 .nb details { position: relative; }
