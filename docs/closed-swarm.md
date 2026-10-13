@@ -115,6 +115,35 @@ coverage f is the share of the Sun's light that hits a sail.
 - **Why 23° and not 18°:** Earth's orbit reaches 1.017 AU, from where acos(0.95 / 1.017) = 21° of
   the shell is in view; 23° (acos 0.92) leaves room for the mirrors' drift.
 
+## Alternative: a shade near Earth instead of mirrors in the swarm
+
+What Earth needs is that every line of sight from it toward the swarm ends on something cold. The
+cap does that inside the swarm; a shade close to Earth does it too, and its area falls with the
+square of its distance from Earth.
+
+- **Where it sits:** the swarm's infrared (~1,400 W/m² from a 419 K sphere filling 73° of the sky)
+  pushes 6.8 µN/m² on a reflecting shade. On the cap's 26 g/m² foil that balances Earth's pull, less
+  the Sun's tide, ~1.02 million km sunward of Earth. The centre hovers under active control; the
+  edges, beyond Earth's Hill sphere, co-orbit like the cap.
+- **Size:** it must hide the 0.95 AU sphere (71.8° from Earth): radius D tan 71.8° + R_E ≈ 3.1
+  million km. 3.0×10¹⁹ m², 7.9×10¹⁷ kg: ~500× less than the cap with its overlap (4.4×10²⁰ kg).
+- **Holes:** Earth's sunlight needs R_E + D · 0.27° ≈ 11,000 km radius; the Moon needs a moving one.
+  Through the hole Earth glimpses the hot swarm over about a degree: ~0.1 W/m².
+- **Earth's own heat** bounces off into space: a flat mirror at D returns (R_E / 2D)² ≈ 10⁻⁵ of it.
+- **The swarm behind it:** the shade fills 19 % of the view of the sails on the Sun–Earth line; reflected
+  straight back, their heat raises them ~22 K. Facets tilted ~40° throw it past the swarm's limb (73°
+  from the shade) instead.
+- **Finer control:** a shadow from 1 million km blurs over 9,400 km, against 28,000 km from the cap.
+- **Why the page keeps the cap:** the shade is opaque and has to be up by ~0.1–1 % coverage, before the
+  hot backs facing Earth add several W/m², so Earth's sky within 72° of the Sun would be black for
+  most of the build; the cap fills with everything else and keeps the glow. Mass is a wash: compute
+  film in the cap's place weighs 7.5× the mirrors per m² (+~2×10²¹ kg), plain light mirrors there
+  bring it back to about even.
+- **A visible-pass, infrared-reflecting filter does not work.** Low-E coatings reflect ~97 % of 3–40 µm;
+  the 3 % absorbed (~43 W/m²) leaves both faces equally, ~21 W/m² toward Earth, ~7 W/m² averaged over
+  Earth. More layers would insulate it but kill the transparency. It would need ~99.9 % reflection
+  over 3–40 µm with no visible loss.
+
 ## Windows in real time
 
 - **A window is mirrors turned edge-on while they cross a line of sight.**
