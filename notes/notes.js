@@ -5,6 +5,7 @@ import * as h from '../src/model/hybrid.js';
 import { sci, sup, pct } from '../src/util/format.js';
 import { sailAnatomy, heatPaths, lightPaths } from '../src/ui/illustrations.js';
 import { windowSim } from '../src/ui/windowSim.js';
+import { FIGURES } from './figures.js';
 
 export const NOTES = [
   ['sail.html', 'The compute sail', 'One satellite, layer by layer'],
@@ -85,6 +86,11 @@ function lineChart(el, { W = 720, H = 360, x, y, series, marks = [], hlines = []
       pen = ok;
     }
     s += `<path d="${d}" style="fill:none;stroke:${sr.color};stroke-width:2;stroke-linejoin:round${sr.dash ? ';stroke-dasharray:6 4' : ''}"/>`;
+    if (sr.end) {   // a direct label beside the line, at sr.end.at along x (or its last point)
+      const pts = sr.pts.filter(([, b]) => Number.isFinite(b) && b >= y.min && b <= y.max);
+      const [ex, ey] = sr.end.at != null ? pts.reduce((m, q) => (Math.abs(q[0] - sr.end.at) < Math.abs(m[0] - sr.end.at) ? q : m)) : pts[pts.length - 1];
+      s += `<text x="${X(ex) + (sr.end.dx ?? 0)}" y="${Y(ey) + (sr.end.dy ?? -8)}" text-anchor="${sr.end.anchor ?? 'end'}" style="fill:var(--ink);font:500 12px var(--sans)${HALO}">${sr.end.text}</text>`;
+    }
   }
   for (const pt of points) s += `<circle cx="${X(pt.x)}" cy="${Y(pt.y)}" r="4" style="fill:var(--paper);stroke:${pt.color || 'var(--ink)'};stroke-width:2"/><text x="${X(pt.x) + (pt.left ? -8 : 8)}" y="${Y(pt.y) + (pt.dy ?? -8)}" text-anchor="${pt.left ? 'end' : 'start'}" style="${LB}${HALO}">${pt.label}</text>`;
   s += `<line class="xh" y1="${T}" y2="${H - B}" style="stroke:var(--ink-3);stroke-width:1" visibility="hidden"/></svg>`;
@@ -128,13 +134,28 @@ const CHARTS = {
       x: { min: 0.55, max: 1.1, ticks: [0.6, 0.7, 0.8, 0.9, 1.0, 1.1], fmt: v => `${v.toFixed(1)} AU`, title: 'distance from the Sun' },
       y: { min: 40, max: 200, ticks: [50, 85, 100, 125, 150, 175, 200], fmt: v => `${v} °C`, title: 'Chip temperature' },
       series: [
-        { pts: rs.map(r => [r, glass(r)]), color: 'var(--sun)', label: 'Glass front: radiates from both faces' },
-        { pts: rs.map(r => [r, dark(r)]), color: 'var(--heat)', label: 'Infrared-dark front: radiates from the back only', dash: true },
+        { pts: rs.map(r => [r, glass(r)]), color: 'var(--sun)', label: 'Glass front: radiates from both faces', end: { text: 'glass front', at: 1.06 } },
+        { pts: rs.map(r => [r, dark(r)]), color: 'var(--heat)', label: 'Infrared-dark front: radiates from the back only', dash: true, end: { text: 'dark front', at: 1.06 } },
       ],
       hlines: [{ y: 85, label: 'the chips’ 85 °C limit', left: true }],
       marks: [{ x: rT, label: `${rT.toFixed(3)} AU`, right: true }, { x: 0.95, label: 'the sphere, 0.95 AU', dy: 16 }],
       points: [{ x: 0.95, y: closedC, label: `closed sphere: ${Math.round(closedC)} °C`, color: 'var(--heat)' }],
       tip: r => `${lead(`${r.toFixed(3)} AU`)}, ${Math.round(fluxAt(r))} W/m²<br>glass front ${Math.round(glass(r))} °C · dark front ${Math.round(dark(r))} °C`,
+    });
+  },
+  // The size trade: the share of a sail's mass that is fixed hardware, by its side.
+  sizeTrade(el) {
+    // design study (docs/data/design_spec.json, sizing_rationale.size_trade): fixed mass ~0.34 t
+    const pts = [[82, 0.191, 8.1], [142, 0.0744, 14.1], [260, 0.0237, 25.7], [450, 0.0081, 44.5], [822, 0.0024, 81.3]];
+    const at = side => { let i = pts.findIndex(q => q[0] >= side); if (i === 0) i = 1; if (i < 0) i = pts.length - 1; const [a, b] = [pts[i - 1], pts[i]]; const u = Math.log(side / a[0]) / Math.log(b[0] / a[0]); return [Math.exp(Math.log(a[1]) + u * Math.log(b[1] / a[1])), a[2] + u * (b[2] - a[2])]; };
+    const xs = range(Math.log(70), Math.log(900), 100).map(Math.exp);
+    lineChart(el, {
+      x: { min: 70, max: 900, log: true, ticks: [100, 200, 279, 500, 800], fmt: v => `${v} m`, title: 'side of the sail' },
+      y: { min: 0.002, max: 0.3, log: true, ticks: [0.003, 0.01, 0.03, 0.1, 0.3], fmt: v => `${+(v * 100).toPrecision(2)}%`, title: 'Share of the sail’s mass that is hub, vanes and tensioners' },
+      series: [{ pts: xs.map(x => [x, at(x)[0]]), color: 'var(--ink-2)', label: '' }],
+      points: [{ x: 82, y: 0.191, label: '82 m: a fifth of the mass', dy: -10 }, { x: 279, y: at(279)[0], label: '279 m: 2.4%', dy: -10 }, { x: 822, y: 0.0024, label: '822 m', left: true, dy: -10 }],
+      tip: x => `${lead(`${Math.round(x)} m`)}: fixed hardware ${(at(x)[0] * 100).toFixed(1)}% of the mass<br>full shadow ${Math.round(at(x)[1])} km long`,
+      legend: false,
     });
   },
   // Mass of the swarm per watt of chips against the share of chip power put in pods.
@@ -307,5 +328,5 @@ for (const el of document.querySelectorAll('[data-chart]')) {
   try { CHARTS[el.dataset.chart](el); } catch (e) { console.error(e); el.textContent = 'This chart could not be drawn.'; }
 }
 for (const el of document.querySelectorAll('[data-draw]')) {
-  try { DRAWINGS[el.dataset.draw](el); } catch (e) { console.error(e); }
+  try { (DRAWINGS[el.dataset.draw] ?? FIGURES[el.dataset.draw])(el); } catch (e) { console.error(e); }
 }

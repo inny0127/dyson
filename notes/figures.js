@@ -1,0 +1,188 @@
+// Explanatory diagrams for the technical notes: each one shows a mechanism the prose would
+// otherwise have to assemble (where heat goes, how a sail folds, why orbits cross). Inline SVG in
+// the page's ink colours, so they follow light and dark themes; one hue only where it carries
+// meaning (sunlight amber, heat red, Earth blue, the swarm violet). Numbers come from the model or
+// the design study and are noted where they are drawn.
+import * as h from '../src/model/hybrid.js';
+
+const P = h.eraParams('mid');
+const HALO = ';paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round';
+const HUE = { ink: 'var(--ink)', ink2: 'var(--ink-2)', ink3: 'var(--ink-3)', sun: 'var(--sun)', heat: 'var(--heat)', earth: 'var(--earth)', swarm: 'var(--swarm)', rule: 'var(--rule)' };
+
+// ---------------------------------------------------------------- drawing helpers
+let uid = 0;
+/** An SVG figure: viewBox W×H, an accessible label, arrowheads in every hue (ids unique per figure). */
+function svg(W, H, label, body) {
+  const id = `f${++uid}`;
+  const defs = Object.entries(HUE).map(([k, c]) => `<marker id="${id}-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" style="fill:${c}"/></marker>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}"><defs>${defs}</defs>${body(id)}</svg>`;
+}
+/** Text: size s, weight w, colour c (a HUE key), anchor a, halo over lines. */
+const T = (x, y, s, { a = 'start', c = 'ink2', w = 400, sz = 12, halo = false, it = false } = {}) =>
+  `<text x="${x}" y="${y}" text-anchor="${a}" style="fill:${HUE[c]};font:${it ? 'italic ' : ''}${w} ${sz}px var(--sans)${halo ? HALO : ''}">${s}</text>`;
+/** A line, optionally an arrow (arrow: the figure id) and dashed. */
+const Ln = (x1, y1, x2, y2, { c = 'ink', w = 1.5, dash = '', arrow = null, both = false } = {}) =>
+  `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:${HUE[c]};stroke-width:${w}${dash ? `;stroke-dasharray:${dash}` : ''}"${arrow ? ` marker-end="url(#${arrow}-${c})"${both ? ` marker-start="url(#${arrow}-${c})"` : ''}` : ''}/>`;
+const Rect = (x, y, w, hh, { fill = 'none', stroke = 'ink', sw = 1, op = 1, rx = 0, dash = '' } = {}) =>
+  `<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="${rx}" style="fill:${HUE[fill] ?? fill};fill-opacity:${op};stroke:${stroke === 'none' ? 'none' : HUE[stroke]};stroke-width:${sw}${dash ? `;stroke-dasharray:${dash}` : ''}"/>`;
+const Circ = (cx, cy, r, { fill = 'none', stroke = 'ink', sw = 1.5, op = 1, dash = '' } = {}) =>
+  `<circle cx="${cx}" cy="${cy}" r="${r}" style="fill:${HUE[fill] ?? fill};fill-opacity:${op};stroke:${stroke === 'none' ? 'none' : HUE[stroke]};stroke-width:${sw}${dash ? `;stroke-dasharray:${dash}` : ''}"/>`;
+const Path = (d, { stroke = 'ink', sw = 1.5, fill = 'none', op = 1, arrow = null, dash = '' } = {}) =>
+  `<path d="${d}" style="fill:${HUE[fill] ?? fill};fill-opacity:${op};stroke:${stroke === 'none' ? 'none' : HUE[stroke]};stroke-width:${sw}${dash ? `;stroke-dasharray:${dash}` : ''}"${arrow ? ` marker-end="url(#${arrow}-${stroke})"` : ''}/>`;
+/** A curved arrow round (cx, cy): an arc of radius r from angle a0 to a1 (degrees, clockwise from east). */
+const Arc = (cx, cy, r, a0, a1, o = {}) => {
+  const p = a => [cx + r * Math.cos((a * Math.PI) / 180), cy + r * Math.sin((a * Math.PI) / 180)];
+  const [x0, y0] = p(a0), [x1, y1] = p(a1);
+  return Path(`M${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${Math.abs(a1 - a0) > 180 ? 1 : 0} ${a1 > a0 ? 1 : 0} ${x1.toFixed(1)},${y1.toFixed(1)}`, o);
+};
+const put = (el, s) => { el.innerHTML = s; };
+
+// ---------------------------------------------------------------- the sail
+export const FIGURES = {
+  /** The film in cross-section: light in, electricity to the chiplet, heat out of both faces. */
+  sailStack(el) {
+    // mature film, thicknesses to scale with each other (µm); the chiplet is drawn narrower than it is
+    const layers = [
+      ['Anti-reflection coating', 0.1, 'var(--wash)', 'lets light in'],
+      ['Cover glass', 8, 'rule', 'stops solar protons'],
+      ['Silicon solar cell', 10, 'ink3', 'turns light into electricity'],
+      ['Contacts and insulation', 1.5, 'ink2', 'collect the current, all at the back'],
+      ['Magnesium spreader', 13, 'rule', 'carries each chip’s heat a few cm'],
+      ['Emitter enamel', 6, 'var(--wash)', 'radiates heat into space'],
+    ];
+    const k = 5.2, x0 = 70, wFilm = 330, yTop = 62, chipX = x0 + 140;
+    put(el, svg(720, 400, 'Cross-section of the film: sunlight enters the front, the silicon turns part of it into electricity for the chiplet on the back, and the heat leaves from both faces', id => {
+      let s = '', y = yTop;
+      const mid = {};
+      layers.forEach(([name, um, fill, role], i) => {
+        const hh = Math.max(3, um * k);
+        s += Rect(x0, y, wFilm, hh, { fill, stroke: 'ink3', sw: 0.75, op: fill === 'ink3' ? 0.55 : fill === 'ink2' ? 0.8 : 1 });
+        mid[name] = y + hh / 2;
+        const ly = yTop + 8 + i * 33;
+        s += Ln(x0 + wFilm + 4, y + hh / 2, x0 + wFilm + 40, ly - 4, { c: 'ink3', w: 0.75 });
+        s += T(x0 + wFilm + 46, ly, `${name}${um >= 1 ? `, ${um} µm` : ''}`, { c: 'ink', w: 500 }) + T(x0 + wFilm + 46, ly + 14, role, { sz: 11.5 });
+        y += hh;
+      });
+      const yBot = y;
+      // sunlight in, and heat out of the front
+      for (const dx of [30, 90, 150]) s += Ln(x0 + dx, 6, x0 + dx + 22, yTop + 52, { c: 'sun', w: 2, arrow: id });
+      s += T(x0 + 30, 16, 'sunlight', { a: 'end', c: 'sun', w: 500 });
+      for (const dx of [250, 300]) s += Ln(x0 + dx, yTop - 3, x0 + dx + 6, 10, { c: 'heat', w: 2, arrow: id });
+      s += T(x0 + wFilm + 12, 22, 'some heat leaves the front', { c: 'heat', w: 500 });
+      // electricity from the cell to the chiplet
+      s += Path(`M${x0 + 112},${mid['Silicon solar cell']} C${x0 + 112},${yBot - 20} ${chipX - 50},${yBot + 2} ${chipX - 2},${yBot + 11}`, { stroke: 'ink', sw: 1.5, dash: '4 3', arrow: id });
+      s += T(x0 + 104, mid['Silicon solar cell'] + 34, 'electricity', { a: 'end', c: 'ink', w: 500, halo: true });
+      // the chiplet, and its heat spreading sideways in the magnesium
+      s += Rect(chipX, yBot, 60, 22, { fill: 'ink', stroke: 'ink', op: 0.9 });
+      s += T(chipX + 30, yBot + 40, 'chiplet, 0.15 W', { a: 'middle', c: 'ink', w: 500, halo: true });
+      const ym = mid['Magnesium spreader'];
+      s += Ln(chipX - 6, ym, x0 + 40, ym, { c: 'heat', w: 1.5, arrow: id }) + Ln(chipX + 66, ym, x0 + wFilm - 40, ym, { c: 'heat', w: 1.5, arrow: id });
+      // heat out of the back
+      for (const dx of [30, 90, 240, 300]) s += Ln(x0 + dx, yBot + 4, x0 + dx, yBot + 56, { c: 'heat', w: 2, arrow: id });
+      s += T(x0 + wFilm + 12, yBot + 40, 'most heat leaves the back', { c: 'heat', w: 500 });
+      s += T(x0, 372, 'Layer thicknesses to scale with each other (the mature film, about 40 µm in all).', { c: 'ink3', sz: 11.5 });
+      s += T(x0, 388, 'The chiplet is drawn narrower than it is: 2.5 mm wide and 50 µm thick, one per 2.5 cm square.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** Three sails edge-on: where the heat can go decides the temperature. */
+  threeSails(el) {
+    const cs = [
+      { t: 'A lone sail, glass front', sub: 'on its own orbit, 0.862 AU', T: '349 K film, chips 85 °C', front: 1, back: 1 },
+      { t: 'A lone sail, dark front', sub: 'the sphere while open, 0.95 AU', T: '382 K film, chips 118 °C', front: 0.1, back: 1 },
+      { t: 'The closed sphere', sub: 'fronts face fronts, 0.95 AU', T: '419 K film, chips 155 °C', front: 0, back: 1, closed: true },
+    ];
+    put(el, svg(720, 290, 'Three sails seen edge-on: a glass-fronted sail sheds heat from both faces and runs coolest; a dark-fronted sail sheds it mostly from its back; in the closed sphere the fronts face other fronts and all the heat leaves from the backs, so it runs hottest', id => {
+      let s = '';
+      cs.forEach((c, i) => {
+        const cx = 120 + i * 240, top = 78, bot = 198;
+        s += T(cx, 22, c.t, { a: 'middle', c: 'ink', w: 600, sz: 13 }) + T(cx, 40, c.sub, { a: 'middle' });
+        // sunlight from the left (in the closed sphere, from the Sun between the two sails)
+        if (c.closed) {
+          s += Circ(cx - 53, 138, 9, { fill: 'sun', stroke: 'none' });
+          for (const y of [118, 138, 158]) s += Ln(cx - 42, y, cx - 18, y, { c: 'sun', w: 2, arrow: id }) + Ln(cx - 64, y, cx - 88, y, { c: 'sun', w: 2, arrow: id });
+          s += T(cx - 53, 102, 'Sun', { a: 'middle', c: 'sun', sz: 11.5 });
+        } else {
+          for (const y of [100, 138, 176]) s += Ln(cx - 105, y, cx - 22, y, { c: 'sun', w: 2, arrow: id });
+          s += T(cx - 105, 92, 'sunlight', { c: 'sun', sz: 11.5 });
+        }
+        // the sail, edge-on
+        s += Ln(cx - 10, top, cx - 10, bot, { c: 'ink', w: 4 });
+        // back: heat out to the right
+        for (const y of [104, 138, 172]) s += Ln(cx - 4, y, cx + 70, y, { c: 'heat', w: 2.2, arrow: id });
+        s += T(cx + 8, 92, 'back', { sz: 11.5 });
+        if (c.closed) {
+          // across the hollow middle, with the Sun between them, another sail faces this one
+          s += Ln(cx - 96, top, cx - 96, bot, { c: 'ink3', w: 4 });
+          for (const x of [cx - 102]) for (const y of [112, 164]) s += Ln(x, y, x - 22, y, { c: 'heat', w: 2.2, arrow: id });
+          s += Ln(cx - 90, 70, cx - 16, 70, { c: 'heat', w: 1.4, dash: '3 3', arrow: id, both: true });
+          s += T(cx - 53, 62, 'fronts trade heat', { a: 'middle', sz: 11.5, halo: true });
+          s += T(cx - 53, 222, 'none escapes', { a: 'middle', sz: 11.5 }) + T(cx - 53, 236, 'between the fronts', { a: 'middle', sz: 11.5 });
+        } else {
+          s += Ln(cx - 16, 120, cx - 16 - (c.front > 0.5 ? 64 : 22), 120, { c: 'heat', w: c.front > 0.5 ? 2.2 : 1, arrow: id });
+          s += T(cx - 22, 222, c.front > 0.5 ? 'front radiates too' : 'front barely radiates', { a: 'middle', sz: 11.5 });
+        }
+        s += T(cx, 268, c.T, { a: 'middle', c: 'heat', w: 600 });
+      });
+      return s;
+    }));
+  },
+
+  /** How a sail folds into one launch package. */
+  foldSequence(el) {
+    put(el, svg(720, 250, 'How a sail is packed: the square is folded like an accordion along its hinge lines into a strip 1.63 m wide and 395 m long, then rolled from both ends toward the hub into two rolls', id => {
+      let s = '';
+      // 1: the diamond with hinge lines
+      const cx = 105, cy = 118, r = 82;
+      s += Path(`M${cx},${cy - r} L${cx + r},${cy} L${cx},${cy + r} L${cx - r},${cy} Z`, { stroke: 'ink', sw: 1.5, fill: 'var(--wash)' });
+      for (let i = -7; i <= 7; i++) { const y = cy + (i * r) / 8, w = r - Math.abs(i * r) / 8; s += Ln(cx - w, y, cx + w, y, { c: 'ink3', w: 0.8 }); }
+      s += T(cx, 226, '1. The flat sail', { a: 'middle', c: 'ink', w: 600 }) + T(cx, 242, '243 hinge lines', { a: 'middle', sz: 11.5 });
+      s += Ln(205, cy, 250, cy, { c: 'ink', arrow: id }) + T(228, cy - 10, 'fold', { a: 'middle', sz: 11.5 });
+      // 2: the accordion, seen from its end
+      let z = `M270,${cy - 40}`;
+      for (let i = 0; i < 12; i++) z += ` L${272 + i * 9 + 4.5},${i % 2 ? cy - 40 : cy + 40}`;
+      s += Path(z, { stroke: 'ink', sw: 1.2 });
+      s += T(330, 226, '2. An accordion strip', { a: 'middle', c: 'ink', w: 600 }) + T(330, 242, '1.63 m wide, 395 m long', { a: 'middle', sz: 11.5 });
+      s += T(330, cy - 54, 'seen end-on', { a: 'middle', sz: 11.5, c: 'ink3' });
+      s += Ln(400, cy, 445, cy, { c: 'ink', arrow: id }) + T(422, cy - 10, 'roll', { a: 'middle', sz: 11.5 });
+      // 3: two rolls and the hub
+      s += Circ(500, cy, 30, { fill: 'var(--wash)' }) + Circ(500, cy, 6) + Arc(500, cy, 20, 200, 520, { stroke: 'ink3', sw: 0.8 });
+      s += Rect(538, cy - 22, 44, 44, { fill: 'var(--wash)', stroke: 'ink' }) + T(560, cy + 4, 'hub', { a: 'middle', sz: 11 });
+      s += Circ(620, cy, 30, { fill: 'var(--wash)' }) + Circ(620, cy, 6) + Arc(620, cy, 20, 200, 520, { stroke: 'ink3', sw: 0.8 });
+      s += Ln(470, cy + 46, 650, cy + 46, { c: 'ink3', w: 0.8 }) + T(560, cy + 62, '7.7 m', { a: 'middle', sz: 11.5 });
+      s += T(560, 226, '3. One launch package', { a: 'middle', c: 'ink', w: 600 }) + T(560, 242, '14.4 t, two rolls 2.2 m across', { a: 'middle', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** Steering: vanes tilt the push of sunlight; a flywheel flips the sail. */
+  steering(el) {
+    put(el, svg(720, 270, 'Two ways a sail turns: tilting a corner vane moves where sunlight pushes and makes a slow torque; spinning up a flywheel turns the whole sail the other way in minutes', id => {
+      let s = '';
+      // left: vane
+      const cx = 170, cy = 140;
+      s += Path(`M${cx},${cy - 90} L${cx + 90},${cy} L${cx},${cy + 90} L${cx - 90},${cy} Z`, { stroke: 'ink', fill: 'var(--wash)' });
+      s += Rect(cx - 7, cy - 7, 14, 14, { fill: 'ink' });
+      s += Ln(cx + 90, cy, cx + 112, cy, { c: 'ink', w: 1 });
+      s += Path(`M${cx + 112},${cy - 16} L${cx + 128},${cy + 16}`, { stroke: 'ink', sw: 3 });
+      for (const dy of [-12, 0, 12]) s += Ln(cx + 165, cy + dy - 30, cx + 128 + dy * 0.3, cy + dy, { c: 'sun', w: 1.8, arrow: id });
+      s += T(cx + 170, cy - 48, 'sunlight on', { sz: 11.5, c: 'sun' }) + T(cx + 170, cy - 34, 'a tilted vane', { sz: 11.5, c: 'sun' });
+      s += Arc(cx, cy, 44, -40, 40, { stroke: 'ink', sw: 1.6, arrow: id });
+      s += T(cx + 6, cy + 64, 'torque', { sz: 11.5, c: 'ink', w: 500 });
+      s += T(cx, 252, 'Vanes: slow, steady pointing', { a: 'middle', c: 'ink', w: 600 }) + T(cx, 268, '0.35 N·m on each axis', { a: 'middle', sz: 11.5 });
+      // right: flywheel
+      const fx = 530, fy = 130;
+      s += Ln(fx - 120, fy, fx + 120, fy, { c: 'ink', w: 4 });
+      s += Circ(fx, fy, 24, { fill: 'var(--paper)' }) + Circ(fx, fy, 3, { fill: 'ink' });
+      s += Arc(fx, fy, 34, 200, 340, { stroke: 'swarm', sw: 2, arrow: id });
+      s += T(fx, fy - 46, 'wheel spins one way', { a: 'middle', c: 'swarm', sz: 11.5, w: 500 });
+      s += Arc(fx, fy, 112, 15, -28, { stroke: 'ink', sw: 1.6, arrow: id });
+      s += Arc(fx, fy, 112, 195, 152, { stroke: 'ink', sw: 1.6, arrow: id });
+      s += T(fx + 112, fy - 70, 'the sail turns', { a: 'end', c: 'ink', sz: 11.5, w: 500 }) + T(fx + 112, fy - 56, 'the other way', { a: 'end', c: 'ink', sz: 11.5, w: 500 });
+      s += T(fx - 120, fy + 22, 'sail, edge-on', { sz: 11.5 });
+      s += T(fx, 252, 'Flywheel: a ten-minute flip', { a: 'middle', c: 'ink', w: 600 }) + T(fx, 268, 'the wheel ends at its starting speed', { a: 'middle', sz: 11.5 });
+      return s;
+    }));
+  },
+};
