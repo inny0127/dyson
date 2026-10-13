@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dyson Swarm Made Real</title>
 <meta name="description" content="A Dyson sphere built from Mercury, watched stage by stage from a lake in Wyoming, from low orbit and from far away. Every picture and number comes from one physics model.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23040506'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23eda100'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%239085e9' stroke-width='3' stroke-dasharray='4 2.5'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="A Dyson Swarm, Made Real">
+<meta property="og:description" content="A Dyson sphere built from Mercury, watched stage by stage from a lake in Wyoming, from low orbit and from far away. Every picture and number comes from one physics model.">
+<meta property="og:image" content="https://inny0127.github.io/dyson/og.jpg">
+<meta property="og:url" content="https://inny0127.github.io/dyson/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -52,6 +59,36 @@ button, input, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+
+/* ---------------- navigation (scripts: src/ui/nav.js). Clear over the hero, solid below it. */
+:root { --nav-h: 3rem; }
+html { scroll-padding-top: calc(var(--nav-h) + 0.75rem); }
+.topnav { position: fixed; top: 0; left: 0; right: 0; z-index: 40; height: var(--nav-h); color: #f2f0eb; background: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0)); transition: background-color 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s; }
+.topnav.solid { background: var(--paper); color: var(--ink); box-shadow: 0 1px 0 var(--rule); }
+.topnav.away { transform: translateY(-100%); }
+.topnav-in { max-width: 88rem; height: 100%; margin: 0 auto; padding: 0 max(1rem, 3vw); box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 1rem; font: 400 0.875rem/1 var(--sans); }
+.topnav-home { font: 500 1.05rem/1.2 var(--serif); color: inherit; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topnav-right { display: flex; align-items: center; gap: 0.2rem; }
+.topnav-link { color: inherit; text-decoration: none; padding: 0.5rem 0.7rem; border-radius: 999px; opacity: 0.85; white-space: nowrap; }
+.topnav-link:hover { opacity: 1; background: rgb(128 128 128 / 0.16); }
+.topnav details { position: relative; margin-left: 0.3rem; }
+.topnav summary { list-style: none; cursor: pointer; padding: 0.45rem 0.85rem; border: 1px solid currentColor; border-radius: 999px; white-space: nowrap; }
+.topnav summary::-webkit-details-marker { display: none; }
+.topnav summary::after { content: ''; display: inline-block; width: 0.35rem; height: 0.35rem; margin-left: 0.5rem; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-0.2rem) rotate(45deg); }
+.topnav details[open] summary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.topnav ol { position: absolute; right: 0; top: calc(100% + 0.5rem); margin: 0; padding: 0.5rem; list-style: none; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 8px 28px rgb(0 0 0 / 0.14); width: min(22rem, calc(100vw - 2rem)); counter-reset: n; }
+.topnav li { counter-increment: n; }
+.topnav li a { display: grid; grid-template-columns: 1.5rem 1fr; padding: 0.55rem 0.6rem; border-radius: 6px; text-decoration: none; color: var(--ink); line-height: 1.3; }
+.topnav li a::before { content: counter(n); color: var(--ink-3); }
+.topnav li a span { grid-column: 2; color: var(--ink-3); font-size: 0.8125rem; }
+.topnav li a:hover { background: var(--wash); }
+.nav-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; pointer-events: none; transition: opacity 0.25s; }
+.nav-progress i { display: block; height: 100%; width: 0; background: var(--sun-mark); }
+.topnav:not(.solid) .nav-progress { opacity: 0; }
+.skip { position: absolute; left: -999px; top: 0.5rem; z-index: 50; background: var(--paper); color: var(--ink); padding: 0.5rem 0.8rem; border-radius: 6px; }
+.skip:focus { left: 0.5rem; }
+@media (max-width: 860px) { .topnav-link { display: none; } }
+@media (max-width: 420px) { .topnav-home { font-size: 0.95rem; } .topnav summary { padding: 0.45rem 0.7rem; } }
 
 /* ---------------- hero */
 .hero { position: relative; background: var(--plate); color: #f2f0eb; }
@@ -186,10 +223,13 @@ footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospac
 @media (min-width: 1200px) {
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; column-gap: 2.5rem; max-width: 88rem; margin-inline: auto; padding-inline: 1.5rem; }
   .layout > main { grid-column: 1; grid-row: 1; min-width: 0; }
-  .layout > .dash { grid-column: 2; grid-row: 1; position: sticky; top: 1.25rem; align-self: start; margin-top: 2.9rem; }
+  .layout > .dash { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--nav-h) + 1.25rem); align-self: start; margin-top: 2.9rem; }
 }
 @media (max-width: 1199px) {
-  .dash { position: sticky; top: 0; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 0.45rem 1rem; display: flex; gap: 1rem; align-items: center; overflow-x: auto; white-space: nowrap; }
+  html { scroll-padding-top: calc(var(--nav-h) + 3rem); }
+  body.nav-away .dash { top: 0; }
+  .dash { transition: top 0.25s; }
+  .dash { position: sticky; top: var(--nav-h); z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 0.45rem 1rem; display: flex; gap: 1rem; align-items: center; overflow-x: auto; white-space: nowrap; }
   .dash .dash-chart, .dash .dash-sails, .dash .dash-what { display: none; }
   .dash .dash-metrics { display: flex; gap: 1.1rem; margin: 0; }
   .dash .dash-metrics > div:nth-child(n+4), .dash .dash-metrics small, .dash .gauge { display: none; }
@@ -267,7 +307,20 @@ section.stage { border-top: 1px solid var(--rule); }
 </style>
 </head>
 <body>
-<header class="hero">
+<a class="skip" href="#summary">Skip to the story</a>
+<nav class="topnav" data-nav aria-label="Site">
+  <div class="topnav-in">
+    <a class="topnav-home" href="#top">A Dyson Swarm, Made Real</a>
+    <div class="topnav-right">
+      <a class="topnav-link" href="#strip">The stages</a>
+      <a class="topnav-link" href="#earth">Earth</a>
+      <a class="topnav-link" href="#how-intro">How it works</a>
+      <a class="topnav-link" href="#assumptions-section">Assumptions</a>
+      <details class="menu"><summary>Technical notes</summary><ol data-notes-menu></ol></details>
+    </div>
+  </div>
+</nav>
+<header class="hero" id="top">
   <img src="renders/sail-hero.1b0231393b.jpg" alt="A near-black diamond-shaped solar sail against black space, with a line of bright glints across it" width="2560" height="1440">
   <div class="title">
     <div class="kicker">Built from Mercury, worked out from physics</div>
@@ -629,6 +682,6 @@ section.stage { border-top: 1px solid var(--rule); }
   </footer>
 </main>
 </div>
-<script type="module" src="src/app.49f227e349.js"></script>
+<script type="module" src="src/app.f1d21c499d.js"></script>
 </body>
 </html>
