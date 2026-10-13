@@ -595,4 +595,82 @@ export const FIGURES = {
       return s;
     }));
   },
+
+  // ---------------------------------------------------------------- how the pictures were made
+  /** From physics to photograph: the render keeps physical units; the camera choices come after. */
+  pipeline(el) {
+    const steps = [
+      ['Scene', 'every light at its', 'physical brightness'],
+      ['Render', 'Blender Cycles, or', 'our own ray caster'],
+      ['Linear image', 'radiance in W/m²/sr', '(EXR file)'],
+      ['Glare', 'the lens spreads', 'very bright points'],
+      ['Develop', 'exposure, white', 'balance, tone curve'],
+      ['Finish', 'vignette, colour', 'fringes, grain'],
+    ];
+    put(el, svg(720, 200, 'The render pipeline: a scene with every light at its physical brightness is rendered into a linear image in physical units; only after that are the camera’s choices applied: lens glare, exposure and white balance, and finishing', id => {
+      let s = '';
+      const w = 104, gap = 12, y = 70;
+      steps.forEach(([a, b, c], i) => {
+        const x = 8 + i * (w + gap);
+        const phys = i < 3;
+        s += Rect(x, y, w, 70, { fill: phys ? 'earth' : 'sun', stroke: phys ? 'earth' : 'sun', op: 0.12, rx: 8 });
+        s += T(x + w / 2, y + 24, a, { a: 'middle', c: 'ink', w: 600, sz: 12.5 }) + T(x + w / 2, y + 42, b, { a: 'middle', sz: 11 }) + T(x + w / 2, y + 56, c, { a: 'middle', sz: 11 });
+        if (i < steps.length - 1) s += Ln(x + w + 1, y + 35, x + w + gap - 1, y + 35, { c: 'ink', w: 1.5, arrow: id });
+      });
+      const xb = 8 + 3 * (w + gap) - gap / 2;
+      s += Ln(xb, 30, xb, 170, { c: 'ink3', w: 1, dash: '4 4' });
+      s += T(xb - 10, 44, 'Physics', { a: 'end', c: 'earth', w: 600 }) + T(xb - 10, 60, 'fixed by the model', { a: 'end', sz: 11.5 });
+      s += T(xb + 10, 44, 'Photography', { c: 'sun', w: 600 }) + T(xb + 10, 60, 'a choice, like developing film', { sz: 11.5 });
+      s += T(8, 192, 'Changing the exposure makes a picture brighter or darker; it never changes the light in the scene.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** What a line of sight from the lake passes through, in the night-sky model. */
+  skyLayers(el) {
+    const layers = [
+      ['Stars and the Milky Way', 'dimmed by each layer of sails in front', 'ink'],
+      ['Dust between the planets', 'lit only by sunlight that escapes', 'ink2'],
+      ['The far side of the shell', 'sunlit sails: the glow, f (1 − f) ρ S ÷ π', 'swarm'],
+      ['The mirrors in front of Earth', 'let through only their gaps', 'ink2'],
+      ['Airglow, ~100 km up', 'the upper air’s own faint light', 'earth'],
+      ['The air', 'scatters twilight and the glow', 'earth'],
+    ];
+    put(el, svg(720, 330, 'The layers a line of sight from the lake passes through, from the ground up: the air, the airglow layer, the mirrors in front of Earth, the far side of the shell, the dust between the planets, and the stars; each adds light or lets only part of it through', id => {
+      let s = '';
+      const x0 = 150, top = 20, hh = 44;
+      layers.forEach(([name, what, c], i) => {
+        const y = top + i * hh;
+        s += Rect(40, y, 220, hh - 6, { fill: c === 'swarm' ? 'swarm' : c === 'earth' ? 'earth' : 'ink3', stroke: 'none', op: c === 'ink' ? 0.06 : 0.14, rx: 4 });
+        s += T(300, y + 16, name, { c: 'ink', w: 600 }) + T(300, y + 31, what, { sz: 11.5 });
+      });
+      s += Ln(x0 - 60, top + 6 * hh + 20, x0 + 40, top + 4, { c: 'ink', w: 2, arrow: id });
+      s += T(40, top + 6 * hh + 34, 'a line of sight from the lake, toward the set Sun', { sz: 11.5, c: 'ink3' });
+      return s;
+    }));
+  },
+
+  /** How bright the night sky is at each stage, and which frames share an exposure. */
+  stageBrightness(el) {
+    const cd = f => f * (1 - f) * 0.004 * (1361 / 0.95 ** 2) / Math.PI * 93;
+    const st = [['tonight', 0, 'A'], ['10⁻⁶', 1e-6, 'A'], ['10⁻⁴', 1e-4, 'B'], ['1%', 0.01, 'C'], ['half', 0.5, 'C'], ['99%', 0.99, 'C'], ['closed', 1, 'A']];
+    const sky = 1.7e-4;                                        // the natural night sky, cd/m²
+    const x0 = 90, x1 = 690, lo = 1e-4, hi = 100, Y = v => 250 - (Math.log10(Math.max(v, lo) / lo) / Math.log10(hi / lo)) * 210;
+    put(el, svg(720, 300, 'The brightness of the night sky round the set Sun at each stage, on a logarithmic scale, from the natural sky to 45 candela per square metre at half built and back; tonight, a millionth and the closed sphere share one exposure, one in ten thousand has its own, and 1%, half and 99% share another', id => {
+      let s = '';
+      for (const v of [1e-4, 1e-3, 1e-2, 0.1, 1, 10, 100]) s += Ln(x0, Y(v), x1, Y(v), { c: 'rule', w: 1 }) + T(x0 - 8, Y(v) + 4, v >= 1 ? `${v}` : `${v}`, { a: 'end', sz: 11.5, c: 'ink3' });
+      s += T(x0, 20, 'Brightness of the sky round the set Sun, cd/m² (logarithmic)', { c: 'ink', w: 500, sz: 12.5 });
+      const X = i => x0 + 40 + i * ((x1 - x0 - 80) / (st.length - 1));
+      const grp = { A: 'ink3', B: 'earth', C: 'swarm' };
+      st.forEach(([lab, f, g], i) => {
+        const v = f === 0 ? sky : f === 1 ? sky * 0.7 : cd(f) + sky;      // closed: airglow alone, no zodiacal light or stars
+        s += Circ(X(i), Y(v), 6, { fill: grp[g], stroke: 'var(--paper)', sw: 2 });
+        s += T(X(i), 272, lab, { a: 'middle', c: 'ink', w: 500, sz: 11.5 });
+        const txt = f === 0 ? 'dark sky' : f === 1 ? 'airglow only' : v < 0.001 ? `${Math.round(v / sky)}× dark sky` : v < 1 ? v.toFixed(3) : v.toFixed(v < 10 ? 1 : 0);
+        s += T(X(i), Y(v) - 12, txt, { a: 'middle', sz: 11, halo: true });
+      });
+      s += T(x0, 292, 'Same colour, same exposure: grey shares tonight’s; blue has its own; violet, 1%, half and 99%, share one.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
 };
