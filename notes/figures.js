@@ -311,4 +311,78 @@ export const FIGURES = {
       return s;
     }));
   },
+
+  // ---------------------------------------------------------------- Mercury
+  /** Mercury cut open to scale, and what each layer yields. */
+  mercuryCutaway(el) {
+    const R = 2439.7, Rc = 2024, crust = 35, k = 0.072;      // px per km
+    const cx = 200, cy = 210;
+    put(el, svg(720, 300, 'Mercury cut in half, to scale: a thin rocky crust and mantle, 416 km thick, over an iron core 2,024 km in radius that is three quarters of the planet’s mass. The rock yields 3.4×10²² kg of spacecraft, the core about 2.5×10²² kg more', id => {
+      let s = '';
+      const half = r => `M${cx - r * k},${cy} A${r * k},${r * k} 0 0 1 ${cx + r * k},${cy} Z`;
+      s += Path(half(R), { fill: 'ink3', stroke: 'ink', sw: 1, op: 0.45 });
+      s += Path(half(R - crust), { fill: 'ink3', stroke: 'none', op: 0.25 });
+      s += Path(half(Rc), { fill: 'heat', stroke: 'ink', sw: 1, op: 0.35 });
+      s += Ln(cx - R * k - 10, cy, cx + R * k + 10, cy, { c: 'ink', w: 1 });
+      // labels
+      s += Ln(cx + 40, cy - Rc * k * 0.55, 420, 96, { c: 'ink3', w: 0.75 }) + Ln(cx + 120, cy - (Rc + 200) * k * 0.86, 420, 50, { c: 'ink3', w: 0.75 });
+      s += T(426, 46, 'Crust and mantle: 416 km of rock', { c: 'ink', w: 600 }) + T(426, 62, '8.0×10²² kg, 24% of Mercury, a quarter silicon', { sz: 11.5 }) + T(426, 78, '→ 3.4×10²² kg of spacecraft', { sz: 11.5, c: 'swarm', w: 500 });
+      s += T(426, 100, 'Iron core: 2,024 km radius', { c: 'ink', w: 600 }) + T(426, 116, '2.5×10²³ kg, 76% of Mercury, ~6% silicon', { sz: 11.5 }) + T(426, 132, '→ 2.5×10²² kg more, at 4× the digging', { sz: 11.5, c: 'swarm', w: 500 });
+      s += T(cx, cy + 22, '4,880 km across', { a: 'middle', sz: 11.5 });
+      // what the swarm takes
+      const bx = 426, bw = 260, by = 176;
+      s += T(bx, by - 10, 'The finished swarm, 5.67×10²² kg, takes', { c: 'ink', w: 500, sz: 12 });
+      const parts = [[0.24, 'ink3', 0.55], [0.76 * 0.91, 'heat', 0.45], [0.76 * 0.09, 'heat', 0.12]];
+      let x = bx;
+      parts.forEach(([w, c, op]) => { s += Rect(x, by, bw * w - 1, 18, { fill: c, stroke: 'none', op }); x += bw * w; });
+      s += T(bx, by + 34, 'all the rock', { sz: 11.5 }) + T(bx + bw * 0.24 + 4, by + 34, '91% of the core', { sz: 11.5 });
+      s += T(bx, by + 56, '93% of the planet in all', { c: 'ink', w: 600 });
+      return s;
+    }));
+  },
+
+  /** Heat left on Mercury per kilogram, by how the work is done, and the export each allows. */
+  heatBudget(el) {
+    const rows = [
+      ['Dig and throw to low orbit; 99% launcher', 0.1, true],
+      ['The same with a 95% launcher', 0.28],
+      ['Launch all the way from the surface', 1.85],
+      ['Refine on the surface too', 30],
+    ];
+    const x0 = 270, x1 = 520, X = v => x0 + (Math.log10(v / 0.05) / Math.log10(60 / 0.05)) * (x1 - x0);
+    put(el, svg(720, 240, 'Heat left on Mercury per kilogram of rock, on a logarithmic scale, for four ways of working, with the export each allows: the less heat per kilogram, the faster the swarm can be built', id => {
+      let s = '';
+      s += T(x0, 20, 'Heat left per kg of rock', { c: 'ink3', sz: 11.5, w: 500 }) + T(600, 20, 'Spacecraft a year', { a: 'middle', c: 'ink3', sz: 11.5, w: 500 });
+      rows.forEach(([name, q, pick], i) => {
+        const y = 44 + i * 40;
+        s += T(x0 - 10, y + 13, name, { a: 'end', c: pick ? 'ink' : 'ink2', w: pick ? 600 : 400, sz: 11.5 });
+        s += Rect(x0, y, X(q) - x0, 18, { fill: pick ? 'heat' : 'ink3', stroke: 'none', op: pick ? 0.8 : 0.5, rx: 2 });
+        s += T(X(q) + 6, y + 13, `${q < 1 ? q : q.toFixed(q < 10 ? 1 : 0)} MJ`, { sz: 11.5, c: 'ink' });
+        const exportKg = (5e18 / (q * 1e6)) * 0.42 * 3.156e7;
+        const e = Math.floor(Math.log10(exportKg)), m = exportKg / 10 ** e;
+        s += T(600, y + 13, `${m.toFixed(1)}×10${String(e).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('')} kg`, { a: 'middle', sz: 11.5, c: pick ? 'ink' : 'ink2', w: pick ? 600 : 400 });
+      });
+      s += T(x0 - 240, 214, 'With the 5×10¹⁸ W of heat Mercury can shed and 0.42 kg of spacecraft per kg of rock. Part of the output', { c: 'ink3', sz: 11.5 }) + T(x0 - 240, 229, 'goes into factory machines, leaving 5.9×10²⁰ kg of sails a year in the central case.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** How Mercury sheds 5×10¹⁸ W: heat pumps lift the mining heat to radiators at 1,650 K. */
+  heatPump(el) {
+    put(el, svg(720, 260, 'Power flow on Mercury at the heat wall: 5×10¹⁸ W of mining heat at about 500 K is lifted by heat pumps, driven by 2.3×10¹⁹ W beamed from the swarm, to radiators at 1,650 K, which shed 2.8×10¹⁹ W to space. Bare ground at 500 K could shed only 2.4×10¹⁷ W', id => {
+      let s = '';
+      const w = p => Math.max(3, p * 2.2);        // stroke width per 10¹⁸ W
+      s += Rect(30, 120, 140, 56, { fill: 'var(--wash)', stroke: 'ink', rx: 8 }) + T(100, 144, 'Mining heat', { a: 'middle', c: 'ink', w: 600 }) + T(100, 162, '5×10¹⁸ W, ~500 K', { a: 'middle', sz: 11.5 });
+      s += Rect(280, 110, 140, 76, { fill: 'swarm', stroke: 'swarm', op: 0.12, rx: 8 }) + T(350, 140, 'Heat pumps', { a: 'middle', c: 'ink', w: 600 }) + T(350, 158, 'half of Carnot', { a: 'middle', sz: 11.5 });
+      s += Rect(530, 104, 160, 88, { fill: 'heat', stroke: 'heat', op: 0.15, rx: 8 }) + T(610, 138, 'Radiators', { a: 'middle', c: 'ink', w: 600 }) + T(610, 156, '1,650 K, glowing orange', { a: 'middle', sz: 11.5 }) + T(610, 172, 'the whole planet paved', { a: 'middle', sz: 11.5 });
+      s += Ln(172, 148, 276, 148, { c: 'heat', w: w(5) }) + T(224, 136, '5×10¹⁸ W', { a: 'middle', sz: 11.5, c: 'ink' });
+      s += Ln(350, 40, 350, 106, { c: 'swarm', w: w(23) / 2.5 }) + T(358, 34, 'work: 2.3×10¹⁹ W, beamed from the swarm', { sz: 11.5, c: 'swarm', w: 500 });
+      s += Ln(422, 148, 526, 148, { c: 'heat', w: w(28) / 2.5 }) + T(474, 128, '2.8×10¹⁹ W', { a: 'middle', sz: 11.5, c: 'ink' });
+      s += Ln(692, 148, 712, 148, { c: 'heat', w: 2, arrow: id });
+      for (const dy of [-30, 30]) s += Ln(690, 148 + dy, 712, 148 + dy * 1.5, { c: 'heat', w: 2, arrow: id });
+      s += T(30, 222, 'Without the pumps: bare ground at 500 K sheds only 2.4×10¹⁷ W, a twentieth as much.', { c: 'ink', sz: 12 });
+      s += T(30, 242, 'At 2,000 K the same arithmetic gives about 9×10¹⁸ W; refractory radiators cannot go much hotter.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
 };
