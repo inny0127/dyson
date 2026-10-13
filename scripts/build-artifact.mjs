@@ -1,18 +1,21 @@
 // Stage the app for publishing as a claude.ai Artifact: the host wraps the page in its own
-// <!doctype>/<html>/<head>/<body>, so strip ours and keep everything else as-is.
-// Usage: node scripts/build-artifact.mjs <outDir>
+// <!doctype>/<html>/<head>/<body>, so strip ours and keep everything else as-is. With --site, keep
+// the whole document, for a static host such as GitHub Pages.
+// Usage: node scripts/build-artifact.mjs <outDir> [--site]
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, copyFileSync, rmSync } from 'node:fs';
 import { join, dirname, relative, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const out = resolve(process.argv[2] || join(root, 'dist'));
+const args = process.argv.slice(2);
+const site = args.includes('--site');
+const out = resolve(args.find(a => !a.startsWith('--')) || join(root, 'dist'));
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 let html = readFileSync(join(root, 'index.html'), 'utf8');
-html = html
+if (!site) html = html
   .replace(/<!doctype html>\s*/i, '')
   .replace(/<html[^>]*>\s*/i, '')
   .replace(/<\/html>\s*/i, '')
@@ -24,7 +27,7 @@ html = html
   .replace(/<meta name="viewport"[^>]*>\s*/i, '');
 // the <title> must lead the file (only the first 8 KB is scanned)
 const title = html.match(/<title>.*?<\/title>/)[0];
-html = `${title}\n${html.replace(title, '')}`;
+if (!site) html = `${title}\n${html.replace(title, '')}`;
 writeFileSync(join(out, 'index.html'), html);
 
 // Every script and photograph is published under a content-stamped name (app.3f2a9c1b0d.js), so a
@@ -63,5 +66,6 @@ for (const name of readdirSync(join(root, 'renders'))) {
   files[stamped] = join(out, stamped);
 }
 writeFileSync(join(out, 'index.html'), html);
-writeFileSync(join(out, 'files.json'), JSON.stringify(files, null, 2));
+if (site) writeFileSync(join(out, '.nojekyll'), '');                // serve files as they are
+else writeFileSync(join(out, 'files.json'), JSON.stringify(files, null, 2));
 console.log(`staged ${Object.keys(files).length + 1} files in ${out}`);
