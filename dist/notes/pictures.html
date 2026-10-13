@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>How the Pictures Were Made</title>
-<meta name="description" content="How the page's photographs were made: physical light sources, a multiple-scattering atmosphere, a calibrated night sky, ray casters for the views from orbit and from far away, thermal false colour, and a camera pipeline that keeps the physics separate from the exposure.">
+<meta name="description" content="How the page's pictures were made: every light at its physical brightness, a calculated atmosphere and night sky, our own renderer for the views from orbit and from far away, thermal false colour, and exposure applied afterwards like developing film.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="notes.124ac92a45.css">
+<link rel="stylesheet" href="notes.56bc68e832.css">
 </head>
 <body>
 <header class="nb"><div class="nb-in"><a class="nb-home" href="../index.html">A Dyson Swarm, Made Real</a><details><summary>Technical notes</summary><ol id="notes-menu"></ol></details></div></header>
@@ -18,7 +18,7 @@
 <header class="head">
   <div class="kicker" id="note-no">Technical note</div>
   <h1>How the pictures were made</h1>
-  <p class="dek">Nothing on the page is painted. Every picture is computed from the model’s numbers and the design study, with each light source at its physical brightness, and then exposed the way a photographer would expose it.</p>
+  <p class="dek">Nothing on the page is painted. Every picture is calculated from the model’s numbers, with each source of light at its real brightness, and then exposed the way a photographer would expose it.</p>
   <p class="byline">From <code>docs/renders.md</code> and the scripts in <code>render/</code> · October 2026</p>
 </header>
 <details class="toc-m" id="toc-m"></details>
@@ -26,134 +26,109 @@
 <section class="summary">
   <h2>In short</h2>
   <ul>
-    <li><b>Physics first, photography second.</b> Each render writes a scene-linear image in physical units. Exposure, white balance and tone mapping are applied afterwards, like developing a raw file, so a darker or brighter print never changes the physics.</li>
-    <li><b>The sky is solved, not drawn.</b> Twilight comes from a multiple-scattering model of the atmosphere, calibrated to measured twilight. The night sky is the Milky Way, airglow, zodiacal light and 20,000 catalogue stars, each at its measured brightness. The swarm’s glow is the formula in the Earth note, scattered by the same air.</li>
-    <li><b>Two kinds of renderer.</b> Scenes with real geometry (the lake, the sails, the pod, Mercury) are path traced in Blender Cycles. Scenes that are spheres and a sky (Earth from orbit, the sphere from far away, the view inside) are ray-cast directly in our own code.</li>
-    <li><b>Thermal images use one fixed scale</b> for each kind of scene, so the same colour always means the same temperature.</li>
+    <li><b>Physics first, photography after.</b> Each picture is first calculated in physical units of light. Exposure and colour are applied afterwards, like developing film, so making a picture brighter never changes what is in it.</li>
+    <li><b>The sky is calculated, not drawn.</b> Twilight comes from a model of how sunlight scatters in the air, checked against measurements. The night sky is the Milky Way, the faint glow of the upper air and 20,000 catalogued stars, each at its measured brightness. The swarm’s glow is added and scattered by the same air.</li>
+    <li><b>Two kinds of renderer.</b> Scenes with detailed shapes, the lake, the sails, the pod and Mercury, are rendered in Blender. Scenes made of spheres and sky, Earth from orbit and the sphere from far away, are calculated by our own code.</li>
+    <li><b>Thermal images use fixed colour scales,</b> so the same colour always means the same temperature.</li>
   </ul>
   <div class="keys">
-    <div><b>93 lm/W</b><span>sunlight’s luminous efficacy, used to turn radiance into what the eye sees</span></div>
-    <div><b>3.4 lux</b><span>measured light at −6° twilight, the calibration point</span></div>
-    <div><b>V ≤ 8</b><span>catalogue stars drawn, 20,000 of them</span></div>
-    <div><b>8 m</b><span>USGS terrain resolution under Grand Teton</span></div>
-    <div><b>8–14 µm</b><span>the band every thermal image shows</span></div>
+    <div><b>93 lm/W</b><span>how bright sunlight looks per watt, used throughout</span></div>
+    <div><b>3.4 lux</b><span>measured twilight with the Sun 6° down, the calibration</span></div>
+    <div><b>20,000</b><span>catalogued stars, down to magnitude 8</span></div>
+    <div><b>8 m</b><span>resolution of the terrain under Grand Teton</span></div>
+    <div><b>8–14 µm</b><span>the heat-radiation band every thermal image shows</span></div>
     <div><b>0</b><span>pixels painted by hand</span></div>
   </div>
 </section>
 
 <h2 id="pipeline">From physics to photograph</h2>
-<p>Every render works in the same units: radiance in W per square metre per steradian, with sunlight converted to what the eye sees at 93 lumens per watt. Sunlight at 1 AU is 1,361 W/m²; the Sun’s disc, the swarm’s fronts, the radiators on Mercury, city lights and airglow all enter at their physical radiance. A render writes a scene-linear EXR file that records those values.</p>
-<p>Developing it is a separate step, in three scripts:</p>
-<ol>
-  <li><b>Glare</b> (<code>render/glare.py</code>). A real lens spreads a little of the light from very bright points across the frame, and the swarm’s glints can be a million times brighter than its glow. The point-spread function is a narrow bloom plus a power-law veil, normalised so that energy is conserved.</li>
-  <li><b>Develop</b> (<code>render/develop.py</code>). An exposure in stops, a daylight white balance (5,772 K, so sunlight renders neutral), and the AgX view transform, which rolls off highlights the way film does.</li>
-  <li><b>Finish</b> (<code>render/post.py</code>). What a real camera adds and a renderer does not: natural vignetting, a trace of lateral chromatic aberration, and sensor noise that grows with the square root of the signal.</li>
-</ol>
-<p>Cameras are metered as a photographer would meter them: on a grey card in sunlight for daylight scenes, on the sky for night scenes. Where two frames are meant to be compared, they share one exposure, and the caption says so. Where a frame has its own exposure, the caption says how much brighter or darker the scene really is.</p>
+<p>Every scene is described in physical units. Sunlight at Earth’s distance is 1,361 watts per square metre; the Sun’s disc, the sails, the radiators on Mercury, city lights and the faint glow of the upper air all go in at their real brightness. The renderer then calculates how much light reaches each pixel of a camera, and writes it down in those same units.</p>
+<p>Only then does photography begin. A real camera has to choose an exposure, because no photograph can show the full range of brightness in a scene with the Sun in it, and a real lens spreads a little light around very bright points. Those choices are applied afterwards, in three steps, so they can be changed without touching the physics.</p>
+<figure class="drawing">
+  <div data-draw="pipeline"></div>
+  <figcaption>The pipeline. Everything to the left of the line is fixed by the model; everything to the right is a photographic choice.<span class="how">Scripts: <code>render/glare.py</code>, <code>render/develop.py</code> (exposure, daylight white balance at 5,772 K so sunlight looks neutral, and the AgX tone curve), <code>render/post.py</code>.</span></figcaption>
+</figure>
+<p>Cameras are metered as a photographer would meter them: on a grey card in sunlight for daylight scenes, on the sky for night scenes. Where two pictures are meant to be compared, they share one exposure, and the caption says so. Where a picture has its own exposure, the caption says how much brighter or darker the scene really is.</p>
 
-<h2 id="lake">The lake: tonight and with the swarm</h2>
-<p>The page’s recurring view is Jenny Lake in Grand Teton National Park, looking west across the water to the range, on 22 August at 22:06 local time, with the Sun 18.5° below the horizon at azimuth 308°: the end of astronomical twilight. A second frame, at 21:04, has the Sun 9° down.</p>
-<h3>The ground</h3>
-<ul>
-  <li><b>Terrain</b> is USGS 3DEP elevation at 8 m. The lake bed is carved below the elevation model’s water surface, and a cobble beach is generated at 5 cm resolution in the foreground (<code>render/teton_prep.py</code>).</li>
-  <li><b>Trees</b> are conifers modelled to the twig and instanced below the 2,900 m treeline. Snowfields sit on high north- and east-facing slopes.</li>
-  <li><b>Air between the camera and the range</b> dims each ray by its length, with Rayleigh scattering and a summer aerosol load at about 2.3 km, and adds the light the air itself scatters, integrated over the whole sky. In deep twilight the air near the ground is in Earth’s shadow and lit only by the sky.</li>
-</ul>
+<h2 id="lake">The lake</h2>
+<p>The page’s recurring view is Jenny Lake in Grand Teton National Park, looking west across the water to the mountains on 22 August at 22:06, with the Sun 18.5° below the horizon: the moment twilight ends.</p>
+<p>The ground is real. The terrain is the US Geological Survey’s elevation map at 8 m resolution; the lake bed is carved below the water surface, and a pebble beach is built in the foreground at 5 cm detail. Conifers are modelled down to the twigs and planted below the treeline, and snowfields lie on high north-facing slopes. Between the camera and the mountains, the air dims and scatters light along each line of sight, as haze does on a summer evening.</p>
 <h3>The sky</h3>
-<p>Blender’s own sky model scatters light only once. That renders civil twilight about 6 times and nautical twilight about 160 times too dark, and turns deep twilight orange where the real sky is blue. So the atmosphere is our own (<code>render/atmosphere.py</code>), after Hillaire (2020): Rayleigh and Mie scattering, ozone absorption, Earth’s shadow, and multiple scattering through a precomputed table. Its colour channels sit at the effective wavelengths of a camera’s sRGB output, 615, 550 and 465 nm, and ozone’s Chappuis band absorbs red more than green, which is why deep twilight comes out blue.</p>
-<p>Even with multiple scattering, a clean-air model is 2–4 times too bright in deep twilight. So the Sun’s sky is scaled to the measured clear-sky illuminance on level ground: 3.4 lux with the Sun 6° down and 0.0083 lux at 12° (Bond and Henderson 1963), log-linear between and beyond.</p>
-<p>The night sky behind it (<code>render/sky_map.py</code>):</p>
-<ul>
-  <li><b>The Milky Way</b> from NASA’s Deep Star Maps, calibrated to its measured surface brightness.</li>
-  <li><b>Airglow</b> at 110 S10 units at the zenith, brightening toward the horizon as the van Rhijn function predicts.</li>
-  <li><b>Zodiacal light</b> after Leinert et al. (1998).</li>
-  <li><b>Stars:</b> 20,000 catalogue stars to magnitude 8, as points placed for the sidereal time.</li>
-  <li><b>Planets</b> for the date, from JPL’s approximate orbital elements and Mallama and Hilton’s magnitudes. Venus, at −4.5, is 6° up in the west-southwest at dusk, behind the range.</li>
-</ul>
+<p>Blender’s own sky model lets sunlight scatter only once in the air. That makes twilight far too dark, six times too dark at the end of sunset and 160 times too dark an hour later, and turns deep twilight orange where the real sky is blue. So the sky is our own calculation, following a method published by Hillaire in 2020, in which light scatters many times and ozone absorbs a little red, which is why deep twilight is blue. Even so, an ideal clean-air model comes out two to four times too bright in deep twilight, so its brightness is matched to measurements of real twilight on clear nights.</p>
+<p>The night sky behind it is built from measurements: the Milky Way from NASA’s calibrated star maps, the faint glow of the upper air, the glow of sunlit dust between the planets, 20,000 catalogued stars placed for the date and time, and the planets in their positions for that night.</p>
 <h3>The swarm in the sky</h3>
-<p>The swarm’s glow is the formula in <a href="earth.html#night">Earth inside the swarm</a>: f (1 − f) ρ S / π, with ρ = 0.004, uniform out to the shell’s edge. On 22 August Earth is 1.0116 AU from the Sun, so the glow ends 69.9° from the Sun and the cap 75.6°. Its colour is sunlight reflected by near-neutral hardware, plus the violet residual of the film’s anti-reflection coating, 9% of its reflectance. The glow is split into point sources so that the same atmosphere model scatters it. Behind it, stars, the Milky Way and the zodiacal light are dimmed by (1 − f) for each thin layer crossed, and the twilight sky is scaled by the sunlight Earth’s window lets through.</p>
+<p>The swarm is added as layers that a line of sight crosses on its way out, each adding light or letting only part of it through.</p>
+<figure class="drawing">
+  <div data-draw="skyLayers"></div>
+  <figcaption>What a line of sight from the lake passes through. The air scatters twilight and the swarm’s glow; the upper air adds its own faint light; the mirrors and the far side of the shell each let through only their gaps, and the far side adds the glow of its sunlit sails; behind them, the dust and the stars are dimmed.<span class="how">The glow’s formula is explained in <a href="earth.html#night">Earth inside the swarm</a>. Script: <code>render/sky_map.py</code>.</span></figcaption>
+</figure>
+<p>On 22 August Earth is a little more than 1 AU from the Sun, so the glowing region ends 69.9° from the Sun and the mirrors 75.6°. The glow’s colour is sunlight reflected by nearly neutral sails, with a faint violet tinge from their anti-reflection coating. The edge of the glow is sharp, softened over about a tenth of a degree, because the shell is thin.</p>
+<p>The brightness changes enormously from stage to stage, far more than one photograph can show. So the stages are developed in three groups, each sharing an exposure.</p>
+<figure class="drawing">
+  <div data-draw="stageBrightness"></div>
+  <figcaption>How bright the sky round the set Sun is at each stage. From a dark sky it rises more than a hundred-thousandfold by half built, then falls back. Once closed it is darker than tonight’s sky, lit only by the glow of the upper air.<span class="how">The glow’s brightness from the model, added to a natural night sky of about 0.0002 cd/m².</span></figcaption>
+</figure>
 <figure>
   <div class="pair">
     <div class="plate"><img src="../renders/stage-night-1e-2.a25af8055f.jpg" alt="The lake with the sphere at one per cent: a twilight-bright glow over the range" width="2400" height="1600" loading="lazy"></div>
     <div class="plate"><img src="../renders/stage-night-0.99.00718f28e5.jpg" alt="The lake with the sphere at 99 per cent: a dim, starless glow over the range" width="2400" height="1600" loading="lazy"></div>
   </div>
-  <figcaption>The lake with the sphere at 1% and at 99%. The glow is the same in both, because f (1 − f) is the same; the difference is behind it. At 1% the stars shine through; at 99% only one part in ten thousand of their light gets through both sides of the sphere.<span class="how">Both developed at one shared exposure, with the half-built frame. The edge of the glow is sharp, softened over 0.15°, because the shell is thin.</span></figcaption>
+  <figcaption>The lake with the sphere at 1% and at 99%, at the same exposure. The glow is the same in both; the difference is behind it. At 1% the stars shine through, at 99% almost none do.</figcaption>
 </figure>
-<p>With the Sun enclosed (<code>sky_map.py</code>, kind <code>closed</code>) there is no glow, no zodiacal light and no planets, and stars and the Milky Way are removed inside the cap’s limb with a soft edge about half a degree wide. That frame shares tonight’s exposure exactly, so the two can be compared directly.</p>
 
-<h2 id="orbit">From low Earth orbit</h2>
-<p>The views from orbit are ray-cast in numpy (<code>render/leo_view.py</code>), because the scene is a sphere, its air and the sky, and integrating each ray directly is faster and more exact than path tracing. The camera is 400 km above the Nile Delta on 22 September 2128, before dawn.</p>
-<ul>
-  <li><b>City lights</b> are NASA’s Black Marble 2016, globally at 5 km with 1 km and 500 m crops of the region in view. A map value of 1 is taken as 3.8×10⁻³ W/m²/sr, a bright city core; that calibration is uncertain by about three times. Colour 3,500 K.</li>
-  <li><b>Clouds</b> are the Blue Marble composite at albedo 0.65; <b>land</b> is Blue Marble colour; <b>the ocean</b> has albedo 0.03 plus a rough mirror of the sky (Fresnel reflection, wave slopes after Cox and Munk).</li>
-  <li><b>The air</b> uses the same multiple-scattering model, integrated along each ray from orbit. Airglow layers emit at their own heights: oxygen’s green line at 557.7 nm at 97 km (250 rayleigh), sodium at 589 nm at 92 km, oxygen’s red line at 630 nm at 250 km.</li>
-  <li><b>The Moon</b> uses LRO albedo scaled to a mean normal albedo of 0.12, lit with lunar-Lambert photometry (McEwen 1991), plus earthshine. Its few dozen pixels are supersampled 8 × 8, or a thin crescent would vanish into aliasing.</li>
-  <li><b>Stars and planets</b> are points seen through the air’s transmittance near the limb.</li>
-</ul>
+<h2 id="orbit">From orbit</h2>
+<p>The views from low orbit are calculated by our own renderer, because the scene is just a sphere, its air and the sky, and following each line of sight directly is faster and more exact than Blender’s general method. The camera is 400 km above the Nile delta before dawn on 22 September 2128.</p>
+<p>City lights come from NASA’s Black Marble satellite maps; how a map value turns into real brightness is uncertain by about three times. Clouds and land come from NASA’s Blue Marble pictures, and the sea reflects the sky like a rough mirror. The same model of the air is followed along each line of sight from orbit, and the upper air’s green and red glow is placed at its real heights, about 100 and 250 km. The Moon uses maps from the Lunar Reconnaissance Orbiter, lit by sunlight and by faint light from Earth; its few dozen pixels are calculated in fine detail, or a thin crescent would vanish.</p>
 <figure>
   <div class="plate"><img src="../renders/leo-closed-tele.a57c3a17d6.jpg" alt="The Milky Way's star clouds cut off along a smooth curved edge; beyond the edge the frame is black" width="2400" height="1600" loading="lazy"></div>
-  <figcaption>Where the sky ends: the rim of the closed sphere against the Milky Way, through a 35 mm lens from orbit. The rim is the limb of the cap’s outer layer, 77.4° from the Sun that night, softened over about half a degree by the layer’s thickness.<span class="how">Exposed for the stars. Inside the rim every line of sight ends on a mirror sail’s back at about 170 K.</span></figcaption>
+  <figcaption>Where the sky ends: the edge of the closed sphere against the Milky Way, seen from orbit through a 35 mm lens. Beyond the edge every line of sight ends on a mirror’s cold back.<span class="how">The edge is softened over about half a degree by the thickness of the mirrors’ layer.</span></figcaption>
 </figure>
 
-<h2 id="far">From far away</h2>
-<p>The views of the whole sphere (<code>render/sphere_space.py</code>) are also ray-cast: the scene is two spheres. The camera is 3 AU from the Sun, 25° above the plane of the planets, with a 28 mm lens.</p>
-<ul>
-  <li><b>In visible light</b> the near side shows its unlit, black backs; through its gaps the far side shows its sunlit fronts, ρ S / π, and behind everything the stars. Each crossing of the thin shell passes 1 − f of the light. The frame is taken through a coronagraph, a disc 1.6° in radius over the Sun, as solar telescopes in space use, or the Sun’s glare would hide everything else. Earth is a point at its true brightness, lit through its window.</li>
-  <li><b>In the infrared</b> the backs radiate at the film’s temperature for each stage (382 K sparse, 402 K at half, 419 K closed), and the infrared-dark fronts show through the gaps. The cap in front of Earth is cold. The thermal frames share a fixed false-colour scale from 150 K (black) to 450 K (pale yellow), so the stages can be compared.</li>
-</ul>
+<h2 id="far">From far away, and from inside</h2>
+<p>The views of the whole sphere are calculated from three times Earth’s distance, 25° above the plane of the planets. In visible light, the near side shows its unlit black backs, and through its gaps the far side shows its sunlit fronts. The Sun itself is covered by a small disc, as solar telescopes in space do, or its glare would hide everything. Through a thermal camera, the sails’ backs glow at their temperature for each stage, 382 K sparse, 402 K at half and 419 K closed, all on one fixed colour scale from 150 K to 450 K.</p>
+<p>The view from inside the closed sphere is two flat layers and a sky: the camera is 800 m sunward of the innermost sails. The sky is the far side of the sphere, 280 million km away, where every sail faces the camera in full sunlight. It is as bright as an overcast day and the same in every direction, so there are no shadows.</p>
 <figure>
   <div class="pair">
     <div class="plate"><img src="../renders/stage-space-ir-0.5.8b87de4b37.jpg" alt="Thermal image of the half-built sphere from far away" width="2400" height="1600" loading="lazy"></div>
     <div class="plate"><img src="../renders/inside-closed.c7e5758acb.jpg" alt="Inside the enclosure: an even violet-grey sky over a floor of dark diamond panels" width="2400" height="1600" loading="lazy"></div>
   </div>
-  <figcaption>Left, the half-built sphere from 3 AU through a thermal camera: the backs at 402 K, mottled where the far side’s cooler fronts show through. Right, inside the closed sphere, 800 m sunward of the innermost sails: the far side fills the sky at about 190 cd/m², as bright as an overcast day.<span class="how">Left: 8–14 µm, 150–450 K scale. Right: a numpy ray caster, 14 mm lens, exposed for the sky.</span></figcaption>
+  <figcaption>Left, the half-built sphere through a thermal camera, from 3 AU. Right, inside the closed sphere, looking across the innermost sails.<span class="how">Scripts: <code>render/sphere_space.py</code>, <code>render/closed_inside.py</code>.</span></figcaption>
 </figure>
-<p>The view from inside (<code>render/closed_inside.py</code>) is two planes and a sky. The sky is the far side of the swarm, 1.9 AU away, every sail facing the camera with its sunlit front: 1.92 W/m²/sr. The floor is the innermost band of sails, 279 m diamonds of navy cells (albedo 0.0006) with lighter hinge strips (0.08) every 1.63 m, which the nearest sails resolve. Every vane within 400 km is tested for a flash toward the camera; at 800 m none falls in the frame, because a vane tilted at most 40° cannot throw the Sun lower than 10° above the plane.</p>
 
 <h2 id="hardware">The sail, the pod and Mercury</h2>
-<ul>
-  <li><b>The sail</b> (<code>render/sail.py</code>, <code>sail_shot.py</code>) is built from the design study’s dimensions. Its anti-reflection coating is a physical thin film, 110 nm of porous silica on glass, so its faint magenta-blue residual comes out of the optics rather than a chosen colour. The slight curl of each fold panel beside its hinge is an analytic normal per sample, so its glints survive at any distance. The film is exposed two stops brighter than a grey card would need, or it would print plain black.</li>
-  <li><b>The counter-sun</b>, in the corner view, is the Sun mirrored back by every sail farther out along that one line. It is computed from the mesh fronts’ mirror reflection, about 4%, and the share of the view those sails cover, 19%: magnitude −21.6.</li>
-  <li><b>The pod</b> (<code>render/pod.py</code>) is the design study’s 1 MW pod at 0.88 AU, in sunlight of 1,758 W/m². Its thermal image is a brightness temperature map: blades 355 K at the root falling to 345 K at the tip, wings 343 K, module 300 K, trusses 293 K, with the spec’s emissivities.</li>
-  <li><b>Mercury</b> (<code>render/mercury.py</code>) uses MESSENGER’s albedo mosaic (mean 0.080) and the USGS 665 m elevation model as true displacement, lit at 0.387 AU, phase 100°. The heat-wall frame paves it with radiator fields at 1,650 K; their glow is the photopic integral of a 1,650 K grey body, about 31,000 cd/m², against 21,500 cd/m² for sunlit rock. An earlier version scaled the glow by the visible share of the Planck spectrum, which overstates a cool source’s luminance, and drew the radiators on the night side only, which cannot shed the model’s heat; both were corrected.</li>
-</ul>
+<p><b>The sail</b> is built from the design study’s dimensions. Its anti-reflection coating is modelled as a real thin film of porous glass, so its faint magenta-blue sheen comes out of the optics rather than a chosen colour. The slight curl of each fold panel beside its hinge is built in, so its glints survive at any distance. The film is so dark that it is exposed two stops brighter than a grey card would need, or it would print as plain black.</p>
+<p><b>The counter-sun</b>, the bright point beyond a sail’s tip, is the Sun mirrored back by every sail farther out along that line, calculated from how much they reflect and how much of the view they fill.</p>
+<p><b>The pod</b> is shown in sunlight and through a thermal camera, with each part at the temperature the design study gives it: radiator blades 345–355 K, solar wings 343 K, the blanketed module about 300 K.</p>
+<p><b>Mercury</b> uses the MESSENGER spacecraft’s maps of its brightness and height. The heat-limit picture paves it with radiators at 1,650 K, whose glow is calculated from that temperature. An earlier version used a short cut that overstated how bright such a surface looks, and placed radiators only on the night side, which could not shed the model’s heat; both were corrected.</p>
 
 <h2 id="earth">Earth by design</h2>
-<p>The frames of Europe and North America’s Pacific coast, today and with the dry-summer belt moved north, are views from 4,000 km in July through the same atmosphere model as the views from orbit. The changed frames are made by <code>render/med_earth.py</code>, and the method matters, because it decides what the pictures can claim.</p>
-<ul>
-  <li>Every field, forest and city stays where it is. Only the season’s palette changes, by matching the colour distribution of each changed band to that of a real region today.</li>
-  <li><b>Europe:</b> the new belt, 44–51° N and fading out to the north and east, takes the colours of today’s Mediterranean lands (Iberia, southern Italy and Greece, 37–42° N); the old southern edge, 33–37.5° N, takes those of the steppe south of the Atlas. Land above about 1,500 m keeps its colours, and summer cloud over the new belt is cut by three quarters. About 1.8 million km² changes to the Mediterranean palette and 1.2 million km² to steppe.</li>
-  <li><b>The Pacific coast</b> already has dry summers up to Seattle, so each 1° band of the coastal strip takes the July colours of the strip 5° further south. About 0.7 million km² changes. Both frames are cloud-free, because the cloud composite is not a July map and it put a storm over exactly the coast that changes.</li>
-</ul>
-<p>These show one plausible outcome of the mechanism described in <a href="earth.html#design">Earth inside the swarm</a>. No climate model has run shading aimed this way.</p>
+<p>The pictures of Europe and North America’s Pacific coast, today and with the dry summer belt moved north, are views from 4,000 km in July through the same model of the air as the views from orbit. The changed pictures keep every field, forest and city where it is. Only the summer’s colours change, matched to the colours of real regions today: in Europe, the new dry belt takes the colours of today’s Spain, southern Italy and Greece, and the old southern edge takes those of the steppe south of the Atlas mountains. On the Pacific coast, which already has dry summers up to Seattle, each strip takes the colours of the coast five degrees further south. They show one plausible outcome of the climate control described in <a href="earth.html#design">Earth inside the swarm</a>; no climate model has yet run it.</p>
 
 <h2 id="limits">What the pictures leave out</h2>
 <ul>
-  <li><b>The bands.</b> The formation bands of the sphere would give the shell a faint texture of crossing stripes; it is drawn uniform.</li>
-  <li><b>Individual sails from Earth.</b> Each sail is about magnitude 25 from Earth, and millions share every pixel, so the glow is smooth. That is correct, not a simplification.</li>
-  <li><b>Weather.</b> The lake frames are clear nights; the swarm’s glow on cloud would light the cloud from above.</li>
-  <li><b>The aurora,</b> which ends once the solar wind stops, is absent from every frame, as it would be.</li>
+  <li><b>The bands.</b> The shell’s formation bands would give it a faint texture of crossing stripes; it is drawn even.</li>
+  <li><b>Single sails from Earth.</b> Each is far too faint to see, and millions share every pixel, so the glow is smooth. That is correct, not a shortcut.</li>
+  <li><b>Weather.</b> The lake is shown on clear nights; the glow would also light clouds from above.</li>
+  <li><b>Auroras,</b> which end once the solar wind stops, are absent from every picture, as they would be.</li>
 </ul>
 
 <section class="sources">
   <h2>Sources and code</h2>
   <ul>
-    <li>Project note: <code>docs/renders.md</code>; scripts in <code>render/</code>; stage renders by <code>scripts/stage-renders.sh</code> and <code>scripts/finish-renders.sh</code>.</li>
+    <li>Project note: <code>docs/renders.md</code>; scripts in <code>render/</code>; stage renders by <code>scripts/stage-renders.sh</code> and <code>scripts/finish-renders.sh</code>; diagrams in <code>notes/figures.js</code>.</li>
     <li>Hillaire (2020), “A scalable and production ready sky and atmosphere rendering technique”, Eurographics Symposium on Rendering.</li>
     <li>Bond and Henderson (1963), illuminance during twilight; US Naval Observatory twilight data.</li>
     <li>Leinert et al. (1998), “The 1997 reference of diffuse night sky brightness”, Astronomy and Astrophysics Supplement 127.</li>
     <li>NASA Scientific Visualization Studio, Deep Star Maps; NASA Black Marble (2016); NASA Blue Marble (2004).</li>
-    <li>USGS 3D Elevation Program, Grand Teton; GEBCO bathymetry and relief.</li>
+    <li>USGS 3D Elevation Program; GEBCO relief.</li>
     <li>MESSENGER MDIS global mosaic and USGS Mercury elevation model; LRO WAC albedo.</li>
-    <li>McEwen (1991), photometric functions for photoclinometry and other applications, Icarus 92.</li>
-    <li>Mallama and Hilton (2018), computing apparent planetary magnitudes, Astronomy and Computing 25; JPL approximate positions of the planets.</li>
-    <li>Cox and Munk (1954), measurement of the roughness of the sea surface from photographs of the Sun’s glitter.</li>
+    <li>McEwen (1991), photometric functions, Icarus 92; Mallama and Hilton (2018), planetary magnitudes, Astronomy and Computing 25; Cox and Munk (1954), sea-surface slopes.</li>
     <li>Asset credits: <code>assets/CREDITS.md</code>.</li>
   </ul>
 </section>
 <nav class="onward" id="onward"></nav>
 </article>
 </div>
-<script type="module" src="notes.9988ee64e6.js"></script>
+<script type="module" src="notes.1c66f4187b.js"></script>
 </body>
 </html>

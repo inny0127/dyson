@@ -174,3 +174,9 @@ aside.box b.t { display: block; font: 600 0.875rem/1.4 var(--sans); margin-botto
 .onward a b { font: 500 1.1rem/1.3 var(--serif); }
 .onward a.next { text-align: right; grid-column: 2; }
 @media (max-width: 760px) { body { font-size: 1.0625rem; } .dek { font-size: 1.15rem; } }
+
+/* the bands rendered on a sphere (figures.js bandsRender) */
+.bands { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.bands canvas { width: 100%; max-width: 300px; aspect-ratio: 1; display: block; margin: 0 auto; }
+.bands p { margin: 0.4rem 0 0; text-align: center; font: 400 0.8125rem/1.4 var(--sans); color: var(--ink-2); }
+.bands p b { display: block; color: var(--ink); font-weight: 600; }
