@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dyson Swarm Made Real</title>
+<meta name="description" content="A Dyson sphere built from Mercury, watched stage by stage from a lake in Wyoming, from low orbit and from far away. Every picture and number comes from one physics model.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an editorial essay. One reading column of serif text; photographs sit on black plates
+   that break wider than the text; illustrations are fine-line technical drawings in the ink colour,
+   with one hue only where it carries meaning (sunlight amber, infrared red, Earth blue).
+   Type: Newsreader for reading and headlines, IBM Plex Sans for figures, captions and controls. */
+:root {
+  --paper: #f6f7f8;
+  --ink: #16191e;
+  --ink-2: #484e57;
+  --ink-3: #7a808a;
+  --rule: #dcdfe4;
+  --wash: #eceef1;
+  --plate: #040506;
+  --sun: #b26a08;
+  --sun-mark: #eda100;
+  --heat: #c8442a;
+  --earth: #2a78d6;
+  --swarm: #6250d6;
+  --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --col: 40rem;
+  --wide: 72rem;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1114; --ink: #ebe9e4; --ink-2: #b9bbbf; --ink-3: #868b93; --rule: #272b31; --wash: #171a1e;
+    --sun: #f0a73a; --sun-mark: #c98500; --heat: #ff7a59; --earth: #3987e5; --swarm: #9085e9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1114; --ink: #ebe9e4; --ink-2: #b9bbbf; --ink-3: #868b93; --rule: #272b31; --wash: #171a1e;
+  --sun: #f0a73a; --sun-mark: #c98500; --heat: #ff7a59; --earth: #3987e5; --swarm: #9085e9;
+  color-scheme: dark;
+}
+
+html { background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.1875rem/1.62 var(--serif); font-optical-sizing: auto; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+
+/* ---------------- hero */
+.hero { position: relative; background: var(--plate); color: #f2f0eb; }
+.hero img { width: 100%; height: clamp(22rem, 58vw, 44rem); object-fit: cover; object-position: 58% 52%; }
+.hero .title { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 max(1rem, 5vw) clamp(1.5rem, 4vw, 3.5rem); display: grid; gap: 0.6rem; }
+.hero .kicker { font: 500 0.75rem/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: #c9c5bb; }
+.hero h1 { margin: 0; font: 300 clamp(2.6rem, 7vw, 5.6rem)/0.98 var(--serif); letter-spacing: -0.01em; text-wrap: balance; max-width: 14ch; }
+.hero .credit { position: absolute; right: max(1rem, 5vw); bottom: clamp(1.5rem, 4vw, 3.5rem); font: 400 0.75rem/1.4 var(--sans); color: #8d8a84; max-width: 20rem; text-align: right; }
+
+main { padding-inline: 1rem; }
+.col { max-width: var(--col); margin-inline: auto; width: 100%; box-sizing: border-box; }
+.wide { max-width: var(--wide); margin-inline: auto; width: 100%; box-sizing: border-box; }
+
+.standfirst { padding-block: 2.75rem 1rem; }
+.standfirst p { margin: 0; font-size: 1.45rem; line-height: 1.45; color: var(--ink); }
+.era { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.25rem; margin-top: 1.75rem; font: 400 0.875rem/1 var(--sans); }
+.era > span { color: var(--ink-3); margin-right: 0.5rem; }
+.era button { border: 0; background: none; padding: 0.45rem 0.7rem; border-radius: 999px; color: var(--ink-2); cursor: pointer; }
+.era button:hover { background: var(--wash); }
+.era button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-block: 2rem 1rem; }
+.figures div { padding: 1.1rem 1rem 1.2rem 0; display: grid; gap: 0.35rem; align-content: start; }
+.figures div + div { padding-left: 1rem; border-left: 1px solid var(--rule); }
+.figures b { font: 500 1.6rem/1.1 var(--sans); letter-spacing: -0.01em; }
+.figures span { font: 400 0.8125rem/1.35 var(--sans); color: var(--ink-3); }
+
+/* ---------------- chapters */
+section.chapter { padding-block: 3.5rem 1rem; display: grid; gap: 1.6rem; }
+.kicker { font: 500 0.75rem/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+h2 { margin: 0.5rem 0 0; font: 400 clamp(1.9rem, 3.6vw, 2.6rem)/1.08 var(--serif); letter-spacing: -0.005em; text-wrap: balance; }
+.prose h3 { margin: 2.2rem 0 0.4rem; font: 500 1.35rem/1.25 var(--serif); }
+.prose p { margin: 0 0 1.05rem; }
+.prose p:last-child { margin-bottom: 0; }
+.num { font: 500 0.92em/1 var(--sans); font-variant-numeric: lining-nums; white-space: nowrap; }
+
+figure { margin: 0; display: grid; gap: 0.75rem; min-width: 0; }
+figcaption { font: 400 0.875rem/1.5 var(--sans); color: var(--ink-2); max-width: var(--col); }
+figcaption .how { display: block; margin-top: 0.4rem; font-size: 0.8125rem; color: var(--ink-3); }
+.dek { margin: 0.7rem 0 0; font-size: 1.2rem; line-height: 1.45; color: var(--ink-2); text-wrap: pretty; }
+dl.summary { margin: 0; display: grid; grid-template-columns: 11rem 1fr; gap: 0.9rem 1.5rem; }
+dl.summary dt { font: 600 0.875rem/1.5 var(--sans); color: var(--ink); padding-top: 0.2rem; }
+dl.summary dd { margin: 0; }
+details.glossary { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 0.9rem 0; }
+details.glossary summary { cursor: pointer; font: 500 0.875rem/1.4 var(--sans); color: var(--ink-2); }
+details.glossary dl { margin: 1rem 0 0.2rem; display: grid; grid-template-columns: 10rem 1fr; gap: 0.55rem 1.25rem; font: 400 0.875rem/1.5 var(--sans); }
+details.glossary dt { font-weight: 600; color: var(--ink); }
+details.glossary dd { margin: 0; color: var(--ink-2); }
+figcaption b { font-weight: 600; color: var(--ink); }
+.plate { background: var(--plate); }
+.plate img { width: 100%; height: auto; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.irscale { display: flex; align-items: center; gap: 0.6rem; font: 400 0.8125rem/1 var(--sans); color: var(--ink-3); }
+.irscale i { display: block; height: 6px; width: 9rem; border-radius: 3px; background: linear-gradient(90deg, #000004, #320a5e, #781c6d, #bb3754, #ed6925, #fbb61a, #fcffa4); }
+
+.drawing { color: var(--ink); }
+.drawing svg, .chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart { position: relative; }
+.tip { position: absolute; pointer-events: none; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 0.5rem 0.65rem; font: 400 0.8125rem/1.45 var(--sans); color: var(--ink); box-shadow: 0 4px 18px rgb(0 0 0 / 0.08); white-space: nowrap; transform: translate(-50%, calc(-100% - 12px)); }
+.tip b { font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font: 400 0.8125rem/1.3 var(--sans); color: var(--ink-2); }
+.legend i { display: inline-block; width: 14px; height: 2px; border-radius: 1px; vertical-align: 0.3em; margin-right: 0.45rem; }
+
+.scrub { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem; align-items: center; }
+.scrub button { width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; font: 400 0.8rem/1 var(--sans); }
+.scrub input { width: 100%; accent-color: var(--ink); margin: 0; }
+.readout { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem 1.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.readout div { display: grid; gap: 0.2rem; }
+.readout span { font: 400 0.8125rem/1.3 var(--sans); color: var(--ink-3); }
+.readout b { font: 500 1.05rem/1.25 var(--sans); font-variant-numeric: tabular-nums; }
+.readout b.over { color: var(--heat); }
+
+table.compare { width: 100%; border-collapse: collapse; font: 400 0.95rem/1.4 var(--sans); }
+table.compare th { text-align: left; font-weight: 500; color: var(--ink-3); font-size: 0.8125rem; padding: 0 0.75rem 0.6rem 0; border-bottom: 1px solid var(--ink); }
+table.compare td { padding: 0.7rem 0.75rem 0.7rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.compare td:first-child { color: var(--ink-2); width: 38%; }
+table.compare td.v { font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; }
+
+/* ---------------- assumptions */
+details.assumptions { border-top: 1px solid var(--ink); padding-top: 1.25rem; }
+details.assumptions summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+details.assumptions summary::-webkit-details-marker { display: none; }
+details.assumptions summary h2 { margin: 0; }
+details.assumptions summary span { font: 400 0.875rem/1 var(--sans); color: var(--ink-3); }
+.params { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.25rem 2rem; margin-top: 1.25rem; }
+.param-group { grid-column: 1 / -1; font: 500 0.75rem/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); padding-top: 1.5rem; }
+.param { padding: 0.7rem 0; border-bottom: 1px solid var(--rule); font-family: var(--sans); }
+.param label { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.875rem; color: var(--ink); }
+.param output { font-size: 0.875rem; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.param input[type=range] { width: 100%; accent-color: var(--ink); margin: 0.5rem 0 0; }
+.param select { width: 100%; margin-top: 0.5rem; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 0.35rem; }
+.param .help { font-size: 0.8125rem; line-height: 1.45; color: var(--ink-3); margin-top: 0.35rem; }
+.reset { margin-top: 1.25rem; border: 1px solid var(--rule); background: none; border-radius: 999px; padding: 0.5rem 1rem; font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+
+footer { padding-block: 3rem 5rem; font: 400 0.875rem/1.6 var(--sans); color: var(--ink-2); }
+footer h2 { font-size: 1.4rem; margin-bottom: 0.75rem; }
+footer ul { padding-left: 1.1rem; margin: 0.75rem 0 0; }
+footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospace; }
+
+@media (max-width: 760px) {
+  body { font-size: 1.0625rem; }
+  .standfirst p { font-size: 1.25rem; }
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  dl.summary, details.glossary dl { grid-template-columns: 1fr; gap: 0.2rem; }
+  dl.summary dd, details.glossary dd { margin-bottom: 0.7rem; }
+  .figures div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .figures div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .pair { grid-template-columns: minmax(0, 1fr); }
+  .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero .credit { display: none; }
+  .drawing > div, .chart { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .drawing svg, .chart svg { min-width: 760px; }
+  .drawing > div::after, .chart::after { content: 'Scroll sideways'; display: block; font: 400 0.75rem/1 var(--sans); color: var(--ink-3); padding-top: 0.4rem; position: sticky; left: 0; }
+}
+/* Reading aids, after ai-2027.com: a year dashboard that follows the story as you scroll (a sticky
+   right column on wide screens, a bar across the top on narrow ones), explainer buttons under the
+   introduction, collapsible deep dives for the technical parts, and a choice of swarms at the end. */
+.dash { font: 400 0.75rem/1.35 var(--mono); color: var(--ink-2); }
+@media (min-width: 1200px) {
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; column-gap: 2.5rem; max-width: 88rem; margin-inline: auto; padding-inline: 1.5rem; }
+  .layout > main { grid-column: 1; grid-row: 1; min-width: 0; }
+  .layout > .dash { grid-column: 2; grid-row: 1; position: sticky; top: 1.25rem; align-self: start; margin-top: 2.9rem; }
+}
+@media (max-width: 1199px) {
+  .dash { position: sticky; top: 0; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 0.45rem 1rem; display: flex; gap: 1rem; align-items: center; overflow-x: auto; white-space: nowrap; }
+  .dash .dash-chart, .dash .dash-sails, .dash .dash-what { display: none; }
+  .dash .dash-metrics { display: flex; gap: 1.1rem; margin: 0; }
+  .dash .dash-metrics > div:nth-child(n+4), .dash .dash-metrics small, .dash .gauge { display: none; }
+}
+.dash-head { display: flex; align-items: center; gap: 0.6rem; }
+.dash-year { background: var(--ink); color: var(--paper); padding: 0.22rem 0.5rem; border-radius: 4px; font-weight: 500; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.dash-chart { margin-top: 0.75rem; }
+.dash-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.dash-sails { margin-top: 0.8rem; }
+.dash-label b { color: var(--ink); font-weight: 500; }
+.dash-grid { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 0.4rem; min-height: 7px; }
+.dash-grid i { width: 7px; height: 7px; background: var(--swarm); display: block; }
+.dash-grid i.part { opacity: 0.35; }
+.dash-metrics { margin: 1rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 1rem; }
+.dash-metrics > div { display: grid; gap: 0.12rem; align-content: start; }
+.dash-metrics dt { color: var(--ink-3); font-size: 0.6875rem; }
+.dash-metrics dd { margin: 0; color: var(--ink); font-size: 0.875rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dash-metrics dd small { display: block; color: var(--ink-3); font-weight: 400; font-size: 0.6875rem; white-space: normal; }
+.dash-metrics .over dd { color: var(--heat); }
+.gauge { display: block; height: 4px; background: var(--wash); position: relative; margin-top: 0.3rem; }
+.gauge i { position: absolute; inset: 0 auto 0 0; background: var(--heat); }
+.gauge b { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
+.kicker .when { color: var(--ink); }
+.explain { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.explain button { font: 400 1rem/1 var(--serif); padding: 0.55rem 0.8rem; border: 1px solid var(--ink); background: none; color: var(--ink); border-radius: 6px; cursor: pointer; }
+.explain button[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+.explain-panel { margin-top: 1rem; padding: 1rem 1.15rem; border-left: 2px solid var(--ink); background: var(--wash); font-size: 1.0625rem; line-height: 1.55; }
+.explain-panel p { margin: 0 0 0.6rem; }
+.explain-panel p:last-child { margin: 0; }
+details.deep { border: 1px solid var(--rule); border-radius: 6px; padding: 0.7rem 1rem; margin: 0 0 1.05rem; }
+details.deep summary { cursor: pointer; font: 500 0.9375rem/1.4 var(--sans); color: var(--ink); }
+details.deep[open] summary { margin-bottom: 0.7rem; }
+details.deep p { font-size: 1.0625rem; margin: 0 0 0.8rem; }
+details.deep p:last-child { margin: 0; }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; max-width: 52rem; }
+.choices button { text-align: left; border: 1px solid var(--rule); border-radius: 8px; background: none; color: var(--ink); padding: 0.9rem 1rem; cursor: pointer; display: grid; gap: 0.4rem; align-content: start; font: 400 0.875rem/1.45 var(--sans); }
+.choices button b { font: 500 1.125rem/1.25 var(--serif); }
+.choices button span { color: var(--ink-2); }
+.choices button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.note { font: 400 0.8125rem/1.45 var(--sans); color: var(--ink-3); margin-top: 0; }
+@media (max-width: 760px) { .choices { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+
+/* ---------------- the progression */
+.strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.strip figure { gap: 0.35rem; }
+.strip img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--plate); }
+.strip span { font: 500 0.75rem/1.3 var(--sans); color: var(--ink-2); }
+.strip span b { display: block; color: var(--ink); font-weight: 600; }
+.strip a { text-decoration: none; color: inherit; }
+section.stage { border-top: 1px solid var(--rule); }
+.stage .kicker .share { color: var(--ink); }
+.sim { color: var(--ink); }
+.sim-canvas { width: 100%; display: block; }
+.sim-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin-top: 0.9rem; font: 400 0.875rem/1.45 var(--sans); }
+.sim-modes { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.sim-modes button, .sim-play { border: 1px solid var(--rule); background: none; padding: 0.45rem 0.8rem; border-radius: 999px; color: var(--ink-2); cursor: pointer; font: 400 0.875rem/1 var(--sans); }
+.sim-modes button:hover, .sim-play:hover { background: var(--wash); }
+.sim-modes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.sim-slider { display: grid; gap: 0.3rem; width: 100%; color: var(--ink-2); }
+.sim-slider[hidden] { display: none; }
+.sim-slider input { width: 100%; accent-color: var(--ink); margin: 0; }
+.sim-readout { margin: 0; width: 100%; color: var(--ink-2); }
+.sim-readout b { color: var(--ink); font-weight: 600; }
+.stage-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.9rem 1.5rem; padding: 1rem 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.stage-facts div { display: grid; gap: 0.2rem; }
+.stage-facts span { font: 400 0.8125rem/1.3 var(--sans); color: var(--ink-3); }
+.stage-facts b { font: 500 1.05rem/1.25 var(--sans); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } .stage-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <img src="renders/sail-hero.1b0231393b.jpg" alt="A near-black diamond-shaped solar sail against black space, with a line of bright glints across it" width="2560" height="1440">
+  <div class="title">
+    <div class="kicker">Built from Mercury, worked out from physics</div>
+    <h1>A Dyson Swarm, Made Real</h1>
+  </div>
+  <div class="credit">One compute sail, seen from a kilometre away at the Sun's true brightness. It is black because it is a good solar cell.</div>
+</header>
+
+<div class="layout">
+<aside class="dash" id="dash" aria-label="The swarm, year by year">
+  <div class="dash-head"><span class="dash-year" id="dash-year"></span><span class="dash-what" id="dash-what"></span></div>
+  <div class="dash-chart" id="dash-chart"></div>
+  <div class="dash-sails"><div class="dash-label" id="dash-sails-label"></div><div class="dash-grid" id="dash-grid"></div></div>
+  <dl class="dash-metrics" id="dash-metrics"></dl>
+</aside>
+<main>
+  <div class="col standfirst">
+    <p>A Dyson sphere is not built overnight. This one starts with a single factory on Mercury in 2050 and ends, some 165 years later, with the Sun enclosed: billions of billions of black sheets, each a solar panel and a computer, spread evenly round it just inside Earth's orbit. Scroll down and watch it grow, stage by stage, from a lake in Wyoming, from orbit, from inside and from far away. Every picture and every number on this page comes from one physics model, and if you change an assumption the page recomputes.</p>
+    <div class="explain" role="group" aria-label="About this page">
+      <button data-explain="what">What is this?</button>
+      <button data-explain="how">How was it worked out?</button>
+      <button data-explain="unsure">What is uncertain?</button>
+      <button data-explain="change">Can I change it?</button>
+    </div>
+    <div class="explain-panel" id="explain-panel" hidden></div>
+  </div>
+  <div class="wide figures" id="figures"></div>
+
+  <section class="chapter" id="summary" data-moment="cap">
+    <div class="col"><div class="kicker">In brief</div><h2>The plan</h2></div>
+    <div class="col"><dl class="summary" id="summary-list"></dl></div>
+    <figure class="wide drawing">
+      <div id="orbit-map"></div>
+      <figcaption class="col" id="orbit-caption"></figcaption>
+    </figure>
+    <div class="col">
+      <details class="glossary">
+        <summary>Words and units used on this page</summary>
+        <dl>
+          <dt>Share of the Sun's light</dt><dd>The fraction of everything the Sun puts out that the sails catch. The finished swarm catches all of it, except what it lets out through its windows.</dd>
+          <dt>AU</dt><dd>The distance from Earth to the Sun, 150 million km.</dd>
+          <dt>W/m² of extra heat</dt><dd>How much more energy Earth absorbs, for every square metre of its surface. Doubling the CO₂ in the air adds about 3.9.</dd>
+          <dt>FLOP/s</dt><dd>Calculations per second. One 2025 AI chip does about 10¹⁵; all of them together, about 3×10²².</dd>
+          <dt>lux</dt><dd>How brightly the ground is lit. A moonless night is 0.001, a full Moon 0.25, a lit street 10 to 20.</dd>
+          <dt>cd/m²</dt><dd>How bright a surface or a patch of sky looks. A dark night sky is 0.0002, the sky at dusk 1 to 100, a white page under office light about 100.</dd>
+          <dt>Magnitude</dt><dd>Astronomers' scale for points of light. Lower is brighter, and 5 steps is a factor of 100. The faintest stars you can see are +6, Venus −4.5, the full Moon −12.7, the Sun −26.7.</dd>
+          <dt>Kelvin (K)</dt><dd>Temperature counted up from absolute zero. A room is about 295 K, a chip at its limit about 360 K, and 1,650 K is orange-hot.</dd>
+          <dt>Ecliptic</dt><dd>The path the Sun and planets follow across the sky.</dd>
+          <dt>L1 and L3</dt><dd>L1 is the balance point 1.5 million km from Earth toward the Sun, where a sunshade can hover. L3 is the point on Earth's orbit directly behind the Sun, where sails would mirror light straight back at Earth, so they stay clear of it.</dd>
+          <dt>Counter-sun</dt><dd>The point in the sky exactly opposite the Sun. Every sail beyond you in that direction mirrors the Sun back at you at once.</dd>
+          <dt>Thermal infrared</dt><dd>The heat glow that thermal cameras see, here the 8–14 µm band. Warmer things are brighter.</dd>
+        </dl>
+      </details>
+    </div>
+  </section>
+
+  <section class="chapter" id="strip" data-f="0.5">
+    <div class="col"><div class="kicker">2050–<span data-y="1"></span> · At a glance</div><h2>One lake, seven nights</h2><p class="dek">The same view at the end of twilight, as the swarm grows. It brightens, peaks when half the Sun is caught, and fades to black as the sphere closes.</p></div>
+    <div class="wide strip" id="strip-row">
+      <a href="#stage-0"><figure><img src="renders/earth-night-tonight.2ee28643f3.jpg" alt="Tonight: the Milky Way beside Grand Teton" loading="lazy"><span><b>2050</b>nothing yet</span></figure></a>
+      <a href="#stage-1e-6"><figure><img src="renders/stage-night-1e-6.5e3ec30bb4.jpg" alt="A faint glow above the range" loading="lazy"><span><b data-y="1e-6"></b>a millionth</span></figure></a>
+      <a href="#stage-1e-4"><figure><img src="renders/stage-night-1e-4.bd1f877c4b.jpg" alt="A pale glow fills the western sky" loading="lazy"><span><b data-y="1e-4"></b>1 in 10,000</span></figure></a>
+      <a href="#stage-1e-2"><figure><img src="renders/stage-night-1e-2.a25af8055f.jpg" alt="Twilight-bright sky over the range" loading="lazy"><span><b data-y="1e-2"></b>1%</span></figure></a>
+      <a href="#stage-0.5"><figure><img src="renders/stage-night-0.5.1ff0921de3.jpg" alt="The brightest sky of all" loading="lazy"><span><b data-y="0.5"></b>half</span></figure></a>
+      <a href="#stage-0.99"><figure><img src="renders/stage-night-0.99.00718f28e5.jpg" alt="A dim, starless glow over the range" loading="lazy"><span><b data-y="0.99"></b>99%</span></figure></a>
+      <a href="#stage-1"><figure><img src="renders/earth-night-closed.4c254dacbb.jpg" alt="A black, starless sky over the range" loading="lazy"><span><b data-y="1"></b>closed</span></figure></a>
+    </div>
+    <p class="col note">Tonight, a millionth and the closed sphere share one exposure. One in ten thousand is exposed for its own sky. 1%, half and 99% share another, so the half-built night shows as the brightest. How much brighter or darker each really is, is in each stage's caption below.</p>
+  </section>
+
+  <section class="chapter" id="progression-intro" data-f="1e-8">
+    <div class="col"><div class="kicker">2050–<span data-y="1"></span> · The progression</div><h2>Watching it grow</h2><p class="dek">Every stage below is the same sphere, the same in every direction, only fuller. What changes is how much of the Sun it has caught.</p></div>
+    <div class="col prose" id="progression-prose"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-0" data-f="0">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="0"></span></div><h2>Nothing to see</h2><p class="dek">The first factory lands on Mercury. For six decades the swarm grows unseen.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/earth-night-tonight.2ee28643f3.jpg" alt="Night at a mountain lake: the Milky Way rising beside Grand Teton, stars reflected in the water" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake in Grand Teton at the end of twilight, as it is tonight.</b> The reference for every night frame below: the Milky Way, faint airglow, the zodiacal light low in the west.<span class="how">22 August, 22:06, Sun 18.5° below the horizon. Terrain from USGS elevation data; twilight from a multiple-scattering model of the atmosphere, checked against measured twilight. Ground illuminance 0.0012 lux.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-0"></div>
+    <div class="col prose" id="prose-0"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1e-6" data-f="1e-6">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1e-6"></span></div><h2>A glow nobody notices</h2><p class="dek">A millionth of the Sun's light caught. The sky round the set Sun is twice as bright as before, and almost no one can tell.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-1e-6.5e3ec30bb4.jpg" alt="The same lake at night with a faint pale glow in the sky above the range" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>The same view with a millionth of the Sun caught.</b> Same moment, same exposure. On the right, round the Sun's side of the sky, the night is now about twice as bright as before: that is the far side of the sphere, seen through the gaps of the part in front of Earth. To the eye it would pass for a strong zodiacal light. A camera shows its edge, a sharp arc 70° from the Sun.<span class="how">Exposed exactly as tonight's frame. The glow is 0.00018 cd/m², about the natural night sky's own brightness, out to the shell's limb: in late August Earth is 1.012 AU from the Sun, so the limb of the 0.95 AU shell is 69.9° from it. Ground illuminance 0.0013 lux, against 0.0012 tonight.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1e-6"></div>
+    <div class="col prose" id="prose-1e-6"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1e-4" data-f="1e-4">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1e-4"></span></div><h2>The night sky lightens</h2><p class="dek">One part in ten thousand. Round the Sun's side of the sky the night is a hundred times brighter than it used to be.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-1e-4.bd1f877c4b.jpg" alt="The lake at night: a pale glowing disc fills the right of the sky above the range, its curved edge sharp against the stars to the left" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake, one part in ten thousand.</b> Round the set Sun the sky now glows a hundred times brighter than a dark sky, and the sphere's edge is plain to see: a sharp arc 70° from the Sun, beyond which the stars are as they are tonight. Exposed for the night, the disc prints almost white. To the eye it would look like the sky over a city suburb, with only the brighter stars showing through. The lake reflects it, and the shore is lit seven times more than tonight.<span class="how">Same moment as tonight's frame, exposed 0.9 stops less, metered for the night scene. The glow is 0.018 cd/m², even out to the shell's limb, 69.9° from the Sun on this date; the shell is so thin that the edge is sharp. Ground illuminance 0.0087 lux, against 0.0012 tonight and about 0.25 under a full Moon.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-1e-4.47624cec71.jpg" alt="From orbit before dawn: Earth's night side and airglow, a faint glow filling the sky above" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit before dawn.</b> Earth's night side at the bottom, its cities lit. Above it, the far side of the sphere fills the sky round the hidden Sun: a pale disc 142° across, its sharp edge arcing across the top of the frame. Stars still show through it. The bright point is the Moon.<span class="how">400 km above the Nile Delta, 12 mm lens aimed 58° above the Sun, which is 18° below Earth's edge. The Sun and the Moon are placed as on 22 September 2128 at 00:54 UTC, when Earth is 1.004 AU from the Sun and the shell's edge 71° from it. Exposed for the disc, 0.018 cd/m². The next three frames share one exposure, set for the disc at one per cent.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1e-4"></div>
+    <div class="col prose" id="prose-1e-4"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1e-2" data-f="1e-2">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1e-2"></span></div><h2>Twilight all night</h2><p class="dek">One per cent. On the Sun's side of the sky, night never gets darker than late dusk.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-1e-2.a25af8055f.jpg" alt="The lake at night: a bright glowing disc over the range on the right, the rest of the sky deep blue and nearly starless" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake at 1%.</b> The Sun's side of the sky is as bright as a late-dusk sky, and stays that way all night. The air scatters the glow over the rest of the sky, which turns the deep blue of a moonlit night, and the stars fade from all but its darkest part. The ground is lit at 0.74 lux, about three full Moons.<span class="how">Same moment. Exposed 9.6 stops less than tonight's frame, metered for the glow, 1.8 cd/m² out to the shell's edge; the half-built and 99% frames below share this exposure. Earth's window is narrowed by 0.12% to cancel the sphere's heat, which dims the last of the twilight by as much.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-1e-2.b854ed99f3.jpg" alt="From orbit: a glowing disc fills the sky above Earth's night side" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit.</b> At one per cent the disc is a hundred times brighter. Exposed for it, the stars behind it no longer show, and the cities below barely do. The Moon is a dark dot with a lit edge: its crescent is bright, but its night side, lit only by Earth, is darker than the sky behind it.<span class="how">Same place, moment and lens. Exposed for the disc, 1.8 cd/m², 6.6 stops less than at one part in ten thousand; the half-built and 99% frames share this exposure.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-space-ir-1e-2.75385fe26b.jpg" alt="Thermal image from far away: a faint dark-purple disc round a bright point" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From 3 AU through a thermal camera.</b> One per cent of a ball 1.9 AU across is covered by warm sail backs, at 382 K. To the camera that is a faint disc round the Sun, which at this distance is a single bright point. The darker slice at the right is the patch in front of Earth, flown by mirror sails with cold backs.<span class="how">8–14 µm on a fixed false-colour scale from 150 K (black) to 450 K (pale yellow). Camera 3 AU from the Sun, 25° above the plane of the planets, 28 mm lens. A pixel sees the average of millions of sails: one per cent of it at the backs' temperature, the rest open sky.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1e-2"></div>
+    <div class="col prose" id="prose-1e-2"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-0.5" data-f="0.5">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="0.5"></span></div><h2>The brightest night</h2><p class="dek">Half the Sun caught. Earth sees the most glow it ever will, and needs the most cooling.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-0.5.1ff0921de3.jpg" alt="The lake at night, lit almost like day: a brilliant glowing disc with a sharp curved edge over the range, the rest of the sky blue, the peaks and shore lit" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake with half the Sun caught.</b> The brightest the night ever gets, at the same exposure as the 1% frame. The Sun's side of the sky shines at 45 cd/m², the air turns the rest of the sky blue, and the peaks and the shore are lit at 19 lux, about eighty full Moons, as much as a lit street. It looks like the light a quarter of an hour after sunset, and it lasts all night. No star is left.<span class="how">Same moment and exposure as the 1% frame, 9.6 stops less than tonight's. The glow is 25 times the 1% frame's, out to the same sharp edge 70° from the Sun. Earth's window is narrowed by 3.6% to cancel the sphere's heat, the most it ever needs to be, which dims the last of the twilight by as much.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-0.5.d839f289ba.jpg" alt="From orbit: a bright glowing disc over Earth" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit.</b> Half caught, at the same exposure as at one per cent: the disc is 25 times brighter, 45 cd/m², as bright as the sky at dusk, and it lights Earth's night side below. The Moon is a dark dot with a thin lit edge.<span class="how">Same place, moment, lens and exposure as at one per cent. The disc's edge stays sharp: the shell is only ~7,000 km thick, so any line of sight that meets it crosses the whole of it.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/stage-space-vis-0.5.0c8478a18c.jpg" alt="From far away in visible light: an evenly glowing pale disc round a small black coronagraph spot" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/stage-space-ir-0.5.8b87de4b37.jpg" alt="The same view through a thermal camera: an orange disc with a dark crescent at its right edge" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>From 3 AU, in visible light and through a thermal camera.</b> Half the sky round the Sun is covered. In visible light the disc glows evenly: the far side's sunlit fronts, seen through the near side's gaps. The Sun, behind the black spot, still shines through half of them. Through the thermal camera the backs glow at 402 K; the dark crescent at the right is the patch in front of Earth, where the mirror sails' backs stay cold.<span class="how">Camera 3 AU from the Sun, 25° above the plane of the planets, 28 mm lens. Visible: exposed for the disc, 0.48 W/m²/sr (45 cd/m²), with a coronagraph's disc 1.6° in radius over the Sun, as solar telescopes in space use. At that exposure the stars beside the disc are too faint to show. Thermal: 8–14 µm, false colour from 150 K to 450 K; the fronts, kept dark in the infrared while the sphere is open, show through the gaps.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-0.5"></div>
+    <div class="col prose" id="prose-0.5"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-0.99" data-f="0.99">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="0.99"></span></div><h2>Darkening</h2><p class="dek">Ninety-nine per cent. The glow is back to where it was at one per cent, and now nothing shines through it.</p></div>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-night-0.99.00718f28e5.jpg" alt="The lake at night: a glowing disc with a sharp curved edge over the range, the rest of the sky deep blue, as at one per cent" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Jenny Lake at 99%.</b> At the same exposure as the 1% and half-built frames, it looks like the 1% night again, and it should: the glow goes as f (1 − f), the far side's lit share seen through the near side's gaps, the same at 0.01 and 0.99. The difference is behind it. Of the starlight from beyond the sphere, one part in ten thousand gets through, and between the glow's edge and 76° from the Sun, where only the mirror cap stands, one part in a hundred.<span class="how">Same moment and exposure as the 1% frame. The glow is 1.8 cd/m² out to the shell's edge, 70° from the Sun; the ground is lit at 0.74 lux. Earth's window is narrowed by 0.35% to cancel the sphere's heat.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-leo-0.99.bedc0dfa6e.jpg" alt="From orbit: a dimmer glowing disc over Earth" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From low Earth orbit.</b> Ninety-nine per cent, at the same exposure again. The disc has dimmed back to its brightness at one per cent, because the glow goes as f (1 − f). The difference is behind it: of the starlight from beyond the sphere, one part in ten thousand gets through.<span class="how">Same place, moment, lens and exposure. Inside the disc, 1.8 cd/m². Between its edge and the mirror cap's, 71° to 77° from the Sun, only the cap dims the stars, to 1%.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-space-ir-0.99.7fe11c4177.jpg" alt="Thermal image: a bright orange-yellow disc" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From 3 AU through a thermal camera.</b> The backs, now at 418 K, fill all but one per cent of the disc. The cold patch in front of Earth is full too.<span class="how">Same camera and colour scale as the other thermal frames. The film runs hotter as the gaps close because the sails' fronts face each other instead of open space.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-0.99"></div>
+    <div class="col prose" id="prose-0.99"></div>
+  </section>
+
+  <section class="chapter stage" id="stage-1" data-f="1">
+    <div class="col"><div class="kicker"><span class="stage-when" data-f="1"></span></div><h2>The Sun enclosed</h2><p class="dek">The last gap closes. Earth still gets its sunlight through its window. Everything else stays inside.</p></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/earth-night-tonight.2ee28643f3.jpg" alt="Night at a mountain lake: the Milky Way rising beside Grand Teton, stars across the whole sky, reflected in the water" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/earth-night-closed.4c254dacbb.jpg" alt="The same view with the Sun enclosed: stars and the Milky Way on the left, but a straight, sharp edge crosses the sky from the upper middle down to the right, and beyond it, over the Teton range, the sky is starless" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col" id="night-caption"><b>Jenny Lake in Grand Teton at the end of twilight, tonight and with the Sun enclosed.</b> Same place, same moment, same exposure. On the right, the sphere hides the sky within 76° of the Sun, which set behind the range an hour and a half ago. Its edge crosses the sky like a line drawn with a ruler, and beyond it there are no stars and no Milky Way. What little light is left there is the air's own faint glow. The rest of the sky is as it is tonight, a shade darker: the zodiacal light is gone, and so is every planet.<span class="how">22 August at 22:06, Sun 18.5° below the horizon at azimuth 308°. Both frames exposed alike. The edge is the limb of the sphere's outer layer, 0.98 AU from the Sun. In late August Earth is 1.012 AU out, so the limb is 75.6° from the Sun; it is 74.6° in July and 85.3° in January. Every line of sight inside it ends on the back of a mirror sail, at about 170 K, which reflects nothing visible. Airglow, twilight and the stars outside it are computed as for tonight. Terrain from USGS elevation data.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/leo-closed-wide.a8e876c38b.jpg" alt="From orbit before dawn: Earth's night side at the bottom with city lights and a thin green band of airglow; above it a vast black dome with no stars, a single bright point of the crescent Moon inside it; beyond the dome's sharp curved rim, near the top of the frame, the stars and the Milky Way" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>The Sun enclosed, from low Earth orbit before dawn.</b> Earth's night side at the bottom, with city lights and the green glow of the upper air. Above it, a black dome: the cold backs of the mirror sails, hiding everything within 77° of the Sun, which is still 18° below Earth's edge. The stars and the Milky Way begin only at its rim, an arc across the top of the frame. The one light inside the dome is the Moon, a thin crescent lit through its own window.<span class="how">400 km above the Nile Delta, 12 mm lens aimed 58° above the Sun. The Sun and the Moon are placed as on 22 September 2128 at 00:54 UTC, when Earth is 1.004 AU from the Sun and the limb 77.4° from it. Exposed for the stars, so the Moon and the cities are overexposed. No zodiacal light and no planets: the swarm lights none of them. City lights from NASA Black Marble.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/leo-closed-tele.a57c3a17d6.jpg" alt="Close view of the sky: the Milky Way's star clouds and dark lanes fill the upper right, cut off along a smooth curved edge; below and left of the edge the frame is completely black" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>Where the sky ends.</b> The rim of the sphere against the Milky Way, through a 35 mm lens. Beyond the arc the stars are as they are tonight; inside it there is nothing at all.<span class="how">Same moment and exposure. The rim is the limb of the outer layer, 77.4° from the Sun that night, softened over about half a degree by the layer's thickness.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/inside-closed.c7e5758acb.jpg" alt="Inside: an even violet-grey sky over a floor of dark diamond panels" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/stage-space-vis-1.313d11a508.jpg" alt="From far away: a black disc hiding the stars, a bright point beside it" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Inside the enclosure, and from 3 AU in visible light.</b> On the left, 800 m sunward of the innermost sails, looking across them. The nearest sails are dark navy diamonds 279 m across, lit from straight overhead. Above the horizon the far side of the sphere, 1.9 AU away, fills the whole sky with the same light, about 190 cd/m², as bright as an overcast day. There is no shadow anywhere. On the right, the sphere from outside: a black disc 37° across, hiding the stars behind it. The point of light at its edge is Earth, lit through its window.<span class="how">Left: 0.92 AU, 14 mm lens, 6° below the horizon, exposed for the sky; the innermost band covers a quarter of the plane, the deeper ones fill in behind it. Right: 3 AU from the Sun, 25° above the plane of the planets, 28 mm lens, exposed for the stars. Earth shines at magnitude 0.3, as it would from there today.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="plate"><img src="renders/stage-space-ir-1.dbe3035978.jpg" alt="Thermal image: a uniformly glowing yellow disc with one dark patch at its edge" width="2400" height="1600" loading="lazy"></div>
+      <figcaption class="col"><b>From 3 AU through a thermal camera.</b> The Sun is gone. In its place is a ball 1.9 AU across, glowing evenly at 419 K, the temperature of the sails' backs. The one cold patch is the mirror sails in front of Earth, which hand their sunlight on to the rest and keep their backs at about 170 K, so that Earth is not heated.<span class="how">8–14 µm on a fixed false-colour scale from 150 K (black) to 450 K (pale yellow), the same for every thermal frame on this page. Same camera as the visible frame: 3 AU out, 25° above the plane of the planets, 28 mm lens. Earth is 70° round the Sun from the camera, so its patch sits near the disc's edge.</span></figcaption>
+    </figure>
+    <div class="col stage-facts" id="facts-1"></div>
+    <div class="col prose" id="prose-1"></div>
+  </section>
+
+  <section class="chapter" id="earth" data-moment="cap">
+    <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Earth</div><h2 id="earth-title">Earth keeps its sunlight, and loses the stars round the Sun</h2><p class="dek" id="earth-dek">Between the Sun and Earth the swarm is a cap of cold mirrors with a window in it. By day nothing changes. At night the sky round the Sun is black.</p></div>
+    <div class="col prose" id="earth-prose"></div>
+    <figure class="wide sim" id="window-sim-fig">
+      <div id="window-sim"></div>
+      <figcaption class="col"><b>How the window works.</b> Seen from the side, not to scale: mirrors facing the Sun send its light back into the swarm. As each drifts toward the line between the Sun and Earth, its flywheel turns it edge-on, and once past the line it turns back. Seen from Earth, the same mirrors: the window is a hole in a black ceiling, just wide enough that every place on Earth sees the whole Sun. Leave some mirrors facing the Sun and all of Earth dims evenly. Tilt the ones round the window and they bend extra sunlight onto it.<span class="how">To scale except for the mirrors. Each is 279 m across, so the window is 145,000 mirrors wide and about 17 billion of them are edge-on at any moment. Here they cross the window in 70 minutes (those on flatter orbits take a few hours) and take ten minutes to turn, so each starts turning before it reaches the edge. One second of animation is six minutes. Half the mirrors cross northward and half southward, in layers a few kilometres apart; one layer is drawn.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="chart" id="earth-chart"></div>
+      <figcaption class="col" id="earth-caption"></figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="design" data-moment="cap">
+    <div class="col"><div class="kicker">After the swarm · Earth by design</div><h2>A climate chosen region by region?</h2><p class="dek">With this much energy, light on Earth becomes something you can place, down to a single field. Temperature follows it closely. Rain is harder, but the swarm can supply the water too.</p></div>
+    <div class="col prose" id="design-prose"></div>
+    <figure class="wide drawing" id="lightpaths-fig">
+      <div id="lightpaths"></div>
+      <figcaption class="col"><b>Four ways to put light, and rain, on Earth.</b> The window sets the whole planet's sunlight. Mirrors in Earth orbit, fed through it, light regions. Lasers from stations in the cap, the only part of the swarm that can see Earth, light single fields at any hour. And light aimed at the sea, or at the air itself, makes rain where it is wanted.<span class="how">50 W/m² on a million km² by laser takes about 5×10¹⁴ W of the swarm's sunlight; evaporating a metre of rain a year over ten million km² takes about 8×10¹⁴ W. Each is around a trillionth of the swarm's output.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/europe-today.54a5d77d08.jpg" alt="Western Europe and the Mediterranean from orbit in July: green from Britain to the Alps and the Balkans, golden-brown Spain, the Sahara below, bands of cloud over the Atlantic and Britain" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/europe-mediterranean.6942018ec7.jpg" alt="The same view with the dry-summer belt moved north: France, the Low Countries, southern England and western Germany golden-brown under clear skies, southern Spain and the North African coast pale like steppe, the Alps still green and white" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Europe from 4,000 km in July: today, and with the dry-summer belt moved north.</b> On the left, today: green from Britain to the Alps, the dry gold of a Mediterranean summer only in Spain, southern Italy and Greece. On the right, the same July with sunlight shaped by latitude and season to push the summer high about five degrees north, the far end of what such shading might do. France, the Low Countries, southern England and western Germany take on the dry gold of today's Mediterranean under clear summer skies, while southern Spain and the coast of North Africa turn to steppe. Both frames have the same exposure and the same full sunlight.<span class="how">Nothing is painted. The July 2004 Blue Marble keeps every field and forest where it is: the new belt, 44–51° N and fading out to the north and east, takes the colour distribution of today's Mediterranean lands, and the old southern edge, 33–38° N, that of the steppe south of the Atlas (render/med_earth.py). About 1.8 million km² changes to the Mediterranean palette and 1.2 million km² to steppe. It shows one plausible outcome, not a climate-model result: no model has yet run shading aimed this way.</span></figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/pacific-today.dfda4e893f.jpg" alt="North America's Pacific coast from orbit in July, cloud-free: dark green forest from British Columbia to northern California, snow on the Coast Mountains, golden California valleys, desert to the south and inland" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/pacific-mediterranean.c1c15e293a.jpg" alt="The same coast with the dry-summer belt moved north: the lowlands of Vancouver Island and the British Columbia coast paler and browner, Oregon's valleys golden, southern California the pale colour of desert, the mountains unchanged" width="2400" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>North America's Pacific coast from 4,000 km in July: today, and with the dry-summer belt moved north.</b> The change is smaller than in Europe, because Seattle and Portland already have dry summers; their forests stay green through July on winter rain. Moved five degrees north, the belt reaches the coast of British Columbia, where lowlands such as Vancouver Island and the Fraser valley take the gold of Oregon's valleys. Oregon takes northern California's colours, and southern California turns to the desert of Baja. Both frames are cloud-free, so the land shows, and share one exposure.<span class="how">Each 1° band of the coastal strip, within about 400 km of the Pacific and west of the Cascades and the Sierra, takes the July colour distribution of the strip 5° further south (render/med_earth.py); land above ~1,500 m keeps its colours. About 0.7 million km² changes. One plausible outcome, not a climate-model result.</span></figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="star" data-moment="cap">
+    <div class="col"><div class="kicker"><span class="when" data-moment="cap"></span> · Seen from another star</div><h2>The Sun goes out, and a cool infrared star takes its place</h2><p class="dek">From light-years away the Sun fades as the swarm grows, and its light comes back as warm infrared.</p></div>
+    <div class="col prose" id="star-prose"></div>
+    <figure class="wide">
+      <div class="chart" id="sed-chart"></div>
+      <div class="legend" id="sed-legend"></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="how-intro" data-moment="first">
+    <div class="col"><div class="kicker">How it works</div><h2>The machine behind the pictures</h2><p class="dek">What one sail is, why its chips are spread through the film, where the rock comes from, and how fast the sphere can be built.</p></div>
+  </section>
+
+  <section class="chapter" id="sail" data-moment="first">
+    <div class="col"><div class="kicker"><span class="when" data-moment="first"></span> · The first sail</div><h2 id="sail-title">A sheet, not a box</h2><p class="dek">Each satellite is a huge, nearly black sheet of solar film, thinner than paper, which is also the computer.</p></div>
+    <div class="col prose" id="sail-prose"></div>
+    <figure class="wide drawing" id="anatomy-fig">
+      <div id="anatomy"></div>
+      <figcaption class="col"><b>The sail, drawn to scale.</b> Booms behind the film hold it taut at the corners, and four mirror vanes steer it. The insets enlarge the back of the film and its cross-section.</figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/sail-swarm-counter-sun.202cc869c5.jpg" alt="One corner of a sail seen from just above it: a deep navy film ruled by bright converging lines rises to a small tensioner mast with a dark square vane above it, and a brilliant point inside a violet halo shines in the dark sky beyond the tip" width="2400" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/sail-corner.a3c0a3e608.jpg" alt="Close view of one corner of the sail: a tensioner, tethers and a tilted mirror vane over the dark film" width="2400" height="1350" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Two closer looks at one sail.</b> On the left, from 30 m above one corner, looking away from the Sun: the dark film, its bright fold lines, and beyond the tip a blinding point of light, the counter-sun. It is the Sun mirrored back by every sail farther out in that one direction, together several thousand times brighter than the full Moon. The dark square above the mast is a steering vane, a mirror that from here reflects only sky. On the right, the same corner from 28 m, with the tensioner that keeps the film taut, its tethers, and a mirror vane used for steering.<span class="how">The fold lines are hinge strips, one every 1.63 m; their slightly curled edges catch the Sun only near the counter-sun. Rendered for a swarm whose fronts carry an infrared-dark aluminium mesh, which reflects about 4% like a mirror; there the counter-sun is magnitude −21.6. The closed swarm's plain glass fronts reflect less, so its counter-sun is fainter. Its halo, 15° across, comes from the curled panel edges. The film is exposed two stops brighter than a grey card would need, or it would print as plain black; at that exposure the sky's glow, 33 cd/m², prints almost black too.</span></figcaption>
+    </figure>
+  </section>
+
+  <section class="chapter" id="computer" data-moment="first">
+    <div class="col"><div class="kicker"><span class="when" data-moment="first"></span> · The first sail</div><h2>The panel is the computer</h2><p class="dek">The chips are spread through the film, so the film's own surface gets rid of their heat.</p></div>
+    <div class="col prose" id="computer-prose"></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/sail-back-lwir-macro.3afad38ca6.jpg" alt="False-colour thermal image of the back of the film: a fine grid of warm dots with a cold truss in front" width="1920" height="1080" loading="lazy"></div>
+        <div class="plate"><img src="renders/sail-hub-lwir.73fa56d9d5.jpg" alt="Thermal image of the hub seen from behind: a cold octagon with laser terminals over a glowing film" width="1920" height="1080" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>The back of the sail, seen by a thermal camera.</b> On the left, from half a metre: each warm dot is one chip, a few degrees warmer than the film around it. The dark bars are a support boom, cold because it sees only deep space. On the right, the hub with its laser terminals, which link the sail to its neighbours. To the eye this side is simply black.<span class="how">Radiance in the 8–14 µm band on a fixed false-colour scale.</span></figcaption>
+      <div class="col irscale"><span>320 K</span><i></i><span>350 K</span></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="why" data-moment="first">
+    <div class="col"><div class="kicker"><span class="when" data-moment="first"></span> · The first sail</div><h2>Why the chips are not in one box</h2><p class="dek">Gathering the chips into one box would need pumps, pipes and radiators that weigh more than the chips. Spreading them out avoids all of it.</p></div>
+    <div class="col prose" id="why-prose"></div>
+    <figure class="wide drawing">
+      <div id="heatpaths"></div>
+      <figcaption class="col"><b>Where the heat goes.</b> On a sail every chiplet radiates its own heat within a few centimetres. In a concentrated pod the same heat has to be pumped tens of metres to radiator blades held edge-on to the Sun, through pipes that need armour against meteoroids.</figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/pod-visible.3ae0000d04.jpg" alt="A pod in sunlight: a small bright module where four white trusses meet, dark solar wings, and radiator blades that are almost invisible" width="2400" height="1350" loading="lazy"></div>
+        <div class="plate"><img src="renders/pod-lwir.e219add802.jpg" alt="The same pod in thermal infrared: the radiator blades glow yellow, the wings orange, the module and trusses dark" width="2400" height="1350" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>One of the few pods, in sunlight and through a thermal camera.</b> A pod is the alternative design: a 1 MW box of chips fed by two 68 m solar wings, with four radiator blades, 6 m tall and only 25 mm thick, to get rid of its heat. In sunlight you can barely see the blades, because they are held exactly edge-on to the Sun. In the thermal image they are the brightest things in the frame.<span class="how">At 0.88 AU. The 1.8 m module holds memory stacked on logic, under a glass-cloth blanket and a magnesium shield. Blade roots about 346 K, wings 330 K; the blanketed module is the coldest part. Thermal image: 8–14 µm band.</span></figcaption>
+      <div class="col irscale"><span>280 K</span><i></i><span>360 K</span></div>
+    </figure>
+    <div class="col tablewrap"><table class="compare" id="why-table"></table></div>
+  </section>
+
+  <section class="chapter" id="mercury" data-moment="wall">
+    <div class="col"><div class="kicker"><span class="when" data-moment="wall"></span> · The heat wall</div><h2>Where the rock comes from</h2><p class="dek">Mercury has rock to spare. What it runs short of is a way to get rid of the heat of digging it up and throwing it into space.</p></div>
+    <div class="col prose" id="mercury-prose"></div>
+    <figure class="wide">
+      <div class="pair">
+        <div class="plate"><img src="renders/mercury-pristine.ad5100007d.jpg" alt="Mercury from orbit, grey and cratered, less than half lit" width="1600" height="1600" loading="lazy"></div>
+        <div class="plate"><img src="renders/mercury-heatwall.2b2a5b8bf9.jpg" alt="The same view of Mercury glowing evenly orange all over, night side as bright as day, the terminator barely visible" width="1600" height="1600" loading="lazy"></div>
+      </div>
+      <figcaption class="col"><b>Mercury today, and when mining runs at full speed, at the same exposure.</b> To get rid of the heat of mining, the whole planet is paved with radiators held at about 1,650 K, hot enough to glow orange and brighter than sunlit rock. So the night side shines as brightly as the day side, and the line between them all but disappears. The planet gives off 170 times more energy than it receives from the Sun. Most of that is the work of the heat pumps that push the heat up to such a temperature, powered from the swarm.<span class="how">MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance. The model lets Mercury shed 5×10¹⁸ W of waste heat; with the pumps the radiators emit 2.8×10¹⁹ W in all, at about 31,000 cd/m². Sunlight adds only 2.4% to what a radiator that hot has to get rid of, so they work by day as well as by night.</span></figcaption>
+    </figure>
+    <div class="col prose"><p>Chip fabs set the pace, so they are the first thing to leave Mercury. In space a fab needs no building, no clean air and no water. The free vacuum alone removes about 60% of a fab's electricity and a third or more of its equipment. Mercury has almost no hydrogen, so the chemistry has to run dry, on chlorine, oxygen, zinc and magnesium.</p></div>
+  </section>
+
+  <section class="chapter" id="buildout" data-moment="one">
+    <div class="col"><div class="kicker"><span class="when" data-moment="one"></span> · Growing</div><h2>How fast it can be built, and where it stops</h2><p class="dek">For decades there is nothing to see. Then the swarm grows fast, until Mercury cannot shed heat any faster.</p></div>
+    <div class="col prose" id="build-prose"></div>
+    <figure class="wide">
+      <div class="chart" id="build-chart"></div>
+      <div class="legend" id="build-legend"></div>
+      <div class="scrub">
+        <button id="play" aria-label="Play the build-out">▶</button>
+        <input type="range" id="year" min="0" max="1000" step="1" value="300" aria-label="Year">
+      </div>
+      <div class="readout" id="build-readout"></div>
+    </figure>
+  </section>
+
+  <section class="chapter" id="future">
+    <div class="col"><div class="kicker">After 2095 · The hardware</div><h2>Today's hardware never flies</h2><p class="dek">The swarm takes a century and a half to build, so it is made of hardware that does not exist yet.</p></div>
+    <div class="col prose" id="future-prose"></div>
+    <div class="col tablewrap"><table class="compare" id="future-table"></table></div>
+    <div class="col notes" id="future-notes"></div>
+  </section>
+
+  <section class="chapter wide" id="assumptions-section">
+    <details class="assumptions" id="assumptions">
+      <summary><h2>Change the assumptions</h2><span>Every number above recomputes</span></summary>
+      <div class="params" id="params"></div>
+      <button class="reset" id="reset-params">Reset to the central assumptions</button>
+    </details>
+  </section>
+
+  <footer class="col">
+    <h2>How this was made</h2>
+    <p>The model, the Blender scenes and the research behind them are in the project repository: <code>docs/architecture.md</code> (why sails and pods), <code>docs/future-tech.md</code> (what hardware actually flies), <code>docs/earth.md</code> (what Earth allows), <code>docs/data/</code> (every study's numbers and sources) and <code>src/model/hybrid.js</code> (the model, with tests). Photographs are path traced in Blender Cycles, and the views from orbit ray-cast by our own renderer, at the true brightness of every light source; thermal images map 8–14 µm band radiance to a fixed false-colour scale.</p>
+    <ul id="sources-list"></ul>
+  </footer>
+</main>
+</div>
+<script type="module" src="src/app.455fcbe001.js"></script>
+</body>
+</html>
