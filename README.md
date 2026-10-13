@@ -5,6 +5,8 @@ are made from Mercury's rock and flown around the Sun. Every photograph, tempera
 FLOP/s on the page comes from one physics model (`src/model/hybrid.js`), and every photograph is
 path traced in Blender at the Sun's true brightness for the orbit.
 
+**Live:** https://inny0127.github.io/dyson/
+
 ## Run it
 
 No build step. Serve the folder and open it in a browser:
@@ -18,6 +20,7 @@ node --test                              # pins the model to the research values
 node scripts/report.mjs NUMBERS.md       # regenerate the written numbers
 node scripts/export-numbers.mjs          # model numbers for the Blender scenes (render/numbers.json)
 node scripts/shot.mjs buildout out.png   # headless screenshot of a page section
+scripts/deploy-pages.sh                  # publish to GitHub Pages (the gh-pages branch)
 blender -b --python render/sail_shot.py -- out.png --era mid --view overhead_glint
 blender -b --python render/earth_sky.py -- dusk.exr --sun-alt -9 --glow shell --exposure 7 --exr
 blender -b --python render/develop.py -- dusk.exr dusk.png --exposure 7
