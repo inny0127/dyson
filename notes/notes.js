@@ -158,6 +158,22 @@ const CHARTS = {
       legend: false,
     });
   },
+  // Spreader metal per watt of chips against the power of each chip: why chips must be small.
+  spreader(el) {
+    // architecture study: 0.09 g/W at 0.1 W, 0.94 at 1 W, 9.4 at 10 W (mass per watt grows as P)
+    const g = w => 0.92 * w;
+    const xs = range(Math.log(0.05), Math.log(20), 80).map(Math.exp);
+    const sail = h.swarmAt(P, 0.01).sail.kgPerW * 1e3;
+    lineChart(el, {
+      x: { min: 0.05, max: 20, log: true, ticks: [0.1, 0.15, 1, 10], fmt: v => `${v} W`, title: 'power of each chip' },
+      y: { min: 0.03, max: 20, log: true, ticks: [0.03, 0.1, 0.3, 1, 3, 10], fmt: v => `${v} g/W`, title: 'Spreader metal needed per watt of chips' },
+      series: [{ pts: xs.map(x => [x, g(x)]), color: 'var(--heat)', label: '' }],
+      hlines: [{ y: sail, label: `the whole rest of the sail, ${sail.toFixed(2)} g/W`, left: true }],
+      points: [{ x: 0.15, y: g(0.15), label: 'the design: 0.15 W, 0.14 g/W', dy: 18 }, { x: 10, y: g(10), label: '10 W: 9.4 g/W', left: true, dy: -10 }],
+      tip: x => `${lead(`${x < 1 ? x.toFixed(2) : x.toFixed(1)} W per chip`)}<br>spreader ${g(x) < 1 ? g(x).toFixed(2) : g(x).toFixed(1)} g per watt`,
+      legend: false,
+    });
+  },
   // Mass of the swarm per watt of chips against the share of chip power put in pods.
   podShare(el) {
     const qs = range(0, 0.3, 60);

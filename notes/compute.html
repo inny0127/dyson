@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chips in the Film</title>
-<meta name="description" content="Why the swarm's computer is spread through its solar film instead of gathered in boxes, what such a computer can and cannot run, why a few concentrated pods remain, and what the whole swarm computes.">
+<meta name="description" content="Why the swarm's computer is spread through its solar film instead of gathered into boxes, what such a computer can run, why a few concentrated pods remain, and what the whole swarm computes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -18,7 +18,7 @@
 <header class="head">
   <div class="kicker" id="note-no">Technical note</div>
   <h1>Chips in the film</h1>
-  <p class="dek">Should a satellite gather its chips in one box, fed by solar wings and cooled by radiators, or spread them through the solar film so that the panel is the radiator? Four studies and an adversarial review answered: spread them, and keep a few boxes for the work a film cannot do.</p>
+  <p class="dek">The obvious way to build a solar-powered computer in space is a box of chips fed by solar wings and cooled by radiators. This swarm does something stranger: it spreads its chips through the solar film itself. Here is why, and what that computer can and cannot do.</p>
   <p class="byline">From <code>docs/architecture.md</code>, the workload and interconnect studies in <code>docs/data/future/</code>, and the page’s model · October 2026</p>
 </header>
 <details class="toc-m" id="toc-m"></details>
@@ -26,172 +26,121 @@
 <section class="summary">
   <h2>In short</h2>
   <ul>
-    <li><b>Concentration pays a heat-transport tax.</b> A box of chips must carry its heat metres to radiators through pumped loops armoured against meteoroids. The film radiates each chip’s heat within a few centimetres. Per kilogram, the film computes about 6.7 times as much as the best box.</li>
-    <li><b>The film is a good computer for most of the work.</b> With light guided between chiplets, one 279 m sail is one tightly coupled machine of about 15 MW. It can train and serve large models; mixture-of-experts layers and tensor parallelism cost a few per cent of its energy.</li>
-    <li><b>Boxes, called pods, remain for what the film cannot host:</b> memory too sensitive to radiation to fly unshielded, dies above a few watts, archives, and general-purpose computers for AI agents’ tools. In the central case they take 6% of chip power, and add 30% to the swarm’s mass.</li>
-    <li><b>The swarm is a population, not one mind.</b> Each sail is the largest unit that computes as one. Beyond it, sails cooperate the way data centres do. No method yet couples millions of them into a single learner.</li>
+    <li><b>Gathering chips into a box means carrying their heat away again.</b> A box needs pumps, pipes and radiators, and these weigh more than the chips. Spread through the film, each chip’s heat is radiated within a few centimetres. Per kilogram, the film computes about 6.7 times as much as the best box.</li>
+    <li><b>The film is a capable computer.</b> With light guides between its chips, one sail works as a single machine of about 15 MW, and it can train and run large AI models.</li>
+    <li><b>A few boxes, called pods, remain</b> for work the film cannot host: memory that cannot survive unshielded radiation, chips too big to cool in the film, archives, and general-purpose computers for AI agents’ tools. They take about 6% of the power.</li>
+    <li><b>The swarm is a population, not one mind.</b> A sail is the largest thing that computes as one. Beyond that, sails cooperate loosely, the way data centres do.</li>
   </ul>
   <div class="keys">
-    <div><b>0.43 g/W</b><span>sail mass per watt of chips (central, after 2095)</span></div>
+    <div><b>0.43 g/W</b><span>sail mass per watt of chips</span></div>
     <div><b>2.6 g/W</b><span>the best concentrated pod</span></div>
     <div><b>6.7×</b><span>more computing per kilogram in the film</span></div>
-    <div><b>6%</b><span>of chip power in pods (1–15% by how capable the chiplets are)</span></div>
-    <div><b>~2 µs</b><span>for a signal to cross a sail on light guides in the film</span></div>
-    <div><b>1.9×10⁴⁰</b><span>FLOP/s, the closed swarm</span></div>
+    <div><b>6%</b><span>of chip power in pods (1–15% by design choice)</span></div>
+    <div><b>~2 µs</b><span>for a signal to cross a sail</span></div>
+    <div><b>1.9×10⁴⁰</b><span>operations a second, the closed swarm</span></div>
   </div>
 </section>
 
-<h2 id="question">The question</h2>
-<p>Computers like their parts close together. Short wires are fast and cheap, and today’s AI data centres pack tens of kilowatts into a rack for exactly that reason. The obvious design for a solar-powered computer in space is the same: a box of chips at the centre, wings of solar cells feeding it, and radiators to shed its heat. Google’s Suncatcher study (2025) is this kind of design.</p>
-<p>The alternative is to spread the chips through the solar film itself, one small chip for every few square centimetres of cell, so that each chip uses the power of the cell under it and the film around it sheds its heat. Nothing is carried anywhere. The cost is that the computer is now a sheet hundreds of metres across, and its parts are far apart.</p>
-<p>The research ran in four passes, each with its own scripts: the physics of moving data, the workloads, heat, mass and reliability, and an adversarial review of the first three. The review overturned several claims from the earlier passes; the numbers here are the corrected ones. They were first worked out with 2026 hardware and then rechecked for the hardware the swarm is actually built with, after 2095. The answer held, and tilted further toward the film.</p>
+<h2 id="question">Box or sheet?</h2>
+<p>Computers like their parts close together. Short wires are fast and cheap, which is why an AI data centre packs tens of kilowatts into each rack. So the obvious design for a computer in space is the same: a box of chips at the centre, wings of solar cells feeding it, and radiators to get rid of its heat. Google’s Suncatcher study of 2025 is a design of this kind.</p>
+<p>The alternative sounds wasteful at first. Spread the chips through the solar film itself, one small chip for every few square centimetres of cell. Each chip runs on the power of the cell beneath it, and the film around it radiates its heat. Nothing is carried anywhere. The price is that the computer is now a sheet hundreds of metres across, with its parts far apart.</p>
+<p>The question was worked through in four studies, each with its own calculations: how data moves, what the work is, heat and mass and reliability, and finally an adversarial review that tried to break the first three. The review overturned several of their claims, and the numbers here are the corrected ones. They were then rechecked for the hardware the swarm will actually be built with, a century from now. The answer held both times: spread the chips out.</p>
 
-<h2 id="tax">The heat-transport tax</h2>
-<p>A chip turns all its electricity into heat, and in space the only way to get rid of heat is to radiate it. Radiating takes area: at the temperatures chips like, roughly a square metre for every few hundred watts. Sunlight arrives spread over exactly such an area. So the question is whether to gather the power into one place and spread the heat out again, or never gather it.</p>
+<h2 id="tax">Heat is the whole story</h2>
+<p>A chip turns all its electricity into heat, and in space the only way to get rid of heat is to radiate it. Radiating takes area, roughly a square metre for every few hundred watts at the temperatures chips like. And sunlight arrives spread over just such an area. So the choice is between gathering the power into one place and then spreading the heat back out over radiators, or never gathering it at all.</p>
 <figure class="drawing">
   <div data-draw="heatpaths"></div>
-  <figcaption>Where the heat goes. On a sail every chiplet radiates its own heat within a few centimetres. In a pod the same heat is pumped tens of metres to radiator blades held edge-on to the Sun, through pipes that need armour against meteoroids.<span class="how">Drawn by the page’s own code; the masses per watt are the model’s, central case.</span></figcaption>
+  <figcaption>Where the heat goes. On a sail every chip radiates its own heat within a few centimetres. In a pod the same heat is pumped tens of metres to radiator blades held edge-on to the Sun, through pipes that need armour against dust.<span class="how">Drawn by the page’s code; masses per watt from the model.</span></figcaption>
 </figure>
-<p>Gathering costs mass at every step:</p>
-<ul>
-  <li><b>Coolant and pipes.</b> The coolant a loop must carry grows with the length of the path divided by how much heat each kilogram can take up. Paths of tens of metres need a lot of it.</li>
-  <li><b>Armour.</b> Interplanetary dust strikes at around 20 km/s, and its flux grows inward roughly as <i>r</i><sup>−1.8</sup>. A punctured film loses one tile. A punctured coolant trunk throttles half a megawatt, so manifolds must be shielded.</li>
-  <li><b>Radiator blades with heat pipes.</b> They must be held edge-on to the Sun, which means they lose part of their view of cold space, and the fins lose efficiency along their length.</li>
-</ul>
-<p>Together that is about 3.7 g per watt in the pod as first studied and about 2 g/W in the best credible one. The film needs none of it. Its 13 µm magnesium spreader costs 0.11 g/W.</p>
+<p>Gathering costs mass at every step. The coolant has to travel tens of metres, so a lot of it is needed. The pipes need armour, because interplanetary dust strikes at about 20 km/s, and a puncture in a main pipe shuts down half a megawatt of chips, where a puncture in the film loses one chip. And the radiators need heat pipes along their fins and must be held edge-on to the Sun. Altogether that is about 2 grams per watt in the best box anyone could design. The film needs none of it: its thin magnesium heat spreader costs a tenth of a gram per watt.</p>
 <div class="tablewrap"><table class="data">
-  <caption>Per watt of compute, with 2026 hardware, at 1% coverage. Ranges are low to high over each assumption’s credible span.</caption>
-  <thead><tr><th></th><th class="v">Compute sail</th><th class="v">Pod as studied</th><th class="v">Pod, best credible</th></tr></thead>
+  <caption>Per watt of computing, with 2026 hardware. Ranges span each assumption’s plausible values.</caption>
+  <thead><tr><th></th><th class="v">Sail</th><th class="v">Pod as first studied</th><th class="v">Best possible pod</th></tr></thead>
   <tbody>
     <tr><td>Mass</td><td class="v">0.89 g/W (0.47–1.98)</td><td class="v">7.2 g/W (4.4–15.1)</td><td class="v">3.9 g/W (2.2–6.6)</td></tr>
     <tr><td>Best distance from the Sun</td><td class="v">0.92 AU</td><td class="v">0.86 AU</td><td class="v">0.86–0.90 AU</td></tr>
-    <tr><td>Solar cell temperature</td><td class="v">348 K</td><td class="v">347 K</td><td class="v">≈ 347 K</td></tr>
-    <tr><td>What one failure takes out</td><td class="v">one 0.15 W chiplet</td><td class="v">0.5–1 MW</td><td class="v">the same</td></tr>
+    <tr><td>What one failure takes out</td><td class="v">one 0.15 W chip</td><td class="v">0.5–1 MW</td><td class="v">the same</td></tr>
   </tbody>
 </table></div>
-<p>With 2026 hardware the film computes 4.8 times as much per kilogram as the best credible pod (2.9–8.9 times over the range). An earlier pass had said ten times; the review found it had compared the film with a pod that was not the best concentrated design. With the hardware of the mature era the model gives 0.43 g/W for the sail and 2.6 g/W for the pod, and the ratio grows to 6.7: the film thins more than the pod lightens, and the pod’s chips run hotter (105 °C, to shrink its radiators), which costs energy per operation.</p>
-<h3>Concentration buys nothing back</h3>
-<p>One might hope a box gains something in exchange: hotter radiators, or cells placed where they work best. It does not. At its own mass optimum a pod’s solar wing sits at 0.86 AU and 347 K, the same place and temperature as the film. Running the wings hotter at 0.6 AU, where silicon gives the most watts per square metre, costs 9% more mass and wastes 40% of the light.</p>
-<h3>Why the chips must be small</h3>
-<p>The film is thin, and a thin sheet conducts heat sideways poorly. The mass of spreader needed to carry a chip’s heat out to the area that can radiate it grows with the square of the chip’s power:</p>
-<div class="tablewrap"><table class="data">
-  <caption>Spreader mass against power per chip, in a film that radiates evenly.</caption>
-  <thead><tr><th>Power per chip</th><th class="v">Spreader mass</th></tr></thead>
-  <tbody>
-    <tr><td>0.1 W</td><td class="v">0.09 g/W</td></tr>
-    <tr><td>1 W</td><td class="v">0.94 g/W</td></tr>
-    <tr><td>10 W</td><td class="v">9.4 g/W</td></tr>
-  </tbody>
-</table></div>
-<p>So clustering chips inside the film, a halfway house between a sheet and a box, does not work either. At 0.15 W per chip and 2.5 cm pitch the die stays within 7–10 K of the film, checked twice by independent scripts; the silicon absorber itself carries about two thirds of the heat.</p>
-<h3>What Mercury lets each design use</h3>
-<p>Pumped loops on spacecraft today often use sodium-potassium alloy. Mercury’s potassium, about 3.5×10¹⁹ kg, would cap that at about 1.4×10²³ W of chips, less than even a small swarm. Ammonia and water are out too, because Mercury has almost no hydrogen. So pods use two-phase loops of sulphur dioxide, made of two elements Mercury has in abundance. The film needs no potassium and little aluminium; what limits it is silicon, and that is a matter for <a href="mercury.html">Taking Mercury apart</a>.</p>
-<h3>Small failures instead of large ones</h3>
-<p>The film loses about 0.13% of its chiplets a year to dust (0.02–1.2%). It has no fluid to leak and no high-voltage strings: each tile makes about one volt. A concentrated design wired as ordinary high-voltage strings would see about 600,000 cell punctures per megawatt per year, each a chance to start an arc. One hit on a pod’s main coolant trunk throttles half a megawatt.</p>
+<p>With 2026 hardware the film computes 4.8 times as much per kilogram as the best pod. (An earlier pass had said ten times; the review found it had compared the film against a pod that was not the best one could build.) With the mature hardware in the model the gap widens to 6.7 times: the film gets thinner faster than the pod gets lighter, and the pod’s chips run hotter, at 105 °C, to keep its radiators small, which costs energy on every operation.</p>
+<p>A box gets nothing back for its trouble. One might hope it could place its solar wings where they work best, or run its radiators hot. At its own best design, though, a pod’s wings sit at the same distance from the Sun and the same temperature as the film. Running them closer in, where silicon makes the most power per square metre, adds 9% to the mass and wastes 40% of the light.</p>
 
-<h2 id="film-computer">What a film computer can do</h2>
-<p>The film is a two-dimensional mesh of small chips. Talking to a neighbour is cheap, about 0.46 pJ per bit per hop on the electrical mesh. Talking across the sail is not: with only the electrical mesh, the bandwidth each chip has to the rest of the sail falls as one over the number of chips, and the worst-case delay grows from 0.28 µs across a metre to 29 µs across a hundred.</p>
-<h3>Light in the film</h3>
-<p>The mature design lays optical lanes through the film: drawn silica fibre or low-loss waveguides, continuous across the fold lines. They change the picture.</p>
-<div class="tablewrap"><table class="data">
-  <caption>Moving data across one sail.</caption>
-  <thead><tr><th></th><th class="v">Electrical mesh only</th><th class="v">With optical lanes (2040–2100+)</th></tr></thead>
-  <tbody>
-    <tr><td>Energy to send a bit across the sail</td><td class="v">220–1,465 pJ</td><td class="v">0.03–2 pJ</td></tr>
-    <tr><td>Delay across the sail, mean / worst</td><td class="v">11–94 µs</td><td class="v">0.9 / 2.7 µs</td></tr>
-    <tr><td>Sail-wide mixture-of-experts all-to-all, share of energy</td><td class="v">60–78%</td><td class="v">2–5%</td></tr>
-    <tr><td>Mass of the network</td><td class="v">—</td><td class="v">0.2–4% of the sail</td></tr>
-  </tbody>
-</table></div>
-<p>With the lanes, bandwidth per chiplet no longer falls with distance, and one sail behaves like one data-centre-scale machine: about 15 MW, 10⁸ chiplets, and with 1–2 GB of non-volatile memory on each, an exabyte or more of memory.</p>
-<h3>How models are laid out on it</h3>
-<ul>
-  <li><b>Tensor parallelism works inside a sail.</b> Splitting each layer’s weights over a square patch of chips in two dimensions (a SUMMA-style layout, with the weights staying put) costs only 1.4–3.5% of the energy for inference and 3.6–13% for training on the electrical mesh, less with light.</li>
-  <li><b>Experts cost more.</b> Routing tokens to the chips that hold each expert of a mixture-of-experts layer costs 15–31% of the energy on the electrical mesh when the experts sit near their layer, and 60–78% when they are spread across the sail. Optical lanes bring the sail-wide case to 2–5%.</li>
-  <li><b>Utilisation is the hard part.</b> With weights held still, a routed expert runs only on the chips that hold it, so much of the sail can sit idle; striping each expert across more chips fixes that but spends 20–30% of chip power on the mesh. Filling the pipeline of layers needs 61–128 or more sequences in flight at once.</li>
-</ul>
-<div class="tablewrap"><table class="data">
-  <caption>The patch of film a model needs with 2026 chiplets (16 MB of SRAM each). Mature chiplets hold about a hundred times as much memory, so a patch holding the same model is about a tenth the side.</caption>
-  <thead><tr><th>Model</th><th class="v">Patch side</th></tr></thead>
-  <tbody>
-    <tr><td>Up to 0.5 trillion parameters</td><td class="v">3–10 m</td></tr>
-    <tr><td>0.67–1 trillion</td><td class="v">8–18 m</td></tr>
-    <tr><td>4–10 trillion, up to 2,000 sequences at once</td><td class="v">17–30 m</td></tr>
-    <tr><td>4–10 trillion, 8,000–32,000 sequences</td><td class="v">30–100 m</td></tr>
-  </tbody>
-</table></div>
-<p>Against a pod built around high-bandwidth memory, the film serves 6–90 times as many tokens per second per kilogram at low and medium concurrency, and 1.8–6 times at batch concurrency (synthetic data, rollouts for reinforcement learning). Its edge is largest for decoding one long stream fast, which matters for agents working inside the swarm; Earth is up to 16 light-minutes away and gains little from it.</p>
+<h2 id="small">Why the chips must be small</h2>
+<p>If spreading the chips out is good, why not cluster them a little, a few big chips per square metre instead of hundreds of small ones? Because a thin sheet carries heat sideways badly. A bigger chip has to send its heat farther to reach enough film to radiate it, through thicker metal. The metal needed per watt grows in step with the chip’s power, so the total grows with its square.</p>
+<figure>
+  <div class="chart" data-chart="spreader"></div>
+  <figcaption>The heat-spreading metal a chip needs, per watt, by the chip’s power. At the design’s 0.15 W it is a small part of the sail; at 10 W per chip it would outweigh the whole rest of the sail twenty times over.<span class="how">From the architecture study’s heat-spreading calculation, checked twice by independent scripts.</span></figcaption>
+</figure>
+<p>At 0.15 W a chip stays within 7–10 °C of the film around it. That number fixes everything else: one chip per 2.5 cm, about a hundred million per sail.</p>
+<p>Mercury’s elements nudge the design the same way. Spacecraft pumps today often use a sodium-potassium alloy as coolant, but Mercury has too little potassium to cool a swarm that way, and it has almost no hydrogen, so ammonia and water are out too. Pods use sulphur dioxide, which Mercury has in abundance. The film needs no coolant at all.</p>
+
+<h2 id="film-computer">What a sheet of chips can compute</h2>
+<p>A sheet of chips is a grid. Each chip talks cheaply to its four neighbours, but a message to a chip on the far side of the sail has to hop from chip to chip, paying energy and time at each step. With only wires, a sail would be a loose patchwork of small computers rather than one big one.</p>
+<figure class="drawing">
+  <div data-draw="meshVsLight"></div>
+  <figcaption>One chip sending to another across the sail. On wires alone the message hops through every chip in between. Light guides laid in the film carry it in one step, at a thousandth of the energy.<span class="how">Energy and time for a bit crossing a whole 279 m sail, from the interconnect study.</span></figcaption>
+</figure>
+<p>The mature design therefore lays light guides through the film: thin glass fibres or waveguides that run unbroken across the fold lines. With them, every chip can reach every other in a few microseconds, and the whole sail becomes one machine of about 15 MW and a hundred million chips, with one to two gigabytes of memory on each, an exabyte or more in all. That is a large data centre in one sheet.</p>
+<p>What can it run? Most of what AI data centres run today. Splitting each layer of a large model over a square patch of chips costs only a few per cent of the energy for running the model and a few to a dozen per cent for training it. Models built from many “experts”, where each word is routed to a few specialised parts of the model, cost more, because the routing sends data across the sail; with light guides that cost falls to 2–5%. The hardest part is keeping all the chips busy, since a part of the model held by one patch idles while the rest of the sail works on other things.</p>
+<details class="deep"><summary>How the film compares with a box of memory chips</summary>
+<p>Against a pod built around today’s high-bandwidth memory, the film delivers 6–90 times as many words per second per kilogram when it serves a few users at a time, and 1.8–6 times at large batch sizes. Its advantage is greatest for producing one long stream of text quickly, which matters for AI agents working inside the swarm. Earth, up to 16 light-minutes away, gains little from it.</p>
+<p>With 2026 chips (16 MB of memory each), a model of half a trillion parameters needs a patch of film 3–10 m across, and the largest models of 4–10 trillion parameters need 17–100 m depending on how many users they serve. Mature chips hold about a hundred times more memory, so the same models fit in a patch a tenth the size.</p></details>
 
 <h2 id="unit">The sail is the unit</h2>
-<p>Every sail is a separate spacecraft, and the laser links between sails carry a small fraction of what the light guides inside one carry. A step of data-parallel training across sails would need about 100 Pbps per sail, against about 6 Pbps of laser terminals. So the sail, about 2×10⁻¹⁹ of the finished swarm, is the largest unit that computes in lockstep.</p>
-<p>Beyond it, cooperation is loose:</p>
-<ul>
-  <li><b>Islands of 10²–10⁵ sails</b> could train together with low-communication methods (DiLoCo and its descendants), which exchange averaged updates every few hundred steps. Those need only 10⁻⁴–4×10⁻² of a sail’s laser capacity, so the limit is how well the method copes with many replicas, not the links. That is unproven: the largest public run of this kind is Covenant-72B, about 5×10²³ FLOP, with 8–16 replicas.</li>
-  <li><b>The whole swarm</b> syncs only on hour scales. Its network is hierarchical, about 60–70 hops across, with 15–35 minutes of light-time; chords through the hollow middle are 36% shorter than paths along the shell. A byte carried across 1 AU costs about as much energy as ten million operations, in every era.</li>
-</ul>
-<p>The largest coherent effort, one learner with its actors, is at most about a billionth of the swarm the workload study considered (3×10¹⁶ sails), and a smaller share still of the finished one. A 10²⁹ FLOP training run, a hundred times today’s largest, takes about five picoseconds of the finished swarm’s output. What limits the size of a single model is algorithms, not hardware.</p>
+<p>Sails are separate spacecraft linked by lasers, and the lasers between two sails carry a small fraction of what the light guides inside one carry. Training one model across two sails in lockstep would need about 100 petabits a second of links per sail, against the 6 petabits its terminals provide. So the sail is the largest thing that computes as one machine.</p>
+<figure class="drawing">
+  <div data-draw="scales"></div>
+  <figcaption>How tightly computers cooperate at each scale. Inside a sail, light guides make one machine. Islands of sails can train together by swapping updates every few minutes. The whole swarm syncs only over hours.</figcaption>
+</figure>
+<p>Beyond a single sail, cooperation is looser. Groups of a hundred to a hundred thousand sails could train one model together with methods that swap only averaged updates every few hundred steps, which needs a tiny fraction of the laser capacity. Whether such methods work at that scale is unproven: the largest public run of this kind, in 2026, used about 5×10²³ operations and up to 16 copies of the model. Across the whole swarm, messages relay through 60–70 hops and take 15–35 minutes, so the swarm as a whole syncs only on the scale of hours.</p>
+<p>What limits the size of a single model, in the end, is not hardware but whether anyone knows how to train one across thousands of loosely linked machines. A training run a hundred times today’s largest would take the finished swarm about five trillionths of a second.</p>
 
-<h2 id="pods">Why pods remain</h2>
-<p>Some work does not fit a mesh of small, unshielded chips:</p>
+<h2 id="pods">Why some boxes remain</h2>
+<p>Some work does not fit a grid of small unshielded chips, and goes into pods:</p>
 <ul>
-  <li><b>Agents’ tools.</b> AI agents run code, browse and test in sandboxes that need 1–16 GB of ordinary memory each and a full processor with memory protection. Industry’s ratio of general-purpose processors to accelerators went from 1:8 to 1:4 and is forecast at 1:1–1:2.</li>
-  <li><b>Memory that cannot fly unshielded.</b> DRAM, flash and the stores that hold datasets, checkpoints and weights are sensitive to radiation; high-bandwidth memory showed irregularities near 2 krad in Suncatcher’s tests, while an unshielded film collects 133–437 krad a decade. Pods carry 5 g/cm² of magnesium and magnesium-silicate shielding on every line of sight to their memory.</li>
-  <li><b>Big dies.</b> Anything above about 4 W cannot shed its heat into the film.</li>
-  <li><b>Archives</b> and the switches that shuffle data between sails and pods.</li>
+  <li><b>Tools for AI agents.</b> Agents write and run code, test it and browse, in walled-off computers that each need several gigabytes of ordinary memory and a general-purpose processor. Industry is buying more of those relative to AI chips every year.</li>
+  <li><b>Memory that cannot fly unshielded.</b> Ordinary memory chips and flash storage, which hold datasets, checkpoints and archives, fail under the radiation an unshielded film collects. Pods carry 5 g/cm² of magnesium shielding around their memory.</li>
+  <li><b>Big chips.</b> Anything above about 4 W cannot shed its heat into the film.</li>
 </ul>
-<p>Pods are never for synchronous work: they do not hold the layers of a model the film is running. How much of the chip power they take depends almost entirely on one design choice. If every chiplet carries a processor able to run a sandbox, with memory protection and enough non-volatile main memory, pods fall to about 1%; that capability costs 10–30% of the swarm’s mass. If no chiplet can, pods stay near 15% for good. The model takes 6% as its central case.</p>
+<p>How much of the power goes to pods depends almost entirely on one choice. If every chip in the film is given a processor able to run agents safely walled off from each other, pods fall to about 1%; that capability costs 10–30% of the swarm’s mass. If no chip can, pods stay near 15% for good. The model takes 6%.</p>
 <figure>
   <div class="chart" data-chart="podShare"></div>
-  <figcaption>The swarm’s mass per watt of chips against the share of chip power put in pods, at 1% coverage. Every 1% of chip power moved into pods adds about 5% to the mass of an all-sail swarm.<span class="how">Computed live from the model (<code>swarmAt</code> with <code>podFrac</code> varied). Hover for values.</span></figcaption>
+  <figcaption>The swarm’s mass per watt of chips, against the share of chip power in pods. Each per cent moved into pods adds about 5% to the mass.<span class="how">Computed live from the model. Hover for values.</span></figcaption>
 </figure>
-<h3>What a pod is</h3>
-<p>The design study’s pod is a 1 MW module of memory stacked on logic, about 1.8 m across, under a glass-cloth blanket and its magnesium shield. Two solar wings of 68 m feed it. Four radiator blades, 40.5 m long, 6 m wide and 25 mm thick, shed its heat, held exactly edge-on to the Sun so that sunlight never falls on their faces. Four sulphur-dioxide loops carry the heat from the module to the blades. The whole craft spans 172 × 204 m and weighs about 4 g per watt with 2026 parts.</p>
+<p>A pod is a 1 MW block of memory stacked on logic, about 1.8 m across, inside its shield. Two solar wings of 68 m feed it, and four radiator blades, 40 m long and only 25 mm thick, shed its heat. The blades are held exactly edge-on to the Sun, so sunlight never falls on their faces.</p>
 <figure>
   <div class="pair">
     <div class="plate"><img src="../renders/pod-visible.jpg" alt="A pod in sunlight: a small bright module where four white trusses meet, dark solar wings, and radiator blades that are almost invisible" width="2400" height="1350" loading="lazy"></div>
     <div class="plate"><img src="../renders/pod-lwir.jpg" alt="The same pod in thermal infrared: the radiator blades glow, the wings less, the module and trusses dark" width="2400" height="1350" loading="lazy"></div>
   </div>
-  <figcaption>A pod in sunlight and through a thermal camera. In sunlight the blades are nearly invisible, being edge-on to the Sun; in the thermal image they are the brightest things in the frame.<span class="how">At 0.88 AU. Blade roots about 355 K falling to 345 K at the tips, wings 343 K, the blanketed module about 300 K. 8–14 µm on a fixed scale from 280 K to 360 K.</span></figcaption>
+  <figcaption>A pod in sunlight and through a thermal camera. In sunlight the blades are nearly invisible because they are edge-on to the Sun; in the thermal image they are the brightest things in the frame.<span class="how">At 0.88 AU. Blades 345–355 K, wings 343 K, the blanketed module about 300 K. 8–14 µm on a fixed scale from 280 K to 360 K.</span></figcaption>
 </figure>
-<h3>Pods and sails fly apart</h3>
-<p>Sunlight pushes on the film about ten times harder, for its mass, than on a pod: the film carries about half a per cent of its weight in light pressure and a pod about a tenth of that. At 0.92 AU the difference in acceleration is about 3×10⁻⁵ m/s², a kilometre per second in a year. So pods cannot simply ride along with the sails they serve. They fly in formations of their own within the sail layer, close enough for their links to reach (Starlink-class terminals close only within about 3,000 km), and formation rules keep them off the sails’ lines to the Sun: at that distance an object’s full shadow reaches about 99 times its size behind it, so a 100 m pod would shade 10 km of space.</p>
-<p>Pods that train together fly as islands, twelve around one on a circle a kilometre across, arranged so that none ever shades another.</p>
+<p>Pods cannot simply ride along with the sails they serve. Sunlight pushes the light film about ten times harder, for its weight, than a heavy pod, so the two drift apart by about a kilometre a second each year. Pods fly in their own formations within the layer of sails, close enough to reach them by laser, and kept off the sails’ lines to the Sun so that their shadows fall on nothing.</p>
 
 <h2 id="what">What the swarm computes</h2>
-<p>At its finished size the closed swarm runs 1.9×10⁴⁰ FLOP/s. That is about 6×10¹⁷ times everything humanity’s AI chips did in 2025, and, at a common estimate of 10¹⁵ FLOP/s for a human brain (Carlsmith 2020; two orders of magnitude either way), about 2×10²⁵ brain-equivalents.</p>
-<p>A single sail with 2070 hardware could serve about 13 million AI agents at once, at about 7×10⁸ tokens a second in all, or decode a model with a trillion active parameters at about 47,000 tokens a second for one user. In a year it could train a model of about 10¹³ active parameters, using half a per cent of its memory. Such a run would need between 1.6 and 7 times all the text humans have ever written, so most of what the swarm trains on would have to be generated: self-play, simulation, synthetic data, and experiments.</p>
-<p>That is why the swarm is best thought of as a population. Its 10²³–10²⁵ concurrent agent streams, its searches, ensembles and simulations are many machines doing many things. Whether that population can be organised into something more coherent is an open question about algorithms, not about the hardware described here.</p>
-
-<h2 id="rules">The design rules this forces</h2>
-<ol>
-  <li><b>Chiplets of 0.15 W at about 2.5 cm pitch,</b> junction near 85 °C on the sail’s own orbit. Weights and working state in non-volatile memory stacked on each chiplet (resistive, magnetic or ferroelectric), with no standby power, immune to single-event upsets, and surviving brownouts. With 2026 SRAM, leakage at 85 °C would take 10–59% of chip power.</li>
-  <li><b>A film stack of silicon, glass, magnesium and silicate enamel,</b> all Mercury-native (<a href="sail.html#film">The compute sail</a>).</li>
-  <li><b>Reliability by redundancy, not shielding:</b> error-correcting memory scrubbed 1–100 times a second, residue checks on logic (2–5% overhead), spare chiplets and detour routing (a 30 m patch of 1.4 million chips loses about five a day), a pause during large solar particle events, and a store to reload from after any brownout.</li>
-  <li><b>Pods kept as small as demand allows,</b> shielded, with sulphur-dioxide loops, in formations of their own.</li>
-  <li><b>Fabs, not Mercury’s mass, may set the build rate.</b> A chiplet with 16 MB of SRAM is about 6 mm², about 40 mm² of leading-edge logic per watt, roughly 640 wafers of 300 mm per megawatt. An accelerator with high-bandwidth memory needs about 5 mm² per watt. See <a href="hardware.html#fabs">Hardware after 2095</a>.</li>
-</ol>
+<p>Finished, the swarm runs about 1.9×10⁴⁰ operations a second. That is about 6×10¹⁷ times all the AI chips in the world in 2025. At a common estimate of 10¹⁵ operations a second for a human brain (Carlsmith 2020, uncertain a hundredfold either way), it is the computing of about 2×10²⁵ brains.</p>
+<p>A single sail with hardware of around 2070 could serve about 13 million AI agents at once, or train in a year a model with about ten trillion active parameters. Such a run would need between 1.6 and 7 times all the text people have ever written, so most of what the swarm learns from would have to be generated: simulations, self-play, experiments.</p>
+<p>So the swarm is best thought of as a population: 10²³–10²⁵ agents working at once, with searches, simulations and experiments running in parallel. Whether that population can be organised into something more coherent is a question about algorithms, not about the hardware described here.</p>
 
 <h2 id="open">What remains open</h2>
 <ul>
-  <li><b>Low-communication training at swarm scale.</b> Proven to about 5×10²³ FLOP and 8–16 replicas. Frontier runs today are 3×10²⁶–10²⁷.</li>
-  <li><b>Whether inference keeps dominating demand.</b> Inference’s share of AI compute went from 26% in 2024 to about half in 2025 and two thirds in 2026, but the architecture does not depend on it, because the film can also train.</li>
-  <li><b>Sandbox-capable chiplets.</b> Whether every chiplet can safely run agents walled off from each other decides whether pods are 1% or 15% of the swarm.</li>
-  <li><b>Energy per operation.</b> The research files disagree by up to 3.5 times on one basis. The model uses 1.3×10⁻¹³ J per dense 8-bit operation for 2026 and 2.3×10⁻¹⁵ J for the mature era, both at 85 °C and full clock, and takes 0.6 of that for chips run below full clock.</li>
+  <li><b>Training across many loosely linked machines.</b> Proven so far only to about 5×10²³ operations and 16 copies.</li>
+  <li><b>Chips that can run agents safely.</b> Whether every chip in the film can, decides whether pods are 1% or 15% of the swarm.</li>
+  <li><b>What the demand will be.</b> Running models has overtaken training them, from about a quarter of AI computing in 2024 to about two thirds in 2026. The design does not depend on it, because the film can also train.</li>
+  <li><b>Energy per operation.</b> The research files disagree by up to 3.5 times. The model uses one consistent basis for each era (<a href="hardware.html#logic">Hardware after 2095</a>).</li>
 </ul>
 
 <section class="sources">
   <h2>Sources and code</h2>
   <ul>
     <li>Project studies: <code>docs/architecture.md</code>, <code>docs/data/architecture_thermal_mass.json</code>, <code>docs/data/architecture_skeptic.json</code>, <code>docs/data/future/workloads.json</code>, <code>docs/data/future/interconnect.json</code>, <code>docs/data/design_spec.json</code> (the pod).</li>
-    <li>Model: <code>src/model/hybrid.js</code> (<code>sailAt</code>, <code>podAt</code>, <code>swarmAt</code>), <code>src/model/model.js</code> (radiators and wings).</li>
+    <li>Model: <code>src/model/hybrid.js</code> (<code>sailAt</code>, <code>podAt</code>, <code>swarmAt</code>); diagrams in <code>notes/figures.js</code>.</li>
     <li>Google, “Towards a future space-based, highly scalable AI infrastructure system design” (Suncatcher), arXiv:2511.19468.</li>
     <li>Miller, “Attojoule optoelectronics”, J. Lightwave Technology 35(3), 2017, arXiv:1609.05510. Horowitz, “Computing’s energy problem”, ISSCC 2014.</li>
-    <li>UCIe Consortium metrics (HOTI 2025); NVLink-C2C at 1.3 pJ/bit (Hot Chips 2022); HBM3E at 3.44 pJ/bit (arXiv:2602.18568).</li>
-    <li>Charles et al., DiLoCo scaling laws, NeurIPS 2025, arXiv:2503.09799. Covenant-72B and SparseLoCo, arXiv:2603.08163.</li>
-    <li>Meta, Llama 3: 419 unexpected interruptions in 54 days on 16,384 H100s.</li>
-    <li>Epoch AI estimates of training-run sizes and the split between research and inference.</li>
+    <li>Charles et al., DiLoCo scaling laws, arXiv:2503.09799. Covenant-72B and SparseLoCo, arXiv:2603.08163.</li>
+    <li>Epoch AI estimates of training-run sizes and of the split between training and inference.</li>
     <li>Carlsmith (2020), “How much computational power does it take to match the human brain?”</li>
-    <li>JAXA and NASA Glenn, impact-induced arcing on solar arrays. NIST WebBook saturation properties of SO₂.</li>
+    <li>JAXA and NASA Glenn, impact-induced arcing on solar arrays. NIST WebBook properties of SO₂.</li>
   </ul>
 </section>
 <nav class="onward" id="onward"></nav>

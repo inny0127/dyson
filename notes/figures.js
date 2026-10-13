@@ -34,6 +34,7 @@ const Arc = (cx, cy, r, a0, a1, o = {}) => {
   const p = a => [cx + r * Math.cos((a * Math.PI) / 180), cy + r * Math.sin((a * Math.PI) / 180)];
   const [x0, y0] = p(a0), [x1, y1] = p(a1);
   return Path(`M${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${Math.abs(a1 - a0) > 180 ? 1 : 0} ${a1 > a0 ? 1 : 0} ${x1.toFixed(1)},${y1.toFixed(1)}`, o);
+
 };
 const put = (el, s) => { el.innerHTML = s; };
 
@@ -182,6 +183,57 @@ export const FIGURES = {
       s += T(fx + 112, fy - 70, 'the sail turns', { a: 'end', c: 'ink', sz: 11.5, w: 500 }) + T(fx + 112, fy - 56, 'the other way', { a: 'end', c: 'ink', sz: 11.5, w: 500 });
       s += T(fx - 120, fy + 22, 'sail, edge-on', { sz: 11.5 });
       s += T(fx, 252, 'Flywheel: a ten-minute flip', { a: 'middle', c: 'ink', w: 600 }) + T(fx, 268, 'the wheel ends at its starting speed', { a: 'middle', sz: 11.5 });
+      return s;
+    }));
+  },
+
+  // ---------------------------------------------------------------- chips in the film
+  /** A message crossing the film: hop by hop on wires, or in one go on a light guide. */
+  meshVsLight(el) {
+    put(el, svg(720, 300, 'Two ways for one chip to reach a chip far across the sail: hop by hop through every chip in between on the electrical mesh, or in one step along a light guide laid in the film', id => {
+      let s = '';
+      const panel = (ox, title, sub, light) => {
+        const n = 7, g = 30, x0 = ox + 40, y0 = 52;
+        for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) s += Rect(x0 + i * g, y0 + j * g, 10, 10, { fill: 'ink3', stroke: 'none', op: 0.7 });
+        const a = [x0 + 5, y0 + 6 * g + 5], b = [x0 + 6 * g + 5, y0 + 5];
+        s += Rect(a[0] - 7, a[1] - 7, 14, 14, { fill: 'none', stroke: 'swarm', sw: 2 }) + Rect(b[0] - 7, b[1] - 7, 14, 14, { fill: 'none', stroke: 'swarm', sw: 2 });
+        if (!light) {
+          let d = `M${a[0]},${a[1]}`;
+          for (let k = 1; k <= 6; k++) d += ` L${a[0] + k * g},${a[1] - (k - 1) * g} L${a[0] + k * g},${a[1] - k * g}`;
+          s += Path(d, { stroke: 'heat', sw: 2, arrow: id });
+          s += T(ox + 145, y0 + 222, '12 hops, each costing energy and time', { a: 'middle', sz: 11.5 });
+        } else {
+          s += Path(`M${a[0]},${a[1]} L${b[0] - 8},${b[1] + 8}`, { stroke: 'swarm', sw: 2.5, arrow: id });
+          s += T(ox + 145, y0 + 222, 'one step, at the speed of light in glass', { a: 'middle', sz: 11.5 });
+        }
+        s += T(ox + 145, 24, title, { a: 'middle', c: 'ink', w: 600, sz: 13 });
+        s += T(ox + 145, y0 + 244, sub, { a: 'middle', c: light ? 'swarm' : 'heat', w: 600 });
+      };
+      panel(40, 'Wires only (2026)', 'about 220–1,465 pJ a bit, 11–94 µs', false);
+      panel(390, 'With light guides (mature)', 'about 0.03–2 pJ a bit, under 3 µs', true);
+      return s;
+    }));
+  },
+
+  /** How tightly computers cooperate at each scale, from one chip to the whole swarm. */
+  scales(el) {
+    const rows = [
+      ['One chiplet', '0.15 W', 'its own memory', 'nanoseconds'],
+      ['One sail', '~15 MW, 10⁸ chiplets', 'light guides in the film', 'microseconds: one machine'],
+      ['An island of sails', '10²–10⁵ sails', 'laser links', 'swap updates every few minutes'],
+      ['The whole swarm', '5×10¹⁸ sails', 'relayed laser network', 'hours: a population'],
+    ];
+    put(el, svg(720, 300, 'Four scales of cooperation: chips inside one sail work as one machine; sails cooperate loosely in islands; the swarm as a whole syncs only over hours', id => {
+      let s = '';
+      s += T(170, 20, 'How big', { a: 'middle', c: 'ink3', sz: 11.5, w: 500 }) + T(420, 20, 'Joined by', { a: 'middle', c: 'ink3', sz: 11.5, w: 500 }) + T(615, 20, 'How tightly', { a: 'middle', c: 'ink3', sz: 11.5, w: 500 });
+      rows.forEach(([name, size, link, sync], i) => {
+        const y = 40 + i * 64, w = 70 + i * 50;
+        s += Rect(170 - w / 2, y, w, 40, { fill: i === 1 ? 'swarm' : 'var(--wash)', stroke: i === 1 ? 'swarm' : 'ink3', op: i === 1 ? 0.18 : 1, rx: 6 });
+        s += T(170, y + 17, name, { a: 'middle', c: 'ink', w: 600 }) + T(170, y + 32, size, { a: 'middle', sz: 11.5 });
+        s += T(420, y + 25, link, { a: 'middle' });
+        s += T(615, y + 25, sync, { a: 'middle', c: i === 1 ? 'swarm' : 'ink', w: i === 1 ? 600 : 400 });
+        if (i < rows.length - 1) s += Ln(170, y + 42, 170, y + 62, { c: 'ink3', w: 1.2, arrow: id });
+      });
       return s;
     }));
   },
