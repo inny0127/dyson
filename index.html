@@ -148,6 +148,18 @@ details.assumptions summary span { font: 400 0.875rem/1 var(--sans); color: var(
 .reset { margin-top: 1.25rem; border: 1px solid var(--rule); background: none; border-radius: 999px; padding: 0.5rem 1rem; font: 400 0.875rem/1 var(--sans); cursor: pointer; }
 
 footer { padding-block: 3rem 5rem; font: 400 0.875rem/1.6 var(--sans); color: var(--ink-2); }
+/* links to the technical notes (notes/), at the end of chapters and in the footer */
+.notelink { margin: 0; font: 400 0.875rem/1.45 var(--sans); }
+.notelink a { display: inline-flex; flex-wrap: wrap; gap: 0.15rem 0.5rem; align-items: baseline; text-decoration: none; color: var(--ink-2); border-bottom: 1px solid var(--rule); padding-bottom: 0.15rem; }
+.notelink a:hover { color: var(--ink); border-color: var(--ink); }
+.notelink b { font-weight: 500; color: var(--ink); }
+.notes-list { list-style: none; padding: 0 !important; margin: 1.25rem 0 2rem !important; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; counter-reset: n; }
+.notes-list li { counter-increment: n; }
+.notes-list a { display: grid; gap: 0.2rem; align-content: start; height: 100%; box-sizing: border-box; padding: 0.8rem 0.95rem; border: 1px solid var(--rule); border-radius: 8px; text-decoration: none; color: var(--ink-2); }
+.notes-list a:hover { border-color: var(--ink); }
+.notes-list a b { font: 500 1.05rem/1.3 var(--serif); color: var(--ink); }
+.notes-list a b::before { content: counter(n) '. '; color: var(--ink-3); }
+@media (max-width: 640px) { .notes-list { grid-template-columns: minmax(0, 1fr); } }
 footer h2 { font-size: 1.4rem; margin-bottom: 0.75rem; }
 footer ul { padding-left: 1.1rem; margin: 0.75rem 0 0; }
 footer code { font: 400 0.85em/1 ui-monospace, 'SFMono-Regular', Menlo, monospace; }
@@ -319,6 +331,7 @@ section.stage { border-top: 1px solid var(--rule); }
       <a href="#stage-1"><figure><img src="renders/earth-night-closed.4c254dacbb.jpg" alt="A black, starless sky over the range" loading="lazy"><span><b data-y="1"></b>closed</span></figure></a>
     </div>
     <p class="col note">Tonight, a millionth and the closed sphere share one exposure. One in ten thousand is exposed for its own sky. 1%, half and 99% share another, so the half-built night shows as the brightest. How much brighter or darker each really is, is in each stage's caption below.</p>
+    <p class="col notelink"><a href="notes/pictures.html"><span>Technical note</span><b>How the pictures were made</b><span>light, air and cameras →</span></a></p>
   </section>
 
   <section class="chapter" id="progression-intro" data-f="1e-8">
@@ -447,6 +460,7 @@ section.stage { border-top: 1px solid var(--rule); }
     </figure>
     <div class="col stage-facts" id="facts-1"></div>
     <div class="col prose" id="prose-1"></div>
+    <p class="col notelink"><a href="notes/sphere.html"><span>Technical note</span><b>Closing the sphere</b><span>orbits, overlap, heat and windows →</span></a></p>
   </section>
 
   <section class="chapter" id="earth" data-moment="cap">
@@ -460,6 +474,7 @@ section.stage { border-top: 1px solid var(--rule); }
       <div class="chart" id="earth-chart"></div>
       <figcaption class="col" id="earth-caption"></figcaption>
     </figure>
+    <p class="col notelink"><a href="notes/earth.html"><span>Technical note</span><b>Earth inside the swarm</b><span>heat, night sky and the window as a dial →</span></a></p>
   </section>
 
   <section class="chapter" id="design" data-moment="cap">
@@ -483,6 +498,7 @@ section.stage { border-top: 1px solid var(--rule); }
       </div>
       <figcaption class="col"><b>North America's Pacific coast from 4,000 km in July: today, and with the dry-summer belt moved north.</b> The change is smaller than in Europe, because Seattle and Portland already have dry summers; their forests stay green through July on winter rain. Moved five degrees north, the belt reaches the coast of British Columbia, where lowlands such as Vancouver Island and the Fraser valley take the gold of Oregon's valleys. Oregon takes northern California's colours, and southern California turns to the desert of Baja. Both frames are cloud-free, so the land shows, and share one exposure.<span class="how">Each 1° band of the coastal strip, within about 400 km of the Pacific and west of the Cascades and the Sierra, takes the July colour distribution of the strip 5° further south (render/med_earth.py); land above ~1,500 m keeps its colours. About 0.7 million km² changes. One plausible outcome, not a climate-model result.</span></figcaption>
     </figure>
+    <p class="col notelink"><a href="notes/earth.html#design"><span>Technical note</span><b>Placing light region by region</b><span>what optics and the atmosphere allow →</span></a></p>
   </section>
 
   <section class="chapter" id="star" data-moment="cap">
@@ -512,6 +528,7 @@ section.stage { border-top: 1px solid var(--rule); }
       </div>
       <figcaption class="col"><b>Two closer looks at one sail.</b> On the left, from 30 m above one corner, looking away from the Sun: the dark film, its bright fold lines, and beyond the tip a blinding point of light, the counter-sun. It is the Sun mirrored back by every sail farther out in that one direction, together several thousand times brighter than the full Moon. The dark square above the mast is a steering vane, a mirror that from here reflects only sky. On the right, the same corner from 28 m, with the tensioner that keeps the film taut, its tethers, and a mirror vane used for steering.<span class="how">The fold lines are hinge strips, one every 1.63 m; their slightly curled edges catch the Sun only near the counter-sun. Rendered for a swarm whose fronts carry an infrared-dark aluminium mesh, which reflects about 4% like a mirror; there the counter-sun is magnitude −21.6. The closed swarm's plain glass fronts reflect less, so its counter-sun is fainter. Its halo, 15° across, comes from the curled panel edges. The film is exposed two stops brighter than a grey card would need, or it would print as plain black; at that exposure the sky's glow, 33 cd/m², prints almost black too.</span></figcaption>
     </figure>
+    <p class="col notelink"><a href="notes/sail.html"><span>Technical note</span><b>The compute sail</b><span>one satellite, layer by layer →</span></a></p>
   </section>
 
   <section class="chapter" id="computer" data-moment="first">
@@ -543,6 +560,7 @@ section.stage { border-top: 1px solid var(--rule); }
       <div class="col irscale"><span>280 K</span><i></i><span>360 K</span></div>
     </figure>
     <div class="col tablewrap"><table class="compare" id="why-table"></table></div>
+    <p class="col notelink"><a href="notes/compute.html"><span>Technical note</span><b>Chips in the film</b><span>what a film computer can run, and why pods remain →</span></a></p>
   </section>
 
   <section class="chapter" id="mercury" data-moment="wall">
@@ -556,6 +574,7 @@ section.stage { border-top: 1px solid var(--rule); }
       <figcaption class="col"><b>Mercury today, and when mining runs at full speed, at the same exposure.</b> To get rid of the heat of mining, the whole planet is paved with radiators held at about 1,650 K, hot enough to glow orange and brighter than sunlit rock. So the night side shines as brightly as the day side, and the line between them all but disappears. The planet gives off 170 times more energy than it receives from the Sun. Most of that is the work of the heat pumps that push the heat up to such a temperature, powered from the swarm.<span class="how">MESSENGER albedo and elevation data, lit by the Sun at Mercury's distance. The model lets Mercury shed 5×10¹⁸ W of waste heat; with the pumps the radiators emit 2.8×10¹⁹ W in all, at about 31,000 cd/m². Sunlight adds only 2.4% to what a radiator that hot has to get rid of, so they work by day as well as by night.</span></figcaption>
     </figure>
     <div class="col prose"><p>Chip fabs set the pace, so they are the first thing to leave Mercury. In space a fab needs no building, no clean air and no water. The free vacuum alone removes about 60% of a fab's electricity and a third or more of its equipment. Mercury has almost no hydrogen, so the chemistry has to run dry, on chlorine, oxygen, zinc and magnesium.</p></div>
+    <p class="col notelink"><a href="notes/mercury.html"><span>Technical note</span><b>Taking Mercury apart</b><span>rock, the heat wall and the pace of the build →</span></a></p>
   </section>
 
   <section class="chapter" id="buildout" data-moment="one">
@@ -577,6 +596,7 @@ section.stage { border-top: 1px solid var(--rule); }
     <div class="col prose" id="future-prose"></div>
     <div class="col tablewrap"><table class="compare" id="future-table"></table></div>
     <div class="col notes" id="future-notes"></div>
+    <p class="col notelink"><a href="notes/hardware.html"><span>Technical note</span><b>Hardware after 2095</b><span>logic, memory, links, solar cells, fabs and refresh →</span></a></p>
   </section>
 
   <section class="chapter wide" id="assumptions-section">
@@ -587,13 +607,23 @@ section.stage { border-top: 1px solid var(--rule); }
     </details>
   </section>
 
-  <footer class="col">
+  <footer class="col" id="notes">
     <h2>How this was made</h2>
+    <p>Seven technical notes go through each part in detail, with the derivations, the studies’ numbers and their sources. Their charts are drawn by the same model as this page.</p>
+    <ol class="notes-list">
+      <li><a href="notes/sail.html"><b>The compute sail</b>One satellite, layer by layer</a></li>
+      <li><a href="notes/compute.html"><b>Chips in the film</b>Why the computer is spread through the panel</a></li>
+      <li><a href="notes/hardware.html"><b>Hardware after 2095</b>What the swarm is actually built with</a></li>
+      <li><a href="notes/mercury.html"><b>Taking Mercury apart</b>Rock, heat and the pace of the build</a></li>
+      <li><a href="notes/sphere.html"><b>Closing the sphere</b>Orbits, overlap, heat and windows</a></li>
+      <li><a href="notes/earth.html"><b>Earth inside the swarm</b>Heat, night sky and a climate by design</a></li>
+      <li><a href="notes/pictures.html"><b>How the pictures were made</b>Light, air and cameras</a></li>
+    </ol>
     <p>The model, the Blender scenes and the research behind them are in the project repository: <code>docs/architecture.md</code> (why sails and pods), <code>docs/future-tech.md</code> (what hardware actually flies), <code>docs/earth.md</code> (what Earth allows), <code>docs/data/</code> (every study's numbers and sources) and <code>src/model/hybrid.js</code> (the model, with tests). Photographs are path traced in Blender Cycles, and the views from orbit ray-cast by our own renderer, at the true brightness of every light source; thermal images map 8–14 µm band radiance to a fixed false-colour scale.</p>
     <ul id="sources-list"></ul>
   </footer>
 </main>
 </div>
-<script type="module" src="src/app.455fcbe001.js"></script>
+<script type="module" src="src/app.629deb4627.js"></script>
 </body>
 </html>

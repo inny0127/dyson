@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Earth Inside the Swarm</title>
+<meta name="description" content="What the swarm does to Earth: the heat it sends at every stage and how the window cancels it, the cost in rain, the night sky as the sphere fills and after it closes, the solar wind, and how light and rain could be placed region by region.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.124ac92a45.css">
+</head>
+<body>
+<header class="nb"><div class="nb-in"><a class="nb-home" href="../index.html">A Dyson Swarm, Made Real</a><details><summary>Technical notes</summary><ol id="notes-menu"></ol></details></div></header>
+<div class="page">
+<nav class="toc" id="toc" aria-label="Contents"></nav>
+<article class="note">
+<header class="head">
+  <div class="kicker" id="note-no">Technical note</div>
+  <h1>Earth inside the swarm</h1>
+  <p class="dek">Every watt the sails catch leaves them as heat, and Earth absorbs its share. The design of the whole sphere follows from keeping that share small. What is left is a planet with its full sunlight, a changed night sky, and a dial for its climate.</p>
+  <p class="byline">From <code>docs/closed-swarm.md</code>, <code>docs/full-swarm.md</code>, <code>docs/earth.md</code>, the Earth-safe studies in <code>docs/data/</code> and the page’s model · October 2026</p>
+</header>
+<details class="toc-m" id="toc-m"></details>
+
+<section class="summary">
+  <h2>In short</h2>
+  <ul>
+    <li><b>Earth keeps its sunlight at every stage.</b> Sails crossing the line from the Sun to Earth turn edge-on as they pass, and once the sphere is closed Earth looks out through a window 40,600 km across.</li>
+    <li><b>The heat peaks when the sphere is half built,</b> at 8.6 W/m², two CO₂ doublings, from the far side’s fronts seen through the gaps. Narrowing Earth’s window by 3.6% cancels it, at a cost of about 6% of the world’s rain. Closed, only the mirror cap’s cold back is left: 0.56 W/m², a quarter of a per cent of sunlight to cancel.</li>
+    <li><b>The night sky brightens, then goes black.</b> The glow is f (1 − f) ρ S / π: it peaks at half, about 24 lux on the ground at the end of twilight, a hundred full Moons. Closed, the sky within 75–85° of the Sun is black, with no stars, no zodiacal light and no planets.</li>
+    <li><b>The solar wind stops,</b> and with it most aurorae and geomagnetic storms.</li>
+    <li><b>Light can then be placed.</b> The window sets the whole planet’s sunlight; mirrors in Earth orbit fed through it, and lasers from the cap, light regions and single fields. Temperature follows closely. Rain is harder, but the swarm can make it.</li>
+  </ul>
+  <div class="keys">
+    <div><b>8.6 W/m²</b><span>the most heat Earth gets, at half built, in 2178</span></div>
+    <div><b>0.56 W/m²</b><span>once closed: the cap’s back</span></div>
+    <div><b>−0.42%</b><span>of world rainfall, closed (−6.3% at half)</span></div>
+    <div><b>24 lux</b><span>on the ground at night, at half built</span></div>
+    <div><b>75–85°</b><span>from the Sun, the black disc’s edge through the year</span></div>
+    <div><b>~10⁻¹²</b><span>of the Sun’s light to add 50 W/m² to a million km² by laser</span></div>
+  </div>
+</section>
+
+<h2 id="heat">The heat Earth gets</h2>
+<p>A sail that catches sunlight sheds all of it again as infrared from its two faces. Earth absorbs whatever part of that it can see. The sphere is designed so that Earth sees as little warm surface as possible:</p>
+<ul>
+  <li><b>The part of the sphere in front of Earth is mirrors from the start.</b> Their cold backs face Earth. Within 23° of the Sun–Earth line, no compute sail ever shows Earth its 382–419 K back.</li>
+  <li><b>Through the mirrors’ gaps, Earth sees the far side’s fronts.</b> While the sphere is open those fronts face the Sun and Earth together. They are switched to a low infrared emissivity, 0.1, so they radiate mostly from their backs, away from Earth.</li>
+  <li><b>The mirrors themselves</b> show Earth their insulated backs: 1.4 W/m² leaks through 40 layers of foil.</li>
+</ul>
+<p>Averaged over Earth, that gives</p>
+<p class="eq"><i>H</i>(<i>f</i>) = 0.56 <i>f</i> + 0.226 · <i>f</i> (1 − <i>f</i>) · 0.1 <i>σT</i>(<i>f</i>)⁴ W/m²</p>
+<p>The first term is the cap’s back, which grows with coverage. The second is the far side seen through the near side’s gaps: a wall filling a disc 72° in radius round the Sun fills sin²(72°) of a sunward plane, a quarter of that averaged over a sphere. It vanishes both when there is nothing to see and when the gaps close.</p>
+<figure>
+  <div class="chart" data-chart="earthHeat"></div>
+  <figcaption>Heat the sphere sends Earth, averaged over the globe, as it fills, before Earth’s window is narrowed to cancel it. It peaks at half built, about two CO₂ doublings, and falls to the cap’s 0.56 W/m² once closed.<span class="how">Computed live from the model (<code>earthForcing</code>). Hover for the sunlight taken to cancel it and the rain lost.</span></figcaption>
+</figure>
+<p>Without these choices the numbers would be enormous. With identical compute sails everywhere, Earth would see the hot backs of those between it and the Sun: over 500 W/m² once closed, more than twice the sunlight Earth absorbs. An open swarm with ordinary glass fronts sends Earth about 5 W/m² for every per cent of the Sun it catches.</p>
+<h3>Cancelling it</h3>
+<p>The heat is cancelled by letting slightly less sunlight through Earth’s window. Earth absorbs about 240 W/m² of sunlight averaged over its surface, so each W/m² of infrared is offset by taking away 1/2.38 = 0.42% of the sunlight. At half built that is 3.6%; once closed, 0.24%. Earth’s mean temperature stays where it is.</p>
+<p>The swap is not neutral. Sunlight drives evaporation; infrared absorbed in the air mostly does not. Climate models running balanced experiments of this kind (GeoMIP) find global rainfall falls about 0.76% for each W/m² swapped. The pattern changes too: sunlight removed evenly cools the tropics more than the poles, leaving the poles about 0.23 W/m² warmer for each W/m² cancelled. A shade shaped by latitude and season can remove much of that.</p>
+<div class="tablewrap"><table class="data">
+  <caption>Earth’s heat and its cost, by stage (central case).</caption>
+  <thead><tr><th>Stage</th><th class="v">Year</th><th class="v">Heat</th><th class="v">Window narrowed</th><th class="v">Rainfall</th></tr></thead>
+  <tbody>
+    <tr><td>One in ten thousand</td><td class="v">2129</td><td class="v">0.003 W/m²</td><td class="v">0.001%</td><td class="v">−0.002%</td></tr>
+    <tr><td>1%</td><td class="v">2141</td><td class="v">0.28 W/m²</td><td class="v">0.12%</td><td class="v">−0.2%</td></tr>
+    <tr><td>10%</td><td class="v">2149</td><td class="v">2.6 W/m²</td><td class="v">1.1%</td><td class="v">−2.0%</td></tr>
+    <tr><td>Half</td><td class="v">2178</td><td class="v">8.6 W/m²</td><td class="v">3.6%</td><td class="v">−6.3%</td></tr>
+    <tr><td>99%</td><td class="v">2342</td><td class="v">0.94 W/m²</td><td class="v">0.40%</td><td class="v">−0.7%</td></tr>
+    <tr><td>Closed</td><td class="v">2361</td><td class="v">0.56 W/m²</td><td class="v">0.24%</td><td class="v">−0.42%</td></tr>
+  </tbody>
+</table></div>
+<p>The rain lost in the middle of the build is the largest cost the sphere imposes on Earth, and it lasts a century or so. It can be paid back directly, because the swarm can supply rain (section 6).</p>
+<details class="deep"><summary>The earlier, open designs, for comparison</summary><p>The page’s earlier default was an open swarm reaching 83% of the Sun with a gap round the Sun–Earth line and infrared-dark fronts on every sail. Earth absorbed 47 W/m², twelve CO₂ doublings, cancelled by a shade at L1 taking 19.6% of Earth’s sunlight. The rain loss, about 0.76% per W/m² at small swaps and saturating, would have been about 30%, and light-limited crops would have lost a few to ten per cent of their yield. Before that, a gentler design held Earth to 1 W/m² and the swarm to 3.8% of the Sun, spread along Earth’s own orbit on the far side of the Sun. The closed sphere is better for Earth than either.</p></details>
+
+<h2 id="day">Daylight</h2>
+<p>By day nothing changes that the eye can see. Sails crossing the line from the Sun to Earth turn edge-on as they pass, at every stage, so no sail ever transits the Sun as seen from Earth, and there is no flicker and no shadow. The 0.12–3.6% narrowing of the window is a uniform dimming smaller than a thin high cloud. Once closed, Earth sees the Sun through a window it cannot see the edges of.</p>
+<p>The one thing that changes by day is above the atmosphere: the solar wind (section 4).</p>
+
+<h2 id="night">The night sky</h2>
+<p>At night, looking toward the Sun’s side of the sky, Earth sees through the cap’s gaps to the far side of the shell, where every sail shows its sunlit front. Each square metre of sky covered by a front at full sunlight <i>S</i> has the radiance of a Lambertian surface of reflectance <i>ρ</i>, and the near side lets through (1 − <i>f</i>) of it:</p>
+<p class="eq"><i>L</i> = <i>f</i> (1 − <i>f</i>) <i>ρ S</i> / π</p>
+<p>with <i>ρ</i> = 0.004, the film’s visible reflectance averaged over all its hardware, and <i>S</i> the sunlight at 0.95 AU. The glow is uniform out to the shell’s edge, arcsin(0.95/<i>d</i>) from the Sun with Earth <i>d</i> AU out, about 70°. It is symmetric: the same at <i>f</i> and 1 − <i>f</i>, the same at 1% and 99%. It peaks at half, about 45 cd/m², the brightness of the sky well into dusk.</p>
+<figure>
+  <div class="chart" data-chart="glow"></div>
+  <figcaption>Light on the ground from the glow, once the Sun is 18° below the horizon, with the glowing disc standing upright above the western horizon. At half built it is about a hundred full Moons; at 1% and at 99%, about four.<span class="how">Computed live from the model (<code>skyLux</code>), which integrates the disc over the sky and through the air. Hover for the glow’s own brightness.</span></figcaption>
+</figure>
+<p>Behind the glow, the stars dim. Every line of sight within the shell’s edge crosses the cap once and the far side once, so starlight from behind the sphere falls as (1 − <i>f</i>)²: to just over half at a quarter built, to a quarter at half, to one part in ten thousand at 99%. Between the shell’s edge and the cap’s, only the cap dims them. The zodiacal light and the planets beyond the sphere are lit only by the sunlight that escapes, (1 − <i>f</i>).</p>
+<figure>
+  <div class="pair">
+    <div class="plate"><img src="../renders/earth-night-tonight.2ee28643f3.jpg" alt="Night at a mountain lake: the Milky Way rising beside Grand Teton" width="2400" height="1600" loading="lazy"></div>
+    <div class="plate"><img src="../renders/stage-night-0.5.1ff0921de3.jpg" alt="The same view with the sphere half built: a bright glow fills the sky over the range" width="2400" height="1600" loading="lazy"></div>
+  </div>
+  <figcaption>Jenny Lake in Grand Teton at the end of twilight, tonight and with the sphere half built, in 2178. On the right the glow fills the sky within 70° of the Sun, which set behind the range an hour and a half earlier; the stars within it are a quarter as bright as tonight.<span class="how">22 August, 22:06, Sun 18.5° below the horizon. The two frames are not at the same exposure: the half-built night is developed for its own sky, which is far brighter. See <a href="pictures.html#lake">How the pictures were made</a>.</span></figcaption>
+</figure>
+<h3>Once closed</h3>
+<p>The cap’s outer layer sits at 0.98 AU. Every line of sight from Earth that meets it meets the cap’s cold back, at about 170 K, which reflects nothing visible. So the sky is black out to the cap’s edge, arcsin(0.98/<i>d</i>) from the Sun: 78.5° at 1 AU. Earth’s orbit is not quite circular, so the edge moves through the year, from 74.6° in early July, when Earth is farthest from the Sun, to 85.3° in early January, when Earth passes just outside the sphere.</p>
+<figure>
+  <div class="chart" data-chart="disc"></div>
+  <figcaption>How far from the Sun the sky is changed, through the year: the edge of the glowing disc while the sphere is open, and of the black disc once it is closed.<span class="how">From Earth’s distance on each date (eccentricity 0.0167, perihelion 3 January). The lake is shown on 22 August, the view from orbit on 22 September.</span></figcaption>
+</figure>
+<p>At mid-latitudes on a summer evening, at the end of twilight, the black reaches some 57° up the western sky. At midnight at 44° N it is still 52° up the northern sky in June and 16° up in December; near the equator at the equinoxes it has set by midnight. Elsewhere the stars and the Milky Way are as they are today, a shade darker, because the zodiacal light and the gegenschein are gone everywhere: the dust outside the sphere is no longer lit. The planets go out. Mercury and Venus are inside the sphere; Mars and everything beyond get the shell’s infrared instead of sunlight and reflect nothing visible. The Moon shines only while its own window is open. Airglow, which is powered by the day’s ultraviolet, is unchanged.</p>
+<figure>
+  <div class="pair">
+    <div class="plate"><img src="../renders/earth-night-closed.4c254dacbb.jpg" alt="The same lake view with the Sun enclosed: a straight sharp edge crosses the sky, beyond it no stars" width="2400" height="1600" loading="lazy"></div>
+    <div class="plate"><img src="../renders/leo-closed-wide.a8e876c38b.jpg" alt="From orbit before dawn: Earth's night side below a vast black dome with no stars, a crescent Moon inside it" width="2400" height="1600" loading="lazy"></div>
+  </div>
+  <figcaption>The Sun enclosed. Left, the lake at the same moment and exposure as tonight’s frame: beyond a straight edge, 75.6° from the Sun that night, there are no stars. Right, from 400 km over the Nile Delta before dawn: a black dome 77.4° in radius over Earth’s night side, the Moon a crescent lit through its window.<span class="how">The edge is the limb of the cap’s outer layer, softened over about half a degree by the layer’s thickness.</span></figcaption>
+</figure>
+
+<h2 id="wind">The solar wind and cosmic rays</h2>
+<p>The shell absorbs the solar wind everywhere except the windows. The column through Earth’s window spreads, at the wind’s thermal speed of about 50 km/s, over about 375,000 km by the time it reaches Earth: about 0.3% of today’s flux. Geomagnetic storms and most aurorae end.</p>
+<p>With no wind beyond 0.95 AU, the heliosphere, the bubble the wind blows in the interstellar medium, collapses. Galactic cosmic rays then arrive at 1 AU with the spectrum Voyager measured outside it, without the modulation the wind provides today. Earth’s magnetic field and air still stop most of them. The change in dose should be largest near the poles and on polar flights, and small at the equator. The model has not quantified it.</p>
+
+<h2 id="dial">The window as a climate dial</h2>
+<p>Closure turns Earth’s sunlight into something the swarm sets.</p>
+<ul>
+  <li><b>Dimming.</b> Narrowing the window, or leaving some of the mirrors in it partly turned, dims all of Earth evenly, from full sunlight to none.</li>
+  <li><b>Brightening.</b> A cap mirror tilted slightly sends its light at Earth. From 3 million km its spot is 28,000 km across, so about 40% of it lands on Earth’s disc. The cap can add sunlight to the whole planet, but it cannot aim at a region.</li>
+</ul>
+<p>The window sim on the <a href="../index.html#window-sim-fig">main page</a> and in <a href="sphere.html#windows">Closing the sphere</a> shows both. The global dial answers the problem of the sphere’s own heat. It can also answer other problems: a quarter of a per cent of sunlight is worth about 0.56 W/m², and about one per cent would cancel all the warming humanity has caused so far.</p>
+
+<h2 id="design">Placing light region by region</h2>
+<p>With this much energy, the amount needed to change a region’s climate is trivial. Adding 50 W/m² of daylight, averaged over a million square kilometres, takes 5×10¹³ W of light: about 10⁻¹³ of what the swarm catches. What limits regional control is how sharply light can be aimed, and how the atmosphere answers.</p>
+<h3>How sharply sunlight can be placed</h3>
+<p>The Sun is not a point. It is 0.53° across, and no arrangement of mirrors or lenses can focus its light into a spot narrower than the distance times that angle: the radiance of light cannot be increased by optics (conservation of étendue). So a mirror or shade at distance <i>d</i> blurs its spot or shadow over about 0.0093 <i>d</i>.</p>
+<div class="tablewrap"><table class="data">
+  <caption>How sharply sunlight can be placed on Earth, by where the mirror or shade is.</caption>
+  <thead><tr><th>Where</th><th class="v">Blur</th><th>What it can control</th></tr></thead>
+  <tbody>
+    <tr><td>The cap, 3 million km</td><td class="v">28,000 km</td><td>The whole planet</td></tr>
+    <tr><td>L1, 1.5 million km</td><td class="v">14,000 km</td><td>Global level, the split between hemispheres, the seasons</td></tr>
+    <tr><td>Orbit at 10,000 km</td><td class="v">90 km</td><td>Regions and countries</td></tr>
+    <tr><td>Orbit at 1,000 km</td><td class="v">9 km</td><td>Valleys, cities, single farms</td></tr>
+  </tbody>
+</table></div>
+<p>Regional control therefore needs mirrors and shades in Earth orbit, steered toward a target and turned edge-on when not over it. They need the light to reach them, so Earth’s window is widened to cover their orbits. About 10¹⁰ kg of mirrors would do for the example above, since each is over its target about 1% of the time. A first 18 m orbital mirror of this kind, with a footprint of about 5 km, was approved for launch in July 2026.</p>
+<p>Laser light is not bound by the Sun’s size. Sunlight turned into laser light at about 10% and beamed from a 1 km aperture 3 million km away makes a spot 2.44 <i>λd</i>/<i>D</i> ≈ 7 m across at 1 µm. The laser stations sit in the cap, the only part of the swarm that can see Earth; the compute sails beam power to them over the same laser links they already use. Land and sea absorb laser light as well as sunlight, and plants grow under red and blue.</p>
+<figure class="drawing">
+  <div data-draw="lightpaths"></div>
+  <figcaption>Four ways to put light, and rain, on Earth. The window sets the whole planet’s sunlight. Mirrors in Earth orbit, fed through it, light regions. Lasers from stations in the cap light single fields at any hour. And light aimed at the sea, or at the air itself, makes rain where it is wanted.<span class="how">Drawn by the page’s own code.</span></figcaption>
+</figure>
+<h3>What the atmosphere lets you do</h3>
+<ul>
+  <li><b>Temperature: yes, locally.</b> Surface temperature follows the local energy budget. With tens of W/m² a region’s winter can be raised or its summer lowered by several kelvin, down to the scale of a valley. Snow is the catch: it reflects most of the added light, so warming a snowy winter first means melting the snow.</li>
+  <li><b>Summer rain: it can be taken away.</b> Shading land in summer weakens the heating that drives convection and the monsoon’s inflow from the sea. With even global dimming, models show monsoon rain falling 5–7% over North America and East Asia. Shading aimed at land in summer dries summers further. That is the Mediterranean pattern, but summer convective rain is also what the American Midwest, the North China Plain and India farm on.</li>
+  <li><b>Winter rain: it can barely be moved.</b> It needs an ocean upwind and a storm track overhead, and storm tracks are planetary in scale. Changing the gradient from equator to pole by season can shift them, and the subtropical highs, by a few degrees of latitude. It cannot bring ocean storms to an interior 1,000 km from the coast.</li>
+  <li><b>Moisture is conserved.</b> Rain moved to one place is taken from another unless more water is evaporated. Shading one hemisphere moves the tropical rain belt away from it; in the models, that is drought in the Sahel.</li>
+</ul>
+<h3>Making rain</h3>
+<p>The swarm can supply water as well as move it. Evaporating a metre of sea water a year over ten million km² takes 10¹⁶ kg × 2.45 MJ/kg a year, 8×10¹⁴ W, about 2×10⁻¹² of the Sun. Heating the right stretch of ocean upwind puts the moisture where the winds will carry it. To make it fall, a beam at a wavelength the air absorbs, in one of water vapour’s infrared bands, heats a column of air rather than the ground. Warmed a few kelvin, the air rises, cools as it expands and rains out its water: the trigger of an afternoon thunderstorm, placed where it is wanted.</p>
+<p>Weather cannot be forecast beyond about two weeks. For the same reason, small, well-timed inputs can steer a chaotic system, if it is observed completely and the inputs can be placed quickly; that is the basis of chaos control (Ott, Grebogi and Yorke 1990). Nobody has steered weather this way. Physics allows it; climate models have not tested it.</p>
+<h3>Can more land be made Mediterranean?</h3>
+<p>A Mediterranean climate has three ingredients: mild winters, with the coldest month between 0 and 18 °C; a dry summer under the subsiding air of a subtropical high, often over a cold current; and a wet winter, when the storm track swings toward the equator. It occurs naturally on west coasts between 30° and 45°.</p>
+<ul>
+  <li><b>West coasts at 40–55°</b>, such as France and Britain, the Pacific Northwest, southern Chile, Tasmania and New Zealand: plausibly yes. Seasonal shading can push the dry-summer belt a few degrees poleward. Its equatorward edge then dries toward steppe, so unless that edge is compensated the belt moves rather than grows; northern land is wider at 45–55° than at 30–40°, so the area could still grow.</li>
+  <li><b>Continental interiors:</b> only half of it. The temperatures can be made Mediterranean and the summers dried, but the winter rain cannot be supplied by steering. With this much energy, water can: desalinating and pumping 500 mm a year onto ten million km² is about 5×10¹⁵ kg a year, a few terawatts. That is irrigated Mediterranean farming rather than a Mediterranean climate.</li>
+</ul>
+<figure>
+  <div class="pair">
+    <div class="plate"><img src="../renders/europe-today.54a5d77d08.jpg" alt="Western Europe and the Mediterranean from orbit in July" width="2400" height="1600" loading="lazy"></div>
+    <div class="plate"><img src="../renders/europe-mediterranean.6942018ec7.jpg" alt="The same view with the dry-summer belt moved north: France, the Low Countries and southern England golden-brown" width="2400" height="1600" loading="lazy"></div>
+  </div>
+  <figcaption>Europe from 4,000 km in July: today, and with the dry-summer belt pushed about five degrees north, the far end of what shading by latitude and season might do. France, the Low Countries, southern England and western Germany take on the dry gold of today’s Mediterranean; southern Spain and the coast of North Africa turn to steppe.<span class="how">Every field and forest stays where it is: the new belt takes the colour distribution of today’s Mediterranean lands, and the old southern edge that of the steppe south of the Atlas. One plausible outcome of the mechanism, not a climate-model result.</span></figcaption>
+</figure>
+<p>No climate model has run orbital shading controlled at the scale of a country. The studies that exist are global or by latitude: two shades near L1 kept nearly 40% of the surface within 0.1 K of its original climate, against under 10% for a single shade (Sánchez and McInnes 2015, a simple energy-balance model); shading by latitude and season cut the worst-off region’s change in temperature and rain by about 30% (MacMartin et al. 2013); and feedback control at four latitudes held three targets at once (GLENS). Regional outcomes depend on how the circulation responds, which simple models fix and full models disagree on.</p>
+<p>And whoever steers the mirrors holds every country’s weather. One region’s new Mediterranean summer is another’s lost monsoon. The physics makes this possible; it says nothing about who should decide.</p>
+
+<h2 id="habitats">Light for habitats</h2>
+<p>Habitats in space, O’Neill cylinders and the like, can be lit the same two ways. Near Earth’s orbit each can have a window of its own, wide enough that the habitat sees the whole Sun through it: about 70,000 km across at Earth’s distance. A million such windows would let out 1.5% of the Sun.</p>
+<p>Farther out that stops working, because the window must grow with the gap between the habitat and the sphere: 520,000 km across at Mars’s distance, 1.1 million km at Jupiter’s. A million habitats at Jupiter’s distance would need four times as much window as the sphere has sky, and would still get only a twenty-seventh of Earth’s sunlight.</p>
+<p>So the swarm sends them power instead. A laser beam does not spread with the Sun’s half-degree width: a transmitter 10 km across lands a beam 150 m wide at Jupiter’s distance and 1.5 km wide at 40 AU. Each habitat turns the beam back into daylight with lamps tuned to the spectrum its people and crops want, and sets its own days, seasons and weather. A large cylinder, 8 km across and 32 km long, needs about 10¹¹ W of daylight; a million of them, about 10¹⁷ W, which after the losses of converting sunlight to electricity, to laser light and back is a few billionths of the Sun.</p>
+
+<h2 id="open">Open questions</h2>
+<ul>
+  <li><b>A climate-model ensemble</b> for this kind of forcing: infrared added from the sunward sky, sunlight removed by day, peaking at 8.6 W/m² for a century, then regional shading on top.</li>
+  <li><b>Cosmic rays without a heliosphere:</b> the dose at the surface and at flight altitudes, by latitude.</li>
+  <li><b>Switchable infrared fronts</b> at swarm scale, and their emissivity over centuries.</li>
+  <li><b>Governance</b> of a climate that can be set.</li>
+</ul>
+
+<section class="sources">
+  <h2>Sources and code</h2>
+  <ul>
+    <li>Project notes: <code>docs/closed-swarm.md</code>, <code>docs/full-swarm.md</code>, <code>docs/earth.md</code>; studies <code>docs/data/earth_safe.json</code> and <code>earth_safe_skeptic.json</code>.</li>
+    <li>Model: <code>src/model/hybrid.js</code> (<code>earthForcing</code>, <code>skyLux</code>, <code>discGroundFactor</code>, <code>FIXED.rainPerW</code>, <code>polarPerW</code>, <code>capIR</code>); renders <code>render/sky_map.py</code>.</li>
+    <li>Kravitz et al., the Geoengineering Model Intercomparison Project (GeoMIP), and Tilmes et al. (2013) on the hydrological response to solar reduction.</li>
+    <li>Sánchez and McInnes (2015), “Optimal sunshade configurations for space-based geoengineering near the Sun–Earth L1 point”, PLOS ONE.</li>
+    <li>MacMartin, Keith, Kravitz and Caldeira (2013), “Management of trade-offs in geoengineering through optimal choice of non-uniform radiative forcing”, Nature Climate Change 3.</li>
+    <li>Tilmes et al. (2018), the Geoengineering Large Ensemble (GLENS), CESM.</li>
+    <li>NCAR (2013), geoengineering and monsoon rainfall; Haywood et al. (2013), Sahel drought under hemispheric aerosol forcing.</li>
+    <li>Ott, Grebogi and Yorke (1990), “Controlling chaos”, Physical Review Letters 64.</li>
+    <li>Sky &amp; Telescope (2026), Reflect Orbital’s space mirrors approved for launch.</li>
+    <li>O’Neill (1974), “The colonization of space”, Physics Today 27.</li>
+  </ul>
+</section>
+<nav class="onward" id="onward"></nav>
+</article>
+</div>
+<script type="module" src="notes.9988ee64e6.js"></script>
+</body>
+</html>
