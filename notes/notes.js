@@ -190,6 +190,22 @@ const CHARTS = {
       legend: false,
     });
   },
+  // Lighting habitats: the window each would need, against a laser beam's spot, by distance.
+  habitats(el) {
+    const AU = 1.496e8, xs = range(Math.log(1), Math.log(40), 100).map(Math.exp);   // km
+    const win = R => 2 * (4 + (R - 0.95) * AU * Math.tan((0.2665 * Math.PI) / 180 / R));   // across, for an 8 km habitat
+    const spot = R => (2.44 * 1e-6 * (R - 0.95) * AU * 1e3) / 1e4 / 1e3;                     // km, 10 km transmitter, 1 µm
+    lineChart(el, {
+      x: { min: 1, max: 40, log: true, ticks: [1, 1.5, 5.2, 10, 40], fmt: v => (v === 1.5 ? 'Mars' : v === 5.2 ? 'Jupiter' : `${v} AU`), title: 'the habitat’s distance from the Sun' },
+      y: { min: 0.01, max: 3e6, log: true, ticks: [0.01, 0.1, 1, 10, 100, 1e3, 1e4, 1e5, 1e6], fmt: v => (v >= 1e3 ? `10${sup(Math.round(Math.log10(v)))} km` : `${v} km`), title: 'Size, km' },
+      series: [
+        { pts: xs.map(R => [R, win(R)]), color: 'var(--sun)', label: 'A window to see the whole Sun', end: { text: 'window, across', at: 20 } },
+        { pts: xs.map(R => [R, spot(R)]), color: 'var(--swarm)', label: 'A laser beam from a 10 km transmitter', dash: true, end: { text: 'laser spot', at: 20 } },
+      ],
+      hlines: [{ y: 8, label: 'an O’Neill cylinder, 8 km across', left: true }],
+      tip: R => `${lead(`${R.toFixed(1)} AU`)}<br>window ${Math.round(win(R)).toLocaleString('en')} km across<br>laser spot ${spot(R) < 1 ? `${Math.round(spot(R) * 1000)} m` : `${spot(R).toFixed(1)} km`}`,
+    });
+  },
   // Mass of the swarm per watt of chips against the share of chip power put in pods.
   podShare(el) {
     const qs = range(0, 0.3, 60);

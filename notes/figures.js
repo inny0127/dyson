@@ -512,4 +512,87 @@ export const FIGURES = {
       return s;
     }));
   },
+
+  // ---------------------------------------------------------------- Earth
+  /** What each line of sight from Earth meets, drawn to true scale. */
+  whatEarthSees(el) {
+    const sx = 190, sy = 210, k = 165;                     // px per AU, true scale
+    const pt = (r, deg) => [sx + r * k * Math.cos((deg * Math.PI) / 180), sy - r * k * Math.sin((deg * Math.PI) / 180)];
+    const [ex, ey] = pt(1, 0);
+    put(el, svg(720, 420, 'Left, to true scale: a line of sight from Earth 45 degrees from the Sun passes the mirrors and crosses the hollow sphere to its far side. Right, Earth’s sky toward the Sun: within 72 degrees of the Sun lines end on the far side’s sunlit sails, which glow while the sphere is open; from 72 to 78 degrees only the mirrors; beyond, the open sky', id => {
+      let s = '';
+      // left: true-scale cross-section with one line of sight
+      const arc = (r, a0, a1, o) => { const [x0, y0] = pt(r, a0), [x1, y1] = pt(r, a1); return Path(`M${x0.toFixed(1)},${y0.toFixed(1)} A${r * k},${r * k} 0 ${Math.abs(a1 - a0) > 180 ? 1 : 0} 0 ${x1.toFixed(1)},${y1.toFixed(1)}`, o); };
+      s += arc(0.95, 23, 337, { stroke: 'swarm', sw: 3 }) + arc(0.98, -23, 23, { stroke: 'ink2', sw: 3 });
+      s += Circ(sx, sy, 6, { fill: 'sun', stroke: 'none' }) + T(sx, sy + 20, 'Sun', { a: 'middle', c: 'sun', sz: 11.5, w: 500 });
+      s += Ln(ex, ey, sx + 8, sy, { c: 'sun', w: 1, dash: '3 4' });
+      // a ray at 45° from the Sun direction, to the far side of the shell
+      const d = [-Math.cos(Math.PI / 4), -Math.sin(Math.PI / 4)], ox = ex - sx, oy = ey - sy, R = 0.95 * k, b = ox * d[0] + oy * d[1], t = -b + Math.sqrt(b * b - (ox * ox + oy * oy - R * R));
+      s += Ln(ex, ey, ex + t * d[0], ey + t * d[1], { c: 'swarm', w: 1.6 }) + Circ(ex + t * d[0], ey + t * d[1], 4, { fill: 'swarm', stroke: 'none' });
+      s += T(ex + t * d[0] + 10, ey + t * d[1] - 6, 'far side: sunlit sails', { c: 'swarm', sz: 11.5, w: 500 });
+      s += Circ(ex, ey, 4, { fill: 'earth', stroke: 'none' }) + T(ex + 8, ey + 18, 'Earth', { c: 'earth', w: 600, sz: 11.5 });
+      s += T(ex - 14, ey - 74, 'mirrors', { a: 'end', sz: 11.5, halo: true });
+      s += T(20, 404, 'Left: true scale. Right: Earth’s sky on the Sun’s side.', { c: 'ink3', sz: 11.5 });
+      // right: the sky from Earth, angles from the Sun's direction
+      const cx = 600, cy = 330, r = 210;
+      const wedge = (a0, a1, fill, op) => { const p = a => [cx - r * Math.cos((a * Math.PI) / 180), cy - r * Math.sin((a * Math.PI) / 180)]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return Path(`M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z`, { fill, stroke: 'none', op }); };
+      s += wedge(0, 71.8, 'swarm', 0.22) + wedge(71.8, 78.5, 'ink3', 0.35) + wedge(78.5, 110, 'var(--wash)', 1);
+      const ray = a => [cx - r * Math.cos((a * Math.PI) / 180), cy - r * Math.sin((a * Math.PI) / 180)];
+      for (const a of [71.8, 78.5]) { const [x, y] = ray(a); s += Ln(cx, cy, x, y, { c: 'ink3', w: 0.8 }); }
+      s += Circ(cx - r - 10, cy, 7, { fill: 'sun', stroke: 'none' }) + T(cx - r - 10, cy + 22, 'toward the Sun', { a: 'middle', c: 'sun', sz: 11.5 });
+      s += Circ(cx, cy, 4, { fill: 'earth', stroke: 'none' }) + T(cx + 8, cy + 18, 'you, on Earth', { c: 'earth', sz: 11.5, w: 500 });
+      const lab = (a, lines, c = 'ink') => { const [x, y] = [cx - 0.62 * r * Math.cos((a * Math.PI) / 180), cy - 0.62 * r * Math.sin((a * Math.PI) / 180)]; lines.forEach((ln, i) => { s += T(x, y + i * 14, ln, { a: 'middle', c: i ? 'ink2' : c, w: i ? 400 : 600, sz: 11.5, halo: true }); }); };
+      lab(36, ['0–72°', 'the far side glows', 'black once closed'], 'swarm');
+      const [qx, qy] = ray(75); s += Ln(qx, qy, qx - 30, qy - 26, { c: 'ink3', w: 0.75 }) + T(qx - 34, qy - 40, '72–78°', { a: 'end', c: 'ink', w: 600, sz: 11.5 }) + T(qx - 34, qy - 26, 'mirrors only', { a: 'end', sz: 11.5 });
+      lab(96, ['beyond 78°', 'open sky']);
+      return s;
+    }));
+  },
+
+  /** Why reflected sunlight cannot be focused smaller than the Sun's angle allows. */
+  etendue(el) {
+    put(el, svg(720, 270, 'A mirror reflecting sunlight onto the ground: light from the two edges of the Sun’s disc arrives half a degree apart, so the reflected beam spreads by half a degree and the spot on the ground is at least the distance times 0.0093', id => {
+      let s = '';
+      const mx = 260, my = 70, gy = 230;
+      s += Circ(60, 50, 26, { fill: 'sun', stroke: 'none', op: 0.85 }) + T(60, 96, 'the Sun, 0.53° wide', { a: 'middle', c: 'sun', sz: 11.5, w: 500 });
+      s += Ln(60, 24, mx, my, { c: 'sun', w: 1.2 }) + Ln(60, 76, mx, my, { c: 'sun', w: 1.2 });
+      s += Path(`M${mx - 26},${my - 10} L${mx + 26},${my + 10}`, { stroke: 'ink', sw: 4 }) + T(mx + 20, my - 16, 'a mirror in orbit', { c: 'ink', w: 500 });
+      s += Ln(mx, my, mx - 40, gy, { c: 'sun', w: 1.2 }) + Ln(mx, my, mx + 40, gy, { c: 'sun', w: 1.2 });
+      s += Path(`M${mx - 40},${gy} L${mx + 40},${gy}`, { stroke: 'sun', sw: 6 });
+      s += Ln(20, gy, 700, gy, { c: 'ink3', w: 1 }) + T(30, gy + 20, 'the ground', { sz: 11.5 });
+      s += Ln(mx + 60, my, mx + 60, gy, { c: 'ink3', w: 1, arrow: id, both: true }) + T(mx + 68, (my + gy) / 2, 'height d', { sz: 11.5 });
+      s += T(mx, gy + 22, 'spot ≥ 0.0093 d', { a: 'middle', c: 'ink', w: 600 });
+      const rows = [['from the mirrors, 3 million km', '28,000 km'], ['from L1, 1.5 million km', '14,000 km'], ['from 10,000 km up', '90 km'], ['from 1,000 km up', '9 km']];
+      s += T(440, 64, 'Smallest spot of reflected sunlight', { c: 'ink', w: 600 });
+      rows.forEach(([a, b], i) => { s += T(440, 90 + i * 22, a, { sz: 11.5 }) + T(700, 90 + i * 22, b, { a: 'end', c: 'ink', w: 600, sz: 11.5 }); });
+      s += T(440, 196, 'A laser has no such limit: from 3 million km,', { sz: 11.5 }) + T(440, 211, 'a 1 km beam director makes a 7 m spot.', { sz: 11.5 });
+      return s;
+    }));
+  },
+
+  /** Making rain: warm the sea upwind, then trigger the rain where it is wanted. */
+  rainMaking(el) {
+    put(el, svg(720, 290, 'Making rain in two steps: a beam warms the sea so that more water evaporates and the wind carries the moist air inland; there, a beam at a wavelength water vapour absorbs heats a column of air, which rises, cools and rains', id => {
+      let s = '';
+      const gy = 230;
+      s += Rect(20, gy, 300, 40, { fill: 'earth', stroke: 'none', op: 0.25 }) + T(40, gy + 26, 'the sea', { c: 'earth', w: 500 });
+      s += Path(`M320,${gy} L700,${gy} L700,270 L320,270 Z`, { fill: 'ink3', stroke: 'none', op: 0.25 }) + T(680, gy + 26, 'land', { a: 'end', c: 'ink', w: 500 });
+      // beam 1 onto the sea
+      s += Ln(120, 10, 150, gy - 4, { c: 'sun', w: 3, arrow: id }) + T(128, 26, '1. light warms the sea', { c: 'sun', w: 600, sz: 11.5 });
+      for (const dx of [130, 160, 190]) s += Path(`M${dx},${gy - 6} q-8,-20 0,-40 q8,-20 0,-40`, { stroke: 'earth', sw: 1.4, dash: '3 3' });
+      s += T(200, 150, 'more water evaporates', { c: 'earth', sz: 11.5 });
+      // wind carries it inland
+      s += Ln(230, 110, 420, 110, { c: 'ink2', w: 2, arrow: id }) + T(325, 100, 'the wind carries it inland', { a: 'middle', sz: 11.5 });
+      // beam 2: infrared heats the air column
+      s += Rect(470, 70, 60, gy - 70, { fill: 'heat', stroke: 'none', op: 0.12 });
+      s += Ln(560, 10, 512, 150, { c: 'heat', w: 3, arrow: id }) + T(712, 22, '2. infrared that the air absorbs', { a: 'end', c: 'heat', w: 600, sz: 11.5, halo: true }) + T(712, 37, 'warms a column a few degrees', { a: 'end', c: 'heat', sz: 11.5 });
+      s += Ln(500, 200, 500, 80, { c: 'ink', w: 2, arrow: id }) + T(458, 176, 'it rises', { a: 'end', sz: 11.5 }) + T(458, 191, 'and cools', { a: 'end', sz: 11.5 });
+      // cloud and rain
+      s += Path('M455,72 q10,-26 35,-18 q14,-22 40,-6 q26,-4 26,20 q-2,16 -26,14 l-58,0 q-24,0 -17,-10 z', { fill: 'var(--wash)', stroke: 'ink2', sw: 1.4 });
+      for (const dx of [470, 490, 510, 530]) s += Ln(dx, 92, dx - 6, 116, { c: 'earth', w: 1.6 });
+      s += T(556, 128, 'rain, where', { c: 'earth', w: 600, sz: 11.5 }) + T(556, 143, 'it is wanted', { c: 'earth', w: 600, sz: 11.5 });
+      s += T(20, 286, 'A metre of rain a year over ten million km² takes about 8×10¹⁴ W, two trillionths of the Sun.', { c: 'ink3', sz: 11.5 });
+      return s;
+    }));
+  },
 };
